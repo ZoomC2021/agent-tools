@@ -46,9 +46,19 @@ Fetch all comments from a GitHub PR, summarize issues, and generate a detailed i
    - Branch: {branch_name}
 
    ## Setup
+   Create an isolated worktree for this PR (allows parallel work on multiple PRs):
    ```bash
-   gh pr checkout {PR_NUMBER}
+   # Get the PR branch name
+   PR_BRANCH=$(gh pr view {PR_NUMBER} --json headRefName -q .headRefName)
+
+   # Create worktree in sibling directory
+   git worktree add ../pr-{PR_NUMBER} "$PR_BRANCH"
+
+   # Change to the worktree directory
+   cd ../pr-{PR_NUMBER}
    ```
+
+   **Working directory:** `../pr-{PR_NUMBER}`
 
    ## Issues to Address
 
@@ -80,11 +90,18 @@ Fetch all comments from a GitHub PR, summarize issues, and generate a detailed i
    {type check / build / test commands}
    ```
 
-   ## Commit
+   ## Commit and Push
    ```bash
    git add -A
    git commit -m "Address PR review feedback"
    git push
+   ```
+
+   ## Cleanup
+   After pushing, remove the worktree:
+   ```bash
+   cd ..
+   git worktree remove pr-{PR_NUMBER}
    ```
    ```
 

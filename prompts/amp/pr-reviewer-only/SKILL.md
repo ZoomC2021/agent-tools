@@ -104,10 +104,19 @@ Output a detailed, self-contained prompt that a less capable coding agent can fo
 - Branch: {branch_name}
 
 ## Setup
-First checkout the PR branch:
+Create an isolated worktree for this PR (allows parallel work on multiple PRs):
 ```bash
-gh pr checkout {PR_NUMBER}
+# Get the PR branch name
+PR_BRANCH=$(gh pr view {PR_NUMBER} --json headRefName -q .headRefName)
+
+# Create worktree in sibling directory
+git worktree add ../pr-{PR_NUMBER} "$PR_BRANCH"
+
+# Change to the worktree directory
+cd ../pr-{PR_NUMBER}
 ```
+
+**Working directory:** `../pr-{PR_NUMBER}`
 
 ## Issues to Address
 
@@ -141,11 +150,18 @@ After making changes, run:
 {type check / build / test commands}
 ```
 
-## Commit
+## Commit and Push
 ```bash
 git add -A
 git commit -m "Address PR review feedback"
 git push
+```
+
+## Cleanup
+After pushing, remove the worktree:
+```bash
+cd ..
+git worktree remove pr-{PR_NUMBER}
 ```
 ```
 

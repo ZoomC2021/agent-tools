@@ -1,79 +1,46 @@
-# Code Review
+---
+description: Review uncommitted changes for issues, regressions, and optimization opportunities
+---
 
-Review all uncommitted changes in the current repository.
+# Review
 
-## Step 1: Get Uncommitted Changes
+Review uncommitted changes for issues, regressions, and optimization opportunities.
 
-Run these commands to see what has changed:
+## Step 1: Get Changes
 
 ```bash
-git diff HEAD
+git diff
 git diff --cached
-git status --short
 ```
 
-## Step 2: Analyze Each Changed File
+## Step 2: Analyze Changes
 
-For each modified file:
-- Read the full file for context (not just the diff)
-- Understand the purpose of the changes
-- Check imports and dependencies affected
+Review for:
+- **Bugs**: Logic errors, off-by-one, null checks
+- **Security**: Exposed secrets, injection vulnerabilities, auth issues
+- **Performance**: N+1 queries, unnecessary loops, memory leaks
+- **Style**: Naming, formatting, code organization
+- **Tests**: Missing test coverage for new code
 
-## Step 3: Check for Issues
+## Step 3: Present Findings
 
-Look for:
-- Logic errors or bugs introduced
-- Edge cases not handled
-- Null/undefined access risks
-- Error handling gaps
-- Type safety issues
-- Security vulnerabilities (exposed secrets, injection risks)
+| # | File:Line | Severity | Issue | Suggestion |
 
-## Step 4: Check for Regressions
+Severity levels:
+- 🔴 Critical: Must fix before commit
+- 🟠 Warning: Should address
+- 🟡 Note: Consider improving
 
-Identify:
-- Breaking changes to existing APIs or contracts
-- Removed functionality that may be needed
-- Changed behavior that could affect callers
-- Test coverage for modified code paths
+## Step 4: Recommendations
 
-## Step 5: Optimize Implementation
+Provide:
+- Specific line-by-line feedback
+- Suggested fixes for critical issues
+- Questions about unclear code
 
-Find opportunities for:
-- Redundant code that can be removed
-- Duplicate logic that should be consolidated
-- Unnecessary complexity that can be simplified
-- Performance issues (N+1 queries, excessive loops, memory leaks)
-- Better patterns or idioms available in the codebase
+## Notes
 
-## Step 6: Verify Code Quality
-
-Run lint and build commands to check for errors.
-
-## Step 7: Fix Simple Issues
-
-If there are only a few issues (≤5) or they are straightforward:
-- Apply the fixes directly without asking
-- Examples: missing null checks, unused imports, simple typos
-
-For complex issues requiring design decisions: report and recommend
-
-## Step 8: Report Findings
-
-Group by severity:
-- 🔴 Critical
-- 🟠 Warning
-- 🟡 Suggestion
-
-Format:
-```markdown
-✅ Fixed: [Category] filename:line
-   Was: <description>
-   Now: <what was changed>
-
-🔴/🟠/🟡 [Category] filename:line
-   Problem: <description>
-   Fix: <recommendation>
-```
-
-End with summary: fixed count, remaining issues by severity, overall assessment.
+- Focus on substantive issues over style nitpicks
+- Consider the context of the change
+- Suggest improvements, don't just criticize
+- Check for missing error handling

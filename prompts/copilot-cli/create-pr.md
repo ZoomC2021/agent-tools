@@ -1,115 +1,57 @@
+---
+description: Create a pull request from current git changes with auto-generated title and description
+---
+
 # Create PR
 
 Create a pull request from current git changes with an auto-generated title and description.
 
-## Workflow
+## Step 1: Check Current State
 
-1. **Check current state**
-   ```bash
-   git status --short
-   git branch --show-current
-   ```
-   
-   Verify:
-   - There are changes to commit (staged or unstaged)
-   - Not on main/master branch (create feature branch if needed)
+```bash
+git status
+git branch --show-current
+```
 
-2. **If on main/master, create feature branch**
-   ```bash
-   git diff --name-only HEAD
-   ```
-   
-   Generate a descriptive branch name from the changes (e.g., `feat/add-user-auth`, `fix/null-pointer-error`).
-   
-   ```bash
-   git checkout -b <branch-name>
-   ```
+## Step 2: Review Changes
 
-3. **Stage all changes**
-   ```bash
-   git add -A
-   ```
+```bash
+git diff --stat
+git log origin/main..HEAD --oneline
+```
 
-4. **Analyze changes for commit message**
-   ```bash
-   git diff --cached --stat
-   git diff --cached
-   ```
-   
-   Generate a conventional commit message:
-   - Type: `feat`, `fix`, `refactor`, `docs`, `style`, `test`, `chore`
-   - Scope: affected component/area (optional)
-   - Subject: imperative, lowercase, no period
-   - Body: what and why (not how)
+## Step 3: Generate PR Title
 
-5. **Commit changes**
-   ```bash
-   git commit -m "<type>(<scope>): <subject>
+Create a concise title based on the commits:
+- Use conventional commit format if the project uses it
+- Keep under 72 characters
+- Be specific about what changed
 
-   <body>"
-   ```
+## Step 4: Generate PR Description
 
-6. **Push branch to origin**
-   ```bash
-   git push -u origin HEAD
-   ```
+Include:
+- **Summary**: What this PR does
+- **Changes**: Bullet list of key changes
+- **Testing**: How it was tested
+- **Related**: Link to related issues if any
 
-7. **Generate PR title and description**
-   
-   Analyze the commits on this branch vs main:
-   ```bash
-   git log main..HEAD --oneline
-   git diff main..HEAD --stat
-   ```
-   
-   **PR Title**: Clear, concise summary (use conventional commit style if single commit)
-   
-   **PR Description** template:
-   ```markdown
-   ## Summary
-   <1-2 sentence overview of changes>
+## Step 5: Create the PR
 
-   ## Changes
-   - <bullet point per logical change>
+```bash
+gh pr create --title "{title}" --body "{description}"
+```
 
-   ## Testing
-   - <how changes were tested, or "Needs testing">
+## Step 6: Report
 
-   ## Related Issues
-   - <link to issues if mentioned in commits, or "N/A">
-   ```
-
-8. **Create the PR**
-   ```bash
-   gh pr create --title "<title>" --body "<description>"
-   ```
-   
-   Or for draft PR:
-   ```bash
-   gh pr create --title "<title>" --body "<description>" --draft
-   ```
-
-9. **Report result**
-   ```
-   ✅ PR created successfully
-   
-   Branch: <branch-name>
-   PR: <pr-url>
-   Title: <title>
-   
-   Commits: X
-   Files changed: Y
-   ```
-
-## Options
-
-- "draft" → create as draft PR
-- branch name → use specified branch name
-- PR title → use as PR title instead of auto-generating
+```
+✅ PR created: {url}
+   Title: {title}
+   Base: {base_branch}
+   Head: {head_branch}
+```
 
 ## Notes
 
-- Always run build/lint checks before creating PR if commands are available
-- If there are uncommitted changes AND existing commits, commit the changes first
-- Never force push or modify history on shared branches
-- If PR already exists for this branch, report the existing PR URL instead
+- Always ensure the branch is pushed before creating PR
+- Use draft PRs for work in progress
+- Add reviewers if specified in project conventions
