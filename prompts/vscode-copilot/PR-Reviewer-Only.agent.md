@@ -32,10 +32,25 @@ Fetch all comments from a GitHub PR, summarize issues, and generate a detailed i
    - 🟡 Nitpicks (style, minor)
    - 💬 Questions/Discussion
 
-5. **Read referenced files**
-   For each issue, read the referenced file to understand the full context.
+5. **Create worktree to read PR code**
+   Create a temporary worktree to access the PR's current code:
+   ```bash
+   PR_BRANCH=$(gh pr view {PR_NUMBER} --json headRefName -q .headRefName)
+   git worktree add ../pr-{PR_NUMBER}-review "$PR_BRANCH"
+   cd ../pr-{PR_NUMBER}-review
+   ```
 
-6. **Generate implementation prompt**
+6. **Read referenced files**
+   For each issue, read the referenced file from the worktree to understand the full context. Extract the relevant code snippets to include in the implementation prompt.
+
+7. **Cleanup review worktree**
+   After reading all files, remove the temporary worktree:
+   ```bash
+   cd -
+   git worktree remove ../pr-{PR_NUMBER}-review
+   ```
+
+8. **Generate implementation prompt**
    Output a detailed, self-contained prompt for another agent:
 
    ```markdown
@@ -105,7 +120,7 @@ Fetch all comments from a GitHub PR, summarize issues, and generate a detailed i
    ```
    ```
 
-7. **Prompt quality guidelines**
+9. **Prompt quality guidelines**
    The prompt must be:
    - **Self-contained**: No searching for context
    - **Explicit**: No ambiguity
@@ -113,7 +128,7 @@ Fetch all comments from a GitHub PR, summarize issues, and generate a detailed i
    - **Verified**: Exact file paths and lines
    - **Actionable**: Clear before/after expectations
 
-8. **Output format**
+10. **Output format**
    Present the final prompt in a fenced code block for easy copying.
 
 ## Notes

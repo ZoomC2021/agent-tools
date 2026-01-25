@@ -81,11 +81,30 @@ Group by:
 - 🟡 Nitpicks (style, minor)
 - 💬 Questions/Discussion
 
-## Step 5: Read Referenced Files
+## Step 5: Create Worktree to Read PR Code
 
-For each issue, read the referenced file to understand the full context. This is essential for generating accurate implementation instructions.
+Create a temporary worktree to access the PR's current code:
 
-## Step 6: Generate Implementation Prompt
+```bash
+PR_BRANCH=$(gh pr view {PR_NUMBER} --json headRefName -q .headRefName)
+git worktree add ../pr-{PR_NUMBER}-review "$PR_BRANCH"
+cd ../pr-{PR_NUMBER}-review
+```
+
+## Step 6: Read Referenced Files
+
+For each issue, read the referenced file from the worktree to understand the full context. Extract the relevant code snippets to include in the implementation prompt.
+
+## Step 7: Cleanup Review Worktree
+
+After reading all files, remove the temporary worktree:
+
+```bash
+cd -
+git worktree remove ../pr-{PR_NUMBER}-review
+```
+
+## Step 8: Generate Implementation Prompt
 
 Output a detailed, self-contained prompt that a less capable coding agent can follow to resolve all issues. The prompt must include:
 
@@ -160,7 +179,7 @@ git worktree remove pr-{PR_NUMBER}
 ```
 ```
 
-## Step 7: Prompt Quality Guidelines
+## Step 9: Prompt Quality Guidelines
 
 The generated prompt must be:
 - **Self-contained**: Agent should not need to search for context
@@ -174,7 +193,7 @@ The generated prompt must be:
 - Flag security issues prominently
 - Note when human feedback contradicts bot suggestions
 
-## Step 8: Output Format
+## Step 10: Output Format
 
 Present the final prompt in a fenced code block so it can be easily copied and passed to another agent.
 
