@@ -155,7 +155,15 @@ install_kilocode() {
     log_info "Installing Kilo Code prompts..."
     local dest="$HOME/.kilocode/prompts"
     mkdir -p "$dest"
-    cp "$PROMPTS_DIR/kilocode/"*.md "$dest/"
+    # Enable nullglob to handle case where no .md files exist
+    shopt -s nullglob
+    local files=("$PROMPTS_DIR/kilocode"/*.md)
+    shopt -u nullglob
+    if [[ ${#files[@]} -eq 0 ]]; then
+        log_warn "No .md files found in $PROMPTS_DIR/kilocode/"
+        return 0
+    fi
+    cp "$PROMPTS_DIR/kilocode"/*.md "$dest/"
     log_success "Kilo Code: $dest"
 }
 

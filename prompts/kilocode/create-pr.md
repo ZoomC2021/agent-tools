@@ -55,12 +55,13 @@ Create a pull request from current git changes with an auto-generated title and 
    ```
 
 7. **Generate PR title and description**
-   
-   Analyze the commits on this branch vs main:
-   ```bash
-   git log main..HEAD --oneline
-   git diff main..HEAD --stat
-   ```
+    
+    Analyze the commits on this branch vs default branch:
+    ```bash
+    DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
+    git log "$DEFAULT_BRANCH"..HEAD --oneline
+    git diff "$DEFAULT_BRANCH"..HEAD --stat
+    ```
    
    **PR Title**: Clear, concise summary (use conventional commit style if single commit)
    

@@ -174,8 +174,8 @@ git push
 ## Cleanup
 After pushing, remove the worktree:
 ```bash
-cd ..
-git worktree remove pr-{PR_NUMBER}
+cd -
+git worktree remove ../pr-{PR_NUMBER}
 ```
 ```
 
