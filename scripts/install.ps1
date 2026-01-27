@@ -38,6 +38,17 @@ function Install-VSCodeCopilot {
     }
 }
 
+function Install-Cursor {
+    Write-Info "Installing Cursor commands..."
+    
+    $SourceDir = Join-Path $PromptsDir "cursor"
+    $Dest = Join-Path $env:USERPROFILE ".cursor\commands"
+    
+    New-Item -ItemType Directory -Path $Dest -Force | Out-Null
+    Copy-Item "$SourceDir\*.md" -Destination $Dest -Force
+    Write-Success "Cursor: $Dest"
+}
+
 Write-Host ""
 Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host "       Agent Tools Installer (Windows)"
@@ -45,6 +56,7 @@ Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host ""
 
 Install-VSCodeCopilot
+Install-Cursor
 
 Write-Host ""
 Write-Host "==========================================" -ForegroundColor Cyan

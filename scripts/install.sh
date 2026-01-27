@@ -150,6 +150,15 @@ install_gemini() {
     log_success "Gemini CLI: $dest/GEMINI.md"
 }
 
+# Install Cursor commands
+install_cursor() {
+    log_info "Installing Cursor commands..."
+    local dest="$HOME/.cursor/commands"
+    mkdir -p "$dest"
+    cp "$PROMPTS_DIR/cursor/"*.md "$dest/"
+    log_success "Cursor (global): $dest"
+}
+
 # Main installation
 main() {
     echo ""
@@ -166,6 +175,7 @@ main() {
     install_copilot_cli
     install_amp
     install_gemini
+    install_cursor
     
     echo ""
     echo "=========================================="
@@ -198,6 +208,7 @@ else
             copilot-cli) install_copilot_cli ;;
             amp) install_amp ;;
             gemini) install_gemini ;;
+            cursor) install_cursor ;;
             *) log_error "Unknown agent: $agent" ;;
         esac
     done
