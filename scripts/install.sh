@@ -176,6 +176,25 @@ install_cursor() {
     log_success "Cursor (global): $dest"
 }
 
+# Install Cline rules
+install_cline() {
+    log_info "Installing Cline rules..."
+    
+    # Linux path
+    local linux_dest="$HOME/Documents/Cline/Rules"
+    mkdir -p "$linux_dest"
+    cp "$PROMPTS_DIR/cline/"*.md "$linux_dest/"
+    log_success "Cline (Linux): $linux_dest"
+    
+    # macOS path
+    if [[ "$OS" == "macos" ]]; then
+        local macos_dest="$HOME/Documents/Cline/Rules"
+        mkdir -p "$macos_dest"
+        cp "$PROMPTS_DIR/cline/"*.md "$macos_dest/"
+        log_success "Cline (macOS): $macos_dest"
+    fi
+}
+
 # Main installation
 main() {
     echo ""
@@ -194,6 +213,7 @@ main() {
     install_gemini
     install_kilocode
     install_cursor
+    install_cline
     
     echo ""
     echo "=========================================="
@@ -228,6 +248,7 @@ else
             gemini) install_gemini ;;
             kilocode) install_kilocode ;;
             cursor) install_cursor ;;
+            cline) install_cline ;;
             *) log_error "Unknown agent: $agent" ;;
         esac
     done

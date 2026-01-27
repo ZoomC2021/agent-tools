@@ -25,6 +25,7 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 | [Gemini CLI](https://github.com/google-gemini/gemini-cli) | CLI | `~/.gemini/GEMINI.md` |
 | [Kilo Code](https://kilocode.com) | CLI | `~/.kilocode/prompts/` |
 | [Cursor](https://cursor.com) | Editor | `~/.cursor/commands/` |
+| [Cline](https://cline.bot) | Editor | `~/Documents/Cline/Rules/` |
 
 ## Quick Install
 
@@ -42,7 +43,7 @@ cd agent-tools
 ./scripts/install.sh claude codex amp
 ```
 
-Available options: `claude`, `codex`, `opencode`, `antigravity`, `vscode`, `copilot-cli`, `amp`, `gemini`, `kilocode`, `cursor`
+Available options: `claude`, `codex`, `opencode`, `antigravity`, `vscode`, `copilot-cli`, `amp`, `gemini`, `kilocode`, `cursor`, `cline`
 
 ## Manual Installation
 
@@ -144,6 +145,15 @@ cp prompts/cursor/*.md ~/.cursor/commands/
 ```
 </details>
 
+<details>
+<summary>Cline</summary>
+
+```bash
+mkdir -p ~/Documents/Cline/Rules
+cp prompts/cline/*.md ~/Documents/Cline/Rules/
+```
+</details>
+
 ### Ubuntu/Linux
 
 <details>
@@ -238,6 +248,15 @@ cp prompts/kilocode/*.md ~/.kilocode/prompts/
 ```bash
 mkdir -p ~/.cursor/commands
 cp prompts/cursor/*.md ~/.cursor/commands/
+```
+</details>
+
+<details>
+<summary>Cline</summary>
+
+```bash
+mkdir -p ~/Documents/Cline/Rules
+cp prompts/cline/*.md ~/Documents/Cline/Rules/
 ```
 </details>
 
