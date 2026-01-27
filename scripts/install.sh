@@ -150,6 +150,15 @@ install_gemini() {
     log_success "Gemini CLI: $dest/GEMINI.md"
 }
 
+# Install Kilo Code prompts
+install_kilocode() {
+    log_info "Installing Kilo Code prompts..."
+    local dest="$HOME/.kilocode/prompts"
+    mkdir -p "$dest"
+    cp "$PROMPTS_DIR/kilocode/"*.md "$dest/"
+    log_success "Kilo Code: $dest"
+}
+
 # Main installation
 main() {
     echo ""
@@ -166,6 +175,7 @@ main() {
     install_copilot_cli
     install_amp
     install_gemini
+    install_kilocode
     
     echo ""
     echo "=========================================="
@@ -198,6 +208,7 @@ else
             copilot-cli) install_copilot_cli ;;
             amp) install_amp ;;
             gemini) install_gemini ;;
+            kilocode) install_kilocode ;;
             *) log_error "Unknown agent: $agent" ;;
         esac
     done
