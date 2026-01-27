@@ -167,6 +167,15 @@ install_kilocode() {
     log_success "Kilo Code: $dest"
 }
 
+# Install Cursor commands
+install_cursor() {
+    log_info "Installing Cursor commands..."
+    local dest="$HOME/.cursor/commands"
+    mkdir -p "$dest"
+    cp "$PROMPTS_DIR/cursor/"*.md "$dest/"
+    log_success "Cursor (global): $dest"
+}
+
 # Main installation
 main() {
     echo ""
@@ -184,6 +193,7 @@ main() {
     install_amp
     install_gemini
     install_kilocode
+    install_cursor
     
     echo ""
     echo "=========================================="
@@ -217,6 +227,7 @@ else
             amp) install_amp ;;
             gemini) install_gemini ;;
             kilocode) install_kilocode ;;
+            cursor) install_cursor ;;
             *) log_error "Unknown agent: $agent" ;;
         esac
     done

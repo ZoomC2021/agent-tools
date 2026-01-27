@@ -24,6 +24,7 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 | [Amp](https://ampcode.com) | CLI/Editor | `~/.config/agents/skills/` |
 | [Gemini CLI](https://github.com/google-gemini/gemini-cli) | CLI | `~/.gemini/GEMINI.md` |
 | [Kilo Code](https://kilocode.com) | CLI | `~/.kilocode/prompts/` |
+| [Cursor](https://cursor.com) | Editor | `~/.cursor/commands/` |
 
 ## Quick Install
 
@@ -41,7 +42,7 @@ cd agent-tools
 ./scripts/install.sh claude codex amp
 ```
 
-Available options: `claude`, `codex`, `opencode`, `antigravity`, `vscode`, `copilot-cli`, `amp`, `gemini`, `kilocode`
+Available options: `claude`, `codex`, `opencode`, `antigravity`, `vscode`, `copilot-cli`, `amp`, `gemini`, `kilocode`, `cursor`
 
 ## Manual Installation
 
@@ -134,6 +135,15 @@ cp prompts/kilocode/*.md ~/.kilocode/prompts/
 ```
 </details>
 
+<details>
+<summary>Cursor</summary>
+
+```bash
+mkdir -p ~/.cursor/commands
+cp prompts/cursor/*.md ~/.cursor/commands/
+```
+</details>
+
 ### Ubuntu/Linux
 
 <details>
@@ -219,6 +229,15 @@ cp prompts/gemini/GEMINI.md ~/.gemini/
 ```bash
 mkdir -p ~/.kilocode/prompts
 cp prompts/kilocode/*.md ~/.kilocode/prompts/
+```
+</details>
+
+<details>
+<summary>Cursor</summary>
+
+```bash
+mkdir -p ~/.cursor/commands
+cp prompts/cursor/*.md ~/.cursor/commands/
 ```
 </details>
 
