@@ -150,6 +150,23 @@ install_gemini() {
     log_success "Gemini CLI: $dest/GEMINI.md"
 }
 
+# Install Kilo Code prompts
+install_kilocode() {
+    log_info "Installing Kilo Code prompts..."
+    local dest="$HOME/.kilocode/prompts"
+    mkdir -p "$dest"
+    # Enable nullglob to handle case where no .md files exist
+    shopt -s nullglob
+    local files=("$PROMPTS_DIR/kilocode"/*.md)
+    shopt -u nullglob
+    if [[ ${#files[@]} -eq 0 ]]; then
+        log_warn "No .md files found in $PROMPTS_DIR/kilocode/"
+        return 0
+    fi
+    cp "$PROMPTS_DIR/kilocode"/*.md "$dest/"
+    log_success "Kilo Code: $dest"
+}
+
 # Install Cursor commands
 install_cursor() {
     log_info "Installing Cursor commands..."
@@ -175,6 +192,7 @@ main() {
     install_copilot_cli
     install_amp
     install_gemini
+    install_kilocode
     install_cursor
     
     echo ""
@@ -208,6 +226,7 @@ else
             copilot-cli) install_copilot_cli ;;
             amp) install_amp ;;
             gemini) install_gemini ;;
+            kilocode) install_kilocode ;;
             cursor) install_cursor ;;
             *) log_error "Unknown agent: $agent" ;;
         esac
