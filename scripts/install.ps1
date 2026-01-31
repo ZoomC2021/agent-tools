@@ -49,6 +49,17 @@ function Install-Cursor {
     Write-Success "Cursor: $Dest"
 }
 
+function Install-Windsurf {
+    Write-Info "Installing Windsurf global rules..."
+    
+    $SourceFile = Join-Path $PromptsDir "windsurf\global_rules.md"
+    $Dest = Join-Path $env:USERPROFILE ".codeium\windsurf\memories"
+    
+    New-Item -ItemType Directory -Path $Dest -Force | Out-Null
+    Copy-Item $SourceFile -Destination $Dest -Force
+    Write-Success "Windsurf: $Dest\global_rules.md"
+}
+
 Write-Host ""
 Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host "       Agent Tools Installer (Windows)"
@@ -57,6 +68,7 @@ Write-Host ""
 
 Install-VSCodeCopilot
 Install-Cursor
+Install-Windsurf
 
 Write-Host ""
 Write-Host "==========================================" -ForegroundColor Cyan
@@ -70,5 +82,5 @@ Write-Host "  - PR-Reviewer      : Address PR review feedback"
 Write-Host "  - PR-Reviewer-Only : Generate implementation prompt for PR feedback"
 Write-Host "  - Create-PR        : Create PR from current changes"
 Write-Host ""
-Write-Host "You may need to restart VSCode to pick up the new prompts."
+Write-Host "You may need to restart your editors to pick up the new prompts."
 Write-Host ""

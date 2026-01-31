@@ -26,6 +26,7 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 | [Kilo Code](https://kilocode.com) | CLI | `~/.kilocode/prompts/` |
 | [Cursor](https://cursor.com) | Editor | `~/.cursor/commands/` |
 | [Cline](https://cline.bot) | Editor | `~/Documents/Cline/Rules/` |
+| [Windsurf](https://codeium.com/windsurf) | Editor | `~/.codeium/windsurf/memories/global_rules.md` |
 
 ## Quick Install
 
@@ -43,7 +44,7 @@ cd agent-tools
 ./scripts/install.sh claude codex amp
 ```
 
-Available options: `claude`, `codex`, `opencode`, `antigravity`, `vscode`, `copilot-cli`, `amp`, `gemini`, `kilocode`, `cursor`, `cline`
+Available options: `claude`, `codex`, `opencode`, `antigravity`, `vscode`, `copilot-cli`, `amp`, `gemini`, `kilocode`, `cursor`, `cline`, `windsurf`
 
 ## Manual Installation
 
@@ -154,6 +155,15 @@ cp prompts/cline/*.md ~/Documents/Cline/Rules/
 ```
 </details>
 
+<details>
+<summary>Windsurf</summary>
+
+```bash
+mkdir -p ~/.codeium/windsurf/memories
+cp prompts/windsurf/global_rules.md ~/.codeium/windsurf/memories/
+```
+</details>
+
 ### Ubuntu/Linux
 
 <details>
@@ -257,6 +267,15 @@ cp prompts/cursor/*.md ~/.cursor/commands/
 ```bash
 mkdir -p ~/Documents/Cline/Rules
 cp prompts/cline/*.md ~/Documents/Cline/Rules/
+```
+</details>
+
+<details>
+<summary>Windsurf</summary>
+
+```bash
+mkdir -p ~/.codeium/windsurf/memories
+cp prompts/windsurf/global_rules.md ~/.codeium/windsurf/memories/
 ```
 </details>
 

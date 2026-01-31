@@ -195,6 +195,15 @@ install_cline() {
     fi
 }
 
+# Install Windsurf global rules
+install_windsurf() {
+    log_info "Installing Windsurf global rules..."
+    local dest="$HOME/.codeium/windsurf/memories"
+    mkdir -p "$dest"
+    cp "$PROMPTS_DIR/windsurf/global_rules.md" "$dest/"
+    log_success "Windsurf: $dest/global_rules.md"
+}
+
 # Main installation
 main() {
     echo ""
@@ -214,6 +223,7 @@ main() {
     install_kilocode
     install_cursor
     install_cline
+    install_windsurf
     
     echo ""
     echo "=========================================="
@@ -249,6 +259,7 @@ else
             kilocode) install_kilocode ;;
             cursor) install_cursor ;;
             cline) install_cline ;;
+            windsurf) install_windsurf ;;
             *) log_error "Unknown agent: $agent" ;;
         esac
     done
