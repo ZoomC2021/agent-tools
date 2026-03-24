@@ -48,3 +48,24 @@ When asked to "create pr" or "make a pr":
 6. Generate PR title and description with Summary, Changes, Testing, Related Issues
 7. Create: `gh pr create --title "<title>" --body "<description>"`
 8. Report: Branch, PR URL, Title, Commits, Files changed
+
+## /deslop - Analyze code for quality issues
+
+When asked to "deslop" or analyze code quality:
+
+1. Read the target files/directory specified by the user (or all source files if none specified)
+2. Cross-reference code against established software engineering principles:
+   - **Simplicity**: KISS, YAGNI, Small Functions, Guard Clauses
+   - **Clarity**: Cognitive Load, SLAP, Self-Documenting Code, Documentation Discipline
+   - **Architecture**: DRY, Single Source of Truth, Separation of Concerns, Modularity
+   - **Dependencies**: Encapsulation, Law of Demeter, Composition Over Inheritance
+   - **Design Patterns**: SOLID, Convention Over Configuration, Command-Query Separation
+   - **Data**: Parse Don't Validate, Immutability, Idempotency
+   - **Reliability**: Fail-Fast, Design by Contract, Postel's Law, Resilience, Observability
+3. For each violation found, provide:
+   - The principle violated
+   - Location in code (file:line)
+   - Before/after code examples showing the fix
+   - Severity: 🔴 Critical | 🟠 Warning | 🟡 Suggestion
+4. Group findings by file, ordered by severity
+5. Offer to apply fixes automatically for simple issues

@@ -236,6 +236,7 @@ main() {
     echo "  - pr-reviewer      : Address PR review feedback"
     echo "  - pr-reviewer-only : Generate implementation prompt for PR feedback"
     echo "  - create-pr        : Create PR from current changes"
+    echo "  - deslop           : Analyze code for quality issues using coding principles"
     echo ""
     echo "You may need to restart your editors/terminals"
     echo "to pick up the new prompts/skills."

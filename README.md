@@ -10,6 +10,7 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 | **review** | Review uncommitted changes for bugs, regressions, and improvements |
 | **pr-reviewer** | Fetch PR comments, summarize issues, address them, update PR |
 | **create-pr** | Create PR with auto-generated title and description |
+| **deslop** | Analyze code for quality issues using established software engineering principles |
 
 ## Supported Agents
 
@@ -319,6 +320,18 @@ Creates a PR from current changes:
 2. **Generates conventional commit** message
 3. **Creates PR** with auto-generated title and description
 4. **Reports result** with PR URL and summary
+
+### deslop
+
+Analyzes code for quality issues using established software engineering principles:
+
+1. **Reads target code**: Files, directories, or entire codebase
+2. **Cross-references principles**: KISS, YAGNI, SOLID, DRY, Separation of Concerns, and 30+ more
+3. **Reports violations** with before/after code examples
+4. **Groups by severity**: 🔴 Critical | 🟠 Warning | 🟡 Suggestion
+5. **Offers automatic fixes** for simple issues
+
+*Based on [deslop](https://github.com/Theta-Tech-AI/llm-public-utils/blob/production/slash_commands/deslop.md) by Theta Tech AI.*
 
 ## Requirements
 
