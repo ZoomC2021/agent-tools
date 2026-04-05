@@ -195,6 +195,15 @@ install_cline() {
     fi
 }
 
+# Install Roo Code commands
+install_roocode() {
+    log_info "Installing Roo Code commands..."
+    local dest="$HOME/.roo/commands"
+    mkdir -p "$dest"
+    cp "$PROMPTS_DIR/roocode/"*.md "$dest/"
+    log_success "Roo Code: $dest"
+}
+
 # Install Windsurf global rules
 install_windsurf() {
     log_info "Installing Windsurf global rules..."
@@ -223,6 +232,7 @@ main() {
     install_kilocode
     install_cursor
     install_cline
+    install_roocode
     install_windsurf
     
     echo ""
@@ -260,6 +270,7 @@ else
             kilocode) install_kilocode ;;
             cursor) install_cursor ;;
             cline) install_cline ;;
+            roocode) install_roocode ;;
             windsurf) install_windsurf ;;
             *) log_error "Unknown agent: $agent" ;;
         esac

@@ -71,6 +71,17 @@ function Install-OpenCode {
     Write-Success "OpenCode: $Dest"
 }
 
+function Install-RooCode {
+    Write-Info "Installing Roo Code commands..."
+    
+    $SourceDir = Join-Path $PromptsDir "roocode"
+    $Dest = Join-Path $env:USERPROFILE ".roo\commands"
+    
+    New-Item -ItemType Directory -Path $Dest -Force | Out-Null
+    Copy-Item "$SourceDir\*.md" -Destination $Dest -Force
+    Write-Success "Roo Code: $Dest"
+}
+
 Write-Host ""
 Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host "       Agent Tools Installer (Windows)"
@@ -79,6 +90,7 @@ Write-Host ""
 
 Install-VSCodeCopilot
 Install-Cursor
+Install-RooCode
 Install-Windsurf
 Install-OpenCode
 

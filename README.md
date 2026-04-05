@@ -18,7 +18,7 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 |-------|------|-----------------|
 | [Claude Code](https://claude.ai) | CLI | `~/.claude/commands/` |
 | [Codex](https://github.com/openai/codex) | CLI | `~/.codex/skills/` |
-| [OpenCode](https://github.com/sst/opencode) | CLI | `~/.config/opencode/prompts/` |
+| [OpenCode](https://opencode.ai) | CLI | `~/.config/opencode/commands/` |
 | [Antigravity](https://antigravity.dev) | Editor | `~/.antigravity/prompts/` or `~/Library/.../Antigravity/User/prompts/` |
 | [VSCode Copilot](https://github.com/features/copilot) | Editor | `~/.config/Code/User/prompts/` or `~/Library/.../Code/User/prompts/` |
 | [Copilot CLI](https://githubnext.com/projects/copilot-cli) | CLI | `~/.copilot/agents/` |
@@ -27,6 +27,7 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 | [Kilo Code](https://kilocode.com) | CLI | `~/.kilocode/prompts/` |
 | [Cursor](https://cursor.com) | Editor | `~/.cursor/commands/` |
 | [Cline](https://cline.bot) | Editor | `~/Documents/Cline/Rules/` |
+| [Roo Code](https://roocode.com) | Editor | `~/.roo/commands/` |
 | [Windsurf](https://codeium.com/windsurf) | Editor | `~/.codeium/windsurf/memories/global_rules.md` |
 
 ## Quick Install
@@ -45,7 +46,7 @@ cd agent-tools
 ./scripts/install.sh claude codex amp
 ```
 
-Available options: `claude`, `codex`, `opencode`, `antigravity`, `vscode`, `copilot-cli`, `amp`, `gemini`, `kilocode`, `cursor`, `cline`, `windsurf`
+Available options: `claude`, `codex`, `opencode`, `antigravity`, `vscode`, `copilot-cli`, `amp`, `gemini`, `kilocode`, `cursor`, `cline`, `roocode`, `windsurf`
 
 ## Manual Installation
 
@@ -73,8 +74,8 @@ cp prompts/codex/*.md ~/.codex/skills/
 <summary>OpenCode</summary>
 
 ```bash
-mkdir -p ~/.config/opencode/prompts
-cp prompts/opencode/*.md ~/.config/opencode/prompts/
+mkdir -p ~/.config/opencode/commands
+cp prompts/opencode/*.md ~/.config/opencode/commands/
 ```
 </details>
 
@@ -157,6 +158,15 @@ cp prompts/cline/*.md ~/Documents/Cline/Rules/
 </details>
 
 <details>
+<summary>Roo Code</summary>
+
+```bash
+mkdir -p ~/.roo/commands
+cp prompts/roocode/*.md ~/.roo/commands/
+```
+</details>
+
+<details>
 <summary>Windsurf</summary>
 
 ```bash
@@ -189,8 +199,8 @@ cp prompts/codex/*.md ~/.codex/skills/
 <summary>OpenCode</summary>
 
 ```bash
-mkdir -p ~/.config/opencode/prompts
-cp prompts/opencode/*.md ~/.config/opencode/prompts/
+mkdir -p ~/.config/opencode/commands
+cp prompts/opencode/*.md ~/.config/opencode/commands/
 ```
 </details>
 
@@ -268,6 +278,15 @@ cp prompts/cursor/*.md ~/.cursor/commands/
 ```bash
 mkdir -p ~/Documents/Cline/Rules
 cp prompts/cline/*.md ~/Documents/Cline/Rules/
+```
+</details>
+
+<details>
+<summary>Roo Code</summary>
+
+```bash
+mkdir -p ~/.roo/commands
+cp prompts/roocode/*.md ~/.roo/commands/
 ```
 </details>
 
