@@ -6,13 +6,13 @@ description: Analyze code for quality issues using established software engineer
 # Deslop: Code Quality Analysis Command
 <sub><sup>Note: This file is ≈27k tokens as of 2026-01-19</sup></sub>
 
-> A comprehensive slash command for identifying and fixing "slop" in your codebase. If you use Claude Code, drop this file into your `~/.claude/commands/` folder. If you use OpenCode, put it in `~/.opencode/commands/` folder. Then, restart your agent harness and run `/deslop`.
+> A comprehensive slash command for identifying and fixing "slop" in your codebase. If you use Claude Code, drop this file into your `~/.claude/commands/` folder. If you use OpenCode, put it in `~/.config/opencode/commands/` folder. Then, restart your agent harness and run `/deslop`.
 
 This command combines a code analysis workflow with an extensive library of coding principles. When you run `/deslop [file-or-directory]`, or even just `/deslop` or perhaps `/deslop my frontend typescript code` the AI will read your code, cross-reference it against these principles, and suggest specific fixes with before/after examples.
 
 Just download this entire markdown file into the location for your agent harness's config folder (such as below) and then restart your harness and run `/deslop`.
 - `~/.claude/commands/deslop.md`
-- `~/.opencode/commands/deslop.md`
+- `~/.config/opencode/commands/deslop.md`
 
 Whether or not you use this deslop command on your code base, you should read all the coding principles yourself, as a human - you might actually learn something useful.
 
@@ -3115,4 +3115,4 @@ Origins of specific principles referenced in this document.
 
 ---
 
-*This document is designed to be dropped into your `~/.claude/commands/` and/or `~/.opencode/commands` folders. Run `/deslop [file-or-directory]` to analyze your code against these principles and let the agent fix any slop it detects.*
+*This document is designed to be dropped into your `~/.claude/commands/` and/or `~/.config/opencode/commands` folders. Run `/deslop [file-or-directory]` to analyze your code against these principles and let the agent fix any slop it detects.*

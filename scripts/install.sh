@@ -54,10 +54,10 @@ install_codex() {
     log_success "Codex: $dest"
 }
 
-# Install OpenCode prompts
+# Install OpenCode commands
 install_opencode() {
-    log_info "Installing OpenCode prompts..."
-    local dest="$HOME/.config/opencode/prompts"
+    log_info "Installing OpenCode commands..."
+    local dest="$HOME/.config/opencode/commands"
     mkdir -p "$dest"
     cp "$PROMPTS_DIR/opencode/"*.md "$dest/"
     log_success "OpenCode: $dest"

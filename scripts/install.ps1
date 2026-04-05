@@ -60,6 +60,17 @@ function Install-Windsurf {
     Write-Success "Windsurf: $Dest\global_rules.md"
 }
 
+function Install-OpenCode {
+    Write-Info "Installing OpenCode commands..."
+    
+    $SourceDir = Join-Path $PromptsDir "opencode"
+    $Dest = Join-Path $env:USERPROFILE ".config\opencode\commands"
+    
+    New-Item -ItemType Directory -Path $Dest -Force | Out-Null
+    Copy-Item "$SourceDir\*.md" -Destination $Dest -Force
+    Write-Success "OpenCode: $Dest"
+}
+
 Write-Host ""
 Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host "       Agent Tools Installer (Windows)"
@@ -69,6 +80,7 @@ Write-Host ""
 Install-VSCodeCopilot
 Install-Cursor
 Install-Windsurf
+Install-OpenCode
 
 Write-Host ""
 Write-Host "==========================================" -ForegroundColor Cyan
