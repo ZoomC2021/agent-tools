@@ -41,10 +41,9 @@ install_agent() {
     local agent_name="$1"
     local source_dir="$2"
     local dest="$3"
-    local post_copy_cmd="$4"
 
     log_info "Installing $agent_name..."
-    
+
     # Check if source directory exists
     if [[ ! -d "$source_dir" ]]; then
         log_warn "Source directory not found: $source_dir"
@@ -52,24 +51,19 @@ install_agent() {
     fi
 
     mkdir -p "$dest"
-    
+
     # Enable nullglob to handle case where no files exist
     shopt -s nullglob
     local files=("$source_dir"/*.md)
     shopt -u nullglob
-    
+
     if [[ ${#files[@]} -eq 0 ]]; then
         log_warn "No .md files found in $source_dir"
         return 0
     fi
-    
+
     cp "$source_dir"/*.md "$dest/"
-    
-    # Run post-copy command if provided
-    if [[ -n "$post_copy_cmd" ]]; then
-        eval "$post_copy_cmd"
-    fi
-    
+
     log_success "$agent_name: $dest"
 }
 

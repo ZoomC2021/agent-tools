@@ -17,7 +17,7 @@ function Install-VSCodeCopilot {
     
     $SourceDir = Join-Path $PromptsDir "vscode-copilot"
     
-    if (-not (Test-Path $SourceDir)) {
+    if (-not (Test-Path -PathType Container $SourceDir)) {
         Write-Warn "Source directory not found: $SourceDir"
         return
     }
@@ -54,7 +54,7 @@ function Install-Cursor {
     
     $SourceDir = Join-Path $PromptsDir "cursor"
     
-    if (-not (Test-Path $SourceDir)) {
+    if (-not (Test-Path -PathType Container $SourceDir)) {
         Write-Warn "Source directory not found: $SourceDir"
         return
     }
@@ -95,7 +95,7 @@ function Install-OpenCode {
     
     $SourceDir = Join-Path $PromptsDir "opencode"
     
-    if (-not (Test-Path $SourceDir)) {
+    if (-not (Test-Path -PathType Container $SourceDir)) {
         Write-Warn "Source directory not found: $SourceDir"
         return
     }
@@ -118,7 +118,7 @@ function Install-RooCode {
     
     $SourceDir = Join-Path $PromptsDir "roocode"
     
-    if (-not (Test-Path $SourceDir)) {
+    if (-not (Test-Path -PathType Container $SourceDir)) {
         Write-Warn "Source directory not found: $SourceDir"
         return
     }
