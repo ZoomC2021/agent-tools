@@ -17,6 +17,17 @@ function Install-VSCodeCopilot {
     
     $SourceDir = Join-Path $PromptsDir "vscode-copilot"
     
+    if (-not (Test-Path $SourceDir)) {
+        Write-Warn "Source directory not found: $SourceDir"
+        return
+    }
+    
+    $SourceFiles = Get-ChildItem -Path $SourceDir -Filter "*.md"
+    if ($SourceFiles.Count -eq 0) {
+        Write-Warn "No .md files found in $SourceDir"
+        return
+    }
+    
     # VSCode Insiders
     $InsidersDest = Join-Path $env:APPDATA "Code - Insiders\User\prompts"
     if (Test-Path (Split-Path -Parent $InsidersDest)) {
@@ -42,6 +53,18 @@ function Install-Cursor {
     Write-Info "Installing Cursor commands..."
     
     $SourceDir = Join-Path $PromptsDir "cursor"
+    
+    if (-not (Test-Path $SourceDir)) {
+        Write-Warn "Source directory not found: $SourceDir"
+        return
+    }
+    
+    $SourceFiles = Get-ChildItem -Path $SourceDir -Filter "*.md"
+    if ($SourceFiles.Count -eq 0) {
+        Write-Warn "No .md files found in $SourceDir"
+        return
+    }
+    
     $Dest = Join-Path $env:USERPROFILE ".cursor\commands"
     
     New-Item -ItemType Directory -Path $Dest -Force | Out-Null
@@ -53,6 +76,12 @@ function Install-Windsurf {
     Write-Info "Installing Windsurf global rules..."
     
     $SourceFile = Join-Path $PromptsDir "windsurf\global_rules.md"
+    
+    if (-not (Test-Path $SourceFile)) {
+        Write-Warn "Source file not found: $SourceFile"
+        return
+    }
+    
     $DestDir = Join-Path $env:USERPROFILE ".codeium\windsurf\memories"
     $DestFile = Join-Path $DestDir "global_rules.md"
     
@@ -65,6 +94,18 @@ function Install-OpenCode {
     Write-Info "Installing OpenCode commands..."
     
     $SourceDir = Join-Path $PromptsDir "opencode"
+    
+    if (-not (Test-Path $SourceDir)) {
+        Write-Warn "Source directory not found: $SourceDir"
+        return
+    }
+    
+    $SourceFiles = Get-ChildItem -Path $SourceDir -Filter "*.md"
+    if ($SourceFiles.Count -eq 0) {
+        Write-Warn "No .md files found in $SourceDir"
+        return
+    }
+    
     $Dest = Join-Path $env:USERPROFILE ".config\opencode\commands"
     
     New-Item -ItemType Directory -Path $Dest -Force | Out-Null
@@ -76,6 +117,18 @@ function Install-RooCode {
     Write-Info "Installing Roo Code commands..."
     
     $SourceDir = Join-Path $PromptsDir "roocode"
+    
+    if (-not (Test-Path $SourceDir)) {
+        Write-Warn "Source directory not found: $SourceDir"
+        return
+    }
+    
+    $SourceFiles = Get-ChildItem -Path $SourceDir -Filter "*.md"
+    if ($SourceFiles.Count -eq 0) {
+        Write-Warn "No .md files found in $SourceDir"
+        return
+    }
+    
     $Dest = Join-Path $env:USERPROFILE ".roo\commands"
     
     New-Item -ItemType Directory -Path $Dest -Force | Out-Null

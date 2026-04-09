@@ -36,48 +36,89 @@ detect_os() {
 OS=$(detect_os)
 log_info "Detected OS: $OS"
 
+# Generic install function
+install_agent() {
+    local agent_name="$1"
+    local source_dir="$2"
+    local dest="$3"
+    local post_copy_cmd="$4"
+
+    log_info "Installing $agent_name..."
+    
+    # Check if source directory exists
+    if [[ ! -d "$source_dir" ]]; then
+        log_warn "Source directory not found: $source_dir"
+        return 0
+    fi
+
+    mkdir -p "$dest"
+    
+    # Enable nullglob to handle case where no files exist
+    shopt -s nullglob
+    local files=("$source_dir"/*.md)
+    shopt -u nullglob
+    
+    if [[ ${#files[@]} -eq 0 ]]; then
+        log_warn "No .md files found in $source_dir"
+        return 0
+    fi
+    
+    cp "$source_dir"/*.md "$dest/"
+    
+    # Run post-copy command if provided
+    if [[ -n "$post_copy_cmd" ]]; then
+        eval "$post_copy_cmd"
+    fi
+    
+    log_success "$agent_name: $dest"
+}
+
 # Install Claude Code commands
 install_claude() {
-    log_info "Installing Claude Code commands..."
-    local dest="$HOME/.claude/commands"
-    mkdir -p "$dest"
-    cp "$PROMPTS_DIR/claude/"*.md "$dest/"
-    log_success "Claude Code: $dest"
+    install_agent "Claude Code" "$PROMPTS_DIR/claude" "$HOME/.claude/commands"
 }
 
 # Install Codex skills
 install_codex() {
-    log_info "Installing Codex skills..."
-    local dest="$HOME/.codex/skills"
-    mkdir -p "$dest"
-    cp "$PROMPTS_DIR/codex/"*.md "$dest/"
-    log_success "Codex: $dest"
+    install_agent "Codex" "$PROMPTS_DIR/codex" "$HOME/.codex/skills"
 }
 
 # Install OpenCode commands
 install_opencode() {
-    log_info "Installing OpenCode commands..."
-    local dest="$HOME/.config/opencode/commands"
-    mkdir -p "$dest"
-    cp "$PROMPTS_DIR/opencode/"*.md "$dest/"
-    log_success "OpenCode: $dest"
+    install_agent "OpenCode" "$PROMPTS_DIR/opencode" "$HOME/.config/opencode/commands"
 }
 
 # Install Antigravity prompts
 install_antigravity() {
     log_info "Installing Antigravity prompts..."
+    local source_dir="$PROMPTS_DIR/antigravity"
+    
+    if [[ ! -d "$source_dir" ]]; then
+        log_warn "Source directory not found: $source_dir"
+        return 0
+    fi
+    
+    # Enable nullglob to handle case where no files exist
+    shopt -s nullglob
+    local files=("$source_dir"/*.md)
+    shopt -u nullglob
+    
+    if [[ ${#files[@]} -eq 0 ]]; then
+        log_warn "No .md files found in $source_dir"
+        return 0
+    fi
     
     # Linux path
     local linux_dest="$HOME/.antigravity/prompts"
     mkdir -p "$linux_dest"
-    cp "$PROMPTS_DIR/antigravity/"*.md "$linux_dest/"
+    cp "$source_dir"/*.md "$linux_dest/"
     log_success "Antigravity (Linux): $linux_dest"
     
     # macOS path
     if [[ "$OS" == "macos" ]]; then
         local macos_dest="$HOME/Library/Application Support/Antigravity/User/prompts"
         mkdir -p "$macos_dest"
-        cp "$PROMPTS_DIR/antigravity/"*.md "$macos_dest/"
+        cp "$source_dir"/*.md "$macos_dest/"
         log_success "Antigravity (macOS): $macos_dest"
     fi
 }
@@ -85,29 +126,45 @@ install_antigravity() {
 # Install VSCode Copilot prompts
 install_vscode_copilot() {
     log_info "Installing VSCode Copilot prompts..."
+    local source_dir="$PROMPTS_DIR/vscode-copilot"
+    
+    if [[ ! -d "$source_dir" ]]; then
+        log_warn "Source directory not found: $source_dir"
+        return 0
+    fi
+    
+    # Enable nullglob to handle case where no files exist
+    shopt -s nullglob
+    local files=("$source_dir"/*.md)
+    shopt -u nullglob
+    
+    if [[ ${#files[@]} -eq 0 ]]; then
+        log_warn "No .md files found in $source_dir"
+        return 0
+    fi
     
     # Linux path
     local linux_dest="$HOME/.config/Code - Insiders/User/prompts"
     mkdir -p "$linux_dest"
-    cp "$PROMPTS_DIR/vscode-copilot/"*.md "$linux_dest/"
+    cp "$source_dir"/*.md "$linux_dest/"
     log_success "VSCode Copilot (Linux): $linux_dest"
     
     # Also install to regular VSCode
     local linux_dest_regular="$HOME/.config/Code/User/prompts"
     mkdir -p "$linux_dest_regular"
-    cp "$PROMPTS_DIR/vscode-copilot/"*.md "$linux_dest_regular/"
+    cp "$source_dir"/*.md "$linux_dest_regular/"
     log_success "VSCode Copilot Regular (Linux): $linux_dest_regular"
     
     # macOS paths
     if [[ "$OS" == "macos" ]]; then
         local macos_dest="$HOME/Library/Application Support/Code - Insiders/User/prompts"
         mkdir -p "$macos_dest"
-        cp "$PROMPTS_DIR/vscode-copilot/"*.md "$macos_dest/"
+        cp "$source_dir"/*.md "$macos_dest/"
         log_success "VSCode Copilot Insiders (macOS): $macos_dest"
         
         local macos_dest_regular="$HOME/Library/Application Support/Code/User/prompts"
         mkdir -p "$macos_dest_regular"
-        cp "$PROMPTS_DIR/vscode-copilot/"*.md "$macos_dest_regular/"
+        cp "$source_dir"/*.md "$macos_dest_regular/"
         log_success "VSCode Copilot Regular (macOS): $macos_dest_regular"
     fi
 }
@@ -115,9 +172,27 @@ install_vscode_copilot() {
 # Install Copilot CLI agents
 install_copilot_cli() {
     log_info "Installing Copilot CLI agents..."
+    local source_dir="$PROMPTS_DIR/copilot-cli"
     local dest="$HOME/.copilot/agents"
+    
+    if [[ ! -d "$source_dir" ]]; then
+        log_warn "Source directory not found: $source_dir"
+        return 0
+    fi
+    
     mkdir -p "$dest"
-    cp "$PROMPTS_DIR/copilot-cli/"*.md "$dest/"
+    
+    # Enable nullglob to handle case where no files exist
+    shopt -s nullglob
+    local files=("$source_dir"/*.md)
+    shopt -u nullglob
+    
+    if [[ ${#files[@]} -eq 0 ]]; then
+        log_warn "No .md files found in $source_dir"
+        return 0
+    fi
+    
+    cp "$source_dir"/*.md "$dest/"
     # Rename to .agent.md format
     for f in "$dest"/*.md; do
         if [[ ! "$f" == *".agent.md" ]]; then
@@ -130,10 +205,20 @@ install_copilot_cli() {
 # Install Amp skills
 install_amp() {
     log_info "Installing Amp skills..."
+    local source_dir="$PROMPTS_DIR/amp"
     local dest="$HOME/.config/agents/skills"
+    
+    if [[ ! -d "$source_dir" ]]; then
+        log_warn "Source directory not found: $source_dir"
+        return 0
+    fi
+    
     mkdir -p "$dest"
     
-    for skill_dir in "$PROMPTS_DIR/amp/"*/; do
+    for skill_dir in "$source_dir/"*/; do
+        if [[ ! -d "$skill_dir" ]]; then
+            continue
+        fi
         local skill_name=$(basename "$skill_dir")
         mkdir -p "$dest/$skill_name"
         cp "$skill_dir"* "$dest/$skill_name/"
@@ -144,72 +229,52 @@ install_amp() {
 # Install Gemini CLI instructions
 install_gemini() {
     log_info "Installing Gemini CLI instructions..."
+    local source="$PROMPTS_DIR/gemini/GEMINI.md"
     local dest="$HOME/.gemini"
+    
+    if [[ ! -f "$source" ]]; then
+        log_warn "Source file not found: $source"
+        return 0
+    fi
+    
     mkdir -p "$dest"
-    cp "$PROMPTS_DIR/gemini/GEMINI.md" "$dest/"
+    cp "$source" "$dest/"
     log_success "Gemini CLI: $dest/GEMINI.md"
 }
 
 # Install Kilo Code prompts
 install_kilocode() {
-    log_info "Installing Kilo Code prompts..."
-    local dest="$HOME/.kilocode/prompts"
-    mkdir -p "$dest"
-    # Enable nullglob to handle case where no .md files exist
-    shopt -s nullglob
-    local files=("$PROMPTS_DIR/kilocode"/*.md)
-    shopt -u nullglob
-    if [[ ${#files[@]} -eq 0 ]]; then
-        log_warn "No .md files found in $PROMPTS_DIR/kilocode/"
-        return 0
-    fi
-    cp "$PROMPTS_DIR/kilocode"/*.md "$dest/"
-    log_success "Kilo Code: $dest"
+    install_agent "Kilo Code" "$PROMPTS_DIR/kilocode" "$HOME/.kilocode/prompts"
 }
 
 # Install Cursor commands
 install_cursor() {
-    log_info "Installing Cursor commands..."
-    local dest="$HOME/.cursor/commands"
-    mkdir -p "$dest"
-    cp "$PROMPTS_DIR/cursor/"*.md "$dest/"
-    log_success "Cursor (global): $dest"
+    install_agent "Cursor" "$PROMPTS_DIR/cursor" "$HOME/.cursor/commands"
 }
 
 # Install Cline rules
 install_cline() {
-    log_info "Installing Cline rules..."
-    
-    # Linux path
-    local linux_dest="$HOME/Documents/Cline/Rules"
-    mkdir -p "$linux_dest"
-    cp "$PROMPTS_DIR/cline/"*.md "$linux_dest/"
-    log_success "Cline (Linux): $linux_dest"
-    
-    # macOS path
-    if [[ "$OS" == "macos" ]]; then
-        local macos_dest="$HOME/Documents/Cline/Rules"
-        mkdir -p "$macos_dest"
-        cp "$PROMPTS_DIR/cline/"*.md "$macos_dest/"
-        log_success "Cline (macOS): $macos_dest"
-    fi
+    install_agent "Cline" "$PROMPTS_DIR/cline" "$HOME/Documents/Cline/Rules"
 }
 
 # Install Roo Code commands
 install_roocode() {
-    log_info "Installing Roo Code commands..."
-    local dest="$HOME/.roo/commands"
-    mkdir -p "$dest"
-    cp "$PROMPTS_DIR/roocode/"*.md "$dest/"
-    log_success "Roo Code: $dest"
+    install_agent "Roo Code" "$PROMPTS_DIR/roocode" "$HOME/.roo/commands"
 }
 
 # Install Windsurf global rules
 install_windsurf() {
     log_info "Installing Windsurf global rules..."
+    local source="$PROMPTS_DIR/windsurf/global_rules.md"
     local dest="$HOME/.codeium/windsurf/memories"
+    
+    if [[ ! -f "$source" ]]; then
+        log_warn "Source file not found: $source"
+        return 0
+    fi
+    
     mkdir -p "$dest"
-    cp "$PROMPTS_DIR/windsurf/global_rules.md" "$dest/"
+    cp "$source" "$dest/"
     log_success "Windsurf: $dest/global_rules.md"
 }
 
