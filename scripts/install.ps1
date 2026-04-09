@@ -53,11 +53,12 @@ function Install-Windsurf {
     Write-Info "Installing Windsurf global rules..."
     
     $SourceFile = Join-Path $PromptsDir "windsurf\global_rules.md"
-    $Dest = Join-Path $env:USERPROFILE ".codeium\windsurf\memories"
+    $DestDir = Join-Path $env:USERPROFILE ".codeium\windsurf\memories"
+    $DestFile = Join-Path $DestDir "global_rules.md"
     
-    New-Item -ItemType Directory -Path $Dest -Force | Out-Null
-    Copy-Item $SourceFile -Destination $Dest -Force
-    Write-Success "Windsurf: $Dest\global_rules.md"
+    New-Item -ItemType Directory -Path $DestDir -Force | Out-Null
+    Copy-Item $SourceFile -Destination $DestFile -Force
+    Write-Success "Windsurf: $DestFile"
 }
 
 function Install-OpenCode {
