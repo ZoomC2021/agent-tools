@@ -75,8 +75,17 @@ cp prompts/codex/*.md ~/.codex/skills/
 
 ```bash
 mkdir -p ~/.config/opencode/commands
+mkdir -p ~/.config/opencode/agent
 cp prompts/opencode/*.md ~/.config/opencode/commands/
+cp prompts/opencode/codex53-kimi.md ~/.config/opencode/agent/
 ```
+
+To configure the codex53-kimi primary agent:
+- If you have no existing config: copy the example directly
+  ```bash
+  cp prompts/opencode/opencode.json.example ~/.config/opencode/opencode.json
+  ```
+- If you already have `~/.config/opencode/opencode.json`: merge only the `agent.codex53-kimi` block from the example into your existing config
 </details>
 
 <details>
@@ -200,8 +209,17 @@ cp prompts/codex/*.md ~/.codex/skills/
 
 ```bash
 mkdir -p ~/.config/opencode/commands
+mkdir -p ~/.config/opencode/agent
 cp prompts/opencode/*.md ~/.config/opencode/commands/
+cp prompts/opencode/codex53-kimi.md ~/.config/opencode/agent/
 ```
+
+To configure the codex53-kimi primary agent:
+- If you have no existing config: copy the example directly
+  ```bash
+  cp prompts/opencode/opencode.json.example ~/.config/opencode/opencode.json
+  ```
+- If you already have `~/.config/opencode/opencode.json`: merge only the `agent.codex53-kimi` block from the example into your existing config
 </details>
 
 <details>
