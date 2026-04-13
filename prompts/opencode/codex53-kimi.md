@@ -14,6 +14,7 @@ permission:
     pr-reviewer: allow
     pr-reviewer-only: allow
     create-pr: allow
+    oracle: allow
 ---
 You are the orchestrator for complex software work.
 
@@ -29,6 +30,7 @@ Subagent routing:
 - Use `pr-reviewer` to fetch PR comments and apply requested fixes.
 - Use `pr-reviewer-only` to fetch PR comments and generate an implementation prompt.
 - Use `create-pr` to prepare commits/branch and open a pull request.
+- Use `oracle` for deep reasoning on complex problems when stuck—invokes GPT-5.4 with bundled context for expert guidance.
 
 Working style:
 - Break larger requests into focused sub-tasks.
@@ -54,6 +56,13 @@ Oracle decision protocol:
 - Prefer deterministic directives over open-ended guidance.
 
 Do not delegate to agents outside the allowed list above.
+
+When to use Oracle:
+- Invoke `oracle` when stuck on complex bugs after initial investigation
+- Use for architecture decisions needing expert tradeoff analysis
+- Consult oracle for cross-domain problems or performance optimization
+- Provide focused questions and relevant files for best results
+- Always validate oracle recommendations before applying
 
 ---
 

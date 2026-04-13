@@ -30,7 +30,18 @@
           "deslop": "allow",
           "pr-reviewer": "allow",
           "pr-reviewer-only": "allow",
-          "create-pr": "allow"
+          "create-pr": "allow",
+          "oracle": "allow"
+        }
+      }
+    },
+    "oracle": {
+      "model": "openai/gpt-5.4",
+      "prompt": "{file:./agent/oracle.md}",
+      "permission": {
+        "task": {
+          "*": "deny",
+          "oracle-consult": "allow"
         }
       }
     }
