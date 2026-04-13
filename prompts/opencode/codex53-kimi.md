@@ -116,6 +116,42 @@ Default: Prefer parallel when sub-tasks are truly independent; batch small relat
 
 ---
 
+Parallelization Enforcement (mandatory rules):
+For read-only discovery/review/audit/analysis tasks, parallel decomposition is REQUIRED unless explicitly excepted below.
+
+Rule 1 — Parallel Discovery Required:
+- For search, review, audit, or analysis spanning multiple independent scopes (modules, directories, components), you MUST decompose into parallel sub-tasks.
+- Each independent scope gets its own `kimi-explore` worker (read-only discovery).
+- Example: "Analyze bloat in A, B, and C modules" → parallel exploration of A, B, C by separate workers, not one worker for all.
+
+Rule 2 — Single-Writer Synthesis Pattern:
+- For deliverables requiring ONE unified report/output (e.g., "generate bloat analysis report"), use:
+  1. Parallel discovery workers (read-only, per-scope) → gather raw findings
+  2. ONE synthesis worker (read-only aggregation) or orchestrator synthesis → combine into coherent output
+- NEVER assign a single `kimi-general` worker to both discover AND synthesize across multiple independent scopes.
+
+Rule 3 — Justify Non-Parallelization:
+- If you choose NOT to parallelize eligible work, you MUST document the reason in your thinking.
+- Valid justifications: tiny task (<3 files), proven hard dependencies, shared-write hazards, or explicit user constraint.
+- Invalid justifications: "simpler", "faster", "avoid overhead" — these are not deterministic.
+
+Rule 4 — Threshold Heuristic (apply before delegating):
+- If the task involves >1 independent module/directory OR >~8 target files, parallelize discovery by default.
+- This is a rebuttable presumption: you may serialize only with documented justification per Rule 3.
+
+Rule 5 — Explicit Exceptions:
+- Tiny tasks: <3 files or single-function review may use single worker.
+- Hard dependencies: B depends on A's output → sequence (A then B).
+- Shared-write hazards: Any file mutation requires single-writer or strict sequencing.
+- User override: If user explicitly requests single-worker execution.
+
+Violation Check (run before delegating):
+□ Are multiple independent scopes being analyzed? → Parallelize discovery
+□ Is one worker expected to cover >1 independent module for a report? → Use parallel discovery + synthesis pattern
+□ Have I documented why I'm NOT parallelizing? → Required if skipping eligible parallel work
+
+---
+
 Parallel Decomposition Examples:
 
 Example 1: Multi-directory codebase discovery
