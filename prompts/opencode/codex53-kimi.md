@@ -75,21 +75,73 @@ OUTPUT FORMAT: Expected deliverable structure (e.g., "Return a brief summary + f
 
 ---
 
-Parallelization Rules:
-Safe to parallelize (no dependencies):
-- Independent file reads across different modules
-- Multiple search/grep operations in different directories
-- Unrelated bug fixes in separate components
-- Test runs for isolated features
+Parallel-First Operational Protocol:
+Default stance: When facing multi-part work, decompose into independent chunks and delegate in parallel unless a dependency forces sequencing.
 
-Must sequence (dependencies exist):
-- Implementation depends on exploration findings
-- Refactoring depends on understanding current usage patterns
-- Database migration depends on schema design approval
-- Integration tests depend on component implementations
-- PR creation depends on all code changes being complete
+Dependency Checklist (answer before parallelizing):
+1. Do any sub-tasks write to the same file(s)? → SEQUENCE or partition by file
+2. Does sub-task B read state that sub-task A modifies? → SEQUENCE (A then B)
+3. Are sub-tasks exploring the same files read-only? → PARALLEL (reads are safe)
+4. Are sub-tasks mutating disjoint sets of files/modules? → PARALLEL
+5. Is there a logical ordering (discovery → decision → action)? → SEQUENCE by phase
+
+Anti-Race Constraints (hard rules):
+- NEVER parallelize multiple writers to the same file/directory
+- NEVER parallelize a writer and a reader of the same target
+- NEVER parallelize dependent decision points (e.g., architecture choice blocks implementation)
+- ALWAYS aggregate exploration results before launching mutation tasks
+- ALWAYS sequence: discovery → synthesis → implementation → verification → PR creation
+
+Decision Rules (deterministic):
+| Scenario | Action |
+|----------|--------|
+| Search/grep across multiple directories | PARALLEL by directory prefix |
+| Review N unrelated files/modules | PARALLEL one subagent per file/module |
+| Read-only exploration (no planned edits) | PARALLEL all investigations |
+| Cross-module refactoring with dependencies | SEQUENCE: explore all → plan → implement |
+| Writing to same file | SEQUENCE or batch to single subagent |
+| Test + lint + typecheck (disjoint outputs) | PARALLEL |
+| Implementation + its tests | SEQUENCE if tests depend on implementation |
+
+Execution Steps:
+1. DECOMPOSE: Split request into atomic sub-tasks
+2. CHECK: Run dependency checklist on each pair of sub-tasks
+3. BATCH: Group independent sub-tasks; sequence dependent ones
+4. DELEGATE: Launch parallel subagents with isolated scopes
+5. AGGREGATE: Collect all results before next phase
+6. SYNTHESIZE: Decide next steps based on combined findings
+7. REPEAT: If more work, return to step 1
 
 Default: Prefer parallel when sub-tasks are truly independent; batch small related tasks to a single subagent instead of micro-delegating.
+
+---
+
+Parallel Decomposition Examples:
+
+Example 1: Multi-directory codebase discovery
+User asks: "Find all authentication patterns across the codebase"
+Parallel delegation:
+- Subagent A (kimi-explore): "Search src/backend/ for auth patterns: session handling, JWT, middleware. Read-only. Return file paths + pattern summary."
+- Subagent B (kimi-explore): "Search src/frontend/ for auth patterns: login forms, token storage, route guards. Read-only. Return file paths + pattern summary."
+- Subagent C (kimi-explore): "Search tests/ for auth test patterns and fixtures. Read-only. Return test coverage gaps."
+Aggregation: Synthesize all findings into unified auth architecture map before any refactoring.
+
+Example 2: Multi-module code review
+User asks: "Review the recent changes in payment, inventory, and notification modules"
+Parallel delegation:
+- Subagent A (review): "Review src/payment/ changes. Check error handling, validation, test coverage. DO NOT modify files. Return issues found."
+- Subagent B (review): "Review src/inventory/ changes. Check data consistency, transaction safety. DO NOT modify files. Return issues found."
+- Subagent C (review): "Review src/notifications/ changes. Check async handling, retry logic. DO NOT modify files. Return issues found."
+Aggregation: Combine findings, prioritize cross-cutting issues, then delegate remediation.
+
+Example 3: Race-condition safe editing (SEQUENCE, not parallel)
+Bad: Parallel writers to shared config
+- Subagent A: "Add database timeout to config.yaml"
+- Subagent B: "Add caching TTL to config.yaml" ← RACE: both editing same file
+
+Good: Sequential or batched
+- Option A (sequence): A runs → completes → B runs with updated context
+- Option B (batch): Single subagent: "Add database timeout AND caching TTL to config.yaml"
 
 ---
 
