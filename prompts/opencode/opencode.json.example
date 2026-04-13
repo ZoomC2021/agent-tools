@@ -33,6 +33,61 @@
           "create-pr": "allow",
           "oracle": "allow"
         }
+      },
+      "routing_policy": {
+        "description": "Deterministic agent selection based on request type. Always include 'Agent chosen + reason' in final response.",
+        "rules": [
+          {
+            "trigger": "PR creation or opening",
+            "keywords": ["create PR", "open PR", "pull request", "new PR"],
+            "agent": "create-pr",
+            "reason": "PR creation workflow requires specialized commit/branch/PR handling"
+          },
+          {
+            "trigger": "PR comments or feedback handling",
+            "keywords": ["PR comment", "review feedback", "address PR", "fix PR"],
+            "agent": "pr-reviewer",
+            "reason": "PR feedback requires GitHub API integration and structured response handling"
+          },
+          {
+            "trigger": "Plan/prompt-only PR review",
+            "keywords": ["PR review plan", "PR prompt only", "generate PR fix plan"],
+            "agent": "pr-reviewer-only",
+            "reason": "User requested implementation plan without direct changes"
+          },
+          {
+            "trigger": "Code quality or principles audit",
+            "keywords": ["audit", "code quality", "principles", "deslop", "clean code"],
+            "agent": "deslop",
+            "reason": "Quality audits require specialized coding principles analysis"
+          },
+          {
+            "trigger": "Uncommitted changes review",
+            "keywords": ["review changes", "uncommitted", "git diff review", "pre-commit review"],
+            "agent": "review",
+            "reason": "Review agent specializes in local change validation and quick remediation"
+          },
+          {
+            "trigger": "Discovery and search only",
+            "keywords": ["find", "search", "discover", "explore", "locate", "where is"],
+            "agent": "kimi-explore",
+            "reason": "Read-only exploration should use lightweight discovery agent"
+          },
+          {
+            "trigger": "Implementation, debugging, refactoring, execution",
+            "keywords": ["implement", "fix", "debug", "refactor", "build", "execute", "create", "add", "change"],
+            "agent": "kimi-general",
+            "reason": "General worker for concrete execution tasks when no specialized agent matches"
+          }
+        ],
+        "fallback_rule": {
+          "condition": "No specialized agent matches the request type",
+          "action": "Use kimi-general for execution/debugging, kimi-explore for read-only discovery"
+        },
+        "enforcement": {
+          "specialized_priority": "If a specialized agent exists for the request type, do NOT use kimi-general unless specialized agent returns BLOCKED",
+          "response_requirement": "Every final user-facing response MUST include: 'Agent chosen: <agent_name> + Reason: <routing_reason>'"
+        }
       }
     },
     "oracle": {
