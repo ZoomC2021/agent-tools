@@ -45,7 +45,10 @@
           "pr-reviewer": "allow",
           "pr-reviewer-only": "allow",
           "create-pr": "allow",
-          "oracle": "allow"
+          "oracle": "allow",
+          "spec-compiler": "allow",
+          "quick-validator": "allow",
+          "change-auditor": "allow"
         }
       },
       "routing_policy": {
@@ -175,6 +178,88 @@
           "oracle-consult": "allow"
         }
       }
+    },
+    "kimi-general": {
+      "_description": "General worker for implementation, debugging, refactoring, execution",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./agent/kimi-general.md}"
+    },
+    "kimi-explore": {
+      "_description": "Lightweight read-only discovery and search agent",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./agent/kimi-explore.md}",
+      "permission": {
+        "task": { "*": "deny" },
+        "read": "allow",
+        "bash": "allow"
+      }
+    },
+    "review": {
+      "_description": "Review uncommitted changes and report/fix issues",
+      "mode": "subagent",
+      "model": "openai/gpt-5.3-codex",
+      "hidden": true,
+      "prompt": "{file:./prompts/review.md}"
+    },
+    "deslop": {
+      "_description": "Detect and prioritize code quality violations",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./prompts/deslop.md}"
+    },
+    "refactor": {
+      "_description": "Analyze and prioritize refactoring opportunities",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./prompts/refactor.md}"
+    },
+    "pr-reviewer": {
+      "_description": "Fetch PR feedback and apply fixes on the PR branch",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./prompts/pr-reviewer.md}"
+    },
+    "pr-reviewer-only": {
+      "_description": "Fetch PR feedback and produce an implementation prompt",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./prompts/pr-reviewer-only.md}"
+    },
+    "create-pr": {
+      "_description": "Create a pull request from current git changes",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./prompts/create-pr.md}"
+    },
+    "spec-compiler": {
+      "_description": "Compile Execution Contract before implementation work (Phase 1)",
+      "mode": "subagent",
+      "model": "openai/gpt-5.3-codex",
+      "hidden": true,
+      "prompt": "{file:./prompts/spec-compiler.md}"
+    },
+    "quick-validator": {
+      "_description": "Run quick validation checks on implementation output (Phase 3)",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./prompts/quick-validator.md}"
+    },
+    "change-auditor": {
+      "_description": "Deep audit for high-risk changes, security, breaking changes (Phase 4, optional)",
+      "mode": "subagent",
+      "model": "openai/gpt-5.3-codex",
+      "hidden": true,
+      "prompt": "{file:./prompts/change-auditor.md}"
     }
   },
   "_reference_setup": {
