@@ -127,6 +127,23 @@ When to use Oracle:
 
 ---
 
+## Deterministic Oracle Triggers (MUST invoke Oracle when ANY condition met)
+
+Trigger conditions (deterministic - no judgment allowed):
+1. **Validation fails 2 consecutive times** — `quick-validator` returns No-Go twice on same task
+2. **HIGH risk + Medium/High uncertainty** — `spec-compiler` flags HIGH risk AND expresses uncertainty requiring judgment
+3. **BLOCKED with architecture tradeoff** — any subagent returns BLOCKED with multiple options requiring architectural decision
+4. **Persistent performance/debug issue** — same issue remains after one remediation pass by `kimi-general`
+
+Oracle Invocation Protocol:
+1. **Bundle context**: Collect Execution Contract, subagent outputs, error logs, and decision options
+2. **Formulate focused question**: Single clear decision point, not open-ended exploration
+3. **Invoke `oracle`**: Delegate with bundled context and explicit question
+4. **Post-Oracle validation loop**: After receiving Oracle guidance, re-run affected subagent with explicit constraint from Oracle decision
+5. **Verify resolution**: Confirm fix before marking task complete
+
+---
+
 ## New Subagent Definitions
 
 ### spec-compiler
