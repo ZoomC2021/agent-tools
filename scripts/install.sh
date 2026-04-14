@@ -81,6 +81,15 @@ install_codex() {
 install_opencode() {
     log_info "Installing OpenCode..."
     local source_dir="$PROMPTS_DIR/opencode"
+    local agent_files=(
+        "codex53-kimi.md"
+        "kimi-general.md"
+        "kimi-explore.md"
+        "github-librarian.md"
+        "docs-research.md"
+        "walkthrough.md"
+        "oracle.md"
+    )
 
     if [[ ! -d "$source_dir" ]]; then
         log_warn "Source directory not found: $source_dir"
@@ -95,11 +104,14 @@ install_opencode() {
     for f in "$source_dir"/*.md; do
         if [[ -f "$f" ]]; then
             local basename=$(basename "$f")
-            # Skip agent files (they go to agent/)
-            if [[ "$basename" != "codex53-kimi.md" && \
-                  "$basename" != "kimi-general.md" && \
-                  "$basename" != "kimi-explore.md" && \
-                  "$basename" != "oracle.md" ]]; then
+            local is_agent=false
+            for agent_file in "${agent_files[@]}"; do
+                if [[ "$basename" == "$agent_file" ]]; then
+                    is_agent=true
+                    break
+                fi
+            done
+            if [[ "$is_agent" == false ]]; then
                 cp "$f" "$commands_dest/"
             fi
         fi
@@ -111,12 +123,30 @@ install_opencode() {
     mkdir -p "$agent_dest"
 
     # Copy agent-specific files
-    for agent_file in "codex53-kimi.md" "kimi-general.md" "kimi-explore.md" "oracle.md"; do
+    for agent_file in "${agent_files[@]}"; do
         if [[ -f "$source_dir/$agent_file" ]]; then
             cp "$source_dir/$agent_file" "$agent_dest/"
         fi
     done
     log_success "OpenCode agent files: $agent_dest"
+
+    # Install helper binaries
+    local bin_source_dir="$source_dir/bin"
+    if [[ -d "$bin_source_dir" ]]; then
+        local bin_dest="$HOME/.config/opencode/bin"
+        mkdir -p "$bin_dest"
+        shopt -s nullglob
+        local bin_files=("$bin_source_dir"/*)
+        shopt -u nullglob
+
+        if [[ ${#bin_files[@]} -gt 0 ]]; then
+            cp "$bin_source_dir"/* "$bin_dest/"
+            chmod +x "$bin_dest"/*
+            log_success "OpenCode helper scripts: $bin_dest"
+        else
+            log_warn "No helper scripts found in $bin_source_dir"
+        fi
+    fi
 
     # Note about config file
     log_info "OpenCode config: Copy prompts/opencode/opencode.json.example to ~/.config/opencode/opencode.json"

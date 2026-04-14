@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+    cat <<'EOF'
+Usage:
+  opencode-gh-librarian default-branch <owner/repo-or-url>
+  opencode-gh-librarian snapshot <owner/repo-or-url> <dest-dir>
+  opencode-gh-librarian cat-file <owner/repo-or-url> <path>
+  opencode-gh-librarian recent-commits <owner/repo-or-url> [limit]
+  opencode-gh-librarian file-history <owner/repo-or-url> <path> [limit]
+EOF
+}
+
+die() {
+    echo "error: $*" >&2
+    exit 1
+}
+
+require_gh() {
+    command -v gh >/dev/null 2>&1 || die "GitHub CLI (gh) is required"
+}
+
+normalize_repo() {
+    local input="$1"
+    local owner repo rest
+
+    input="${input#https://github.com/}"
+    input="${input#http://github.com/}"
+    input="${input#git@github.com:}"
+    input="${input%.git}"
+    input="${input%/}"
+
+    IFS='/' read -r owner repo rest <<<"$input"
+
+    [[ -n "${owner:-}" && -n "${repo:-}" ]] || die "expected <owner/repo> or GitHub URL"
+
+    printf '%s/%s\n' "$owner" "$repo"
+}
+
+default_branch() {
+    local repo="$1"
+    gh api "repos/$repo" --jq .default_branch
+}
+
+snapshot() {
+    local repo="$1"
+    local dest_dir="$2"
+    local branch archive root
+
+    mkdir -p "$dest_dir"
+    branch="$(default_branch "$repo")"
+    archive="$dest_dir/repo.tar.gz"
+
+    gh api "repos/$repo/tarball/$branch" > "$archive"
+    tar -xzf "$archive" -C "$dest_dir"
+    rm -f "$archive"
+
+    root="$(find "$dest_dir" -mindepth 1 -maxdepth 1 -type d | head -n 1)"
+    [[ -n "$root" ]] || die "failed to locate extracted repository root"
+
+    printf '%s\n' "$root"
+}
+
+cat_file() {
+    local repo="$1"
+    local path="$2"
+    local branch
+
+    branch="$(default_branch "$repo")"
+    gh api -H 'Accept: application/vnd.github.raw+json' "repos/$repo/contents/$path?ref=$branch"
+}
+
+recent_commits() {
+    local repo="$1"
+    local limit="${2:-10}"
+
+    gh api -X GET "repos/$repo/commits" -f per_page="$limit" \
+        --jq '.[] | [.sha[0:7], .commit.author.date, (.author.login // .commit.author.name // "unknown"), (.commit.message | split("\n")[0])] | @tsv'
+}
+
+file_history() {
+    local repo="$1"
+    local path="$2"
+    local limit="${3:-10}"
+
+    gh api -X GET "repos/$repo/commits" -f path="$path" -f per_page="$limit" \
+        --jq '.[] | [.sha[0:7], .commit.author.date, (.author.login // .commit.author.name // "unknown"), (.commit.message | split("\n")[0])] | @tsv'
+}
+
+main() {
+    local command="${1:-}"
+    local repo
+
+    require_gh
+
+    case "$command" in
+        default-branch)
+            [[ $# -eq 2 ]] || { usage; exit 1; }
+            repo="$(normalize_repo "$2")"
+            default_branch "$repo"
+            ;;
+        snapshot)
+            [[ $# -eq 3 ]] || { usage; exit 1; }
+            repo="$(normalize_repo "$2")"
+            snapshot "$repo" "$3"
+            ;;
+        cat-file)
+            [[ $# -eq 3 ]] || { usage; exit 1; }
+            repo="$(normalize_repo "$2")"
+            cat_file "$repo" "$3"
+            ;;
+        recent-commits)
+            [[ $# -ge 2 && $# -le 3 ]] || { usage; exit 1; }
+            repo="$(normalize_repo "$2")"
+            recent_commits "$repo" "${3:-10}"
+            ;;
+        file-history)
+            [[ $# -ge 3 && $# -le 4 ]] || { usage; exit 1; }
+            repo="$(normalize_repo "$2")"
+            file_history "$repo" "$3" "${4:-10}"
+            ;;
+        *)
+            usage
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"

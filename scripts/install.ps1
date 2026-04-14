@@ -101,7 +101,15 @@ function Install-OpenCode {
     }
 
     # Agent files that go to agent/ directory
-    $AgentFiles = @("codex53-kimi.md", "kimi-general.md", "kimi-explore.md", "oracle.md")
+    $AgentFiles = @(
+        "codex53-kimi.md",
+        "kimi-general.md",
+        "kimi-explore.md",
+        "github-librarian.md",
+        "docs-research.md",
+        "walkthrough.md",
+        "oracle.md"
+    )
 
     # Install command prompts (workflows) to commands/
     $CommandsDest = Join-Path $env:USERPROFILE ".config\opencode\commands"
@@ -127,6 +135,21 @@ function Install-OpenCode {
     } else {
         Copy-Item $AgentSourceFiles.FullName -Destination $AgentDest -Force
         Write-Success "OpenCode agent files: $AgentDest"
+    }
+
+    # Install helper scripts to bin/
+    $BinSourceDir = Join-Path $SourceDir "bin"
+    if (Test-Path -PathType Container $BinSourceDir) {
+        $BinDest = Join-Path $env:USERPROFILE ".config\opencode\bin"
+        New-Item -ItemType Directory -Path $BinDest -Force | Out-Null
+
+        $BinFiles = Get-ChildItem -Path $BinSourceDir -File
+        if ($BinFiles.Count -eq 0) {
+            Write-Warn "No helper scripts found in $BinSourceDir"
+        } else {
+            Copy-Item $BinFiles.FullName -Destination $BinDest -Force
+            Write-Success "OpenCode helper scripts: $BinDest"
+        }
     }
 
     # Note about config file

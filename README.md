@@ -14,7 +14,7 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 
 ## Opencode Codex53-Kimi Setup (Primary Agent Architecture)
 
-This repository includes a sophisticated agent architecture for OpenCode using GPT-5.3-Codex as the orchestrator and Fireworks Kimi K2.5 Turbo as subagents.
+This repository includes a sophisticated agent architecture for OpenCode using GPT-5.3-Codex as the orchestrator and Fireworks Kimi K2.5 Turbo as specialized subagents.
 
 ### Architecture
 
@@ -26,17 +26,24 @@ This repository includes a sophisticated agent architecture for OpenCode using G
 │  • Delegates to specialized subagents                       │
 └──────────────────────┬────────────────────────────────────────┘
                        │
-       ┌───────────────┼───────────────┐
-       │               │               │
-┌──────▼──────┐ ┌──────▼──────┐ ┌─────▼─────┐
-│ kimi-general │ │ kimi-explore │ │ review    │
-│ (execution)  │ │ (discovery)  │ │ (audit)   │
-└─────────────┘ └─────────────┘ └───────────┘
-       │               │               │
-┌──────▼──────┐ ┌──────▼──────┐ ┌─────▼─────┐
-│ pr-reviewer │ │ deslop       │ │ create-pr │
-│ (PR fixes)   │ │ (quality)    │ │ (workflow)│
-└─────────────┘ └─────────────┘ └───────────┘
+   ┌───────────┬──────────────┬──────────────────┬──────────────┐
+   │           │              │                  │              │
+┌──▼────────┐ ┌▼───────────┐ ┌▼────────────────┐ ┌▼────────────┐
+│ kimi-     │ │ kimi-      │ │ github-         │ │ docs-       │
+│ general   │ │ explore    │ │ librarian       │ │ research    │
+│ execution │ │ local find │ │ remote GitHub   │ │ official    │
+└───────────┘ └────────────┘ └─────────────────┘ └─────────────┘
+   │               │                 │                  │
+┌──▼────────┐ ┌────▼─────┐ ┌────────▼──────┐ ┌─────────▼──────┐
+│walkthrough│ │ review   │ │ deslop        │ │ pr-reviewer    │
+│ diagrams  │ │ local QA │ │ code quality  │ │ PR fixes       │
+└───────────┘ └──────────┘ └───────────────┘ └────────────────┘
+                            │                  │
+                      ┌─────▼─────┐      ┌────▼────┐
+                      │ create-pr │      │ oracle  │
+                      │ workflow  │      │ deep    │
+                      └───────────┘      │ reasoning│
+                                         └─────────┘
 ```
 
 ### Deterministic Routing
@@ -49,27 +56,35 @@ The orchestrator uses keyword-based deterministic routing:
 | PR feedback | "PR comment", "address PR" | **pr-reviewer** |
 | Code audit | "audit", "code quality" | **deslop** |
 | Local review | "review changes", "uncommitted" | **review** |
-| Discovery | "find", "search", "explore" | **kimi-explore** |
+| Remote repo research | GitHub URL, `owner/repo`, "reference implementation" | **github-librarian** |
+| Official docs research | "official docs", "migration guide", "API docs" | **docs-research** |
+| Local walkthrough | "walk me through", "diagram", "architecture" | **walkthrough** |
+| Local discovery | "find", "search", "explore" | **kimi-explore** |
 | Implementation | "implement", "fix", "refactor" | **kimi-general** |
 
 ### 4-Phase Implementation Workflow
 
 For implementation/debugging/refactoring tasks, the orchestrator follows:
 
-1. **PHASE 1: spec-compiler** → Compile Execution Contract (scope, risks, success criteria)
-2. **PHASE 2: kimi-general** → Execute implementation based on contract
-3. **PHASE 3: quick-validator** → Run validation tests/checks
-4. **PHASE 4 (optional): change-auditor** → Deep audit for high-risk areas
+1. **PHASE 0 (optional): docs-research / github-librarian** → Gather official docs or upstream reference code first
+2. **PHASE 1: spec-compiler** → Compile Execution Contract (scope, risks, success criteria)
+3. **PHASE 2: kimi-general** → Execute implementation based on contract
+4. **PHASE 3: quick-validator** → Run validation tests/checks
+5. **PHASE 4 (optional): change-auditor** → Deep audit for high-risk areas
 
 ### Directory Layout
 
 ```
 ~/.config/opencode/
 ├── opencode.json              # Main configuration (see example)
+├── bin/                       # Helper scripts (e.g. opencode-gh-librarian)
 ├── agent/                     # Primary agent definitions
 │   ├── codex53-kimi.md       # Orchestrator (routing logic)
 │   ├── kimi-general.md       # Execution worker
-│   ├── kimi-explore.md       # Read-only discovery
+│   ├── kimi-explore.md       # Local read-only discovery
+│   ├── github-librarian.md   # Remote GitHub research
+│   ├── docs-research.md      # Official docs + API research
+│   ├── walkthrough.md        # Architecture walkthroughs + diagrams
 │   └── oracle.md             # Deep reasoning (GPT-5.4)
 └── commands/                  # Workflow prompts
     ├── review.md
@@ -94,7 +109,7 @@ For implementation/debugging/refactoring tasks, the orchestrator follows:
 A local reference setup uses:
 - Fireworks Kimi K2.5 Turbo for build mode and subagents
 - GPT-5.3-Codex for the orchestrator (plan mode)
-- Specialized subagents for different task types
+- Specialized subagents for local discovery, remote GitHub research, docs research, architecture walkthroughs, and execution
 
 See `prompts/opencode/opencode.json.example` for the full configuration structure.
 
@@ -163,6 +178,7 @@ cp prompts/codex/*.md ~/.codex/skills/
 # Create directories
 mkdir -p ~/.config/opencode/commands
 mkdir -p ~/.config/opencode/agent
+mkdir -p ~/.config/opencode/bin
 
 # Copy workflow prompts to commands/
 for f in prompts/opencode/review.md prompts/opencode/deslop.md \
@@ -174,15 +190,23 @@ done
 
 # Copy agent definitions to agent/
 for f in prompts/opencode/codex53-kimi.md prompts/opencode/kimi-general.md \
-         prompts/opencode/kimi-explore.md prompts/opencode/oracle.md; do
+         prompts/opencode/kimi-explore.md prompts/opencode/github-librarian.md \
+         prompts/opencode/docs-research.md prompts/opencode/walkthrough.md \
+         prompts/opencode/oracle.md; do
   [ -f "$f" ] && cp "$f" ~/.config/opencode/agent/
 done
+
+# Copy helper scripts used by subagents
+cp prompts/opencode/bin/* ~/.config/opencode/bin/
+chmod +x ~/.config/opencode/bin/*
 
 # Copy and edit config (⚠️ NEVER commit with real API key)
 cp prompts/opencode/opencode.json.example ~/.config/opencode/opencode.json
 ```
 
 **⚠️ Security Warning**: Edit `~/.config/opencode/opencode.json` and replace `YOUR_FIREWORKS_API_KEY_HERE` with your actual API key. **Do not commit this file.**
+
+**Note**: `github-librarian` requires `gh` to be installed and authenticated. `docs-research` works best when `websearch` is available, which OpenCode enables when using the OpenCode provider or when `OPENCODE_ENABLE_EXA=1` is set.
 
 See [Opencode Codex53-Kimi Setup](#opencode-codex53-kimi-setup-primary-agent-architecture) for architecture details.
 </details>
@@ -310,6 +334,7 @@ cp prompts/codex/*.md ~/.codex/skills/
 # Create directories
 mkdir -p ~/.config/opencode/commands
 mkdir -p ~/.config/opencode/agent
+mkdir -p ~/.config/opencode/bin
 
 # Copy workflow prompts to commands/
 for f in prompts/opencode/review.md prompts/opencode/deslop.md \
@@ -321,15 +346,23 @@ done
 
 # Copy agent definitions to agent/
 for f in prompts/opencode/codex53-kimi.md prompts/opencode/kimi-general.md \
-         prompts/opencode/kimi-explore.md prompts/opencode/oracle.md; do
+         prompts/opencode/kimi-explore.md prompts/opencode/github-librarian.md \
+         prompts/opencode/docs-research.md prompts/opencode/walkthrough.md \
+         prompts/opencode/oracle.md; do
   [ -f "$f" ] && cp "$f" ~/.config/opencode/agent/
 done
+
+# Copy helper scripts used by subagents
+cp prompts/opencode/bin/* ~/.config/opencode/bin/
+chmod +x ~/.config/opencode/bin/*
 
 # Copy and edit config (⚠️ NEVER commit with real API key)
 cp prompts/opencode/opencode.json.example ~/.config/opencode/opencode.json
 ```
 
 **⚠️ Security Warning**: Edit `~/.config/opencode/opencode.json` and replace `YOUR_FIREWORKS_API_KEY_HERE` with your actual API key. **Do not commit this file.**
+
+**Note**: `github-librarian` requires `gh` to be installed and authenticated. `docs-research` works best when `websearch` is available, which OpenCode enables when using the OpenCode provider or when `OPENCODE_ENABLE_EXA=1` is set.
 
 See [Opencode Codex53-Kimi Setup](#opencode-codex53-kimi-setup-primary-agent-architecture) for architecture details.
 </details>
@@ -485,8 +518,18 @@ Analyzes code for quality issues using established software engineering principl
 ## Requirements
 
 - **Git** for version control operations
-- **GitHub CLI (`gh`)** for PR operations
+- **GitHub CLI (`gh`)** for PR operations and `github-librarian`
+- **OpenCode `webfetch`** for `docs-research`
+- **OpenCode `websearch`** for best `docs-research` discovery results when URLs are not provided
 - The respective coding agent installed and configured
+
+## Example OpenCode Prompts
+
+- `In github.com/cli/cli, find where auth token resolution happens`
+- `Use official docs to verify how SvelteKit remote functions work before changing our implementation`
+- `Walk me through how authentication works in this repo and include a Mermaid diagram`
+- `Compare our caching layer with owner/repo's implementation before proposing changes`
+- `Show me recent commits affecting src/auth.ts in owner/repo`
 
 ## Contributing
 

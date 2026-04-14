@@ -3,8 +3,9 @@
   "_comment": "OPENCODE CONFIGURATION EXAMPLE - Codex53-Kimi Setup",
   "_security_warning": "⚠️  NEVER commit this file with real API keys to version control. Use environment variables or secure secrets management instead.",
   "_file_placement": {
-    "agent_files": "~/.config/opencode/agent/ - Primary agent prompts (codex53-kimi.md, kimi-general.md, kimi-explore.md, oracle.md)",
+    "agent_files": "~/.config/opencode/agent/ - Primary agent prompts and subagent prompts (codex53-kimi.md, kimi-general.md, kimi-explore.md, github-librarian.md, docs-research.md, walkthrough.md, oracle.md)",
     "command_prompts": "~/.config/opencode/commands/ - Workflow prompts (review.md, deslop.md, pr-reviewer.md, etc.)",
+    "helper_binaries": "~/.config/opencode/bin/ - Helper scripts used by subagents (for example opencode-gh-librarian)",
     "this_config": "~/.config/opencode/opencode.json - Main configuration file"
   },
   "provider": {
@@ -36,6 +37,9 @@
           "*": "deny",
           "kimi-general": "allow",
           "kimi-explore": "allow",
+          "github-librarian": "allow",
+          "docs-research": "allow",
+          "walkthrough": "allow",
           "review": "allow",
           "deslop": "allow",
           "pr-reviewer": "allow",
@@ -78,6 +82,24 @@
             "reason": "Review agent specializes in local change validation and quick remediation"
           },
           {
+            "trigger": "Remote GitHub code research",
+            "keywords": ["github.com/", "owner/repo", "upstream repo", "remote repo", "reference implementation"],
+            "agent": "github-librarian",
+            "reason": "Remote repository analysis should use a dedicated GitHub research worker"
+          },
+          {
+            "trigger": "Official docs, API behavior, migration notes, release notes",
+            "keywords": ["official docs", "documentation", "api docs", "migration guide", "release notes", "how does"],
+            "agent": "docs-research",
+            "reason": "External behavior questions should be grounded in authoritative documentation"
+          },
+          {
+            "trigger": "Local architecture walkthrough and diagrams",
+            "keywords": ["walk me through", "show the flow", "diagram", "architecture", "how does this work"],
+            "agent": "walkthrough",
+            "reason": "Architecture explanations deserve a dedicated evidence-backed walkthrough agent"
+          },
+          {
             "trigger": "Discovery and search only",
             "keywords": ["find", "search", "discover", "explore", "locate", "where is"],
             "agent": "kimi-explore",
@@ -92,12 +114,55 @@
         ],
         "fallback_rule": {
           "condition": "No specialized agent matches the request type",
-          "action": "Use kimi-general for execution/debugging, kimi-explore for read-only discovery"
+          "action": "Use kimi-general for execution/debugging, kimi-explore for local read-only discovery, and specialized research agents for external docs or remote repositories"
         },
         "enforcement": {
           "specialized_priority": "If a specialized agent exists for the request type, do NOT use kimi-general unless specialized agent returns BLOCKED",
           "response_requirement": "Every final user-facing response MUST include: 'Agent chosen: <agent_name> + Reason: <routing_reason>'"
         }
+      }
+    },
+    "github-librarian": {
+      "_description": "Read-only remote GitHub code research on default branches with lightweight history",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./agent/github-librarian.md}",
+      "permission": {
+        "task": {
+          "*": "deny"
+        },
+        "read": "allow",
+        "bash": "allow"
+      }
+    },
+    "docs-research": {
+      "_description": "Research official documentation, API behavior, and release notes",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./agent/docs-research.md}",
+      "permission": {
+        "task": {
+          "*": "deny"
+        },
+        "read": "allow",
+        "webfetch": "allow",
+        "websearch": "allow"
+      }
+    },
+    "walkthrough": {
+      "_description": "Explain local architecture and generate Mermaid walkthroughs",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./agent/walkthrough.md}",
+      "permission": {
+        "task": {
+          "*": "deny"
+        },
+        "read": "allow",
+        "bash": "allow"
       }
     },
     "oracle": {
@@ -114,8 +179,8 @@
   },
   "_reference_setup": {
     "note": "This configuration enables deterministic routing between specialized subagents",
-    "architecture": "codex53-kimi (orchestrator) -> subagents (kimi-general, kimi-explore, review, deslop, pr-reviewer, create-pr)",
+    "architecture": "codex53-kimi (orchestrator) -> subagents (kimi-general, kimi-explore, github-librarian, docs-research, walkthrough, review, deslop, pr-reviewer, create-pr)",
     "workflow": "4-phase implementation: spec-compiler -> kimi-general -> quick-validator -> change-auditor (optional)",
-    "local_reference": "~/.config/opencode/agent/ contains agent definitions, ~/.config/opencode/commands/ contains workflow prompts"
+    "local_reference": "~/.config/opencode/agent/ contains agent definitions, ~/.config/opencode/commands/ contains workflow prompts, ~/.config/opencode/bin/ contains helper scripts"
   }
 }
