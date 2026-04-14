@@ -77,9 +77,50 @@ install_codex() {
     install_agent "Codex" "$PROMPTS_DIR/codex" "$HOME/.codex/skills"
 }
 
-# Install OpenCode commands
+# Install OpenCode commands and agent files
 install_opencode() {
-    install_agent "OpenCode" "$PROMPTS_DIR/opencode" "$HOME/.config/opencode/commands"
+    log_info "Installing OpenCode..."
+    local source_dir="$PROMPTS_DIR/opencode"
+
+    if [[ ! -d "$source_dir" ]]; then
+        log_warn "Source directory not found: $source_dir"
+        return 0
+    fi
+
+    # Install command prompts (workflows)
+    local commands_dest="$HOME/.config/opencode/commands"
+    mkdir -p "$commands_dest"
+
+    # Copy non-agent workflow prompts to commands/
+    for f in "$source_dir"/*.md; do
+        if [[ -f "$f" ]]; then
+            local basename=$(basename "$f")
+            # Skip agent files (they go to agent/)
+            if [[ "$basename" != "codex53-kimi.md" && \
+                  "$basename" != "kimi-general.md" && \
+                  "$basename" != "kimi-explore.md" && \
+                  "$basename" != "oracle.md" ]]; then
+                cp "$f" "$commands_dest/"
+            fi
+        fi
+    done
+    log_success "OpenCode commands: $commands_dest"
+
+    # Install agent files to agent/
+    local agent_dest="$HOME/.config/opencode/agent"
+    mkdir -p "$agent_dest"
+
+    # Copy agent-specific files
+    for agent_file in "codex53-kimi.md" "kimi-general.md" "kimi-explore.md" "oracle.md"; do
+        if [[ -f "$source_dir/$agent_file" ]]; then
+            cp "$source_dir/$agent_file" "$agent_dest/"
+        fi
+    done
+    log_success "OpenCode agent files: $agent_dest"
+
+    # Note about config file
+    log_info "OpenCode config: Copy prompts/opencode/opencode.json.example to ~/.config/opencode/opencode.json"
+    log_info "  ⚠️  IMPORTANT: Replace YOUR_FIREWORKS_API_KEY_HERE with your actual API key (DO NOT commit)"
 }
 
 # Install Antigravity prompts

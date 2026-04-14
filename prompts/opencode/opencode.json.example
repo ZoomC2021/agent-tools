@@ -1,9 +1,17 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "_comment": "OPENCODE CONFIGURATION EXAMPLE - Codex53-Kimi Setup",
+  "_security_warning": "⚠️  NEVER commit this file with real API keys to version control. Use environment variables or secure secrets management instead.",
+  "_file_placement": {
+    "agent_files": "~/.config/opencode/agent/ - Primary agent prompts (codex53-kimi.md, kimi-general.md, kimi-explore.md, oracle.md)",
+    "command_prompts": "~/.config/opencode/commands/ - Workflow prompts (review.md, deslop.md, pr-reviewer.md, etc.)",
+    "this_config": "~/.config/opencode/opencode.json - Main configuration file"
+  },
   "provider": {
     "fireworks-ai": {
       "options": {
-        "apiKey": "YOUR_FIREWORKS_API_KEY"
+        "_apiKey_note": "Use env var: OPENCODE_FIREWORKS_API_KEY or replace with your key (DO NOT COMMIT)",
+        "apiKey": "YOUR_FIREWORKS_API_KEY_HERE"
       }
     }
   },
@@ -18,7 +26,9 @@
     }
   },
   "agent": {
+    "_comment": "AGENT DEFINITIONS - These reference files in ~/.config/opencode/agent/",
     "codex53-kimi": {
+      "_description": "Primary orchestrator agent - delegates to subagents for specialized tasks",
       "model": "openai/gpt-5.3-codex",
       "prompt": "{file:./agent/codex53-kimi.md}",
       "permission": {
@@ -91,6 +101,7 @@
       }
     },
     "oracle": {
+      "_description": "Deep reasoning agent for complex problems - GPT-5.4 powered",
       "model": "openai/gpt-5.4",
       "prompt": "{file:./agent/oracle.md}",
       "permission": {
@@ -100,5 +111,11 @@
         }
       }
     }
+  },
+  "_reference_setup": {
+    "note": "This configuration enables deterministic routing between specialized subagents",
+    "architecture": "codex53-kimi (orchestrator) -> subagents (kimi-general, kimi-explore, review, deslop, pr-reviewer, create-pr)",
+    "workflow": "4-phase implementation: spec-compiler -> kimi-general -> quick-validator -> change-auditor (optional)",
+    "local_reference": "~/.config/opencode/agent/ contains agent definitions, ~/.config/opencode/commands/ contains workflow prompts"
   }
 }

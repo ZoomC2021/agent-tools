@@ -12,6 +12,92 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 | **create-pr** | Create PR with auto-generated title and description |
 | **deslop** | Analyze code for quality issues using established software engineering principles |
 
+## Opencode Codex53-Kimi Setup (Primary Agent Architecture)
+
+This repository includes a sophisticated agent architecture for OpenCode using GPT-5.3-Codex as the orchestrator and Fireworks Kimi K2.5 Turbo as subagents.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Codex53-Kimi Orchestrator (GPT-5.3-Codex)                 │
+│  • Plans and sequences work                                  │
+│  • Makes routing decisions                                    │
+│  • Delegates to specialized subagents                       │
+└──────────────────────┬────────────────────────────────────────┘
+                       │
+       ┌───────────────┼───────────────┐
+       │               │               │
+┌──────▼──────┐ ┌──────▼──────┐ ┌─────▼─────┐
+│ kimi-general │ │ kimi-explore │ │ review    │
+│ (execution)  │ │ (discovery)  │ │ (audit)   │
+└─────────────┘ └─────────────┘ └───────────┘
+       │               │               │
+┌──────▼──────┐ ┌──────▼──────┐ ┌─────▼─────┐
+│ pr-reviewer │ │ deslop       │ │ create-pr │
+│ (PR fixes)   │ │ (quality)    │ │ (workflow)│
+└─────────────┘ └─────────────┘ └───────────┘
+```
+
+### Deterministic Routing
+
+The orchestrator uses keyword-based deterministic routing:
+
+| Trigger | Keywords | Agent Selected |
+|---------|----------|----------------|
+| PR creation | "create PR", "pull request" | **create-pr** |
+| PR feedback | "PR comment", "address PR" | **pr-reviewer** |
+| Code audit | "audit", "code quality" | **deslop** |
+| Local review | "review changes", "uncommitted" | **review** |
+| Discovery | "find", "search", "explore" | **kimi-explore** |
+| Implementation | "implement", "fix", "refactor" | **kimi-general** |
+
+### 4-Phase Implementation Workflow
+
+For implementation/debugging/refactoring tasks, the orchestrator follows:
+
+1. **PHASE 1: spec-compiler** → Compile Execution Contract (scope, risks, success criteria)
+2. **PHASE 2: kimi-general** → Execute implementation based on contract
+3. **PHASE 3: quick-validator** → Run validation tests/checks
+4. **PHASE 4 (optional): change-auditor** → Deep audit for high-risk areas
+
+### Directory Layout
+
+```
+~/.config/opencode/
+├── opencode.json              # Main configuration (see example)
+├── agent/                     # Primary agent definitions
+│   ├── codex53-kimi.md       # Orchestrator (routing logic)
+│   ├── kimi-general.md       # Execution worker
+│   ├── kimi-explore.md       # Read-only discovery
+│   └── oracle.md             # Deep reasoning (GPT-5.4)
+└── commands/                  # Workflow prompts
+    ├── review.md
+    ├── deslop.md
+    ├── pr-reviewer.md
+    ├── create-pr.md
+    ├── spec-compiler.md
+    ├── quick-validator.md
+    └── change-auditor.md
+```
+
+### ⚠️ Security Warning
+
+**NEVER commit your `opencode.json` with real API keys to version control.**
+
+- Use environment variables: `OPENCODE_FIREWORKS_API_KEY`
+- Or keep the config file in a secure location with `apiKey: "YOUR_KEY_HERE"`
+- The example file includes placeholder warnings to help prevent accidental commits
+
+### Reference Example
+
+A local reference setup uses:
+- Fireworks Kimi K2.5 Turbo for build mode and subagents
+- GPT-5.3-Codex for the orchestrator (plan mode)
+- Specialized subagents for different task types
+
+See `prompts/opencode/opencode.json.example` for the full configuration structure.
+
 ## Supported Agents
 
 | Agent | Type | Prompt Location |
@@ -71,21 +157,34 @@ cp prompts/codex/*.md ~/.codex/skills/
 </details>
 
 <details>
-<summary>OpenCode</summary>
+<summary>OpenCode (Codex53-Kimi Architecture)</summary>
 
 ```bash
+# Create directories
 mkdir -p ~/.config/opencode/commands
 mkdir -p ~/.config/opencode/agent
-cp prompts/opencode/*.md ~/.config/opencode/commands/
-cp prompts/opencode/codex53-kimi.md ~/.config/opencode/agent/
+
+# Copy workflow prompts to commands/
+for f in prompts/opencode/review.md prompts/opencode/deslop.md \
+         prompts/opencode/pr-reviewer.md prompts/opencode/create-pr.md \
+         prompts/opencode/spec-compiler.md prompts/opencode/quick-validator.md \
+         prompts/opencode/change-auditor.md; do
+  [ -f "$f" ] && cp "$f" ~/.config/opencode/commands/
+done
+
+# Copy agent definitions to agent/
+for f in prompts/opencode/codex53-kimi.md prompts/opencode/kimi-general.md \
+         prompts/opencode/kimi-explore.md prompts/opencode/oracle.md; do
+  [ -f "$f" ] && cp "$f" ~/.config/opencode/agent/
+done
+
+# Copy and edit config (⚠️ NEVER commit with real API key)
+cp prompts/opencode/opencode.json.example ~/.config/opencode/opencode.json
 ```
 
-To configure the codex53-kimi primary agent:
-- If you have no existing config: copy the example directly
-  ```bash
-  cp prompts/opencode/opencode.json.example ~/.config/opencode/opencode.json
-  ```
-- If you already have `~/.config/opencode/opencode.json`: merge only the `agent.codex53-kimi` block from the example into your existing config
+**⚠️ Security Warning**: Edit `~/.config/opencode/opencode.json` and replace `YOUR_FIREWORKS_API_KEY_HERE` with your actual API key. **Do not commit this file.**
+
+See [Opencode Codex53-Kimi Setup](#opencode-codex53-kimi-setup-primary-agent-architecture) for architecture details.
 </details>
 
 <details>
@@ -205,21 +304,34 @@ cp prompts/codex/*.md ~/.codex/skills/
 </details>
 
 <details>
-<summary>OpenCode</summary>
+<summary>OpenCode (Codex53-Kimi Architecture)</summary>
 
 ```bash
+# Create directories
 mkdir -p ~/.config/opencode/commands
 mkdir -p ~/.config/opencode/agent
-cp prompts/opencode/*.md ~/.config/opencode/commands/
-cp prompts/opencode/codex53-kimi.md ~/.config/opencode/agent/
+
+# Copy workflow prompts to commands/
+for f in prompts/opencode/review.md prompts/opencode/deslop.md \
+         prompts/opencode/pr-reviewer.md prompts/opencode/create-pr.md \
+         prompts/opencode/spec-compiler.md prompts/opencode/quick-validator.md \
+         prompts/opencode/change-auditor.md; do
+  [ -f "$f" ] && cp "$f" ~/.config/opencode/commands/
+done
+
+# Copy agent definitions to agent/
+for f in prompts/opencode/codex53-kimi.md prompts/opencode/kimi-general.md \
+         prompts/opencode/kimi-explore.md prompts/opencode/oracle.md; do
+  [ -f "$f" ] && cp "$f" ~/.config/opencode/agent/
+done
+
+# Copy and edit config (⚠️ NEVER commit with real API key)
+cp prompts/opencode/opencode.json.example ~/.config/opencode/opencode.json
 ```
 
-To configure the codex53-kimi primary agent:
-- If you have no existing config: copy the example directly
-  ```bash
-  cp prompts/opencode/opencode.json.example ~/.config/opencode/opencode.json
-  ```
-- If you already have `~/.config/opencode/opencode.json`: merge only the `agent.codex53-kimi` block from the example into your existing config
+**⚠️ Security Warning**: Edit `~/.config/opencode/opencode.json` and replace `YOUR_FIREWORKS_API_KEY_HERE` with your actual API key. **Do not commit this file.**
+
+See [Opencode Codex53-Kimi Setup](#opencode-codex53-kimi-setup-primary-agent-architecture) for architecture details.
 </details>
 
 <details>

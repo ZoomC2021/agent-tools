@@ -91,26 +91,47 @@ function Install-Windsurf {
 }
 
 function Install-OpenCode {
-    Write-Info "Installing OpenCode commands..."
-    
+    Write-Info "Installing OpenCode commands and agent files..."
+
     $SourceDir = Join-Path $PromptsDir "opencode"
-    
+
     if (-not (Test-Path -PathType Container $SourceDir)) {
         Write-Warn "Source directory not found: $SourceDir"
         return
     }
-    
+
+    # Agent files that go to agent/ directory
+    $AgentFiles = @("codex53-kimi.md", "kimi-general.md", "kimi-explore.md", "oracle.md")
+
+    # Install command prompts (workflows) to commands/
+    $CommandsDest = Join-Path $env:USERPROFILE ".config\opencode\commands"
+    New-Item -ItemType Directory -Path $CommandsDest -Force | Out-Null
+
     $SourceFiles = Get-ChildItem -Path $SourceDir -Filter "*.md"
-    if ($SourceFiles.Count -eq 0) {
-        Write-Warn "No .md files found in $SourceDir"
-        return
+    $CommandFiles = $SourceFiles | Where-Object { $AgentFiles -notcontains $_.Name }
+
+    if ($CommandFiles.Count -eq 0) {
+        Write-Warn "No command .md files found in $SourceDir"
+    } else {
+        Copy-Item $CommandFiles.FullName -Destination $CommandsDest -Force
+        Write-Success "OpenCode commands: $CommandsDest"
     }
-    
-    $Dest = Join-Path $env:USERPROFILE ".config\opencode\commands"
-    
-    New-Item -ItemType Directory -Path $Dest -Force | Out-Null
-    Copy-Item "$SourceDir\*.md" -Destination $Dest -Force
-    Write-Success "OpenCode: $Dest"
+
+    # Install agent files to agent/
+    $AgentDest = Join-Path $env:USERPROFILE ".config\opencode\agent"
+    New-Item -ItemType Directory -Path $AgentDest -Force | Out-Null
+
+    $AgentSourceFiles = $SourceFiles | Where-Object { $AgentFiles -contains $_.Name }
+    if ($AgentSourceFiles.Count -eq 0) {
+        Write-Warn "No agent .md files found in $SourceDir"
+    } else {
+        Copy-Item $AgentSourceFiles.FullName -Destination $AgentDest -Force
+        Write-Success "OpenCode agent files: $AgentDest"
+    }
+
+    # Note about config file
+    Write-Info "OpenCode config: Copy prompts/opencode/opencode.json.example to ~/.config/opencode/opencode.json"
+    Write-Warn "IMPORTANT: Replace YOUR_FIREWORKS_API_KEY_HERE with your actual API key (DO NOT commit)"
 }
 
 function Install-RooCode {
