@@ -243,7 +243,7 @@
     "spec-compiler": {
       "_description": "Compile Execution Contract before implementation work (Phase 1)",
       "mode": "subagent",
-      "model": "openai/gpt-5.3-codex",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "hidden": true,
       "prompt": "{file:./prompts/spec-compiler.md}"
     },

@@ -1,7 +1,7 @@
 ---
 description: Compile Execution Contract before implementation work
 mode: subagent
-model: openai/gpt-5.3-codex
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 permission:
   task:
     '*': deny
