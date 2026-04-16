@@ -108,7 +108,9 @@ function Install-OpenCode {
         "github-librarian.md",
         "docs-research.md",
         "walkthrough.md",
-        "oracle.md"
+        "oracle.md",
+        "spec-compiler.md",
+        "quick-validator.md"
     )
 
     # Install command prompts (workflows) to commands/
@@ -152,9 +154,92 @@ function Install-OpenCode {
         }
     }
 
-    # Note about config file
-    Write-Info "OpenCode config: Copy prompts/opencode/opencode.json.example to ~/.config/opencode/opencode.json"
-    Write-Warn "IMPORTANT: Replace YOUR_FIREWORKS_API_KEY_HERE with your actual API key (DO NOT commit)"
+    # Setup config directory and copy example config
+    $ConfigDir = Join-Path $env:USERPROFILE ".config\opencode"
+    $ConfigFile = Join-Path $ConfigDir "opencode.json"
+    $ExampleFile = Join-Path $RepoDir "prompts\opencode\opencode.json.example"
+
+    New-Item -ItemType Directory -Path $ConfigDir -Force | Out-Null
+
+    if (Test-Path $ExampleFile) {
+        if (-not (Test-Path $ConfigFile)) {
+            Copy-Item $ExampleFile -Destination $ConfigFile -Force
+            Write-Success "OpenCode config created: $ConfigFile"
+        } else {
+            Write-Warn "OpenCode config already exists: $ConfigFile (not overwriting)"
+        }
+    } else {
+        Write-Warn "Example config not found: $ExampleFile"
+    }
+
+    Write-Warn "  ⚠️  IMPORTANT: Edit $ConfigFile and replace YOUR_FIREWORKS_API_KEY_HERE with your actual API key (DO NOT commit)"
+
+    # Self-check: verify installed files
+    Test-OpenCodeInstallation -AgentDest $AgentDest -CommandsDest $CommandsDest -ConfigFile $ConfigFile
+}
+
+function Test-OpenCodeInstallation {
+    param(
+        [string]$AgentDest,
+        [string]$CommandsDest,
+        [string]$ConfigFile
+    )
+
+    Write-Info "Running OpenCode self-check..."
+    $failed = 0
+
+    # Check required agent files
+    $requiredAgentFiles = @(
+        "spec-compiler.md",
+        "quick-validator.md",
+        "codex53-kimi.md",
+        "kimi-general.md",
+        "kimi-explore.md",
+        "github-librarian.md",
+        "docs-research.md",
+        "walkthrough.md",
+        "oracle.md"
+    )
+
+    foreach ($file in $requiredAgentFiles) {
+        $fullPath = Join-Path $AgentDest $file
+        if (-not (Test-Path $fullPath)) {
+            Write-Err "Missing agent file: $fullPath"
+            $failed++
+        }
+    }
+
+    # Check required command files
+    $requiredCommandFiles = @(
+        "pr-reviewer-only.md",
+        "refactor.md",
+        "review.md",
+        "pr-reviewer.md",
+        "change-auditor.md",
+        "deslop.md",
+        "create-pr.md"
+    )
+
+    foreach ($file in $requiredCommandFiles) {
+        $fullPath = Join-Path $CommandsDest $file
+        if (-not (Test-Path $fullPath)) {
+            Write-Err "Missing command file: $fullPath"
+            $failed++
+        }
+    }
+
+    # Check config file exists
+    if (-not (Test-Path $ConfigFile)) {
+        Write-Err "Missing config file: $ConfigFile"
+        $failed++
+    }
+
+    if ($failed -eq 0) {
+        Write-Success "OpenCode self-check PASSED: all required files installed"
+    } else {
+        Write-Warn "OpenCode self-check FAILED: $failed check(s) failed"
+        Write-Warn "  → Run the installer again or check file permissions"
+    }
 }
 
 function Install-RooCode {

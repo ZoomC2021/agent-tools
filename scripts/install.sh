@@ -89,6 +89,8 @@ install_opencode() {
         "docs-research.md"
         "walkthrough.md"
         "oracle.md"
+        "spec-compiler.md"
+        "quick-validator.md"
     )
 
     if [[ ! -d "$source_dir" ]]; then
@@ -148,9 +150,89 @@ install_opencode() {
         fi
     fi
 
-    # Note about config file
-    log_info "OpenCode config: Copy prompts/opencode/opencode.json.example to ~/.config/opencode/opencode.json"
-    log_info "  ⚠️  IMPORTANT: Replace YOUR_FIREWORKS_API_KEY_HERE with your actual API key (DO NOT commit)"
+    # Setup config directory and copy example config
+    local config_dir="$HOME/.config/opencode"
+    local config_file="$config_dir/opencode.json"
+    local example_file="$REPO_DIR/prompts/opencode/opencode.json.example"
+
+    mkdir -p "$config_dir"
+
+    if [[ -f "$example_file" ]]; then
+        if [[ ! -f "$config_file" ]]; then
+            cp "$example_file" "$config_file"
+            log_success "OpenCode config created: $config_file"
+        else
+            log_warn "OpenCode config already exists: $config_file (not overwriting)"
+        fi
+    else
+        log_warn "Example config not found: $example_file"
+    fi
+
+    log_warn "  ⚠️  IMPORTANT: Edit $config_file and replace YOUR_FIREWORKS_API_KEY_HERE with your actual API key (DO NOT commit)"
+
+    # Self-check: verify installed files
+    _self_check_opencode "$agent_dest" "$commands_dest" "$config_file"
+}
+
+# Self-check function for OpenCode installation
+_self_check_opencode() {
+    local agent_dest="$1"
+    local commands_dest="$2"
+    local config_file="$3"
+    local failed=0
+
+    log_info "Running OpenCode self-check..."
+
+    # Check required agent files
+    local required_agent_files=(
+        "spec-compiler.md"
+        "quick-validator.md"
+        "codex53-kimi.md"
+        "kimi-general.md"
+        "kimi-explore.md"
+        "github-librarian.md"
+        "docs-research.md"
+        "walkthrough.md"
+        "oracle.md"
+    )
+
+    for f in "${required_agent_files[@]}"; do
+        if [[ ! -f "$agent_dest/$f" ]]; then
+            log_error "Missing agent file: $agent_dest/$f"
+            ((failed++))
+        fi
+    done
+
+    # Check required command files
+    local required_command_files=(
+        "pr-reviewer-only.md"
+        "refactor.md"
+        "review.md"
+        "pr-reviewer.md"
+        "change-auditor.md"
+        "deslop.md"
+        "create-pr.md"
+    )
+
+    for f in "${required_command_files[@]}"; do
+        if [[ ! -f "$commands_dest/$f" ]]; then
+            log_error "Missing command file: $commands_dest/$f"
+            ((failed++))
+        fi
+    done
+
+    # Check config file exists
+    if [[ ! -f "$config_file" ]]; then
+        log_error "Missing config file: $config_file"
+        ((failed++))
+    fi
+
+    if [[ $failed -eq 0 ]]; then
+        log_success "OpenCode self-check PASSED: all required files installed"
+    else
+        log_warn "OpenCode self-check FAILED: $failed check(s) failed"
+        log_warn "  → Run the installer again or check file permissions"
+    fi
 }
 
 # Install Antigravity prompts
