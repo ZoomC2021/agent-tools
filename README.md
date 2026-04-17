@@ -62,15 +62,23 @@ The orchestrator uses keyword-based deterministic routing:
 | Local discovery | "find", "search", "explore" | **kimi-explore** |
 | Implementation | "implement", "fix", "refactor" | **kimi-general** |
 
-### 4-Phase Implementation Workflow
+### Mission-Aware Implementation Workflow
 
-For implementation/debugging/refactoring tasks, the orchestrator follows:
+For implementation/debugging/refactoring tasks, the orchestrator uses one of two paths:
 
-1. **PHASE 0 (optional): docs-research / github-librarian** → Gather official docs or upstream reference code first
-2. **PHASE 1: spec-compiler** → Compile Execution Contract (scope, risks, success criteria)
-3. **PHASE 2: kimi-general** → Execute implementation based on contract
-4. **PHASE 3: quick-validator** → Run validation tests/checks
-5. **PHASE 4 (optional): change-auditor** → Deep audit for high-risk areas
+1. **Standard flow** for small/medium single-milestone work:
+   1. **PHASE 0 (optional): docs-research / github-librarian** → Gather official docs or upstream reference code first
+   2. **PHASE 1: spec-compiler** → Compile Execution Contract (scope, risks, success criteria)
+   3. **PHASE 2: kimi-general** → Execute implementation based on contract
+   4. **PHASE 3: quick-validator** → Run validation tests/checks
+   5. **PHASE 4 (optional): change-auditor** → Deep audit for high-risk areas
+
+2. **Mission flow** for long-running, multi-step work:
+   1. **PHASE 0 (optional): docs-research / github-librarian** → Gather external references first when needed
+   2. **PHASE 1: mission-scrutiny** → Front-load scrutiny, decompose into milestones, set validation cadence
+   3. **PHASE 2 (loop per milestone): spec-compiler → kimi-general → milestone-validator**
+   4. **PHASE 3: quick-validator** → Final end-to-end validation across all milestones
+   5. **PHASE 4 (optional): change-auditor** → Deep audit for high-risk milestone or final changes
 
 ### Directory Layout
 
@@ -89,6 +97,8 @@ For implementation/debugging/refactoring tasks, the orchestrator follows:
 └── commands/                  # Workflow prompts
     ├── review.md
     ├── deslop.md
+    ├── mission-scrutiny.md
+    ├── milestone-validator.md
     ├── pr-reviewer.md
     ├── create-pr.md
     ├── spec-compiler.md
@@ -182,6 +192,7 @@ mkdir -p ~/.config/opencode/bin
 
 # Copy workflow prompts to commands/
 for f in prompts/opencode/review.md prompts/opencode/deslop.md \
+         prompts/opencode/mission-scrutiny.md prompts/opencode/milestone-validator.md \
          prompts/opencode/pr-reviewer.md prompts/opencode/create-pr.md \
          prompts/opencode/spec-compiler.md prompts/opencode/quick-validator.md \
          prompts/opencode/change-auditor.md; do
@@ -338,6 +349,7 @@ mkdir -p ~/.config/opencode/bin
 
 # Copy workflow prompts to commands/
 for f in prompts/opencode/review.md prompts/opencode/deslop.md \
+         prompts/opencode/mission-scrutiny.md prompts/opencode/milestone-validator.md \
          prompts/opencode/pr-reviewer.md prompts/opencode/create-pr.md \
          prompts/opencode/spec-compiler.md prompts/opencode/quick-validator.md \
          prompts/opencode/change-auditor.md; do

@@ -211,6 +211,8 @@ function Test-OpenCodeInstallation {
 
     # Check required command files
     $requiredCommandFiles = @(
+        "mission-scrutiny.md",
+        "milestone-validator.md",
         "pr-reviewer-only.md",
         "refactor.md",
         "review.md",

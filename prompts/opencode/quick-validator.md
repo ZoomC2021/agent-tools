@@ -28,6 +28,7 @@ You receive:
 - List of modified files
 - Implementation summary
 - Expected behavior / success criteria
+- Optional mission context (milestone ledger, mission scrutiny output) when validating the final pass of a long-running task
 
 ## Output: Validation Receipt
 
@@ -73,6 +74,8 @@ Your ONLY output is the Validation Receipt.
 2. **Verify each success criterion**
    - Check against actual modified files
    - Confirm behavior matches contract
+
+   If mission context is provided, also verify the final behavior is consistent with earlier milestone receipts and that no milestone-level assumptions were broken later.
 
 3. **Spot-check for regressions**
    - Did any existing tests fail?

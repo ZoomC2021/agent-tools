@@ -205,6 +205,8 @@ _self_check_opencode() {
 
     # Check required command files
     local required_command_files=(
+        "mission-scrutiny.md"
+        "milestone-validator.md"
         "pr-reviewer-only.md"
         "refactor.md"
         "review.md"
