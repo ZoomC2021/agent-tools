@@ -1,7 +1,7 @@
 ---
 description: Quick validation that implementation meets contract and passes tests
 mode: subagent
-model: fireworks-ai/accounts/fireworks/models/kimi-k2-5
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 permission:
   task:
     '*': deny
