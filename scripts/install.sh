@@ -89,8 +89,6 @@ install_opencode() {
         "docs-research.md"
         "walkthrough.md"
         "oracle.md"
-        "spec-compiler.md"
-        "quick-validator.md"
     )
 
     if [[ ! -d "$source_dir" ]]; then
@@ -119,6 +117,17 @@ install_opencode() {
         fi
     done
     log_success "OpenCode commands: $commands_dest"
+
+    # Keep legacy prompts/ in sync for backward compatibility with older configs
+    local prompts_dest="$HOME/.config/opencode/prompts"
+    mkdir -p "$prompts_dest"
+    shopt -s nullglob
+    local command_files=("$commands_dest"/*.md)
+    shopt -u nullglob
+    if [[ ${#command_files[@]} -gt 0 ]]; then
+        cp "$commands_dest"/*.md "$prompts_dest/"
+        log_success "OpenCode legacy prompts mirror: $prompts_dest"
+    fi
 
     # Install agent files to agent/
     local agent_dest="$HOME/.config/opencode/agent"
@@ -185,8 +194,6 @@ _self_check_opencode() {
 
     # Check required agent files
     local required_agent_files=(
-        "spec-compiler.md"
-        "quick-validator.md"
         "codex53-kimi.md"
         "kimi-general.md"
         "kimi-explore.md"
@@ -205,6 +212,8 @@ _self_check_opencode() {
 
     # Check required command files
     local required_command_files=(
+        "spec-compiler.md"
+        "quick-validator.md"
         "mission-scrutiny.md"
         "milestone-validator.md"
         "pr-reviewer-only.md"
@@ -227,6 +236,12 @@ _self_check_opencode() {
     if [[ ! -f "$config_file" ]]; then
         log_error "Missing config file: $config_file"
         ((failed++))
+    else
+        _normalize_opencode_config_references "$config_file"
+        _sync_opencode_frontmatter_models "$config_file"
+        if ! _validate_opencode_config_file_references "$config_file"; then
+            ((failed++))
+        fi
     fi
 
     if [[ $failed -eq 0 ]]; then
@@ -235,6 +250,141 @@ _self_check_opencode() {
         log_warn "OpenCode self-check FAILED: $failed check(s) failed"
         log_warn "  → Run the installer again or check file permissions"
     fi
+}
+
+_normalize_opencode_config_references() {
+    local config_file="$1"
+
+    if ! grep -q "{file:\\./prompts/" "$config_file"; then
+        return 0
+    fi
+
+    local backup_file="${config_file}.backup-$(date +%Y%m%d-%H%M%S)-normalize-refs"
+    cp "$config_file" "$backup_file"
+
+    local tmp_file
+    tmp_file=$(mktemp)
+    sed 's|{file:\./prompts/|{file:./commands/|g' "$config_file" > "$tmp_file"
+    mv "$tmp_file" "$config_file"
+
+    log_warn "Normalized OpenCode config refs: ./prompts -> ./commands"
+    log_warn "  Backup written to: $backup_file"
+}
+
+_sync_opencode_frontmatter_models() {
+    local config_file="$1"
+
+    if ! command -v jq >/dev/null 2>&1; then
+        log_warn "jq not found; skipping prompt frontmatter model sync"
+        return 0
+    fi
+
+    local config_dir
+    config_dir="$(dirname "$config_file")"
+
+    local rows
+    rows="$(jq -r '
+      .agent
+      | to_entries[]
+      | select((.value.prompt | type) == "string")
+      | select((.value.model | type) == "string")
+      | select(.value.prompt | test("^\\{file:[^}]+\\}$"))
+      | [
+          .key,
+          .value.model,
+          (.value.prompt | capture("^\\{file:(?<path>[^}]+)\\}$").path)
+        ]
+      | @tsv
+    ' "$config_file" 2>/dev/null || true)"
+
+    if [[ -z "$rows" ]]; then
+        return 0
+    fi
+
+    while IFS=$'\t' read -r agent_name agent_model prompt_rel_path; do
+        [[ -z "$agent_name" || -z "$agent_model" || -z "$prompt_rel_path" ]] && continue
+
+        local prompt_file
+        if [[ "$prompt_rel_path" = /* ]]; then
+            prompt_file="$prompt_rel_path"
+        else
+            prompt_file="$config_dir/${prompt_rel_path#./}"
+        fi
+
+        [[ -f "$prompt_file" ]] || continue
+
+        local frontmatter_model
+        frontmatter_model="$(awk '
+            NR==1 && $0=="---" { in_fm=1; next }
+            in_fm && $0=="---" { exit }
+            in_fm && $0 ~ /^model:[[:space:]]*/ {
+                sub(/^model:[[:space:]]*/, "", $0)
+                print $0
+                exit
+            }
+        ' "$prompt_file")"
+
+        if [[ -n "$frontmatter_model" && "$frontmatter_model" != "$agent_model" ]]; then
+            local tmp_file
+            tmp_file="$(mktemp)"
+            awk -v new_model="$agent_model" '
+                NR==1 && $0=="---" { in_fm=1; print; next }
+                in_fm && !replaced && $0 ~ /^model:[[:space:]]*/ {
+                    print "model: " new_model
+                    replaced=1
+                    next
+                }
+                in_fm && $0=="---" { in_fm=0; print; next }
+                { print }
+            ' "$prompt_file" > "$tmp_file"
+            mv "$tmp_file" "$prompt_file"
+            log_warn "Aligned frontmatter model for $agent_name to config model: $agent_model"
+        fi
+    done <<< "$rows"
+}
+
+_validate_opencode_config_file_references() {
+    local config_file="$1"
+    local missing=0
+
+    if ! command -v jq >/dev/null 2>&1; then
+        log_warn "jq not found; skipping config file-reference validation"
+        return 0
+    fi
+
+    if ! jq -e '.' "$config_file" >/dev/null 2>&1; then
+        log_error "Invalid OpenCode config JSON: $config_file"
+        return 1
+    fi
+
+    local config_dir
+    config_dir="$(dirname "$config_file")"
+
+    while IFS= read -r ref_path; do
+        [[ -z "$ref_path" ]] && continue
+
+        local resolved_path
+        if [[ "$ref_path" = /* ]]; then
+            resolved_path="$ref_path"
+        else
+            resolved_path="$config_dir/${ref_path#./}"
+        fi
+
+        if [[ ! -f "$resolved_path" ]]; then
+            log_error "Bad file reference in opencode.json: {file:$ref_path} -> $resolved_path"
+            missing=1
+        fi
+    done < <(jq -r '
+        .. | strings
+        | select(test("^\\{file:[^}]+\\}$"))
+        | capture("^\\{file:(?<path>[^}]+)\\}$").path
+    ' "$config_file" | sort -u)
+
+    if [[ $missing -eq 1 ]]; then
+        return 1
+    fi
+
+    return 0
 }
 
 # Install Antigravity prompts

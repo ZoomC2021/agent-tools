@@ -108,9 +108,7 @@ function Install-OpenCode {
         "github-librarian.md",
         "docs-research.md",
         "walkthrough.md",
-        "oracle.md",
-        "spec-compiler.md",
-        "quick-validator.md"
+        "oracle.md"
     )
 
     # Install command prompts (workflows) to commands/
@@ -125,6 +123,12 @@ function Install-OpenCode {
     } else {
         Copy-Item $CommandFiles.FullName -Destination $CommandsDest -Force
         Write-Success "OpenCode commands: $CommandsDest"
+
+        # Keep legacy prompts/ in sync for backward compatibility with older configs
+        $PromptsDest = Join-Path $env:USERPROFILE ".config\opencode\prompts"
+        New-Item -ItemType Directory -Path $PromptsDest -Force | Out-Null
+        Copy-Item "$CommandsDest\*.md" -Destination $PromptsDest -Force
+        Write-Success "OpenCode legacy prompts mirror: $PromptsDest"
     }
 
     # Install agent files to agent/
@@ -190,8 +194,6 @@ function Test-OpenCodeInstallation {
 
     # Check required agent files
     $requiredAgentFiles = @(
-        "spec-compiler.md",
-        "quick-validator.md",
         "codex53-kimi.md",
         "kimi-general.md",
         "kimi-explore.md",
@@ -211,6 +213,8 @@ function Test-OpenCodeInstallation {
 
     # Check required command files
     $requiredCommandFiles = @(
+        "spec-compiler.md",
+        "quick-validator.md",
         "mission-scrutiny.md",
         "milestone-validator.md",
         "pr-reviewer-only.md",
@@ -234,6 +238,13 @@ function Test-OpenCodeInstallation {
     if (-not (Test-Path $ConfigFile)) {
         Write-Err "Missing config file: $ConfigFile"
         $failed++
+    } else {
+        Repair-OpenCodeConfigReferences -ConfigFile $ConfigFile
+        Sync-OpenCodePromptFrontmatterModels -ConfigFile $ConfigFile
+        $missingRefs = Test-OpenCodeConfigFileReferences -ConfigFile $ConfigFile
+        if ($missingRefs -gt 0) {
+            $failed += $missingRefs
+        }
     }
 
     if ($failed -eq 0) {
@@ -242,6 +253,164 @@ function Test-OpenCodeInstallation {
         Write-Warn "OpenCode self-check FAILED: $failed check(s) failed"
         Write-Warn "  → Run the installer again or check file permissions"
     }
+}
+
+function Repair-OpenCodeConfigReferences {
+    param([string]$ConfigFile)
+
+    if (-not (Test-Path $ConfigFile)) { return }
+
+    $content = Get-Content -Raw -Path $ConfigFile
+    if ($content -notmatch "\{file:\./prompts/") { return }
+
+    $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+    $backup = "$ConfigFile.backup-$timestamp-normalize-refs"
+    Copy-Item -Path $ConfigFile -Destination $backup -Force
+
+    $updated = $content -replace "\{file:\./prompts/", "{file:./commands/"
+    Set-Content -Path $ConfigFile -Value $updated -NoNewline
+
+    Write-Warn "Normalized OpenCode config refs: ./prompts -> ./commands"
+    Write-Warn "  Backup written to: $backup"
+}
+
+function Sync-OpenCodePromptFrontmatterModels {
+    param([string]$ConfigFile)
+
+    if (-not (Test-Path $ConfigFile)) { return }
+
+    try {
+        $config = Get-Content -Raw -Path $ConfigFile | ConvertFrom-Json
+    } catch {
+        Write-Warn "Skipping prompt frontmatter model sync; invalid JSON in $ConfigFile"
+        return
+    }
+
+    if (-not ($config.PSObject.Properties.Name -contains "agent")) { return }
+
+    $configDir = Split-Path -Parent $ConfigFile
+
+    foreach ($entry in $config.agent.PSObject.Properties) {
+        $agentName = $entry.Name
+        $agentConfig = $entry.Value
+
+        if ($null -eq $agentConfig) { continue }
+        if (-not ($agentConfig.PSObject.Properties.Name -contains "model")) { continue }
+        if (-not ($agentConfig.PSObject.Properties.Name -contains "prompt")) { continue }
+
+        $agentModel = [string]$agentConfig.model
+        $promptRef = [string]$agentConfig.prompt
+
+        if ($promptRef -notmatch '^\{file:(.+)\}$') { continue }
+        $promptPathRef = $Matches[1]
+
+        $promptPath =
+            if ([System.IO.Path]::IsPathRooted($promptPathRef)) {
+                $promptPathRef
+            } else {
+                Join-Path $configDir ($promptPathRef -replace '^\./', '')
+            }
+
+        if (-not (Test-Path $promptPath)) { continue }
+
+        $lines = Get-Content -Path $promptPath
+        if ($lines.Count -lt 3) { continue }
+        if ($lines[0] -ne "---") { continue }
+
+        $frontmatterEnd = -1
+        for ($i = 1; $i -lt $lines.Count; $i++) {
+            if ($lines[$i] -eq "---") {
+                $frontmatterEnd = $i
+                break
+            }
+        }
+        if ($frontmatterEnd -lt 0) { continue }
+
+        $modelLineIndex = -1
+        $frontmatterModel = $null
+        for ($i = 1; $i -lt $frontmatterEnd; $i++) {
+            if ($lines[$i] -match '^model:\s*(.+)$') {
+                $modelLineIndex = $i
+                $frontmatterModel = $Matches[1].Trim()
+                break
+            }
+        }
+        if ($modelLineIndex -lt 0) { continue }
+
+        if ($frontmatterModel -ne $agentModel) {
+            $lines[$modelLineIndex] = "model: $agentModel"
+            Set-Content -Path $promptPath -Value $lines
+            Write-Warn "Aligned frontmatter model for $agentName to config model: $agentModel"
+        }
+    }
+}
+
+function Get-OpenCodeFileRefs {
+    param([object]$Object)
+
+    $refs = @()
+
+    if ($null -eq $Object) { return $refs }
+
+    if ($Object -is [string]) {
+        if ($Object -match '^\{file:(.+)\}$') {
+            return @($Matches[1])
+        }
+        return $refs
+    }
+
+    if ($Object -is [System.Collections.IDictionary]) {
+        foreach ($value in $Object.Values) {
+            $refs += Get-OpenCodeFileRefs -Object $value
+        }
+        return $refs
+    }
+
+    if ($Object -is [System.Collections.IEnumerable] -and -not ($Object -is [string])) {
+        foreach ($item in $Object) {
+            $refs += Get-OpenCodeFileRefs -Object $item
+        }
+        return $refs
+    }
+
+    foreach ($prop in $Object.PSObject.Properties) {
+        $refs += Get-OpenCodeFileRefs -Object $prop.Value
+    }
+
+    return $refs
+}
+
+function Test-OpenCodeConfigFileReferences {
+    param([string]$ConfigFile)
+
+    if (-not (Test-Path $ConfigFile)) { return 0 }
+
+    $configDir = Split-Path -Parent $ConfigFile
+    $missing = 0
+
+    try {
+        $configObj = Get-Content -Raw -Path $ConfigFile | ConvertFrom-Json
+    } catch {
+        Write-Err "Invalid OpenCode config JSON: $ConfigFile"
+        return 1
+    }
+
+    $refs = Get-OpenCodeFileRefs -Object $configObj | Sort-Object -Unique
+    foreach ($ref in $refs) {
+        $resolved =
+            if ([System.IO.Path]::IsPathRooted($ref)) {
+                $ref
+            } else {
+                Join-Path $configDir ($ref -replace '^\./', '')
+            }
+
+        if (-not (Test-Path $resolved)) {
+            Write-Err "Bad file reference in opencode.json: {file:$ref} -> $resolved"
+            $missing++
+        }
+    }
+
+    return $missing
 }
 
 function Install-RooCode {
