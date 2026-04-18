@@ -1,17 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "_comment": "OPENCODE CONFIGURATION EXAMPLE - Codex53-Kimi Setup",
-  "_security_warning": "⚠️  NEVER commit this file with real API keys to version control. Use environment variables or secure secrets management instead.",
-  "_file_placement": {
-    "agent_files": "~/.config/opencode/agent/ - Primary agent prompts and subagent prompts (codex53-kimi.md, kimi-general.md, kimi-explore.md, github-librarian.md, docs-research.md, walkthrough.md, oracle.md)",
-    "command_prompts": "~/.config/opencode/commands/ - Workflow and orchestration prompts (review.md, deslop.md, mission-scrutiny.md, milestone-validator.md, spec-compiler.md, etc.)",
-    "helper_binaries": "~/.config/opencode/bin/ - Helper scripts used by subagents (for example opencode-gh-librarian)",
-    "this_config": "~/.config/opencode/opencode.json - Main configuration file"
-  },
   "provider": {
     "fireworks-ai": {
       "options": {
-        "_apiKey_note": "Use env var: OPENCODE_FIREWORKS_API_KEY or replace with your key (DO NOT COMMIT)",
         "apiKey": "YOUR_FIREWORKS_API_KEY_HERE"
       }
     }
@@ -27,9 +18,7 @@
     }
   },
   "agent": {
-    "_comment": "AGENT DEFINITIONS - These reference files in ~/.config/opencode/agent/",
     "codex53-kimi": {
-      "_description": "Primary orchestrator agent - delegates to subagents for specialized tasks",
       "model": "openai/gpt-5.3-codex",
       "prompt": "{file:./agent/codex53-kimi.md}",
       "permission": {
@@ -58,61 +47,122 @@
         "rules": [
           {
             "trigger": "PR creation or opening",
-            "keywords": ["create PR", "open PR", "pull request", "new PR"],
+            "keywords": [
+              "create PR",
+              "open PR",
+              "pull request",
+              "new PR"
+            ],
             "agent": "create-pr",
             "reason": "PR creation workflow requires specialized commit/branch/PR handling"
           },
           {
             "trigger": "PR comments or feedback handling",
-            "keywords": ["PR comment", "review feedback", "address PR", "fix PR"],
+            "keywords": [
+              "PR comment",
+              "review feedback",
+              "address PR",
+              "fix PR"
+            ],
             "agent": "pr-reviewer",
             "reason": "PR feedback requires GitHub API integration and structured response handling"
           },
           {
             "trigger": "Plan/prompt-only PR review",
-            "keywords": ["PR review plan", "PR prompt only", "generate PR fix plan"],
+            "keywords": [
+              "PR review plan",
+              "PR prompt only",
+              "generate PR fix plan"
+            ],
             "agent": "pr-reviewer-only",
             "reason": "User requested implementation plan without direct changes"
           },
           {
             "trigger": "Code quality or principles audit",
-            "keywords": ["audit", "code quality", "principles", "deslop", "clean code"],
+            "keywords": [
+              "audit",
+              "code quality",
+              "principles",
+              "deslop",
+              "clean code"
+            ],
             "agent": "deslop",
             "reason": "Quality audits require specialized coding principles analysis"
           },
           {
             "trigger": "Uncommitted changes review",
-            "keywords": ["review changes", "uncommitted", "git diff review", "pre-commit review"],
+            "keywords": [
+              "review changes",
+              "uncommitted",
+              "git diff review",
+              "pre-commit review"
+            ],
             "agent": "review",
             "reason": "Review agent specializes in local change validation and quick remediation"
           },
           {
             "trigger": "Remote GitHub code research",
-            "keywords": ["github.com/", "owner/repo", "upstream repo", "remote repo", "reference implementation"],
+            "keywords": [
+              "github.com/",
+              "owner/repo",
+              "upstream repo",
+              "remote repo",
+              "reference implementation"
+            ],
             "agent": "github-librarian",
             "reason": "Remote repository analysis should use a dedicated GitHub research worker"
           },
           {
             "trigger": "Official docs, API behavior, migration notes, release notes",
-            "keywords": ["official docs", "documentation", "api docs", "migration guide", "release notes", "how does"],
+            "keywords": [
+              "official docs",
+              "documentation",
+              "api docs",
+              "migration guide",
+              "release notes",
+              "how does"
+            ],
             "agent": "docs-research",
             "reason": "External behavior questions should be grounded in authoritative documentation"
           },
           {
             "trigger": "Local architecture walkthrough and diagrams",
-            "keywords": ["walk me through", "show the flow", "diagram", "architecture", "how does this work"],
+            "keywords": [
+              "walk me through",
+              "show the flow",
+              "diagram",
+              "architecture",
+              "how does this work"
+            ],
             "agent": "walkthrough",
             "reason": "Architecture explanations deserve a dedicated evidence-backed walkthrough agent"
           },
           {
             "trigger": "Discovery and search only",
-            "keywords": ["find", "search", "discover", "explore", "locate", "where is"],
+            "keywords": [
+              "find",
+              "search",
+              "discover",
+              "explore",
+              "locate",
+              "where is"
+            ],
             "agent": "kimi-explore",
             "reason": "Read-only exploration should use lightweight discovery agent"
           },
           {
             "trigger": "Implementation, debugging, refactoring, execution",
-            "keywords": ["implement", "fix", "debug", "refactor", "build", "execute", "create", "add", "change"],
+            "keywords": [
+              "implement",
+              "fix",
+              "debug",
+              "refactor",
+              "build",
+              "execute",
+              "create",
+              "add",
+              "change"
+            ],
             "agent": "kimi-general",
             "reason": "General worker for concrete execution tasks when no specialized agent matches; large multi-step tasks add mission-scrutiny and milestone-validator around it"
           }
@@ -142,10 +192,10 @@
           "specialized_priority": "If a specialized agent exists for the request type, do NOT use kimi-general unless specialized agent returns BLOCKED",
           "response_requirement": "Every final user-facing response MUST include: 'Agent chosen: <agent_name> + Reason: <routing_reason>'; mission-style tasks should also report scrutiny and milestone outcomes"
         }
-      }
+      },
+      "description": "Primary orchestrator agent - delegates to subagents for specialized tasks"
     },
     "github-librarian": {
-      "_description": "Read-only remote GitHub code research on default branches with lightweight history",
       "mode": "subagent",
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "hidden": true,
@@ -156,10 +206,10 @@
         },
         "read": "allow",
         "bash": "allow"
-      }
+      },
+      "description": "Read-only remote GitHub code research on default branches with lightweight history"
     },
     "docs-research": {
-      "_description": "Research official documentation, API behavior, and release notes",
       "mode": "subagent",
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "hidden": true,
@@ -171,10 +221,10 @@
         "read": "allow",
         "webfetch": "allow",
         "websearch": "allow"
-      }
+      },
+      "description": "Research official documentation, API behavior, and release notes"
     },
     "walkthrough": {
-      "_description": "Explain local architecture and generate Mermaid walkthroughs",
       "mode": "subagent",
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "hidden": true,
@@ -185,10 +235,10 @@
         },
         "read": "allow",
         "bash": "allow"
-      }
+      },
+      "description": "Explain local architecture and generate Mermaid walkthroughs"
     },
     "oracle": {
-      "_description": "Deep reasoning agent for complex problems - GPT-5.4 powered",
       "model": "openai/gpt-5.4",
       "prompt": "{file:./agent/oracle.md}",
       "permission": {
@@ -196,109 +246,106 @@
           "*": "deny",
           "oracle-consult": "allow"
         }
-      }
+      },
+      "description": "Deep reasoning agent for complex problems - GPT-5.4 powered"
     },
     "mission-scrutiny": {
-      "_description": "Front-load scrutiny and milestone planning for long-running multi-step tasks",
       "mode": "subagent",
       "model": "openai/gpt-5.3-codex",
       "hidden": true,
-      "prompt": "{file:./prompts/mission-scrutiny.md}"
+      "prompt": "{file:./commands/mission-scrutiny.md}",
+      "description": "Front-load scrutiny and milestone planning for long-running multi-step tasks"
     },
     "kimi-general": {
-      "_description": "General worker for implementation, debugging, refactoring, execution",
       "mode": "subagent",
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "hidden": true,
-      "prompt": "{file:./agent/kimi-general.md}"
+      "prompt": "{file:./agent/kimi-general.md}",
+      "description": "General worker for implementation, debugging, refactoring, execution"
     },
     "kimi-explore": {
-      "_description": "Lightweight read-only discovery and search agent",
       "mode": "subagent",
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "hidden": true,
       "prompt": "{file:./agent/kimi-explore.md}",
       "permission": {
-        "task": { "*": "deny" },
+        "task": {
+          "*": "deny"
+        },
         "read": "allow",
         "bash": "allow"
-      }
+      },
+      "description": "Lightweight read-only discovery and search agent"
     },
     "review": {
-      "_description": "Review uncommitted changes and report/fix issues",
       "mode": "subagent",
       "model": "openai/gpt-5.3-codex",
       "hidden": true,
-      "prompt": "{file:./prompts/review.md}"
+      "prompt": "{file:./commands/review.md}",
+      "description": "Review uncommitted changes and report/fix issues"
     },
     "deslop": {
-      "_description": "Detect and prioritize code quality violations",
       "mode": "subagent",
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "hidden": true,
-      "prompt": "{file:./prompts/deslop.md}"
+      "prompt": "{file:./commands/deslop.md}",
+      "description": "Detect and prioritize code quality violations"
     },
     "refactor": {
-      "_description": "Analyze and prioritize refactoring opportunities",
       "mode": "subagent",
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "hidden": true,
-      "prompt": "{file:./prompts/refactor.md}"
+      "prompt": "{file:./commands/refactor.md}",
+      "description": "Analyze and prioritize refactoring opportunities"
     },
     "pr-reviewer": {
-      "_description": "Fetch PR feedback and apply fixes on the PR branch",
       "mode": "subagent",
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "hidden": true,
-      "prompt": "{file:./prompts/pr-reviewer.md}"
+      "prompt": "{file:./commands/pr-reviewer.md}",
+      "description": "Fetch PR feedback and apply fixes on the PR branch"
     },
     "pr-reviewer-only": {
-      "_description": "Fetch PR feedback and produce an implementation prompt",
       "mode": "subagent",
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "hidden": true,
-      "prompt": "{file:./prompts/pr-reviewer-only.md}"
+      "prompt": "{file:./commands/pr-reviewer-only.md}",
+      "description": "Fetch PR feedback and produce an implementation prompt"
     },
     "create-pr": {
-      "_description": "Create a pull request from current git changes",
       "mode": "subagent",
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "hidden": true,
-      "prompt": "{file:./prompts/create-pr.md}"
+      "prompt": "{file:./commands/create-pr.md}",
+      "description": "Create a pull request from current git changes"
     },
     "spec-compiler": {
-      "_description": "Compile Execution Contract before implementation work (Phase 1)",
       "mode": "subagent",
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "hidden": true,
-      "prompt": "{file:./prompts/spec-compiler.md}"
+      "prompt": "{file:./commands/spec-compiler.md}",
+      "description": "Compile Execution Contract before implementation work (Phase 1)"
     },
     "milestone-validator": {
-      "_description": "Validate each milestone before the next milestone begins",
       "mode": "subagent",
       "model": "openai/gpt-5.3-codex",
       "hidden": true,
-      "prompt": "{file:./prompts/milestone-validator.md}"
+      "prompt": "{file:./commands/milestone-validator.md}",
+      "description": "Validate each milestone before the next milestone begins"
     },
     "quick-validator": {
-      "_description": "Run quick validation checks on implementation output (Phase 3)",
       "mode": "subagent",
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "hidden": true,
-      "prompt": "{file:./prompts/quick-validator.md}"
+      "prompt": "{file:./commands/quick-validator.md}",
+      "description": "Run quick validation checks on implementation output (Phase 3)"
     },
     "change-auditor": {
-      "_description": "Deep audit for high-risk changes, security, breaking changes (Phase 4, optional)",
       "mode": "subagent",
       "model": "openai/gpt-5.3-codex",
       "hidden": true,
-      "prompt": "{file:./prompts/change-auditor.md}"
+      "prompt": "{file:./commands/change-auditor.md}",
+      "description": "Deep audit for high-risk changes, security, breaking changes (Phase 4, optional)"
     }
-  },
-  "_reference_setup": {
-    "note": "This configuration enables deterministic routing between specialized subagents",
-    "architecture": "codex53-kimi (orchestrator) -> subagents (mission-scrutiny, kimi-general, kimi-explore, github-librarian, docs-research, walkthrough, review, deslop, pr-reviewer, create-pr, milestone-validator)",
-    "workflow": "Standard flow: spec-compiler -> kimi-general -> quick-validator -> change-auditor (optional). Long-running flow adds mission-scrutiny plus per-milestone validation gates.",
-    "local_reference": "~/.config/opencode/agent/ contains agent definitions, ~/.config/opencode/commands/ contains workflow prompts, ~/.config/opencode/bin/ contains helper scripts"
   }
 }
