@@ -53,19 +53,25 @@ When asked to "create pr" or "make a pr":
 
 When asked to "deslop" or analyze code quality:
 
-1. Read the target files/directory specified by the user (or all source files if none specified)
-2. Cross-reference code against established software engineering principles:
-   - **Simplicity**: KISS, YAGNI, Small Functions, Guard Clauses
-   - **Clarity**: Cognitive Load, SLAP, Self-Documenting Code, Documentation Discipline
-   - **Architecture**: DRY, Single Source of Truth, Separation of Concerns, Modularity
-   - **Dependencies**: Encapsulation, Law of Demeter, Composition Over Inheritance
-   - **Design Patterns**: SOLID, Convention Over Configuration, Command-Query Separation
-   - **Data**: Parse Don't Validate, Immutability, Idempotency
-   - **Reliability**: Fail-Fast, Design by Contract, Postel's Law, Resilience, Observability
-3. For each violation found, provide:
-   - The principle violated
-   - Location in code (file:line)
-   - Before/after code examples showing the fix
-   - Severity: 🔴 Critical | 🟠 Warning | 🟡 Suggestion
-4. Group findings by file, ordered by severity
-5. Offer to apply fixes automatically for simple issues
+1. Treat `deslop` as a safe cleanup workflow, not a general refactor command
+2. Do a quick scan first: repo shape, language/tooling, likely validation commands, and risky generated/vendor/public API areas
+3. Read the relevant target files, then apply only the engineering principles that match the issues you actually find
+4. Inspect cleanup findings across these lanes:
+   - duplication / DRY with clear ownership
+   - weak types or shared type cleanup
+   - unused code, exports, or dependencies
+   - circular dependencies or boundary tangles
+   - error handling that hides failures
+   - deprecated, legacy, or fallback leftovers
+   - AI slop, stubs, stale comments, placeholder code
+   - local complexity, cognitive load, or naming problems
+5. Produce an evidence-backed report for each finding with:
+   - principle(s) involved
+   - location in code (`file:line`)
+   - evidence and why it matters
+   - smallest behavior-preserving fix
+   - risk: `Low`, `Medium`, or `High`
+   - status: `Implement now`, `Needs human review`, or `Defer to refactor`
+6. Include before/after code only when it clarifies a non-obvious or high-value change
+7. If the user asked for cleanup, implement only the high-confidence `Implement now` items and run the narrowest relevant validation first
+8. If the user asked only for an audit, stop after the report and clearly separate deferred refactor work from safe cleanup

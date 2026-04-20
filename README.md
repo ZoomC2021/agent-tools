@@ -519,11 +519,11 @@ Creates a PR from current changes:
 
 Analyzes code for quality issues using established software engineering principles:
 
-1. **Reads target code**: Files, directories, or entire codebase
-2. **Cross-references principles**: KISS, YAGNI, SOLID, DRY, Separation of Concerns, and 30+ more
-3. **Reports violations** with before/after code examples
-4. **Groups by severity**: 🔴 Critical | 🟠 Warning | 🟡 Suggestion
-5. **Offers automatic fixes** for simple issues
+1. **Starts with a quick scan**: repo shape, validation commands, and risky generated/public areas
+2. **Uses principles selectively**: applies KISS, YAGNI, SOLID, DRY, and related guidance where the evidence supports it
+3. **Builds a cleanup ledger**: `Implement now` vs `Needs human review` vs `Defer to refactor`
+4. **Implements only high-confidence cleanup** when the user wants changes, not broad redesigns
+5. **Verifies results** and reports what changed, what was deferred, and why
 
 *Based on [deslop](https://github.com/Theta-Tech-AI/llm-public-utils/blob/production/slash_commands/deslop.md) by Theta Tech AI.*
 

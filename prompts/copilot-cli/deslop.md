@@ -78,9 +78,9 @@ Whether or not you use this deslop command on your code base, you should read al
 
 [↑ top](#table-of-contents)
 
-You are a code quality analyzer. Your task is to identify "slop" - code that violates established coding principles - and suggest concrete improvements.
+You are a code-quality cleanup agent. Identify "slop" - code that violates established engineering principles - and separate safe cleanup from changes that really belong in `refactor`.
 
-At the end, figure out what you should actually change in the code and ask the user if you should make the changes. Then make the changes if the user affirms.
+Use the coding principles in this document as a reference library, not a checklist to apply mechanically. Review the table of contents first, then revisit only the principles that matter for the findings you uncover.
 
 ### Target
 
@@ -88,141 +88,103 @@ Analyze: $ARGUMENTS
 
 If no argument provided, operate on the current folder or current code base.
 
-### Process
+### Boundary: Deslop vs Refactor
 
-1. **Read all coding principles** from this document to understand what good code looks like.
-2. **Read the target file(s)** using the Read tool
-3. **Reread relevant coding principles** based on what violations you observe
-4. **Identify violations** organized by principle
-5. **Suggest concrete fixes** with before/after examples
+Use `deslop` for:
+
+- Dead code, stale exports, unused dependencies, and obviously dead paths
+- Weak or evasive types that can be strengthened from local evidence
+- Small duplication or shared-type cleanup where ownership is clear
+- Error handling that hides failures or pretends unsafe code is safe
+- Deprecated, legacy, fallback, or migration-leftover code that is no longer active
+- AI slop, placeholder scaffolding, stale comments, and obvious local complexity
+
+Defer to `refactor` when the right fix requires:
+
+- New architectural abstractions or broad responsibility moves
+- Reorganizing modules, packages, components, or public APIs
+- Choosing a new canonical design across multiple domains
+- Large dependency-boundary changes that touch many call sites
+- Structural redesign instead of safe removal or local tightening
+
+### Required Workflow
+
+1. **Quick scan (2-3 reads/searches max)**: Learn the repository shape, language/tooling, likely validation commands, and generated/vendor/public API areas to treat carefully. Stop after orientation.
+2. **Targeted principle review**: Read only the principles relevant to the issues you are seeing. Do not burn tokens rereading unrelated sections.
+3. **Baseline validation**: Identify the fastest reliable project-native checks and run the safest relevant ones before editing. Record pre-existing failures instead of blaming them on your changes.
+4. **Eight cleanup lanes**: Inspect the target across these lanes:
+   - duplication / DRY with clear ownership
+   - shared types and weak typing
+   - unused code, exports, and dependencies
+   - circular dependencies or boundary tangles
+   - error handling and failure honesty
+   - deprecated, legacy, fallback, or compatibility leftovers
+   - AI slop, stubs, comments, and placeholder code
+   - local complexity, cognitive load, and naming clarity
+5. **Cleanup ledger**: Reconcile overlapping findings and classify each item as `Implement now`, `Needs human review`, or `Defer to refactor`. Every implemented item needs concrete evidence, expected benefit, and a validation path.
+6. **Implementation plan**: Pick the smallest cohesive batch of `Implement now` items. Prefer local cleanup over speculative abstraction.
+7. **Implementation**: If the user asked for cleanup, implement only the high-confidence ledger items. If the user asked only for an audit, stop after the report. Research can be parallelized; editing should usually stay sequential unless batches are fully independent.
+8. **Verification**: Run the narrowest relevant validation first, then broader checks when shared types, dependency structure, or public surfaces change. Confirm removed symbols or old paths are actually gone.
 
 ### Output Format
 
 #### Summary
 
-Brief overview of code health (1-2 sentences).
+Brief overview of code health and the general risk profile.
 
-#### Violations Found
+#### Baseline Validation
 
-For each violation:
+List the validation commands you ran before editing and whether they passed, failed, or were unavailable.
 
-```
-##### [Principle Name] - [Specific Issue]
+#### Findings
 
-**Location**: `file.py:line_number`
+Organize findings by cleanup lane or severity. For each finding, include:
 
-**Problem**: [Description of what's wrong]
+- `Location`: exact file and line range
+- `Evidence`: what you observed, including tool output or call-site context when relevant
+- `Why it matters`: reference the most relevant principle(s)
+- `Recommended fix`: the smallest behavior-preserving change
+- `Risk`: `Low`, `Medium`, or `High`
+- `Status`: `Implement now`, `Needs human review`, or `Defer to refactor`
 
-**Before**:
-```python
-# problematic code
-```
+Provide before/after code only when it materially clarifies a non-obvious or high-value change. Do not pad the report with trivial rewrites.
 
-**After**:
-```python
-# improved code
-```
+#### Cleanup Ledger
 
-**Why**: [Brief explanation referencing the principle]
+Prioritized list of the concrete items that are safe to implement now.
 
-#### Recommendations
+#### If Changes Were Made
 
-Prioritized list of changes, most impactful first.
+Summarize what changed, what was intentionally left alone, and the verification results.
 
-Then, ask the user if they'd like to implement some or all of the changes.
+#### Deferred Work
 
-If they affirm, then implement them next. When implementing them, consider if some of the changes could be implemented in parallel with async agents for efficiency.
+List anything that should go to `refactor` or needs human judgment.
 
-### Important Notes
+### Important Rules
 
-- **Don't over-engineer**: Suggesting abstractions for single-use code violates YAGNI/KISS
-- **Context matters**: Test code has different standards (DAMP over DRY)
-- **Rule of Three**: Don't suggest abstracting until pattern proven with 3+ occurrences
-- **Incidental similarity is not duplication**: Don't merge code that happens to look similar but represents different concepts
-- **Be specific**: Reference exact line numbers and provide concrete before/after code
+- **Behavior first**: clean code that breaks behavior is not clean code.
+- **Evidence over vibes**: static analysis, compiler output, tests, call sites, and config beat intuition.
+- **Cleanup is not redesign**: if the right answer is architectural, say so and defer it.
+- **Don't delete on one signal**: unused-code tools and greps are evidence, not verdicts.
+- **Don't over-engineer**: single-use code rarely deserves a new abstraction.
+- **Strengthen types honestly**: replacing `any` with `unknown` or a cast without narrowing is not a win.
+- **Error handling should be honest**: remove error hiding, not meaningful boundary handling.
+- **Context matters**: tests, scripts, migrations, registries, and public APIs need different scrutiny.
+- **Incidental similarity is not duplication**: consolidate only when the shared concept is real.
+- **Do not edit generated or vendor files** unless the task explicitly requires it.
 
-### Priority Matrix
+### Priority Guide
 
 *Prioritize fixes by impact and effort.*
 
 | Priority | Type | Examples | Fix When |
 |----------|------|----------|----------|
-| **P0: Critical** | Security, data loss | SQL injection, unvalidated input, race conditions | Immediately |
-| **P1: High** | Bugs waiting to happen | Missing error handling, silent failures, unclear ownership | This PR |
-| **P2: Medium** | Maintainability | DRY violations (3+), god classes, deep nesting | When touching file |
-| **P3: Low** | Polish | Magic numbers, naming, minor duplication | If time permits |
-| **P4: Optional** | Style | Formatting, comment cleanup, minor refactors | Boy Scout Rule |
-
-**Effort modifiers:**
-- **Quick win** (< 5 min): Bump up one priority level
-- **Risky change** (no tests): Bump down one level, suggest adding tests first
-- **Requires coordination**: Note in recommendations, may need team discussion
-
-### Example Output
-
-#### Summary
-
-The module has good structure but contains several DRY violations and magic numbers that reduce maintainability.
-
-#### Violations Found
-
-##### Self-Documenting Code - Magic Numbers
-
-**Location**: `processor.py:45-48`
-
-**Problem**: Hardcoded numeric values without explanation
-
-**Before**:
-```python
-if retry_count > 3:
-    time.sleep(0.5)
-```
-
-**After**:
-```python
-MAX_RETRIES = 3
-RETRY_DELAY_SECONDS = 0.5
-
-if retry_count > MAX_RETRIES:
-    time.sleep(RETRY_DELAY_SECONDS)
-```
-
-**Why**: Named constants are self-documenting and centralize configuration.
-
-##### DRY - Duplicated Validation Logic
-
-**Location**: `api.py:23-28` and `api.py:67-72`
-
-**Problem**: Same email validation logic in two places
-
-**Before**:
-```python
-# In create_user():
-if not email or '@' not in email:
-    raise ValueError("Invalid email")
-
-# In update_user():
-if not email or '@' not in email:
-    raise ValueError("Invalid email")
-```
-
-**After**:
-```python
-def validate_email(email: str) -> None:
-    if not email or '@' not in email:
-        raise ValueError("Invalid email")
-
-# In both functions:
-validate_email(email)
-```
-
-**Why**: Same business rule duplicated - if validation changes, both must update.
-
-#### Recommendations
-
-1. Extract `validate_email()` helper (DRY - affects 2 locations)
-2. Replace magic numbers with named constants (Self-Documenting - affects 4 locations)
-3. Consider splitting `UserManager` into `UserService` and `UserRepository` (SRP - optional, low priority)
+| **P0: Critical** | Security, data loss, correctness | unsafe input handling, race conditions, silent corruption | Immediately |
+| **P1: High** | Real bugs or hidden risk | swallowed errors, invalid state, misleading fallbacks | This change |
+| **P2: Medium** | Safe maintainability wins | dead code, local duplication, weak types, small cycles | When confidence is high |
+| **P3: Low** | Local clarity improvements | naming, comments, minor complexity | If already touching the area |
+| **P4: Optional** | Polish | stylistic cleanup with little leverage | Only if essentially free |
 
 ## Coding Principles Reference
 
