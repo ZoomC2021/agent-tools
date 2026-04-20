@@ -6,6 +6,16 @@ description: Analyze codebase for refactoring opportunities and prioritize by im
 
 Analyze the codebase for refactoring opportunities and prioritize by impact.
 
+## Guard Rails
+
+Before applying any refactoring:
+
+- **Skip stable code** that won't change again — speculative refactoring has no payoff.
+- **Require tests first** on critical paths. Without tests you're editing, not refactoring; flag the area and stop.
+- **Preserve behavior exactly** — never mix refactoring with feature or bug-fix changes.
+- **One technique per commit** so regressions are bisectable.
+- **Don't introduce abstractions** (Strategy, Builder, wrapper types, Result types) unless they remove more code than they add. Three similar lines beats a premature framework.
+
 ## Step 1: Identify Scope
 
 Ask the user what area to analyze:
