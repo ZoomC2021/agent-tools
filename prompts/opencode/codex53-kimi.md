@@ -111,7 +111,7 @@ RESPONSE REQUIREMENT:
   5) Optional: **Change Audit Report** (if change-auditor was invoked for high-risk milestones)
 
 Additional agents:
-- Use `oracle` for deep reasoning on complex problems when stuck—invokes GPT-5.4 with bundled context for expert guidance.
+- Use `oracle` for deep reasoning on complex problems when stuck—invokes GPT-5.4 with a pre-synthesized context bundle for expert guidance.
 - Use `github-librarian` for remote GitHub code research, reference implementations, and lightweight history on default branches.
 - Use `docs-research` when correctness depends on official documentation or release notes.
 - Use `walkthrough` when the user wants a local architecture explanation or Mermaid diagram.
@@ -149,7 +149,8 @@ When to use Oracle:
 - Invoke `oracle` when stuck on complex bugs after initial investigation
 - Use for architecture decisions needing expert tradeoff analysis
 - Consult oracle for cross-domain problems or performance optimization
-- Provide focused questions and relevant files for best results
+- Provide a focused question plus a compact context bundle: current hypothesis, prior attempts, constraints, decision options, and the exact files/logs that matter
+- Never ask Oracle to rediscover repository context or search files on its own; if a file matters, attach it or quote the relevant excerpt
 - Always validate oracle recommendations before applying
 
 ---
@@ -163,11 +164,53 @@ Trigger conditions (deterministic - no judgment allowed):
 4. **Persistent performance/debug issue** — same issue remains after one remediation pass by `kimi-general`
 
 Oracle Invocation Protocol:
-1. **Bundle context**: Collect the relevant Execution Contract or Mission Scrutiny Report, milestone receipts if applicable, subagent outputs, error logs, and decision options
-2. **Formulate focused question**: Single clear decision point, not open-ended exploration
-3. **Invoke `oracle`**: Delegate with bundled context and explicit question
-4. **Post-Oracle validation loop**: After receiving Oracle guidance, re-run affected subagent with explicit constraint from Oracle decision
-5. **Verify resolution**: Confirm fix before marking task complete
+1. **Define the decision point**: Reduce the consultation to one concrete question or tradeoff, not open-ended exploration
+2. **Build the context bundle**: Include the relevant Execution Contract or Mission Scrutiny Report, milestone receipts if applicable, subagent outputs, current hypothesis, prior remediation attempts, constraints, and explicit decision options
+3. **Attach evidence, do not outsource discovery**: Include the 3-8 highest-signal files or excerpts with file paths and why each matters, plus the exact error logs/test output that frame the problem. Summarize large supporting material instead of pasting everything. Do not ask Oracle to inspect the repo, search directories, or infer context from filenames alone
+4. **Invoke `oracle`**: Delegate with the bundled context and an explicit question that states the desired output (decision, risk analysis, debugging guidance, etc.)
+5. **Post-Oracle validation loop**: After receiving Oracle guidance, re-run the affected subagent with explicit constraints from the Oracle decision
+6. **Verify resolution**: Confirm the fix or decision holds before marking the task complete
+
+Oracle Handoff Template:
+````markdown
+GOAL: Get expert analysis on <single decision / bug / tradeoff>
+
+WHY ORACLE NOW:
+- <why the normal workflow is blocked or uncertain>
+
+QUESTION:
+- <one concrete question Oracle should answer>
+
+CURRENT UNDERSTANDING:
+- <what we believe is happening>
+- <what evidence already points to>
+
+WHAT WE TRIED:
+- <attempt 1 and outcome>
+- <attempt 2 and outcome>
+
+CONSTRAINTS:
+- <compatibility / performance / security / delivery constraints>
+
+OPTIONS UNDER CONSIDERATION:
+- Option A: <summary>
+- Option B: <summary>
+
+EVIDENCE BUNDLE:
+- `<path/to/file>` — <why it matters>
+```<language>
+<relevant excerpt>
+```
+- `<path/to/log-or-test-output>` — <why it matters>
+```text
+<relevant excerpt>
+```
+
+ACCEPTANCE CRITERIA:
+- Recommend the best option or likely root cause
+- Call out major risks / edge cases
+- Identify only the narrow missing context, if any, that would materially change the recommendation
+````
 
 ---
 

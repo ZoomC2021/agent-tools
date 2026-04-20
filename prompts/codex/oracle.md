@@ -21,17 +21,26 @@ Or use npx: `npx -y @steipete/oracle ...`
 
 1. **Prepare context**
    - Identify the core question or problem
-   - Gather relevant files (code, config, logs)
-   - Summarize what you've already tried
+   - Gather the 3-8 highest-signal files or excerpts (code, config, logs), with precise paths
+   - Summarize what you've already tried, your current hypothesis, and the constraints Oracle should respect
+   - Prefer a compact curated bundle over broad globs; if a file matters, attach it or quote the relevant excerpt
 
 2. **Bundle and consult**
    ```bash
+   # Preview the bundle and per-file token cost before a paid run
+   npx -y @steipete/oracle \
+     --dry-run summary \
+     --files-report \
+     -p "Your detailed question here" \
+     --file "src/relevant/file.ts" \
+     --file "tests/failing_case.ts"
+
    # API mode (requires OPENAI_API_KEY)
    npx -y @steipete/oracle \
      --engine api \
      --model gpt-5.4 \
      -p "Your detailed question here" \
-     --file "src/**/*.ts" \
+     --file "src/relevant/file.ts" \
      --file "docs/architecture.md"
 
    # Or render for manual paste
@@ -53,6 +62,8 @@ Or use npx: `npx -y @steipete/oracle ...`
 - Provide specific, focused questions
 - Include relevant code files and context
 - Summarize prior investigation attempts
+- Use `--dry-run summary|full` and `--files-report` to inspect the exact bundle before a paid run
+- Treat Oracle as attachment-first: if a file matters, attach it or quote the relevant excerpt instead of asking Oracle to search for it
 - Use for complex problems, not trivial tasks
 - Verify oracle recommendations before applying
 
@@ -61,6 +72,7 @@ Or use npx: `npx -y @steipete/oracle ...`
 - Use for simple questions answerable by search
 - Blindly apply recommendations without validation
 - Rely on browser mode for automated workflows
+- Hand Oracle a broad directory or open-ended "look around the repo" task when you can provide the exact files instead
 
 ### STOP IF
 - The consultation would include sensitive data
@@ -82,7 +94,8 @@ npx -y @steipete/oracle \
   --engine api \
   --model gpt-5.4 \
   -p "Analyze this code for race conditions in the payment processing flow. I've observed intermittent test failures in test_payment_flow.py::test_refund. Review the transaction handling and async patterns." \
-  --file "src/payments/*.py" \
+  --file "src/payments/processor.py" \
+  --file "src/payments/transactions.py" \
   --file "tests/test_payment_flow.py"
 ```
 
@@ -92,7 +105,8 @@ npx -y @steipete/oracle \
   --engine api \
   --model gpt-5.4 \
   -p "We're considering migrating from REST to GraphQL for our API. Review the current API structure and evaluate: 1) Migration complexity, 2) Performance implications, 3) Breaking changes for clients. Recommend approach with tradeoffs." \
-  --file "src/api/**/*.py" \
+  --file "src/api/router.py" \
+  --file "src/api/resolvers.py" \
   --file "docs/api-design.md"
 ```
 
@@ -102,7 +116,8 @@ npx -y @steipete/oracle \
   --engine api \
   --model gpt-5.4 \
   -p "Review this authentication refactor for security issues and edge cases. Pay special attention to session handling and token validation." \
-  --file "src/auth/*.py" \
+  --file "src/auth/session.py" \
+  --file "src/auth/tokens.py" \
   --file "src/middleware/auth.py"
 ```
 
@@ -123,11 +138,11 @@ When delegating to Oracle from an orchestrator:
 GOAL: Get expert analysis on [specific problem]
 
 SCOPE BOUNDARIES:
-- DO: Bundle relevant files, ask focused questions, await analysis
-- DO NOT: Include sensitive data, ask open-ended research questions
+- DO: Bundle pre-synthesized context, attach the exact files or excerpts that matter, ask focused questions, await analysis
+- DO NOT: Include sensitive data, ask open-ended research questions, or ask Oracle to search the repo for basic context
 - STOP IF: Cost exceeds value, sensitive data would be exposed
 
-CONTEXT: [What you've tried, relevant architecture, constraints]
+CONTEXT: [What you've tried, current hypothesis, relevant architecture, constraints, exact file/log excerpts]
 
 ACCEPTANCE CRITERIA:
 - Oracle provides specific findings on the question asked

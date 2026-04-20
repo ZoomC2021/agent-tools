@@ -21,10 +21,12 @@ Or use npx: `npx -y @steipete/oracle ...`
 
 1. **Prepare context**
    - Identify the core question or problem
-   - Gather relevant files (code, config, logs)
-   - Summarize what you've already tried
+   - Gather the 3-8 highest-signal files or excerpts (code, config, logs), with precise paths
+   - Summarize what you've already tried, your current hypothesis, and any constraints Oracle should respect
+   - Prefer a curated bundle over broad globs; if a file matters, attach it or quote the relevant excerpt
 
 2. **Bundle and consult**
+   - Use `--dry-run summary|full` and `--files-report` first to inspect the exact bundle before a paid run
    - Use terminal to run oracle with API mode
    - Or use `--render --copy` for manual paste into ChatGPT
 
@@ -41,7 +43,7 @@ npx -y @steipete/oracle \
   --engine api \
   --model gpt-5.4 \
   -p "Your detailed question here" \
-  --file "src/**/*.ts" \
+  --file "src/relevant/file.ts" \
   --file "docs/architecture.md"
 
 # Render for manual paste
@@ -57,6 +59,7 @@ npx -y @steipete/oracle \
 - Provide specific, focused questions
 - Include relevant code files and context
 - Summarize prior investigation attempts
+- Treat Oracle as attachment-first: attach the exact files or excerpts that matter instead of asking it to search for them
 - Use for complex problems, not trivial tasks
 - Verify oracle recommendations before applying
 
@@ -64,6 +67,7 @@ npx -y @steipete/oracle \
 - Send sensitive data (secrets, PII, credentials)
 - Use for simple questions answerable by search
 - Blindly apply recommendations without validation
+- Hand Oracle a broad "look around the repo" task when you can provide the exact files instead
 
 ## Model Configuration
 
