@@ -115,6 +115,21 @@
           "model": "openai/gpt-5.3-codex"
         }
       }
+    },
+    {
+      "name": "mission-scrutiny-kimi25turbo",
+      "description": "Direct mission-scrutiny subagent eval using Fireworks Kimi K2.5 Turbo only.",
+      "configOverrides": {
+        "agent.mission-scrutiny.mode": "primary",
+        "agent.mission-scrutiny.hidden": false,
+        "agent.mission-scrutiny.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+      },
+      "promptFrontmatterOverrides": {
+        "commands/mission-scrutiny.md": {
+          "mode": "primary",
+          "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+        }
+      }
     }
   ]
 }

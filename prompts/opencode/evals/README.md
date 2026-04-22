@@ -56,6 +56,11 @@ Run only the GPT 5.4 primary variant against the sandbox implementation scenario
 bin/opencode-eval run --variants gpt54-primary --scenarios implementation-sandbox
 ```
 
+Run mission-scrutiny subagent evals on Kimi K2.5 Turbo only:
+
+```bash
+bin/opencode-eval run --variants mission-scrutiny-kimi25turbo --tags mission-scrutiny
+```
 Rebuild the summary for an existing run directory:
 
 ```bash

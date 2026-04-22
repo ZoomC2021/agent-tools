@@ -259,6 +259,11 @@ function prepareVariantWorkspace(variant, variantDir) {
   }
 
   const configPath = path.join(variantDir, "opencode.json")
+  if (!fileExists(configPath)) {
+    throw new Error(
+      `missing opencode.json in ${relativeToRoot(variantDir)}. Create prompts/opencode/opencode.json with valid credentials (local untracked copy is recommended).`,
+    )
+  }
   const config = readJson(configPath)
   const configOverrides = variant.configOverrides || {}
   for (const [dottedPath, value] of Object.entries(configOverrides)) {

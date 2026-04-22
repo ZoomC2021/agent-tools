@@ -1036,6 +1036,118 @@
           }
         ]
       }
+    },
+    {
+      "id": "subagent-mission-scrutiny-large-feature",
+      "description": "Directly test mission-scrutiny on a large multi-surface request requiring milestone decomposition.",
+      "agent": "mission-scrutiny",
+      "prompt": "User request:\nWe're building on an existing Python FastAPI service. Add per-tenant rate limiting (Redis), structured audit logging for all mutating endpoints, and an admin dashboard page that shows current limits and recent audit events. The codebase already has Postgres and React frontend.\n\nContext:\nRepo layout: backend/app/main.py, backend/app/routes/, frontend/src/. Redis is not wired yet.\n\nReturn only the Mission Scrutiny Report.",
+      "timeoutMs": 90000,
+      "tags": [
+        "subagent",
+        "mission-scrutiny",
+        "planning"
+      ],
+      "workingDirectory": "${VARIANT_ROOT}",
+      "expectations": {
+        "exitCode": 0,
+        "finalIncludes": [
+          "## Mission Scrutiny Report",
+          "### Goal Summary",
+          "### Milestone Plan",
+          "### Validation Cadence",
+          "### Major Risks",
+          "### Estimated Worker Runs",
+          "### Recommended First Milestone",
+          "Milestone 1",
+          "Milestone 2"
+        ],
+        "forbiddenTools": [
+          "task",
+          "edit",
+          "write"
+        ]
+      }
+    },
+    {
+      "id": "subagent-mission-scrutiny-underspecified-blocked",
+      "description": "Directly test mission-scrutiny BLOCKED behavior on vague underspecified requests.",
+      "agent": "mission-scrutiny",
+      "prompt": "User request:\nMake the app better.\n\nContext:\nNone.\n\nIf scrutiny is unsafe, use the BLOCKED protocol exactly.",
+      "timeoutMs": 90000,
+      "tags": [
+        "subagent",
+        "mission-scrutiny",
+        "blocked"
+      ],
+      "workingDirectory": "${VARIANT_ROOT}",
+      "expectations": {
+        "exitCode": 0,
+        "finalRegex": [
+          "BLOCKED",
+          "Needed from orchestrator:"
+        ],
+        "forbiddenTools": [
+          "task",
+          "edit",
+          "write"
+        ]
+      }
+    },
+    {
+      "id": "subagent-mission-scrutiny-small-change",
+      "description": "Directly test mission-scrutiny on a genuinely small scoped change.",
+      "agent": "mission-scrutiny",
+      "prompt": "User request:\nAdd a single new environment variable LOG_LEVEL defaulting to INFO, read in backend/config.py, and use it when configuring the stdlib logging basicConfig. No other behavior changes.\n\nContext:\nbackend/config.py exists; logging is initialized in backend/app/main.py.\n\nReturn only the Mission Scrutiny Report.",
+      "timeoutMs": 90000,
+      "tags": [
+        "subagent",
+        "mission-scrutiny",
+        "planning"
+      ],
+      "workingDirectory": "${VARIANT_ROOT}",
+      "expectations": {
+        "exitCode": 0,
+        "finalIncludes": [
+          "## Mission Scrutiny Report",
+          "### Goal Summary",
+          "### Milestone Plan",
+          "### Validation Cadence",
+          "### Recommended First Milestone",
+          "Milestone 1"
+        ],
+        "forbiddenTools": [
+          "task",
+          "edit",
+          "write"
+        ]
+      }
+    },
+    {
+      "id": "subagent-mission-scrutiny-contradiction-blocked",
+      "description": "Directly test mission-scrutiny BLOCKED behavior on contradictory constraints.",
+      "agent": "mission-scrutiny",
+      "prompt": "User request:\nMigrate our production monolith to microservices with zero downtime and zero new infrastructure spend, and complete the cutover in one weekend. Pick all technology choices yourself.\n\nContext:\nSingle-region deployment; team of 3 engineers; no staging environment.\n\nIf scrutiny is unsafe, use the BLOCKED protocol exactly.",
+      "timeoutMs": 90000,
+      "tags": [
+        "subagent",
+        "mission-scrutiny",
+        "blocked"
+      ],
+      "workingDirectory": "${VARIANT_ROOT}",
+      "expectations": {
+        "exitCode": 0,
+        "finalRegex": [
+          "BLOCKED",
+          "Options:",
+          "Needed from orchestrator:"
+        ],
+        "forbiddenTools": [
+          "task",
+          "edit",
+          "write"
+        ]
+      }
     }
   ]
 }
