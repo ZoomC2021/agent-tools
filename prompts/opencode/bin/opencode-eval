@@ -251,6 +251,13 @@ function prepareVariantWorkspace(variant, variantDir) {
     copyEntry(sourcePath, path.join(variantDir, entry))
   }
 
+  if (variant.includeProjectPlugins) {
+    const pluginsPath = path.join(repoRoot, ".opencode")
+    if (fileExists(pluginsPath)) {
+      copyEntry(pluginsPath, path.join(variantDir, ".opencode"))
+    }
+  }
+
   const configPath = path.join(variantDir, "opencode.json")
   const config = readJson(configPath)
   const configOverrides = variant.configOverrides || {}
@@ -291,15 +298,22 @@ function runShellCommand(command, cwd, logFile) {
 }
 
 function prepareScenarioWorkspace(scenario, caseDir, variantDir) {
-  const workspaceRoot = path.join(caseDir, "workspace")
-  fs.rmSync(workspaceRoot, { recursive: true, force: true })
+  const os = require("os")
+  const isolatedDir = fs.mkdtempSync(path.join(os.tmpdir(), "opencode-eval-"))
+  const workspaceRoot = path.join(isolatedDir, "workspace")
+  fs.mkdirSync(workspaceRoot, { recursive: true })
   copyEntry(variantDir, workspaceRoot)
+
+  const xdgConfigOpencode = path.join(isolatedDir, "opencode")
+  fs.mkdirSync(xdgConfigOpencode, { recursive: true })
+  copyEntry(variantDir, xdgConfigOpencode)
 
   const variables = {
     REPO_ROOT: repoRoot,
     VARIANT_ROOT: workspaceRoot,
     CASE_DIR: caseDir,
     RUN_DIR: path.dirname(caseDir),
+    ISOLATED_DIR: isolatedDir,
   }
 
   let scenarioWorkdir = workspaceRoot
@@ -351,9 +365,10 @@ function extractEvents(stdout) {
     })
 }
 
-function exportSession(sessionId, cwd) {
+function exportSession(sessionId, cwd, xdgConfigHome) {
   const result = spawnSync("opencode", ["export", sessionId], {
     cwd,
+    env: { ...process.env, XDG_CONFIG_HOME: xdgConfigHome },
     encoding: "utf8",
     maxBuffer: 50 * 1024 * 1024,
   })
@@ -415,11 +430,16 @@ function summarizeCase({ variant, scenario, runResult, events, sessionExport, wo
     .filter((event) => event.part?.tool === "task")
     .map((event) => ({
       subagent: event.part?.state?.input?.subagent_type || null,
+      prompt: event.part?.state?.input?.prompt || null,
       modelProvider: event.part?.state?.metadata?.model?.providerID || null,
       modelId: event.part?.state?.metadata?.model?.modelID || null,
       title: event.part?.state?.title || null,
     }))
     .filter((call) => call.subagent)
+
+  const toolCalls = toolUses
+    .map((event) => event.part?.tool)
+    .filter((tool) => typeof tool === "string")
 
   const assistantMessage = sessionExport?.parsed?.messages?.find(
     (message) => message.info?.role === "assistant",
@@ -432,9 +452,12 @@ function summarizeCase({ variant, scenario, runResult, events, sessionExport, wo
     description: scenario.description,
     sessionId,
     exitCode: runResult.exitCode,
+    timedOut: Boolean(runResult.timedOut),
+    timeoutMs: runResult.timeoutMs || null,
     finalText,
     durationMs: timestamps.length ? Math.max(...timestamps) - Math.min(...timestamps) : null,
     tokens: totalTokens,
+    toolCalls,
     subagentCalls,
     assistantModel: assistantMessage
       ? `${assistantMessage.info?.providerID}/${assistantMessage.info?.modelID}`
@@ -460,6 +483,15 @@ function evaluateExpectations(expectations, summary) {
     pushCheck(
       `finalIncludes:${needle}`,
       summary.finalText.includes(needle),
+      needle,
+      summary.finalText,
+    )
+  }
+
+  for (const needle of expectations.finalIncludesInsensitive || []) {
+    pushCheck(
+      `finalIncludesInsensitive:${needle}`,
+      summary.finalText.toLowerCase().includes(String(needle).toLowerCase()),
       needle,
       summary.finalText,
     )
@@ -507,6 +539,24 @@ function evaluateExpectations(expectations, summary) {
     )
   }
 
+  for (const tool of expectations.requiredTools || []) {
+    pushCheck(
+      `requiredTool:${tool}`,
+      summary.toolCalls.includes(tool),
+      tool,
+      summary.toolCalls,
+    )
+  }
+
+  for (const tool of expectations.forbiddenTools || []) {
+    pushCheck(
+      `forbiddenTool:${tool}`,
+      !summary.toolCalls.includes(tool),
+      `not ${tool}`,
+      summary.toolCalls,
+    )
+  }
+
   if (expectations.requiredAssistantModel) {
     pushCheck(
       "requiredAssistantModel",
@@ -525,6 +575,60 @@ function evaluateExpectations(expectations, summary) {
     )
   }
 
+  for (const promptCheck of expectations.taskPromptIncludes || []) {
+    const calls = summary.subagentCalls.filter((call) => call.subagent === promptCheck.subagent)
+    pushCheck(
+      `taskPromptSubagent:${promptCheck.subagent}`,
+      calls.length > 0,
+      promptCheck.subagent,
+      summary.subagentCalls.map((call) => call.subagent),
+    )
+    for (const needle of promptCheck.includes || []) {
+      const lowerNeedle = String(needle).toLowerCase()
+      pushCheck(
+        `taskPromptIncludes:${promptCheck.subagent}:${needle}`,
+        calls.some((call) => String(call.prompt || "").toLowerCase().includes(lowerNeedle)),
+        needle,
+        calls.map((call) => call.prompt || ""),
+      )
+    }
+  }
+
+  for (const commandCheck of expectations.workspaceCommands || []) {
+    const result = spawnSync(commandCheck.command, {
+      cwd: summary.workdir,
+      shell: true,
+      encoding: "utf8",
+      timeout: commandCheck.timeoutMs || 30000,
+      maxBuffer: 10 * 1024 * 1024,
+    })
+    const output = `${result.stdout || ""}${result.stderr || ""}`
+    const actualExitCode = result.status ?? (result.signal ? 124 : 1)
+    pushCheck(
+      `workspaceCommand:${commandCheck.command}:exitCode`,
+      actualExitCode === (commandCheck.exitCode ?? 0),
+      commandCheck.exitCode ?? 0,
+      { exitCode: actualExitCode, output },
+    )
+    for (const needle of commandCheck.outputIncludes || []) {
+      pushCheck(
+        `workspaceCommand:${commandCheck.command}:outputIncludes:${needle}`,
+        output.includes(needle),
+        needle,
+        output,
+      )
+    }
+    for (const pattern of commandCheck.outputRegex || []) {
+      const regex = new RegExp(pattern, "m")
+      pushCheck(
+        `workspaceCommand:${commandCheck.command}:outputRegex:${pattern}`,
+        regex.test(output),
+        pattern,
+        output,
+      )
+    }
+  }
+
   for (const fileCheck of expectations.fileContains || []) {
     const targetPath = path.join(summary.workdir, fileCheck.path)
     const exists = fileExists(targetPath)
@@ -537,6 +641,15 @@ function evaluateExpectations(expectations, summary) {
         `fileContains:${fileCheck.path}:${needle}`,
         contents.includes(needle),
         needle,
+        exists ? contents : "<missing file>",
+      )
+    }
+
+    for (const needle of fileCheck.excludes || []) {
+      pushCheck(
+        `fileExcludes:${fileCheck.path}:${needle}`,
+        !contents.includes(needle),
+        `not ${needle}`,
         exists ? contents : "<missing file>",
       )
     }
@@ -568,16 +681,40 @@ function runOpencodeCase({ variant, variantDir, scenario, workspace, caseDir }) 
   }
 
   args.push(scenario.prompt)
+  const timeoutMs = Number(scenario.timeoutMs || 180000)
 
   return new Promise((resolve) => {
     const child = spawn("opencode", args, {
       cwd: variantDir,
-      env: process.env,
+      env: { ...process.env, XDG_CONFIG_HOME: workspace.variables.ISOLATED_DIR },
       stdio: ["ignore", "pipe", "pipe"],
+      detached: true,
     })
 
     let stdout = ""
     let stderr = ""
+    let timedOut = false
+    let sigkillTimer = null
+
+    const killProcessGroup = (signal) => {
+      if (!child.pid) return
+      try {
+        process.kill(-child.pid, signal)
+      } catch {
+        try {
+          child.kill(signal)
+        } catch {
+          // The process may have exited between timeout and kill.
+        }
+      }
+    }
+
+    const timeoutTimer = setTimeout(() => {
+      timedOut = true
+      stderr += `\n[opencode-eval] Timed out after ${timeoutMs}ms\n`
+      killProcessGroup("SIGTERM")
+      sigkillTimer = setTimeout(() => killProcessGroup("SIGKILL"), 2000)
+    }, timeoutMs)
 
     child.stdout.on("data", (chunk) => {
       const text = chunk.toString()
@@ -594,9 +731,11 @@ function runOpencodeCase({ variant, variantDir, scenario, workspace, caseDir }) 
     })
 
     child.on("close", (code) => {
+      clearTimeout(timeoutTimer)
+      if (sigkillTimer) clearTimeout(sigkillTimer)
       writeText(path.join(caseDir, "events.jsonl"), stdout)
       writeText(path.join(caseDir, "stderr.log"), stderr)
-      resolve({ exitCode: code ?? 0, stdout, stderr })
+      resolve({ exitCode: timedOut ? 124 : code ?? 0, stdout, stderr, timedOut, timeoutMs })
     })
   })
 }
@@ -732,7 +871,12 @@ async function runCommand(options) {
       const runResult = await runOpencodeCase({ variant, variantDir, scenario, workspace, caseDir })
       const events = extractEvents(runResult.stdout)
       const sessionId = events.find((event) => event.sessionID)?.sessionID || null
-      const sessionExport = sessionId ? exportSession(sessionId, variantDir) : { raw: "", parsed: null, parseError: "no session id" }
+      const sessionExport = sessionId ? exportSession(sessionId, variantDir, workspace.variables.ISOLATED_DIR) : { raw: "", parsed: null, parseError: "no session id" }
+
+      const finalWorkspacePath = path.join(caseDir, "workspace")
+      copyEntry(workspace.variables.ISOLATED_DIR + "/workspace", finalWorkspacePath)
+      workspace.workdir = workspace.workdir.replace(workspace.variables.ISOLATED_DIR + "/workspace", finalWorkspacePath)
+      fs.rmSync(workspace.variables.ISOLATED_DIR, { recursive: true, force: true })
 
       writeText(path.join(caseDir, "session-export.txt"), sessionExport.raw || "")
       if (sessionExport.parsed) {

@@ -1,0 +1,8 @@
+{
+  "name": "tricky-js-app",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test"
+  }
+}

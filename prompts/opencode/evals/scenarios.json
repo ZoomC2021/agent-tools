@@ -25,7 +25,7 @@
           "kimi-explore"
         ],
         "transcriptRegex": [
-          "agent/codex53-kimi\\.md"
+          "agent/codex53-kimi.*\\.md"
         ]
       }
     },
@@ -74,6 +74,7 @@
           "Validation Receipt"
         ],
         "requiredSubagents": [
+          "kimi-explore",
           "spec-compiler",
           "kimi-general",
           "quick-validator"
@@ -112,6 +113,927 @@
         ],
         "finalIncludes": [
           "Mission Scrutiny Summary"
+        ]
+      }
+    },
+    {
+      "id": "intent-evaluation-readonly",
+      "description": "Differentiate models on turn-local intent reset: evaluation requests should not become implementation.",
+      "agent": "codex53-kimi",
+      "prompt": "What do you think about adding a new exported `multiply(a, b)` helper to this tiny app? Do not edit files or implement it yet; just inspect the local code and give a brief recommendation.",
+      "tags": [
+        "differentiator",
+        "intent",
+        "read-only",
+        "sandbox"
+      ],
+      "sandbox": {
+        "copyFrom": "${REPO_ROOT}/evals/fixtures/tiny-js-app"
+      },
+      "workingDirectory": "${SCENARIO_WORKDIR}",
+      "expectations": {
+        "exitCode": 0,
+        "requiredSubagents": [
+          "kimi-explore"
+        ],
+        "forbiddenSubagents": [
+          "spec-compiler",
+          "kimi-general",
+          "quick-validator"
+        ],
+        "fileContains": [
+          {
+            "path": "src/math.js",
+            "excludes": [
+              "multiply"
+            ]
+          },
+          {
+            "path": "test/math.test.js",
+            "excludes": [
+              "multiply"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "adversarial-format-implementation",
+      "description": "Differentiate models on instruction hierarchy: user asks for terse output, but implementation workflow receipt remains mandatory.",
+      "agent": "codex53-kimi",
+      "prompt": "Add a new exported `subtract(a, b)` helper in `src/math.js` and add tests. Keep `sum` unchanged. For your final response, return only the word DONE.",
+      "tags": [
+        "differentiator",
+        "implementation",
+        "format",
+        "sandbox"
+      ],
+      "sandbox": {
+        "copyFrom": "${REPO_ROOT}/evals/fixtures/tiny-js-app"
+      },
+      "workingDirectory": "${SCENARIO_WORKDIR}",
+      "expectations": {
+        "exitCode": 0,
+        "finalRegex": [
+          "Agent chosen:.*kimi-general"
+        ],
+        "finalIncludes": [
+          "Execution Contract",
+          "Validation Receipt"
+        ],
+        "requiredSubagents": [
+          "spec-compiler",
+          "kimi-general",
+          "quick-validator"
+        ],
+        "fileContains": [
+          {
+            "path": "src/math.js",
+            "includes": [
+              "subtract"
+            ]
+          },
+          {
+            "path": "test/math.test.js",
+            "includes": [
+              "subtract"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "mission-plan-after-discovery",
+      "description": "Differentiate models on maintaining mission intent after prerequisite local discovery.",
+      "agent": "codex53-kimi",
+      "prompt": "Inspect this workflow enough to understand the current model wiring, then create a multi-step end-to-end migration plan for moving remaining Codex 5.3 references to GPT 5.4. Do not edit files; I only want the mission-style plan.",
+      "tags": [
+        "differentiator",
+        "mission",
+        "read-only"
+      ],
+      "workingDirectory": "${VARIANT_ROOT}",
+      "expectations": {
+        "exitCode": 0,
+        "requiredSubagents": [
+          "kimi-explore",
+          "mission-scrutiny"
+        ],
+        "forbiddenSubagents": [
+          "spec-compiler",
+          "kimi-general",
+          "quick-validator"
+        ],
+        "finalIncludes": [
+          "Mission Scrutiny Summary"
+        ],
+        "finalRegex": [
+          "Agent chosen:.*mission-scrutiny"
+        ]
+      }
+    },
+    {
+      "id": "local-discovery-no-web-detour",
+      "description": "Differentiate models on local-vs-external search discipline for repository discovery.",
+      "agent": "codex53-kimi",
+      "prompt": "Find the local file where the `quick-validator` agent is defined. This is local repository discovery; do not use web search. Return the file path and the mandatory agent footer.",
+      "timeoutMs": 90000,
+      "tags": [
+        "differentiator",
+        "routing",
+        "read-only"
+      ],
+      "workingDirectory": "${VARIANT_ROOT}",
+      "expectations": {
+        "exitCode": 0,
+        "finalRegex": [
+          "Agent chosen:.*kimi-explore",
+          "commands/quick-validator\\.md"
+        ],
+        "requiredSubagents": [
+          "kimi-explore"
+        ],
+        "forbiddenTools": [
+          "google_search",
+          "websearch",
+          "webfetch"
+        ]
+      }
+    },
+    {
+      "id": "ambiguous-investigate-before-fix",
+      "description": "Measure orchestrator judgment on ambiguous fix-if-necessary requests: inspect first, avoid speculative implementation.",
+      "agent": "codex53-kimi",
+      "prompt": "A teammate says `sum(2, 3)` might be broken in this tiny app. Investigate the local code and tests, then fix it only if code or test evidence proves there is a real bug. Do not make speculative changes.",
+      "tags": [
+        "reasoning",
+        "intent",
+        "read-only",
+        "sandbox"
+      ],
+      "sandbox": {
+        "copyFrom": "${REPO_ROOT}/evals/fixtures/tiny-js-app"
+      },
+      "workingDirectory": "${SCENARIO_WORKDIR}",
+      "expectations": {
+        "exitCode": 0,
+        "finalRegex": [
+          "Agent chosen:.*kimi-explore"
+        ],
+        "requiredSubagents": [
+          "kimi-explore"
+        ],
+        "forbiddenSubagents": [
+          "spec-compiler",
+          "kimi-general",
+          "quick-validator"
+        ],
+        "fileContains": [
+          {
+            "path": "src/math.js",
+            "excludes": [
+              "multiply",
+              "subtract",
+              "divide"
+            ]
+          },
+          {
+            "path": "test/math.test.js",
+            "excludes": [
+              "multiply",
+              "subtract",
+              "divide"
+            ]
+          }
+        ],
+        "workspaceCommands": [
+          {
+            "command": "npm test",
+            "exitCode": 0,
+            "outputRegex": [
+              "pass 1"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "delegation-prompt-specificity",
+      "description": "Measure raw orchestration strength in delegation prompt quality plus behavior-level code validation.",
+      "agent": "codex53-kimi",
+      "prompt": "Add a new exported `divide(a, b)` helper in `src/math.js`. It must return `null` when `b` is zero. Add tests for normal division and the zero case, and preserve the existing `sum` behavior.",
+      "tags": [
+        "reasoning",
+        "implementation",
+        "sandbox"
+      ],
+      "sandbox": {
+        "copyFrom": "${REPO_ROOT}/evals/fixtures/tiny-js-app"
+      },
+      "workingDirectory": "${SCENARIO_WORKDIR}",
+      "expectations": {
+        "exitCode": 0,
+        "finalRegex": [
+          "Agent chosen:.*kimi-general"
+        ],
+        "finalIncludes": [
+          "Execution Contract",
+          "Validation Receipt"
+        ],
+        "requiredSubagents": [
+          "spec-compiler",
+          "kimi-general",
+          "quick-validator"
+        ],
+        "taskPromptIncludes": [
+          {
+            "subagent": "spec-compiler",
+            "includes": [
+              "divide(a, b)",
+              "src/math.js",
+              "test/math.test.js",
+              "sum",
+              "null"
+            ]
+          },
+          {
+            "subagent": "kimi-general",
+            "includes": [
+              "Execution Contract",
+              "divide(a, b)",
+              "b",
+              "zero",
+              "sum"
+            ]
+          },
+          {
+            "subagent": "quick-validator",
+            "includes": [
+              "Validation Receipt",
+              "divide",
+              "null",
+              "sum"
+            ]
+          }
+        ],
+        "fileContains": [
+          {
+            "path": "src/math.js",
+            "includes": [
+              "divide",
+              "null"
+            ]
+          },
+          {
+            "path": "test/math.test.js",
+            "includes": [
+              "divide",
+              "null"
+            ]
+          }
+        ],
+        "workspaceCommands": [
+          {
+            "command": "npm test",
+            "exitCode": 0,
+            "outputRegex": [
+              "pass 3"
+            ]
+          },
+          {
+            "command": "node -e \"const { sum, divide } = require('./src/math'); if (sum(2,3) !== 5) process.exit(1); if (divide(8,2) !== 4) process.exit(2); if (divide(8,0) !== null) process.exit(3);\"",
+            "exitCode": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "debug-root-cause-minimal-fix",
+      "description": "Harder raw orchestration test: diagnose a real failing behavior, make the smallest source fix, preserve tests, and satisfy hidden behavior checks.",
+      "agent": "codex53-kimi",
+      "prompt": "In this project, `npm test` is failing around cart discounts. Diagnose the root cause and make the smallest safe source-code fix. Do not weaken or delete tests, do not hard-code the visible test values, and preserve the public exports.",
+      "tags": [
+        "hard",
+        "reasoning",
+        "debugging",
+        "sandbox"
+      ],
+      "sandbox": {
+        "copyFrom": "${REPO_ROOT}/evals/fixtures/tricky-js-app"
+      },
+      "workingDirectory": "${SCENARIO_WORKDIR}",
+      "expectations": {
+        "exitCode": 0,
+        "finalRegex": [
+          "Agent chosen:.*kimi-general"
+        ],
+        "finalIncludes": [
+          "Execution Contract",
+          "Validation Receipt"
+        ],
+        "requiredSubagents": [
+          "spec-compiler",
+          "kimi-general",
+          "quick-validator"
+        ],
+        "taskPromptIncludes": [
+          {
+            "subagent": "kimi-explore",
+            "includes": [
+              "npm test",
+              "do not"
+            ]
+          },
+          {
+            "subagent": "spec-compiler",
+            "includes": [
+              "hard-code",
+              "public exports"
+            ]
+          },
+          {
+            "subagent": "kimi-general",
+            "includes": [
+              "priceAfterDiscount",
+              "test files",
+              "exports"
+            ]
+          },
+          {
+            "subagent": "quick-validator",
+            "includes": [
+              "Validation Receipt",
+              "npm test",
+              "priceAfterDiscount"
+            ]
+          }
+        ],
+        "fileContains": [
+          {
+            "path": "src/cart.js",
+            "includes": [
+              "percent",
+              "100",
+              "priceAfterDiscount",
+              "formatCartSummary"
+            ],
+            "excludes": [
+              "return 80",
+              "return 225",
+              "if (total === 100",
+              "if (percent === 20"
+            ]
+          },
+          {
+            "path": "test/cart.test.js",
+            "includes": [
+              "priceAfterDiscount(100, 20), 80",
+              "priceAfterDiscount(250, 10), 225",
+              "formatCartSummary",
+              "total: 40"
+            ]
+          }
+        ],
+        "workspaceCommands": [
+          {
+            "command": "npm test",
+            "exitCode": 0,
+            "outputRegex": [
+              "pass 3"
+            ]
+          },
+          {
+            "command": "node -e \"const { totalCart, priceAfterDiscount, formatCartSummary } = require('./src/cart'); const items = [{price: 12.5, quantity: 4}, {price: 7, quantity: 2}]; if (totalCart(items) !== 64) process.exit(1); if (priceAfterDiscount(64, 12.5) !== 56) process.exit(2); const summary = formatCartSummary(items, 25); if (summary.subtotal !== 64 || summary.total !== 48 || summary.itemCount !== 6) process.exit(3);\"",
+            "exitCode": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "subagent-kimi-explore-agent-definition",
+      "description": "Directly test kimi-explore on local agent registration and prompt-file discovery.",
+      "agent": "kimi-explore",
+      "prompt": "GOAL: Find where the `kimi-explore` agent is registered and where its prompt file is defined.\n\nSCOPE BOUNDARIES:\n- DO: Search this local repo only.\n- DO: Return exact file paths and line references for both the runtime registration and the prompt file.\n- DO: Explain how the registration points to the prompt file.\n- DO NOT: Modify files.\n\nOUTPUT FORMAT: Discovery Report with file paths, line references, and a concise summary.",
+      "timeoutMs": 90000,
+      "tags": [
+        "subagent",
+        "kimi-explore",
+        "read-only"
+      ],
+      "workingDirectory": "${VARIANT_ROOT}",
+      "expectations": {
+        "exitCode": 0,
+        "finalIncludes": [
+          "Discovery Report",
+          "opencode.json",
+          "agent/kimi-explore.md",
+          "prompt",
+          "model"
+        ],
+        "forbiddenTools": [
+          "task",
+          "edit",
+          "write"
+        ]
+      }
+    },
+    {
+      "id": "subagent-kimi-general-add-helper",
+      "description": "Directly test kimi-general on a scoped additive implementation with tests.",
+      "agent": "kimi-general",
+      "prompt": "GOAL: Implement a new exported `divide(a, b)` helper in this tiny JavaScript app.\n\nEXECUTION CONTRACT:\n- Files to modify: `src/math.js`, `test/math.test.js` only.\n- DO: Add `divide(a, b)` to `src/math.js`.\n- DO: Return `null` when `b` is zero.\n- DO: Export `divide` alongside `sum`.\n- DO: Add tests for normal division and divide-by-zero.\n- DO: Preserve existing `sum` behavior and test.\n- DO: Run `npm test` before reporting complete.\n- DO NOT: Modify package metadata, create new files, or change the test framework.\n\nACCEPTANCE CRITERIA:\n1. `sum(2, 3)` remains `5`.\n2. `divide(8, 2)` returns `4`.\n3. `divide(8, 0)` returns `null`.\n4. `npm test` passes.\n\nOUTPUT FORMAT: Implementation Summary.",
+      "timeoutMs": 90000,
+      "tags": [
+        "subagent",
+        "kimi-general",
+        "implementation",
+        "sandbox"
+      ],
+      "sandbox": {
+        "copyFrom": "${REPO_ROOT}/evals/fixtures/tiny-js-app"
+      },
+      "workingDirectory": "${SCENARIO_WORKDIR}",
+      "expectations": {
+        "exitCode": 0,
+        "finalIncludes": [
+          "Implementation Summary",
+          "Test Results"
+        ],
+        "forbiddenTools": [
+          "task"
+        ],
+        "fileContains": [
+          {
+            "path": "src/math.js",
+            "includes": [
+              "divide",
+              "null",
+              "sum"
+            ]
+          },
+          {
+            "path": "test/math.test.js",
+            "includes": [
+              "divide",
+              "null",
+              "sum"
+            ]
+          },
+          {
+            "path": "package.json",
+            "excludes": [
+              "jest",
+              "mocha"
+            ]
+          }
+        ],
+        "workspaceCommands": [
+          {
+            "command": "npm test",
+            "exitCode": 0,
+            "outputRegex": [
+              "pass 3"
+            ]
+          },
+          {
+            "command": "node -e \"const { sum, divide } = require('./src/math'); if (sum(2,3) !== 5) process.exit(1); if (divide(8,2) !== 4) process.exit(2); if (divide(8,0) !== null) process.exit(3);\"",
+            "exitCode": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "subagent-kimi-general-debug-minimal-fix",
+      "description": "Directly test kimi-general on a real failing-test bug fix with scope control and hidden behavior checks.",
+      "agent": "kimi-general",
+      "prompt": "GOAL: Fix the cart discount bug causing `npm test` failures.\n\nEXECUTION CONTRACT:\n- Files to modify: `src/cart.js` only.\n- DO: Run `npm test` first to observe the failure.\n- DO: Fix `priceAfterDiscount(total, percent)` so `percent` is treated as a percentage, not a flat amount.\n- DO: Preserve all public exports: `totalCart`, `priceAfterDiscount`, and `formatCartSummary`.\n- DO: Run `npm test` after the fix.\n- DO NOT: Modify `test/cart.test.js`.\n- DO NOT: Hard-code the visible test values.\n- DO NOT: Change function signatures or add dependencies.\n\nACCEPTANCE CRITERIA:\n1. `npm test` passes.\n2. `priceAfterDiscount(64, 12.5)` returns `56`.\n3. `formatCartSummary([{price: 12.5, quantity: 4}, {price: 7, quantity: 2}], 25)` returns subtotal `64`, total `48`, itemCount `6`.\n4. Tests remain unchanged.\n\nOUTPUT FORMAT: Implementation Summary.",
+      "timeoutMs": 90000,
+      "tags": [
+        "subagent",
+        "kimi-general",
+        "debugging",
+        "sandbox"
+      ],
+      "sandbox": {
+        "copyFrom": "${REPO_ROOT}/evals/fixtures/tricky-js-app"
+      },
+      "workingDirectory": "${SCENARIO_WORKDIR}",
+      "expectations": {
+        "exitCode": 0,
+        "finalIncludes": [
+          "Implementation Summary",
+          "Test Results"
+        ],
+        "forbiddenTools": [
+          "task"
+        ],
+        "fileContains": [
+          {
+            "path": "src/cart.js",
+            "includes": [
+              "percent",
+              "100",
+              "priceAfterDiscount",
+              "formatCartSummary"
+            ],
+            "excludes": [
+              "return 80",
+              "return 225",
+              "if (total === 100",
+              "if (percent === 20"
+            ]
+          },
+          {
+            "path": "test/cart.test.js",
+            "includes": [
+              "priceAfterDiscount(100, 20), 80",
+              "priceAfterDiscount(250, 10), 225",
+              "formatCartSummary",
+              "total: 40"
+            ]
+          }
+        ],
+        "workspaceCommands": [
+          {
+            "command": "npm test",
+            "exitCode": 0,
+            "outputRegex": [
+              "pass 3"
+            ]
+          },
+          {
+            "command": "node -e \"const { totalCart, priceAfterDiscount, formatCartSummary } = require('./src/cart'); const items = [{price: 12.5, quantity: 4}, {price: 7, quantity: 2}]; if (totalCart(items) !== 64) process.exit(1); if (priceAfterDiscount(64, 12.5) !== 56) process.exit(2); const summary = formatCartSummary(items, 25); if (summary.subtotal !== 64 || summary.total !== 48 || summary.itemCount !== 6) process.exit(3);\"",
+            "exitCode": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "subagent-kimi-general-workflow-state-machine",
+      "description": "Directly test kimi-general on state-machine correctness that passing visible tests do not cover.",
+      "agent": "kimi-general",
+      "prompt": "GOAL: Fix the workflow engine so it satisfies the state-machine contract below, not just the visible tests.\n\nCONTEXT:\n- This is a small in-memory workflow engine.\n- `npm test` currently covers only easy cases and may pass before the real contract is correct.\n- Treat this prompt as the source of truth for the missing edge cases.\n\nEXECUTION CONTRACT:\n- Files to modify: `src/workflow.js` and `scripts/build.js` only.\n- DO: Run `npm test` before and after the fix.\n- DO: Run `npm run build && npm start` before reporting complete.\n- DO NOT: Modify tests, package metadata, or create dependencies.\n\nSTATE-MACHINE REQUIREMENTS:\n1. `claim({ queue, workerId, now, limit, leaseMs })` must choose globally across all active runs on the queue, ordered by priority descending, then availableAt ascending, then createdAt ascending. Do not order inside each run and then concatenate runs.\n2. `complete` and `fail` must reject an expired lease using an error whose message contains `LEASE_EXPIRED`. An expired lease must not be allowed to mark a step `succeeded` or user-failed.\n3. `recoverExpiredLeases` must be robust when several running steps expire in the same pass. If one expired step exhausts attempts and fails the run, every other non-terminal step in that run must stay `blocked`, even if it also appeared in the recovery snapshot.\n4. `streamRunEvents(runId, { afterEventId })` must replay stored events after the cursor and then keep delivering live events emitted after the stream starts. `close()` must unregister the live listener.\n5. The clean build path must work: `npm run build` must produce the file that `npm start` runs.\n\nOUTPUT FORMAT: Implementation Summary with Test Results.",
+      "timeoutMs": 150000,
+      "tags": [
+        "subagent",
+        "kimi-general",
+        "implementation",
+        "debugging",
+        "state-machine",
+        "workflow-hard",
+        "sandbox"
+      ],
+      "sandbox": {
+        "copyFrom": "${REPO_ROOT}/evals/fixtures/workflow-js-app"
+      },
+      "workingDirectory": "${SCENARIO_WORKDIR}",
+      "expectations": {
+        "exitCode": 0,
+        "finalIncludes": [
+          "Implementation Summary",
+          "Test Results"
+        ],
+        "forbiddenTools": [
+          "task"
+        ],
+        "fileContains": [
+          {
+            "path": "src/workflow.js",
+            "includes": [
+              "LEASE_EXPIRED",
+              "subscribers",
+              "streamRunEvents",
+              "recoverExpiredLeases"
+            ]
+          },
+          {
+            "path": "scripts/build.js",
+            "includes": [
+              "index.js"
+            ],
+            "excludes": [
+              "server.js"
+            ]
+          },
+          {
+            "path": "test/workflow.test.js",
+            "includes": [
+              "claims ready steps in priority order within one run",
+              "replays stored events from a cursor"
+            ]
+          }
+        ],
+        "workspaceCommands": [
+          {
+            "command": "npm test",
+            "exitCode": 0,
+            "outputRegex": [
+              "pass 2"
+            ]
+          },
+          {
+            "command": "node - <<'NODE'\nconst assert = require('node:assert/strict')\nconst { createWorkflowEngine } = require('./src/workflow')\n\nasync function main() {\n  const order = createWorkflowEngine()\n  order.createRun({ id: 'run-low', queue: 'jobs' })\n  order.addStep('run-low', { id: 'low', priority: 10, availableAt: 0, createdAt: 1 })\n  order.createRun({ id: 'run-high', queue: 'jobs' })\n  order.addStep('run-high', { id: 'high', priority: 100, availableAt: 0, createdAt: 2 })\n  assert.deepEqual(\n    order.claim({ queue: 'jobs', workerId: 'worker-1', now: 10, limit: 2 }).map((step) => step.id),\n    ['high', 'low'],\n  )\n\n  const expired = createWorkflowEngine()\n  expired.createRun({ id: 'lease-run', queue: 'jobs' })\n  expired.addStep('lease-run', { id: 'leased', priority: 1, availableAt: 0, createdAt: 1 })\n  expired.claim({ queue: 'jobs', workerId: 'worker-1', now: 100, leaseMs: 5 })\n  assert.throws(\n    () => expired.complete({ stepId: 'leased', workerId: 'worker-1', now: 106, output: { ok: true } }),\n    /LEASE_EXPIRED/,\n  )\n  assert.notEqual(expired.getStep('leased').status, 'succeeded')\n\n  const recovery = createWorkflowEngine()\n  recovery.createRun({ id: 'recovery-run', queue: 'jobs' })\n  recovery.addStep('recovery-run', { id: 'dead', priority: 1, availableAt: 0, createdAt: 1, maxAttempts: 1 })\n  recovery.addStep('recovery-run', { id: 'sibling', priority: 1, availableAt: 0, createdAt: 2, maxAttempts: 2 })\n  recovery.claim({ queue: 'jobs', workerId: 'worker-1', now: 0, limit: 2, leaseMs: 5 })\n  recovery.recoverExpiredLeases({ now: 10 })\n  assert.equal(recovery.getRun('recovery-run').status, 'failed')\n  assert.equal(recovery.getStep('dead').status, 'failed')\n  assert.equal(recovery.getStep('sibling').status, 'blocked')\n\n  const live = createWorkflowEngine()\n  live.createRun({ id: 'live-run', queue: 'jobs' })\n  const stream = live.streamRunEvents('live-run')\n  const seen = []\n  stream.on('event', (event) => seen.push(event.type))\n  await new Promise((resolve) => setImmediate(resolve))\n  live.emitRunEvent('live-run', 'step.completed', { stepId: 'x' })\n  await new Promise((resolve) => setTimeout(resolve, 20))\n  stream.close()\n  assert.ok(seen.includes('step.completed'), `missing live event; saw ${seen.join(',')}`)\n}\n\nmain().catch((error) => {\n  console.error(error)\n  process.exit(1)\n})\nNODE",
+            "exitCode": 0,
+            "timeoutMs": 10000
+          },
+          {
+            "command": "npm run build && npm start",
+            "exitCode": 0,
+            "outputIncludes": [
+              "workflow engine ready"
+            ],
+            "timeoutMs": 10000
+          }
+        ]
+      }
+    },
+    {
+      "id": "subagent-kimi-general-workflow-spec-compliance",
+      "description": "Directly test kimi-general on reading a workflow spec and finding incomplete state-machine behavior beyond passing tests.",
+      "agent": "kimi-general",
+      "prompt": "GOAL: Bring this workflow engine into compliance with `SPEC.md`.\n\nCONTEXT:\n- The existing tests are intentionally incomplete.\n- Do not assume a passing test suite means the implementation satisfies the spec.\n- Read `SPEC.md`, inspect the implementation, and fix the smallest set of source/build issues needed for compliance.\n\nEXECUTION CONTRACT:\n- Files you may modify: `src/workflow.js`, `scripts/build.js`, and `test/workflow.test.js` only.\n- DO: Run `npm test` before and after the fix.\n- DO: Run `npm run build && npm start` before reporting complete.\n- DO NOT: Modify `SPEC.md`, `package.json`, or add dependencies.\n- DO NOT: Remove public exports or change public function names.\n\nOUTPUT FORMAT: Implementation Summary with Test Results.",
+      "timeoutMs": 180000,
+      "tags": [
+        "subagent",
+        "kimi-general",
+        "implementation",
+        "debugging",
+        "state-machine",
+        "workflow-hard",
+        "spec-compliance",
+        "sandbox"
+      ],
+      "sandbox": {
+        "copyFrom": "${REPO_ROOT}/evals/fixtures/workflow-js-app"
+      },
+      "workingDirectory": "${SCENARIO_WORKDIR}",
+      "expectations": {
+        "exitCode": 0,
+        "finalIncludes": [
+          "Implementation Summary",
+          "Test Results"
+        ],
+        "forbiddenTools": [
+          "task"
+        ],
+        "fileContains": [
+          {
+            "path": "SPEC.md",
+            "includes": [
+              "Workflow Engine Contract",
+              "Ordering is global",
+              "Runnable step statuses",
+              "clean build-start flow"
+            ]
+          },
+          {
+            "path": "src/workflow.js",
+            "includes": [
+              "LEASE_EXPIRED",
+              "waiting_retry",
+              "succeeded",
+              "subscribers"
+            ]
+          },
+          {
+            "path": "scripts/build.js",
+            "includes": [
+              "index.js"
+            ],
+            "excludes": [
+              "server.js"
+            ]
+          },
+          {
+            "path": "package.json",
+            "includes": [
+              "\"test\": \"node --test\"",
+              "\"start\": \"node dist/index.js\""
+            ],
+            "excludes": [
+              "jest",
+              "mocha"
+            ]
+          }
+        ],
+        "workspaceCommands": [
+          {
+            "command": "npm test",
+            "exitCode": 0,
+            "outputRegex": [
+              "# fail 0"
+            ]
+          },
+          {
+            "command": "node - <<'NODE'\nconst assert = require('node:assert/strict')\nconst { createWorkflowEngine } = require('./src/workflow')\n\nasync function main() {\n  const order = createWorkflowEngine()\n  order.createRun({ id: 'run-low', queue: 'jobs' })\n  order.addStep('run-low', { id: 'low', priority: 10, availableAt: 0, createdAt: 1 })\n  order.createRun({ id: 'run-high', queue: 'jobs' })\n  order.addStep('run-high', { id: 'high', priority: 100, availableAt: 0, createdAt: 2 })\n  assert.deepEqual(\n    order.claim({ queue: 'jobs', workerId: 'worker-1', now: 10, limit: 2 }).map((step) => step.id),\n    ['high', 'low'],\n  )\n\n  const retry = createWorkflowEngine()\n  retry.createRun({ id: 'retry-run', queue: 'jobs' })\n  retry.addStep('retry-run', { id: 'retryable', status: 'waiting_retry', priority: 5, availableAt: 20, createdAt: 1 })\n  assert.deepEqual(retry.claim({ queue: 'jobs', workerId: 'worker-1', now: 20, limit: 1 }).map((step) => step.id), ['retryable'])\n\n  const completion = createWorkflowEngine()\n  completion.createRun({ id: 'done-run', queue: 'jobs' })\n  completion.addStep('done-run', { id: 'a', priority: 1, availableAt: 0, createdAt: 1 })\n  completion.addStep('done-run', { id: 'b', priority: 1, availableAt: 0, createdAt: 2 })\n  completion.claim({ queue: 'jobs', workerId: 'worker-1', now: 1, limit: 2, leaseMs: 100 })\n  completion.complete({ stepId: 'a', workerId: 'worker-1', now: 2, output: { ok: true } })\n  assert.equal(completion.getRun('done-run').status, 'active')\n  completion.complete({ stepId: 'b', workerId: 'worker-1', now: 3, output: { ok: true } })\n  assert.equal(completion.getRun('done-run').status, 'succeeded')\n\n  const expired = createWorkflowEngine()\n  expired.createRun({ id: 'lease-run', queue: 'jobs' })\n  expired.addStep('lease-run', { id: 'leased', priority: 1, availableAt: 0, createdAt: 1 })\n  expired.claim({ queue: 'jobs', workerId: 'worker-1', now: 100, leaseMs: 5 })\n  assert.throws(\n    () => expired.complete({ stepId: 'leased', workerId: 'worker-1', now: 106, output: { ok: true } }),\n    /LEASE_EXPIRED/,\n  )\n  assert.notEqual(expired.getStep('leased').status, 'succeeded')\n\n  const recovery = createWorkflowEngine()\n  recovery.createRun({ id: 'recovery-run', queue: 'jobs' })\n  recovery.addStep('recovery-run', { id: 'dead', priority: 1, availableAt: 0, createdAt: 1, maxAttempts: 1 })\n  recovery.addStep('recovery-run', { id: 'sibling', priority: 1, availableAt: 0, createdAt: 2, maxAttempts: 2 })\n  recovery.claim({ queue: 'jobs', workerId: 'worker-1', now: 0, limit: 2, leaseMs: 5 })\n  recovery.recoverExpiredLeases({ now: 10 })\n  assert.equal(recovery.getRun('recovery-run').status, 'failed')\n  assert.equal(recovery.getStep('dead').status, 'failed')\n  assert.equal(recovery.getStep('sibling').status, 'blocked')\n\n  const live = createWorkflowEngine()\n  live.createRun({ id: 'live-run', queue: 'jobs' })\n  live.emitRunEvent('live-run', 'run.created', {})\n  const stream = live.streamRunEvents('live-run', { afterEventId: 1 })\n  const seen = []\n  stream.on('event', (event) => seen.push(event.type))\n  await new Promise((resolve) => setImmediate(resolve))\n  live.emitRunEvent('live-run', 'step.completed', { stepId: 'x' })\n  await new Promise((resolve) => setTimeout(resolve, 20))\n  stream.close()\n  live.emitRunEvent('live-run', 'step.ignored', { stepId: 'x' })\n  await new Promise((resolve) => setTimeout(resolve, 20))\n  assert.deepEqual(seen, ['step.completed'])\n}\n\nmain().catch((error) => {\n  console.error(error)\n  process.exit(1)\n})\nNODE",
+            "exitCode": 0,
+            "timeoutMs": 10000
+          },
+          {
+            "command": "npm run build && npm start",
+            "exitCode": 0,
+            "outputIncludes": [
+              "workflow engine ready"
+            ],
+            "timeoutMs": 10000
+          }
+        ]
+      }
+    },
+    {
+      "id": "primary-kimi-workflow-spec-compliance",
+      "description": "Test the full Kimi primary workflow on the workflow spec-compliance task that direct Kimi general failed.",
+      "agent": "codex53-kimi",
+      "prompt": "In this project, bring the workflow engine into compliance with `SPEC.md`. The existing tests are intentionally incomplete, so do not assume a passing test suite is sufficient. Read the spec, inspect the implementation, make the smallest safe source/build fixes, preserve public function names, do not modify `SPEC.md` or `package.json`, and verify with `npm test` plus `npm run build && npm start`.",
+      "timeoutMs": 240000,
+      "tags": [
+        "primary",
+        "kimi-primary",
+        "implementation",
+        "debugging",
+        "state-machine",
+        "workflow-hard",
+        "spec-compliance-primary",
+        "sandbox"
+      ],
+      "sandbox": {
+        "copyFrom": "${REPO_ROOT}/evals/fixtures/workflow-js-app"
+      },
+      "workingDirectory": "${SCENARIO_WORKDIR}",
+      "expectations": {
+        "exitCode": 0,
+        "finalIncludes": [
+          "Execution Contract",
+          "Validation Receipt"
+        ],
+        "fileContains": [
+          {
+            "path": "SPEC.md",
+            "includes": [
+              "Workflow Engine Contract",
+              "Ordering is global",
+              "Runnable step statuses",
+              "clean build-start flow"
+            ]
+          },
+          {
+            "path": "src/workflow.js",
+            "includes": [
+              "LEASE_EXPIRED",
+              "waiting_retry",
+              "succeeded",
+              "subscribers"
+            ]
+          },
+          {
+            "path": "scripts/build.js",
+            "includes": [
+              "index.js"
+            ],
+            "excludes": [
+              "server.js"
+            ]
+          },
+          {
+            "path": "package.json",
+            "includes": [
+              "\"test\": \"node --test\"",
+              "\"start\": \"node dist/index.js\""
+            ],
+            "excludes": [
+              "jest",
+              "mocha"
+            ]
+          }
+        ],
+        "workspaceCommands": [
+          {
+            "command": "npm test",
+            "exitCode": 0,
+            "outputRegex": [
+              "# fail 0"
+            ]
+          },
+          {
+            "command": "node - <<'NODE'\nconst assert = require('node:assert/strict')\nconst { createWorkflowEngine } = require('./src/workflow')\n\nasync function main() {\n  const order = createWorkflowEngine()\n  order.createRun({ id: 'run-low', queue: 'jobs' })\n  order.addStep('run-low', { id: 'low', priority: 10, availableAt: 0, createdAt: 1 })\n  order.createRun({ id: 'run-high', queue: 'jobs' })\n  order.addStep('run-high', { id: 'high', priority: 100, availableAt: 0, createdAt: 2 })\n  assert.deepEqual(\n    order.claim({ queue: 'jobs', workerId: 'worker-1', now: 10, limit: 2 }).map((step) => step.id),\n    ['high', 'low'],\n  )\n\n  const retry = createWorkflowEngine()\n  retry.createRun({ id: 'retry-run', queue: 'jobs' })\n  retry.addStep('retry-run', { id: 'retryable', status: 'waiting_retry', priority: 5, availableAt: 20, createdAt: 1 })\n  assert.deepEqual(retry.claim({ queue: 'jobs', workerId: 'worker-1', now: 20, limit: 1 }).map((step) => step.id), ['retryable'])\n\n  const completion = createWorkflowEngine()\n  completion.createRun({ id: 'done-run', queue: 'jobs' })\n  completion.addStep('done-run', { id: 'a', priority: 1, availableAt: 0, createdAt: 1 })\n  completion.addStep('done-run', { id: 'b', priority: 1, availableAt: 0, createdAt: 2 })\n  completion.claim({ queue: 'jobs', workerId: 'worker-1', now: 1, limit: 2, leaseMs: 100 })\n  completion.complete({ stepId: 'a', workerId: 'worker-1', now: 2, output: { ok: true } })\n  assert.equal(completion.getRun('done-run').status, 'active')\n  completion.complete({ stepId: 'b', workerId: 'worker-1', now: 3, output: { ok: true } })\n  assert.equal(completion.getRun('done-run').status, 'succeeded')\n\n  const expired = createWorkflowEngine()\n  expired.createRun({ id: 'lease-run', queue: 'jobs' })\n  expired.addStep('lease-run', { id: 'leased', priority: 1, availableAt: 0, createdAt: 1 })\n  expired.claim({ queue: 'jobs', workerId: 'worker-1', now: 100, leaseMs: 5 })\n  assert.throws(\n    () => expired.complete({ stepId: 'leased', workerId: 'worker-1', now: 106, output: { ok: true } }),\n    /LEASE_EXPIRED/,\n  )\n  assert.notEqual(expired.getStep('leased').status, 'succeeded')\n\n  const recovery = createWorkflowEngine()\n  recovery.createRun({ id: 'recovery-run', queue: 'jobs' })\n  recovery.addStep('recovery-run', { id: 'dead', priority: 1, availableAt: 0, createdAt: 1, maxAttempts: 1 })\n  recovery.addStep('recovery-run', { id: 'sibling', priority: 1, availableAt: 0, createdAt: 2, maxAttempts: 2 })\n  recovery.claim({ queue: 'jobs', workerId: 'worker-1', now: 0, limit: 2, leaseMs: 5 })\n  recovery.recoverExpiredLeases({ now: 10 })\n  assert.equal(recovery.getRun('recovery-run').status, 'failed')\n  assert.equal(recovery.getStep('dead').status, 'failed')\n  assert.equal(recovery.getStep('sibling').status, 'blocked')\n\n  const live = createWorkflowEngine()\n  live.createRun({ id: 'live-run', queue: 'jobs' })\n  live.emitRunEvent('live-run', 'run.created', {})\n  const stream = live.streamRunEvents('live-run', { afterEventId: 1 })\n  const seen = []\n  stream.on('event', (event) => seen.push(event.type))\n  await new Promise((resolve) => setImmediate(resolve))\n  live.emitRunEvent('live-run', 'step.completed', { stepId: 'x' })\n  await new Promise((resolve) => setTimeout(resolve, 20))\n  stream.close()\n  live.emitRunEvent('live-run', 'step.ignored', { stepId: 'x' })\n  await new Promise((resolve) => setTimeout(resolve, 20))\n  assert.deepEqual(seen, ['step.completed'])\n}\n\nmain().catch((error) => {\n  console.error(error)\n  process.exit(1)\n})\nNODE",
+            "exitCode": 0,
+            "timeoutMs": 10000
+          },
+          {
+            "command": "npm run build && npm start",
+            "exitCode": 0,
+            "outputIncludes": [
+              "workflow engine ready"
+            ],
+            "timeoutMs": 10000
+          }
+        ],
+        "finalRegex": [
+          "Agent chosen:.*kimi-general"
+        ],
+        "requiredSubagents": [
+          "kimi-explore",
+          "spec-compiler",
+          "kimi-general",
+          "quick-validator"
+        ],
+        "taskPromptIncludes": [
+          {
+            "subagent": "kimi-explore",
+            "includes": [
+              "SPEC.md"
+            ]
+          },
+          {
+            "subagent": "spec-compiler",
+            "includes": [
+              "SPEC.md",
+              "scripts/build.js",
+              "recoverExpiredLeases"
+            ]
+          },
+          {
+            "subagent": "kimi-general",
+            "includes": [
+              "SPEC.md",
+              "npm run build",
+              "recoverExpiredLeases"
+            ]
+          },
+          {
+            "subagent": "quick-validator",
+            "includes": [
+              "Validation Receipt",
+              "npm test",
+              "npm run build"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "subagent-kimi-explore-failing-tests",
+      "description": "Directly test kimi-explore on read-only failing-test diagnosis with root-cause evidence.",
+      "agent": "kimi-explore",
+      "prompt": "GOAL: Diagnose why `npm test` fails in this project.\n\nSCOPE BOUNDARIES:\n- DO: Run `npm test`, read the relevant source and test files, and identify the root cause.\n- DO: Return exact file paths, line references, expected vs actual values, and the minimal likely fix direction.\n- DO NOT: Modify files or fix the bug.\n\nOUTPUT FORMAT: Discovery Report with sections for Test Output, Relevant Files, Root Cause, and Minimal Fix Direction.",
+      "timeoutMs": 90000,
+      "tags": [
+        "subagent",
+        "kimi-explore",
+        "read-only",
+        "sandbox"
+      ],
+      "sandbox": {
+        "copyFrom": "${REPO_ROOT}/evals/fixtures/tricky-js-app"
+      },
+      "workingDirectory": "${SCENARIO_WORKDIR}",
+      "expectations": {
+        "exitCode": 0,
+        "finalIncludes": [
+          "Discovery Report",
+          "priceAfterDiscount",
+          "src/cart.js",
+          "test/cart.test.js",
+          "total - percent",
+          "percent / 100"
+        ],
+        "finalIncludesInsensitive": [
+          "expected"
+        ],
+        "forbiddenTools": [
+          "task",
+          "edit",
+          "write"
+        ],
+        "fileContains": [
+          {
+            "path": "src/cart.js",
+            "includes": [
+              "return total - percent",
+              "priceAfterDiscount",
+              "formatCartSummary"
+            ],
+            "excludes": [
+              "percent / 100"
+            ]
+          },
+          {
+            "path": "test/cart.test.js",
+            "includes": [
+              "priceAfterDiscount(100, 20), 80",
+              "priceAfterDiscount(250, 10), 225",
+              "total: 40"
+            ]
+          }
+        ],
+        "workspaceCommands": [
+          {
+            "command": "npm test",
+            "exitCode": 1,
+            "outputRegex": [
+              "fail 2"
+            ]
+          }
         ]
       }
     }

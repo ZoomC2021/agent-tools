@@ -30,18 +30,89 @@
     },
     {
       "name": "kimi25turbo-primary",
-      "description": "Fireworks Kimi K2.5 Turbo used as the orchestrator/primary model while subagent routing remains unchanged.",
+      "description": "Fireworks Kimi K2.5 Turbo used as the orchestrator/primary model with subagent routing unchanged.",
       "cliModel": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "includeProjectPlugins": true,
       "configOverrides": {
         "agent.codex53-kimi.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+        "agent.codex53-kimi.prompt": "{file:./agent/codex53-kimi-turbo.md}",
+        "agent.codex53-kimi.permission.read": "deny",
+        "agent.codex53-kimi.permission.grep": "deny",
+        "agent.codex53-kimi.permission.glob": "deny",
+        "agent.codex53-kimi.permission.bash": "deny",
+        "agent.codex53-kimi.permission.google_search": "deny",
+        "agent.codex53-kimi.permission.websearch": "deny",
+        "agent.codex53-kimi.permission.webfetch": "deny",
         "mode.plan.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
       },
       "configDeletes": [
         "agent.codex53-kimi.routing_policy"
       ],
       "promptFrontmatterOverrides": {
-        "agent/codex53-kimi.md": {
+        "agent/codex53-kimi-turbo.md": {
           "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+        }
+      }
+    },
+    {
+      "name": "kimi-explore-kimi25turbo",
+      "description": "Direct kimi-explore subagent eval using the existing Fireworks Kimi K2.5 Turbo model.",
+      "configOverrides": {
+        "agent.kimi-explore.mode": "primary",
+        "agent.kimi-explore.hidden": false,
+        "agent.kimi-explore.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+        "agent.kimi-explore.permission.bash": "allow"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/kimi-explore.md": {
+          "mode": "primary",
+          "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+        }
+      }
+    },
+    {
+      "name": "kimi-explore-gpt54mini-fast",
+      "description": "Direct kimi-explore subagent eval using OpenAI GPT-5.4 mini Fast.",
+      "configOverrides": {
+        "agent.kimi-explore.mode": "primary",
+        "agent.kimi-explore.hidden": false,
+        "agent.kimi-explore.model": "openai/gpt-5.4-mini-fast",
+        "agent.kimi-explore.permission.bash": "allow"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/kimi-explore.md": {
+          "mode": "primary",
+          "model": "openai/gpt-5.4-mini-fast"
+        }
+      }
+    },
+    {
+      "name": "kimi-general-kimi25turbo",
+      "description": "Direct kimi-general subagent eval using the existing Fireworks Kimi K2.5 Turbo model.",
+      "configOverrides": {
+        "agent.kimi-general.mode": "primary",
+        "agent.kimi-general.hidden": false,
+        "agent.kimi-general.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/kimi-general.md": {
+          "mode": "primary",
+          "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+        }
+      }
+    },
+    {
+      "name": "kimi-general-gpt53-codex",
+      "description": "Direct kimi-general subagent eval using OpenAI GPT-5.3 Codex.",
+      "configOverrides": {
+        "agent.kimi-general.mode": "primary",
+        "agent.kimi-general.hidden": false,
+        "agent.kimi-general.model": "openai/gpt-5.3-codex"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/kimi-general.md": {
+          "mode": "primary",
+          "model": "openai/gpt-5.3-codex"
         }
       }
     }
