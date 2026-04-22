@@ -140,6 +140,21 @@ function Install-OpenCode {
         Write-Warn "Agent source directory not found: $AgentSource"
     }
 
+    # Install .opencode/plugins (local plugins like kimi-routing-guard)
+    $PluginsSource = Join-Path $SourceDir ".opencode\plugins"
+    $PluginsDest = Join-Path $env:USERPROFILE ".config\opencode\.opencode\plugins"
+
+    if (Test-Path -PathType Container $PluginsSource) {
+        New-Item -ItemType Directory -Path $PluginsDest -Force | Out-Null
+        $PluginFiles = Get-ChildItem -Path $PluginsSource -File
+        if ($PluginFiles.Count -eq 0) {
+            Write-Warn "No plugin files found in $PluginsSource"
+        } else {
+            Copy-Item $PluginFiles.FullName -Destination $PluginsDest -Force
+            Write-Success "OpenCode plugins: $PluginsDest"
+        }
+    }
+
     # Install helper scripts to bin/
     $BinSourceDir = Join-Path $SourceDir "bin"
     if (Test-Path -PathType Container $BinSourceDir) {
@@ -209,6 +224,7 @@ function Test-OpenCodeInstallation {
     # Check required agent files
     $requiredAgentFiles = @(
         "codex53-kimi.md",
+        "codex53-kimi-turbo.md",
         "kimi-general.md",
         "kimi-explore.md",
         "github-librarian.md",

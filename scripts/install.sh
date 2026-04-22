@@ -136,6 +136,23 @@ install_opencode() {
         log_warn "Agent source directory not found: $agent_source"
     fi
 
+    # Install .opencode/plugins (local plugins like kimi-routing-guard)
+    local plugins_source="$source_dir/.opencode/plugins"
+    local plugins_dest="$HOME/.config/opencode/.opencode/plugins"
+
+    if [[ -d "$plugins_source" ]]; then
+        mkdir -p "$plugins_dest"
+        shopt -s nullglob
+        local plugin_files=("$plugins_source"/*)
+        shopt -u nullglob
+        if [[ ${#plugin_files[@]} -gt 0 ]]; then
+            cp "$plugins_source"/* "$plugins_dest/"
+            log_success "OpenCode plugins: $plugins_dest"
+        else
+            log_warn "No plugin files found in $plugins_source"
+        fi
+    fi
+
     # Install helper binaries
     local bin_source_dir="$source_dir/bin"
     if [[ -d "$bin_source_dir" ]]; then
@@ -206,6 +223,7 @@ _self_check_opencode() {
     # Check required agent files
     local required_agent_files=(
         "codex53-kimi.md"
+        "codex53-kimi-turbo.md"
         "kimi-general.md"
         "kimi-explore.md"
         "github-librarian.md"
