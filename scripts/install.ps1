@@ -142,7 +142,7 @@ function Install-OpenCode {
 
     # Install .opencode/plugins (local plugins like kimi-routing-guard)
     $PluginsSource = Join-Path $SourceDir ".opencode\plugins"
-    $PluginsDest = Join-Path $env:USERPROFILE ".config\opencode\.opencode\plugins"
+    $PluginsDest = Join-Path $env:USERPROFILE ".config\opencode\plugins"
 
     if (Test-Path -PathType Container $PluginsSource) {
         New-Item -ItemType Directory -Path $PluginsDest -Force | Out-Null

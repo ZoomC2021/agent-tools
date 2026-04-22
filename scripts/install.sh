@@ -138,7 +138,7 @@ install_opencode() {
 
     # Install .opencode/plugins (local plugins like kimi-routing-guard)
     local plugins_source="$source_dir/.opencode/plugins"
-    local plugins_dest="$HOME/.config/opencode/.opencode/plugins"
+    local plugins_dest="$HOME/.config/opencode/plugins"
 
     if [[ -d "$plugins_source" ]]; then
         mkdir -p "$plugins_dest"
