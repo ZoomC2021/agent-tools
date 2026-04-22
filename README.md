@@ -62,6 +62,17 @@ The orchestrator uses keyword-based deterministic routing:
 | Local discovery | "find", "search", "explore" | **kimi-explore** |
 | Implementation | "implement", "fix", "refactor" | **kimi-general** |
 
+### Orchestrator Safety Gates
+
+Before routing, the orchestrator applies these safety checks (in order):
+
+| Gate | Purpose |
+|------|---------|
+| **Intent Verbalization** | State routing reasoning out loud so users can catch misroutes before work begins |
+| **Turn-Local Intent Reset** | Reclassify intent from the CURRENT message only — never carry "implementation mode" from prior turns |
+| **Context-Completion Gate** | Block `spec-compiler` until an explicit implementation verb + concrete scope + no pending research |
+| **Consecutive Failure Protocol** | After 2 No-Go results → auto-escalate to Oracle; after 3 → STOP, revert, report to user |
+
 ### Mission-Aware Implementation Workflow
 
 For implementation/debugging/refactoring tasks, the orchestrator uses one of two paths:

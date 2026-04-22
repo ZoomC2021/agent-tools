@@ -1,6 +1,500 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "plugin": [
+    "opencode-antigravity-auth@1.6.0",
+    "opencode-openai-codex-auth@4.2.0"
+  ],
   "provider": {
+    "openai": {
+      "options": {
+        "reasoningEffort": "medium",
+        "reasoningSummary": "auto",
+        "textVerbosity": "medium",
+        "include": [
+          "reasoning.encrypted_content"
+        ],
+        "store": false
+      },
+      "models": {
+        "gpt-5.2-none": {
+          "name": "GPT 5.2 None (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "none",
+            "reasoningSummary": "auto",
+            "textVerbosity": "medium",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        },
+        "gpt-5.2-low": {
+          "name": "GPT 5.2 Low (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "low",
+            "reasoningSummary": "auto",
+            "textVerbosity": "medium",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        },
+        "gpt-5.2-medium": {
+          "name": "GPT 5.2 Medium (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "medium",
+            "reasoningSummary": "auto",
+            "textVerbosity": "medium",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        },
+        "gpt-5.2-high": {
+          "name": "GPT 5.2 High (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "high",
+            "reasoningSummary": "detailed",
+            "textVerbosity": "medium",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        },
+        "gpt-5.2-xhigh": {
+          "name": "GPT 5.2 Extra High (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "xhigh",
+            "reasoningSummary": "detailed",
+            "textVerbosity": "medium",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        },
+        "gpt-5.2-codex-low": {
+          "name": "GPT 5.2 Codex Low (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "low",
+            "reasoningSummary": "auto",
+            "textVerbosity": "medium",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        },
+        "gpt-5.2-codex-medium": {
+          "name": "GPT 5.2 Codex Medium (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "medium",
+            "reasoningSummary": "auto",
+            "textVerbosity": "medium",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        },
+        "gpt-5.2-codex-high": {
+          "name": "GPT 5.2 Codex High (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "high",
+            "reasoningSummary": "detailed",
+            "textVerbosity": "medium",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        },
+        "gpt-5.2-codex-xhigh": {
+          "name": "GPT 5.2 Codex Extra High (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "xhigh",
+            "reasoningSummary": "detailed",
+            "textVerbosity": "medium",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        },
+        "gpt-5.1-codex-max-low": {
+          "name": "GPT 5.1 Codex Max Low (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "low",
+            "reasoningSummary": "detailed",
+            "textVerbosity": "medium",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        },
+        "gpt-5.1-codex-max-medium": {
+          "name": "GPT 5.1 Codex Max Medium (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "medium",
+            "reasoningSummary": "detailed",
+            "textVerbosity": "medium",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        },
+        "gpt-5.1-codex-max-high": {
+          "name": "GPT 5.1 Codex Max High (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "high",
+            "reasoningSummary": "detailed",
+            "textVerbosity": "medium",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        },
+        "gpt-5.1-codex-max-xhigh": {
+          "name": "GPT 5.1 Codex Max Extra High (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "xhigh",
+            "reasoningSummary": "detailed",
+            "textVerbosity": "medium",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        },
+        "gpt-5.1-codex-low": {
+          "name": "GPT 5.1 Codex Low (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "low",
+            "reasoningSummary": "auto",
+            "textVerbosity": "medium",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        },
+        "gpt-5.1-codex-medium": {
+          "name": "GPT 5.1 Codex Medium (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "medium",
+            "reasoningSummary": "auto",
+            "textVerbosity": "medium",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        },
+        "gpt-5.1-codex-high": {
+          "name": "GPT 5.1 Codex High (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "high",
+            "reasoningSummary": "detailed",
+            "textVerbosity": "medium",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        },
+        "gpt-5.1-codex-mini-medium": {
+          "name": "GPT 5.1 Codex Mini Medium (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "medium",
+            "reasoningSummary": "auto",
+            "textVerbosity": "medium",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        },
+        "gpt-5.1-codex-mini-high": {
+          "name": "GPT 5.1 Codex Mini High (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "high",
+            "reasoningSummary": "detailed",
+            "textVerbosity": "medium",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        },
+        "gpt-5.1-none": {
+          "name": "GPT 5.1 None (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "none",
+            "reasoningSummary": "auto",
+            "textVerbosity": "medium",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        },
+        "gpt-5.1-low": {
+          "name": "GPT 5.1 Low (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "low",
+            "reasoningSummary": "auto",
+            "textVerbosity": "low",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        },
+        "gpt-5.1-medium": {
+          "name": "GPT 5.1 Medium (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "medium",
+            "reasoningSummary": "auto",
+            "textVerbosity": "medium",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        },
+        "gpt-5.1-high": {
+          "name": "GPT 5.1 High (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "high",
+            "reasoningSummary": "detailed",
+            "textVerbosity": "high",
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        }
+      }
+    },
+    "google": {
+      "models": {
+        "gemini-3-pro-high": {
+          "name": "Gemini 3 Pro High (Antigravity)",
+          "limit": {
+            "context": 1048576,
+            "output": 65535
+          },
+          "modalities": {
+            "input": ["text", "image", "pdf"],
+            "output": ["text"]
+          }
+        },
+        "gemini-3-pro-low": {
+          "name": "Gemini 3 Pro Low (Antigravity)",
+          "limit": {
+            "context": 1048576,
+            "output": 65535
+          },
+          "modalities": {
+            "input": ["text", "image", "pdf"],
+            "output": ["text"]
+          }
+        },
+        "gemini-3-flash": {
+          "name": "Gemini 3 Flash (Antigravity)",
+          "limit": {
+            "context": 1048576,
+            "output": 65536
+          },
+          "modalities": {
+            "input": ["text", "image", "pdf"],
+            "output": ["text"]
+          }
+        },
+        "claude-sonnet-4-5": {
+          "name": "Claude Sonnet 4.5 (Antigravity)",
+          "limit": {
+            "context": 200000,
+            "output": 64000
+          },
+          "modalities": {
+            "input": ["text", "image", "pdf"],
+            "output": ["text"]
+          }
+        },
+        "claude-sonnet-4-5-thinking": {
+          "name": "Claude Sonnet 4.5 Thinking (Antigravity)",
+          "limit": {
+            "context": 200000,
+            "output": 64000
+          },
+          "modalities": {
+            "input": ["text", "image", "pdf"],
+            "output": ["text"]
+          }
+        },
+        "claude-opus-4-5-thinking": {
+          "name": "Claude Opus 4.5 Thinking (Antigravity)",
+          "limit": {
+            "context": 200000,
+            "output": 64000
+          },
+          "modalities": {
+            "input": ["text", "image", "pdf"],
+            "output": ["text"]
+          }
+        },
+        "gpt-oss-120b-medium": {
+          "name": "GPT-OSS 120B Medium (Antigravity)",
+          "limit": {
+            "context": 131072,
+            "output": 32768
+          },
+          "modalities": {
+            "input": ["text", "image", "pdf"],
+            "output": ["text"]
+          }
+        }
+      }
+    },
     "fireworks-ai": {
       "options": {
         "apiKey": "YOUR_FIREWORKS_API_KEY_HERE"
@@ -18,6 +512,24 @@
     }
   },
   "agent": {
+    "plan": {
+      "variant": "high",
+      "reasoningEffort": "high"
+    },
+    "title": {
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+    },
+    "summary": {
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+    },
+    "compaction": {
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+    },
+    "code-review": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "high",
+      "reasoningEffort": "high"
+    },
     "codex53-kimi": {
       "model": "openai/gpt-5.3-codex",
       "prompt": "{file:./agent/codex53-kimi.md}",
@@ -35,11 +547,11 @@
           "pr-reviewer-only": "allow",
           "create-pr": "allow",
           "oracle": "allow",
-          "mission-scrutiny": "allow",
           "spec-compiler": "allow",
-          "milestone-validator": "allow",
           "quick-validator": "allow",
-          "change-auditor": "allow"
+          "change-auditor": "allow",
+          "mission-scrutiny": "allow",
+          "milestone-validator": "allow"
         }
       },
       "routing_policy": {
@@ -47,126 +559,73 @@
         "rules": [
           {
             "trigger": "PR creation or opening",
-            "keywords": [
-              "create PR",
-              "open PR",
-              "pull request",
-              "new PR"
-            ],
+            "keywords": ["create PR", "open PR", "pull request", "new PR"],
             "agent": "create-pr",
             "reason": "PR creation workflow requires specialized commit/branch/PR handling"
           },
           {
             "trigger": "PR comments or feedback handling",
-            "keywords": [
-              "PR comment",
-              "review feedback",
-              "address PR",
-              "fix PR"
-            ],
+            "keywords": ["PR comment", "review feedback", "address PR", "fix PR"],
             "agent": "pr-reviewer",
             "reason": "PR feedback requires GitHub API integration and structured response handling"
           },
           {
             "trigger": "Plan/prompt-only PR review",
-            "keywords": [
-              "PR review plan",
-              "PR prompt only",
-              "generate PR fix plan"
-            ],
+            "keywords": ["PR review plan", "PR prompt only", "generate PR fix plan"],
             "agent": "pr-reviewer-only",
             "reason": "User requested implementation plan without direct changes"
           },
           {
             "trigger": "Code quality or principles audit",
-            "keywords": [
-              "audit",
-              "code quality",
-              "principles",
-              "deslop",
-              "clean code"
-            ],
+            "keywords": ["audit", "code quality", "principles", "deslop", "clean code"],
             "agent": "deslop",
             "reason": "Quality audits require specialized coding principles analysis"
           },
           {
             "trigger": "Uncommitted changes review",
-            "keywords": [
-              "review changes",
-              "uncommitted",
-              "git diff review",
-              "pre-commit review"
-            ],
+            "keywords": ["review changes", "uncommitted", "git diff review", "pre-commit review"],
             "agent": "review",
             "reason": "Review agent specializes in local change validation and quick remediation"
           },
           {
             "trigger": "Remote GitHub code research",
-            "keywords": [
-              "github.com/",
-              "owner/repo",
-              "upstream repo",
-              "remote repo",
-              "reference implementation"
-            ],
+            "keywords": ["github.com/", "owner/repo", "upstream repo", "remote repo", "reference implementation"],
             "agent": "github-librarian",
             "reason": "Remote repository analysis should use a dedicated GitHub research worker"
           },
           {
             "trigger": "Official docs, API behavior, migration notes, release notes",
-            "keywords": [
-              "official docs",
-              "documentation",
-              "api docs",
-              "migration guide",
-              "release notes",
-              "how does"
-            ],
+            "keywords": ["official docs", "documentation", "api docs", "migration guide", "release notes", "how does"],
             "agent": "docs-research",
             "reason": "External behavior questions should be grounded in authoritative documentation"
           },
           {
             "trigger": "Local architecture walkthrough and diagrams",
-            "keywords": [
-              "walk me through",
-              "show the flow",
-              "diagram",
-              "architecture",
-              "how does this work"
-            ],
+            "keywords": ["walk me through", "show the flow", "diagram", "architecture", "how does this work"],
             "agent": "walkthrough",
             "reason": "Architecture explanations deserve a dedicated evidence-backed walkthrough agent"
           },
           {
             "trigger": "Discovery and search only",
-            "keywords": [
-              "find",
-              "search",
-              "discover",
-              "explore",
-              "locate",
-              "where is"
-            ],
+            "keywords": ["find", "search", "discover", "explore", "locate", "where is"],
             "agent": "kimi-explore",
             "reason": "Read-only exploration should use lightweight discovery agent"
           },
           {
             "trigger": "Implementation, debugging, refactoring, execution",
-            "keywords": [
-              "implement",
-              "fix",
-              "debug",
-              "refactor",
-              "build",
-              "execute",
-              "create",
-              "add",
-              "change"
-            ],
+            "keywords": ["implement", "fix", "debug", "refactor", "build", "execute", "create", "add", "change"],
             "agent": "kimi-general",
             "reason": "General worker for concrete execution tasks when no specialized agent matches; large multi-step tasks add mission-scrutiny and milestone-validator around it"
           }
         ],
+        "fallback_rule": {
+          "condition": "No specialized agent matches the request type",
+          "action": "Use kimi-general for execution/debugging, kimi-explore for local read-only discovery, and specialized research agents for external docs or remote repositories"
+        },
+        "enforcement": {
+          "specialized_priority": "If a specialized agent exists for the request type, do NOT use kimi-general unless specialized agent returns BLOCKED",
+          "response_requirement": "Every final user-facing response MUST include: \"Agent chosen: <agent_name> + Reason: <routing_reason>\"; mission-style tasks should also report scrutiny and milestone outcomes"
+        },
         "mission_workflow": {
           "trigger": "Large or long-running multi-step implementation",
           "conditions": [
@@ -183,19 +642,12 @@
             "quick-validator final pass",
             "change-auditor optional high-risk pass"
           ]
-        },
-        "fallback_rule": {
-          "condition": "No specialized agent matches the request type",
-          "action": "Use kimi-general for execution/debugging, kimi-explore for local read-only discovery, and specialized research agents for external docs or remote repositories"
-        },
-        "enforcement": {
-          "specialized_priority": "If a specialized agent exists for the request type, do NOT use kimi-general unless specialized agent returns BLOCKED",
-          "response_requirement": "Every final user-facing response MUST include: 'Agent chosen: <agent_name> + Reason: <routing_reason>'; mission-style tasks should also report scrutiny and milestone outcomes"
         }
       },
       "description": "Primary orchestrator agent - delegates to subagents for specialized tasks"
     },
     "github-librarian": {
+      "description": "Read-only remote GitHub code research on default branches with lightweight history.",
       "mode": "subagent",
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "hidden": true,
@@ -206,10 +658,10 @@
         },
         "read": "allow",
         "bash": "allow"
-      },
-      "description": "Read-only remote GitHub code research on default branches with lightweight history"
+      }
     },
     "docs-research": {
+      "description": "Research official documentation, API behavior, and release notes.",
       "mode": "subagent",
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "hidden": true,
@@ -221,10 +673,10 @@
         "read": "allow",
         "webfetch": "allow",
         "websearch": "allow"
-      },
-      "description": "Research official documentation, API behavior, and release notes"
+      }
     },
     "walkthrough": {
+      "description": "Explain local architecture and generate Mermaid walkthroughs.",
       "mode": "subagent",
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "hidden": true,
@@ -235,8 +687,7 @@
         },
         "read": "allow",
         "bash": "allow"
-      },
-      "description": "Explain local architecture and generate Mermaid walkthroughs"
+      }
     },
     "oracle": {
       "model": "openai/gpt-5.4",
@@ -246,24 +697,76 @@
           "*": "deny",
           "oracle-consult": "allow"
         }
-      },
-      "description": "Deep reasoning agent for complex problems - GPT-5.4 powered"
+      }
     },
-    "mission-scrutiny": {
+    "review": {
+      "description": "Review uncommitted changes and report/fix issues.",
       "mode": "subagent",
       "model": "openai/gpt-5.3-codex",
       "hidden": true,
-      "prompt": "{file:./commands/mission-scrutiny.md}",
-      "description": "Front-load scrutiny and milestone planning for long-running multi-step tasks"
+      "prompt": "{file:./commands/review.md}"
+    },
+    "refactor": {
+      "description": "Analyze and prioritize refactoring opportunities.",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./commands/refactor.md}"
+    },
+    "deslop": {
+      "description": "Detect and prioritize code quality violations.",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./commands/deslop.md}"
+    },
+    "pr-reviewer": {
+      "description": "Fetch PR feedback and apply fixes on the PR branch.",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./commands/pr-reviewer.md}"
+    },
+    "pr-reviewer-only": {
+      "description": "Fetch PR feedback and produce an implementation prompt.",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./commands/pr-reviewer-only.md}"
+    },
+    "create-pr": {
+      "description": "Create a pull request from current git changes.",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./commands/create-pr.md}"
+    },
+    "spec-compiler": {
+      "description": "Compile Execution Contract before implementation work.",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./commands/spec-compiler.md}"
     },
     "kimi-general": {
+      "description": "Concrete implementation, debugging, refactoring, and execution tasks.",
       "mode": "subagent",
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "hidden": true,
       "prompt": "{file:./agent/kimi-general.md}",
-      "description": "General worker for implementation, debugging, refactoring, execution"
+      "permission": {
+        "task": {
+          "*": "deny"
+        },
+        "read": "allow",
+        "bash": "allow",
+        "edit": "allow",
+        "glob": "allow",
+        "grep": "allow"
+      }
     },
     "kimi-explore": {
+      "description": "Read-only local codebase discovery and search.",
       "mode": "subagent",
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "hidden": true,
@@ -273,79 +776,37 @@
           "*": "deny"
         },
         "read": "allow",
-        "bash": "allow"
-      },
-      "description": "Lightweight read-only discovery and search agent"
-    },
-    "review": {
-      "mode": "subagent",
-      "model": "openai/gpt-5.3-codex",
-      "hidden": true,
-      "prompt": "{file:./commands/review.md}",
-      "description": "Review uncommitted changes and report/fix issues"
-    },
-    "deslop": {
-      "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
-      "hidden": true,
-      "prompt": "{file:./commands/deslop.md}",
-      "description": "Detect and prioritize code quality violations"
-    },
-    "refactor": {
-      "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
-      "hidden": true,
-      "prompt": "{file:./commands/refactor.md}",
-      "description": "Analyze and prioritize refactoring opportunities"
-    },
-    "pr-reviewer": {
-      "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
-      "hidden": true,
-      "prompt": "{file:./commands/pr-reviewer.md}",
-      "description": "Fetch PR feedback and apply fixes on the PR branch"
-    },
-    "pr-reviewer-only": {
-      "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
-      "hidden": true,
-      "prompt": "{file:./commands/pr-reviewer-only.md}",
-      "description": "Fetch PR feedback and produce an implementation prompt"
-    },
-    "create-pr": {
-      "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
-      "hidden": true,
-      "prompt": "{file:./commands/create-pr.md}",
-      "description": "Create a pull request from current git changes"
-    },
-    "spec-compiler": {
-      "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
-      "hidden": true,
-      "prompt": "{file:./commands/spec-compiler.md}",
-      "description": "Compile Execution Contract before implementation work (Phase 1)"
-    },
-    "milestone-validator": {
-      "mode": "subagent",
-      "model": "openai/gpt-5.3-codex",
-      "hidden": true,
-      "prompt": "{file:./commands/milestone-validator.md}",
-      "description": "Validate each milestone before the next milestone begins"
+        "glob": "allow",
+        "grep": "allow"
+      }
     },
     "quick-validator": {
+      "description": "Run quick validation checks on implementation output.",
       "mode": "subagent",
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "hidden": true,
-      "prompt": "{file:./commands/quick-validator.md}",
-      "description": "Run quick validation checks on implementation output (Phase 3)"
+      "prompt": "{file:./commands/quick-validator.md}"
     },
     "change-auditor": {
+      "description": "Deep audit for high-risk changes (security, breaking changes).",
       "mode": "subagent",
       "model": "openai/gpt-5.3-codex",
       "hidden": true,
-      "prompt": "{file:./commands/change-auditor.md}",
-      "description": "Deep audit for high-risk changes, security, breaking changes (Phase 4, optional)"
+      "prompt": "{file:./commands/change-auditor.md}"
+    },
+    "mission-scrutiny": {
+      "description": "Front-load scrutiny and milestone planning for long-running multi-step tasks.",
+      "mode": "subagent",
+      "model": "openai/gpt-5.3-codex",
+      "hidden": true,
+      "prompt": "{file:./commands/mission-scrutiny.md}"
+    },
+    "milestone-validator": {
+      "description": "Validate each milestone before the next milestone begins.",
+      "mode": "subagent",
+      "model": "openai/gpt-5.3-codex",
+      "hidden": true,
+      "prompt": "{file:./commands/milestone-validator.md}"
     }
   }
 }

@@ -154,3 +154,14 @@ cython_debug/
 
 # VS Code
 .vscode/
+
+# Opencode eval harness
+prompts/opencode/evals/out/
+prompts/opencode/opencode.json
+prompts/opencode/antigravity-accounts.json
+prompts/opencode/antigravity-accounts.json.*.tmp
+prompts/opencode/antigravity-signature-cache.json
+prompts/opencode/antigravity-logs/
+prompts/opencode/node_modules/
+prompts/opencode/package-lock.json
+prompts/opencode/bun.lock

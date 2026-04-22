@@ -100,47 +100,44 @@ function Install-OpenCode {
         return
     }
 
-    # Agent files that go to agent/ directory
-    $AgentFiles = @(
-        "codex53-kimi.md",
-        "kimi-general.md",
-        "kimi-explore.md",
-        "github-librarian.md",
-        "docs-research.md",
-        "walkthrough.md",
-        "oracle.md"
-    )
-
-    # Install command prompts (workflows) to commands/
+    # Install command prompts from commands/ subdirectory
+    $CommandsSource = Join-Path $SourceDir "commands"
     $CommandsDest = Join-Path $env:USERPROFILE ".config\opencode\commands"
     New-Item -ItemType Directory -Path $CommandsDest -Force | Out-Null
 
-    $SourceFiles = Get-ChildItem -Path $SourceDir -Filter "*.md"
-    $CommandFiles = $SourceFiles | Where-Object { $AgentFiles -notcontains $_.Name }
+    if (Test-Path -PathType Container $CommandsSource) {
+        $CmdFiles = Get-ChildItem -Path $CommandsSource -Filter "*.md"
+        if ($CmdFiles.Count -eq 0) {
+            Write-Warn "No command .md files found in $CommandsSource"
+        } else {
+            Copy-Item $CmdFiles.FullName -Destination $CommandsDest -Force
+            Write-Success "OpenCode commands: $CommandsDest"
 
-    if ($CommandFiles.Count -eq 0) {
-        Write-Warn "No command .md files found in $SourceDir"
+            # Keep legacy prompts/ in sync for backward compatibility with older configs
+            $PromptsDest = Join-Path $env:USERPROFILE ".config\opencode\prompts"
+            New-Item -ItemType Directory -Path $PromptsDest -Force | Out-Null
+            Copy-Item "$CommandsDest\*.md" -Destination $PromptsDest -Force
+            Write-Success "OpenCode legacy prompts mirror: $PromptsDest"
+        }
     } else {
-        Copy-Item $CommandFiles.FullName -Destination $CommandsDest -Force
-        Write-Success "OpenCode commands: $CommandsDest"
-
-        # Keep legacy prompts/ in sync for backward compatibility with older configs
-        $PromptsDest = Join-Path $env:USERPROFILE ".config\opencode\prompts"
-        New-Item -ItemType Directory -Path $PromptsDest -Force | Out-Null
-        Copy-Item "$CommandsDest\*.md" -Destination $PromptsDest -Force
-        Write-Success "OpenCode legacy prompts mirror: $PromptsDest"
+        Write-Warn "Commands source directory not found: $CommandsSource"
     }
 
-    # Install agent files to agent/
+    # Install agent files from agent/ subdirectory
+    $AgentSource = Join-Path $SourceDir "agent"
     $AgentDest = Join-Path $env:USERPROFILE ".config\opencode\agent"
     New-Item -ItemType Directory -Path $AgentDest -Force | Out-Null
 
-    $AgentSourceFiles = $SourceFiles | Where-Object { $AgentFiles -contains $_.Name }
-    if ($AgentSourceFiles.Count -eq 0) {
-        Write-Warn "No agent .md files found in $SourceDir"
+    if (Test-Path -PathType Container $AgentSource) {
+        $AgentMdFiles = Get-ChildItem -Path $AgentSource -Filter "*.md"
+        if ($AgentMdFiles.Count -eq 0) {
+            Write-Warn "No agent .md files found in $AgentSource"
+        } else {
+            Copy-Item $AgentMdFiles.FullName -Destination $AgentDest -Force
+            Write-Success "OpenCode agent files: $AgentDest"
+        }
     } else {
-        Copy-Item $AgentSourceFiles.FullName -Destination $AgentDest -Force
-        Write-Success "OpenCode agent files: $AgentDest"
+        Write-Warn "Agent source directory not found: $AgentSource"
     }
 
     # Install helper scripts to bin/
@@ -156,6 +153,23 @@ function Install-OpenCode {
             Copy-Item $BinFiles.FullName -Destination $BinDest -Force
             Write-Success "OpenCode helper scripts: $BinDest"
         }
+    }
+
+    # Install evals harness (scenarios, variants, fixtures — not output)
+    $EvalsSource = Join-Path $SourceDir "evals"
+    if (Test-Path -PathType Container $EvalsSource) {
+        $EvalsDest = Join-Path $env:USERPROFILE ".config\opencode\evals"
+        New-Item -ItemType Directory -Path $EvalsDest -Force | Out-Null
+
+        # Copy everything except the out/ directory
+        Get-ChildItem -Path $EvalsSource | Where-Object { $_.Name -ne "out" } | ForEach-Object {
+            if ($_.PSIsContainer) {
+                Copy-Item $_.FullName -Destination (Join-Path $EvalsDest $_.Name) -Recurse -Force
+            } else {
+                Copy-Item $_.FullName -Destination $EvalsDest -Force
+            }
+        }
+        Write-Success "OpenCode evals harness: $EvalsDest"
     }
 
     # Setup config directory and copy example config

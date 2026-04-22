@@ -1,0 +1,119 @@
+{
+  "defaults": {
+    "agent": "codex53-kimi",
+    "workingDirectory": "${VARIANT_ROOT}"
+  },
+  "scenarios": [
+    {
+      "id": "routing-local-discovery",
+      "description": "Verify that local discovery requests route through kimi-explore and preserve file-level evidence in the final answer.",
+      "agent": "codex53-kimi",
+      "prompt": "Find where `codex53-kimi` is defined in this repo. Return file path only.",
+      "tags": [
+        "starter",
+        "routing",
+        "read-only"
+      ],
+      "workingDirectory": "${VARIANT_ROOT}",
+      "expectations": {
+        "exitCode": 0,
+        "finalRegex": [
+          "Agent chosen:.*kimi-explore",
+          "opencode\\.json"
+        ],
+        "requiredSubagents": [
+          "kimi-explore"
+        ],
+        "transcriptRegex": [
+          "agent/codex53-kimi\\.md"
+        ]
+      }
+    },
+    {
+      "id": "routing-walkthrough",
+      "description": "Verify that local architecture explanation requests route through the walkthrough subagent.",
+      "agent": "codex53-kimi",
+      "prompt": "Walk me through how the codex53-kimi workflow is wired in this repo. Keep it brief and focus on the local architecture.",
+      "tags": [
+        "starter",
+        "routing",
+        "read-only"
+      ],
+      "workingDirectory": "${VARIANT_ROOT}",
+      "expectations": {
+        "exitCode": 0,
+        "finalRegex": [
+          "Agent chosen:.*walkthrough"
+        ],
+        "requiredSubagents": [
+          "walkthrough"
+        ]
+      }
+    },
+    {
+      "id": "implementation-sandbox",
+      "description": "Exercise the full standard implementation workflow inside an isolated fixture project.",
+      "agent": "codex53-kimi",
+      "prompt": "Add a new exported `multiply(a, b)` helper in `src/math.js`, add tests for it, and keep the existing `sum` behavior unchanged.",
+      "tags": [
+        "starter",
+        "implementation",
+        "sandbox"
+      ],
+      "sandbox": {
+        "copyFrom": "${REPO_ROOT}/evals/fixtures/tiny-js-app"
+      },
+      "workingDirectory": "${SCENARIO_WORKDIR}",
+      "expectations": {
+        "exitCode": 0,
+        "finalRegex": [
+          "Agent chosen:.*kimi-general"
+        ],
+        "finalIncludes": [
+          "Execution Contract",
+          "Validation Receipt"
+        ],
+        "requiredSubagents": [
+          "spec-compiler",
+          "kimi-general",
+          "quick-validator"
+        ],
+        "fileContains": [
+          {
+            "path": "src/math.js",
+            "includes": [
+              "multiply"
+            ]
+          },
+          {
+            "path": "test/math.test.js",
+            "includes": [
+              "multiply"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "mission-plan-readonly",
+      "description": "Exercise the mission workflow planning path without changing files.",
+      "agent": "codex53-kimi",
+      "prompt": "Create a multi-step end-to-end migration plan for replacing the primary model in this Opencode workflow from Codex 5.3 to GPT 5.4. Do not edit files; I only want the mission-style plan.",
+      "tags": [
+        "extended",
+        "mission",
+        "read-only"
+      ],
+      "workingDirectory": "${VARIANT_ROOT}",
+      "expectations": {
+        "exitCode": 0,
+        "requiredSubagents": [
+          "mission-scrutiny"
+        ],
+        "finalIncludes": [
+          "Mission Scrutiny Summary"
+        ]
+      }
+    }
+  ]
+}

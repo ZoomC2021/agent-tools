@@ -1,0 +1,49 @@
+{
+  "variants": [
+    {
+      "name": "baseline-codex53-primary",
+      "description": "Current workflow: codex53-kimi and plan mode both use openai/gpt-5.3-codex.",
+      "cliModel": "openai/gpt-5.3-codex",
+      "configOverrides": {
+        "agent.codex53-kimi.model": "openai/gpt-5.3-codex",
+        "mode.plan.model": "openai/gpt-5.3-codex"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/codex53-kimi.md": {
+          "model": "openai/gpt-5.3-codex"
+        }
+      }
+    },
+    {
+      "name": "gpt54-primary",
+      "description": "Candidate workflow: codex53-kimi and plan mode both use openai/gpt-5.4 while subagent routing stays the same.",
+      "cliModel": "openai/gpt-5.4",
+      "configOverrides": {
+        "agent.codex53-kimi.model": "openai/gpt-5.4",
+        "mode.plan.model": "openai/gpt-5.4"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/codex53-kimi.md": {
+          "model": "openai/gpt-5.4"
+        }
+      }
+    },
+    {
+      "name": "kimi25turbo-primary",
+      "description": "Fireworks Kimi K2.5 Turbo used as the orchestrator/primary model while subagent routing remains unchanged.",
+      "cliModel": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "configOverrides": {
+        "agent.codex53-kimi.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+        "mode.plan.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+      },
+      "configDeletes": [
+        "agent.codex53-kimi.routing_policy"
+      ],
+      "promptFrontmatterOverrides": {
+        "agent/codex53-kimi.md": {
+          "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+        }
+      }
+    }
+  ]
+}

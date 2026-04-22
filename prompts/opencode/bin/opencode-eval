@@ -1,0 +1,816 @@
+#!/usr/bin/env node
+
+const fs = require("fs")
+const path = require("path")
+const { spawn, spawnSync } = require("child_process")
+
+const repoRoot = path.resolve(__dirname, "..")
+const defaultVariantsPath = path.join(repoRoot, "evals", "variants.json")
+const defaultScenariosPath = path.join(repoRoot, "evals", "scenarios.json")
+const defaultOutputRoot = path.join(repoRoot, "evals", "out")
+const supportEntries = [
+  "agent",
+  "bin",
+  "command",
+  "commands",
+  "prompts",
+  "opencode.json",
+  "antigravity-accounts.json",
+]
+
+function usage() {
+  console.log(`Usage:
+  opencode-eval list [variants|scenarios]
+  opencode-eval run [--variants pattern[,pattern]] [--scenarios pattern[,pattern]] [--tags tag[,tag]] [--out dir] [--dry-run]
+  opencode-eval report <run-dir>
+
+Defaults:
+  variants file:  ${relativeToRoot(defaultVariantsPath)}
+  scenarios file: ${relativeToRoot(defaultScenariosPath)}
+  output root:    ${relativeToRoot(defaultOutputRoot)}
+
+Examples:
+  opencode-eval list
+  opencode-eval run
+  opencode-eval run --variants gpt54-primary --scenarios implementation-sandbox
+  opencode-eval run --tags extended
+  opencode-eval report evals/out/20260422T120000Z
+`)
+}
+
+function die(message) {
+  console.error(`error: ${message}`)
+  process.exit(1)
+}
+
+function relativeToRoot(targetPath) {
+  return path.relative(repoRoot, targetPath) || "."
+}
+
+function ensureDir(dirPath) {
+  fs.mkdirSync(dirPath, { recursive: true })
+}
+
+function readJson(filePath) {
+  return JSON.parse(fs.readFileSync(filePath, "utf8"))
+}
+
+function writeJson(filePath, value) {
+  fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`)
+}
+
+function writeText(filePath, value) {
+  fs.writeFileSync(filePath, value)
+}
+
+function fileExists(targetPath) {
+  return fs.existsSync(targetPath)
+}
+
+function timestampSlug(date = new Date()) {
+  const iso = date.toISOString()
+  return iso.replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z")
+}
+
+function parseArgs(argv) {
+  const positionals = []
+  const options = {}
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const part = argv[index]
+    if (!part.startsWith("--")) {
+      positionals.push(part)
+      continue
+    }
+
+    const key = part.slice(2)
+    if (["dry-run"].includes(key)) {
+      options[key] = true
+      continue
+    }
+
+    const next = argv[index + 1]
+    if (!next || next.startsWith("--")) {
+      die(`missing value for --${key}`)
+    }
+
+    options[key] = next
+    index += 1
+  }
+
+  return { positionals, options }
+}
+
+function splitCsv(value) {
+  if (!value) {
+    return []
+  }
+
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean)
+}
+
+function wildcardToRegExp(pattern) {
+  const escaped = pattern.replace(/[|\\{}()[\]^$+?.]/g, "\\$&")
+  return new RegExp(`^${escaped.replace(/\*/g, ".*")}$`)
+}
+
+function matchesAnyPattern(value, patterns) {
+  if (!patterns.length) {
+    return true
+  }
+
+  return patterns.some((pattern) => wildcardToRegExp(pattern).test(value))
+}
+
+function copyEntry(sourcePath, destinationPath) {
+  fs.cpSync(sourcePath, destinationPath, {
+    recursive: true,
+    force: true,
+    preserveTimestamps: true,
+  })
+}
+
+function setNestedValue(object, dottedPath, value) {
+  const parts = dottedPath.split(".")
+  let current = object
+
+  for (let index = 0; index < parts.length - 1; index += 1) {
+    const part = parts[index]
+    if (!(part in current) || typeof current[part] !== "object" || current[part] === null) {
+      current[part] = {}
+    }
+    current = current[part]
+  }
+
+  current[parts[parts.length - 1]] = value
+}
+
+function deleteNestedValue(object, dottedPath) {
+  const parts = dottedPath.split(".")
+  let current = object
+
+  for (let index = 0; index < parts.length - 1; index += 1) {
+    const part = parts[index]
+    if (!(part in current) || typeof current[part] !== "object" || current[part] === null) {
+      return
+    }
+    current = current[part]
+  }
+
+  delete current[parts[parts.length - 1]]
+}
+
+function updateFrontmatterValue(filePath, key, value) {
+  const original = fs.readFileSync(filePath, "utf8")
+  const match = original.match(/^---\n([\s\S]*?)\n---\n/)
+  if (!match) {
+    throw new Error(`frontmatter block not found in ${relativeToRoot(filePath)}`)
+  }
+
+  const frontmatterLines = match[1].split("\n")
+  const replacement = `${key}: ${value}`
+  let replaced = false
+
+  const updatedLines = frontmatterLines.map((line) => {
+    if (line.startsWith(`${key}:`)) {
+      replaced = true
+      return replacement
+    }
+    return line
+  })
+
+  if (!replaced) {
+    updatedLines.push(replacement)
+  }
+
+  const updated = `---\n${updatedLines.join("\n")}\n---\n${original.slice(match[0].length)}`
+  fs.writeFileSync(filePath, updated)
+}
+
+function expandTemplate(value, variables) {
+  if (typeof value !== "string") {
+    return value
+  }
+
+  return value.replace(/\$\{([A-Z0-9_]+)\}/g, (_, name) => {
+    if (!(name in variables)) {
+      throw new Error(`missing template variable ${name}`)
+    }
+    return variables[name]
+  })
+}
+
+function loadVariants(variantsPath) {
+  const payload = readJson(variantsPath)
+  if (!Array.isArray(payload.variants)) {
+    die(`${relativeToRoot(variantsPath)} must contain a variants array`)
+  }
+  return payload
+}
+
+function loadScenarios(scenariosPath) {
+  const payload = readJson(scenariosPath)
+  if (!Array.isArray(payload.scenarios)) {
+    die(`${relativeToRoot(scenariosPath)} must contain a scenarios array`)
+  }
+
+  const defaults = payload.defaults || {}
+  payload.scenarios = payload.scenarios.map((scenario) => ({
+    ...defaults,
+    ...scenario,
+  }))
+
+  return payload
+}
+
+function filterVariants(variants, patterns) {
+  return variants.filter((variant) => matchesAnyPattern(variant.name, patterns))
+}
+
+function filterScenarios(scenarios, scenarioPatterns, tagPatterns) {
+  return scenarios.filter((scenario) => {
+    const matchesScenario = matchesAnyPattern(scenario.id, scenarioPatterns)
+    const tags = Array.isArray(scenario.tags) ? scenario.tags : []
+    const matchesTags = !tagPatterns.length || tags.some((tag) => tagPatterns.includes(tag))
+    return matchesScenario && matchesTags
+  })
+}
+
+function prepareVariantWorkspace(variant, variantDir) {
+  fs.rmSync(variantDir, { recursive: true, force: true })
+  ensureDir(variantDir)
+
+  for (const entry of supportEntries) {
+    const sourcePath = path.join(repoRoot, entry)
+    if (!fileExists(sourcePath)) {
+      continue
+    }
+    copyEntry(sourcePath, path.join(variantDir, entry))
+  }
+
+  const configPath = path.join(variantDir, "opencode.json")
+  const config = readJson(configPath)
+  const configOverrides = variant.configOverrides || {}
+  for (const [dottedPath, value] of Object.entries(configOverrides)) {
+    setNestedValue(config, dottedPath, value)
+  }
+
+  for (const dottedPath of variant.configDeletes || []) {
+    deleteNestedValue(config, dottedPath)
+  }
+
+  writeJson(configPath, config)
+
+  const promptOverrides = variant.promptFrontmatterOverrides || {}
+  for (const [relativeFile, frontmatterValues] of Object.entries(promptOverrides)) {
+    const filePath = path.join(variantDir, relativeFile)
+    for (const [key, value] of Object.entries(frontmatterValues)) {
+      updateFrontmatterValue(filePath, key, value)
+    }
+  }
+
+  writeJson(path.join(variantDir, "variant.json"), variant)
+}
+
+function runShellCommand(command, cwd, logFile) {
+  const result = spawnSync(command, [], {
+    cwd,
+    shell: true,
+    encoding: "utf8",
+  })
+
+  const contents = [`$ ${command}`, "", result.stdout || "", result.stderr || ""].join("\n")
+  writeText(logFile, contents)
+
+  if (result.status !== 0) {
+    throw new Error(`setup command failed (${command})`)
+  }
+}
+
+function prepareScenarioWorkspace(scenario, caseDir, variantDir) {
+  const workspaceRoot = path.join(caseDir, "workspace")
+  fs.rmSync(workspaceRoot, { recursive: true, force: true })
+  copyEntry(variantDir, workspaceRoot)
+
+  const variables = {
+    REPO_ROOT: repoRoot,
+    VARIANT_ROOT: workspaceRoot,
+    CASE_DIR: caseDir,
+    RUN_DIR: path.dirname(caseDir),
+  }
+
+  let scenarioWorkdir = workspaceRoot
+
+  if (scenario.sandbox && scenario.sandbox.copyFrom) {
+    const sandboxSource = expandTemplate(scenario.sandbox.copyFrom, variables)
+    copyEntry(sandboxSource, workspaceRoot)
+    variables.SCENARIO_WORKDIR = workspaceRoot
+  }
+
+  scenarioWorkdir = expandTemplate(
+    scenario.workingDirectory || scenario.workdir || (variables.SCENARIO_WORKDIR || workspaceRoot),
+    variables,
+  )
+
+  variables.SCENARIO_WORKDIR = variables.SCENARIO_WORKDIR || scenarioWorkdir
+
+  for (const [name, value] of Object.entries(variables)) {
+    variables[name] = value
+  }
+
+  const setupCommands = Array.isArray(scenario.setupCommands) ? scenario.setupCommands : []
+  if (setupCommands.length) {
+    const setupDir = path.join(caseDir, "setup")
+    ensureDir(setupDir)
+    setupCommands.forEach((command, index) => {
+      const expanded = expandTemplate(command, variables)
+      runShellCommand(expanded, scenarioWorkdir, path.join(setupDir, `${index + 1}.log`))
+    })
+  }
+
+  return {
+    workdir: scenarioWorkdir,
+    variables,
+  }
+}
+
+function extractEvents(stdout) {
+  return stdout
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      try {
+        return JSON.parse(line)
+      } catch (error) {
+        return { type: "parse_error", raw: line, error: error.message }
+      }
+    })
+}
+
+function exportSession(sessionId, cwd) {
+  const result = spawnSync("opencode", ["export", sessionId], {
+    cwd,
+    encoding: "utf8",
+    maxBuffer: 50 * 1024 * 1024,
+  })
+
+  const stdout = result.stdout || ""
+  const stderr = result.stderr || ""
+  const raw = `${stdout}${stderr}`
+  const preferredText = stdout.includes("{") ? stdout : raw
+  const jsonStart = preferredText.indexOf("{")
+  const jsonEnd = preferredText.lastIndexOf("}")
+
+  if (result.status !== 0 || jsonStart === -1 || jsonEnd === -1 || jsonEnd < jsonStart) {
+    return {
+      raw,
+      parsed: null,
+      exitCode: result.status,
+      parseError: "unable to parse session export",
+    }
+  }
+
+  const jsonText = preferredText.slice(jsonStart, jsonEnd + 1)
+  try {
+    return {
+      raw,
+      parsed: JSON.parse(jsonText),
+      exitCode: result.status,
+      parseError: null,
+    }
+  } catch (error) {
+    return {
+      raw,
+      parsed: null,
+      exitCode: result.status,
+      parseError: error.message,
+    }
+  }
+}
+
+function summarizeCase({ variant, scenario, runResult, events, sessionExport, workspace }) {
+  const sessionId = events.find((event) => event.sessionID)?.sessionID || null
+  const textParts = events.filter((event) => event.type === "text" && event.part?.text)
+  const finalText = textParts.map((event) => event.part.text).join("\n")
+  const toolUses = events.filter((event) => event.type === "tool_use")
+  const stepFinishes = events.filter((event) => event.type === "step_finish")
+  const timestamps = events.map((event) => event.timestamp).filter((value) => typeof value === "number")
+  const totalTokens = stepFinishes.reduce(
+    (totals, event) => {
+      const tokens = event.part?.tokens || {}
+      totals.total += Number(tokens.total || 0)
+      totals.input += Number(tokens.input || 0)
+      totals.output += Number(tokens.output || 0)
+      totals.reasoning += Number(tokens.reasoning || 0)
+      return totals
+    },
+    { total: 0, input: 0, output: 0, reasoning: 0 },
+  )
+
+  const subagentCalls = toolUses
+    .filter((event) => event.part?.tool === "task")
+    .map((event) => ({
+      subagent: event.part?.state?.input?.subagent_type || null,
+      modelProvider: event.part?.state?.metadata?.model?.providerID || null,
+      modelId: event.part?.state?.metadata?.model?.modelID || null,
+      title: event.part?.state?.title || null,
+    }))
+    .filter((call) => call.subagent)
+
+  const assistantMessage = sessionExport?.parsed?.messages?.find(
+    (message) => message.info?.role === "assistant",
+  )
+
+  return {
+    variant: variant.name,
+    configuredModel: variant.cliModel || null,
+    scenario: scenario.id,
+    description: scenario.description,
+    sessionId,
+    exitCode: runResult.exitCode,
+    finalText,
+    durationMs: timestamps.length ? Math.max(...timestamps) - Math.min(...timestamps) : null,
+    tokens: totalTokens,
+    subagentCalls,
+    assistantModel: assistantMessage
+      ? `${assistantMessage.info?.providerID}/${assistantMessage.info?.modelID}`
+      : null,
+    workdir: workspace.workdir,
+    transcriptText: sessionExport?.parsed ? JSON.stringify(sessionExport.parsed) : runResult.stdout,
+  }
+}
+
+function evaluateExpectations(expectations, summary) {
+  const checks = []
+  const transcript = summary.transcriptText || ""
+
+  const pushCheck = (name, pass, expected, actual) => {
+    checks.push({ name, pass, expected, actual })
+  }
+
+  if (Object.prototype.hasOwnProperty.call(expectations, "exitCode")) {
+    pushCheck("exitCode", summary.exitCode === expectations.exitCode, expectations.exitCode, summary.exitCode)
+  }
+
+  for (const needle of expectations.finalIncludes || []) {
+    pushCheck(
+      `finalIncludes:${needle}`,
+      summary.finalText.includes(needle),
+      needle,
+      summary.finalText,
+    )
+  }
+
+  for (const needle of expectations.finalExcludes || []) {
+    pushCheck(
+      `finalExcludes:${needle}`,
+      !summary.finalText.includes(needle),
+      `not ${needle}`,
+      summary.finalText,
+    )
+  }
+
+  for (const pattern of expectations.finalRegex || []) {
+    const regex = new RegExp(pattern, "m")
+    pushCheck(`finalRegex:${pattern}`, regex.test(summary.finalText), pattern, summary.finalText)
+  }
+
+  for (const needle of expectations.transcriptIncludes || []) {
+    pushCheck(`transcriptIncludes:${needle}`, transcript.includes(needle), needle, transcript)
+  }
+
+  for (const pattern of expectations.transcriptRegex || []) {
+    const regex = new RegExp(pattern, "m")
+    pushCheck(`transcriptRegex:${pattern}`, regex.test(transcript), pattern, transcript)
+  }
+
+  const actualSubagents = summary.subagentCalls.map((call) => call.subagent)
+  for (const subagent of expectations.requiredSubagents || []) {
+    pushCheck(
+      `requiredSubagent:${subagent}`,
+      actualSubagents.includes(subagent),
+      subagent,
+      actualSubagents,
+    )
+  }
+
+  for (const subagent of expectations.forbiddenSubagents || []) {
+    pushCheck(
+      `forbiddenSubagent:${subagent}`,
+      !actualSubagents.includes(subagent),
+      `not ${subagent}`,
+      actualSubagents,
+    )
+  }
+
+  if (expectations.requiredAssistantModel) {
+    pushCheck(
+      "requiredAssistantModel",
+      summary.assistantModel === expectations.requiredAssistantModel,
+      expectations.requiredAssistantModel,
+      summary.assistantModel,
+    )
+  }
+
+  if (expectations.maxTotalTokens) {
+    pushCheck(
+      "maxTotalTokens",
+      summary.tokens.total <= expectations.maxTotalTokens,
+      expectations.maxTotalTokens,
+      summary.tokens.total,
+    )
+  }
+
+  for (const fileCheck of expectations.fileContains || []) {
+    const targetPath = path.join(summary.workdir, fileCheck.path)
+    const exists = fileExists(targetPath)
+    const contents = exists ? fs.readFileSync(targetPath, "utf8") : ""
+
+    pushCheck(`fileExists:${fileCheck.path}`, exists, true, exists)
+
+    for (const needle of fileCheck.includes || []) {
+      pushCheck(
+        `fileContains:${fileCheck.path}:${needle}`,
+        contents.includes(needle),
+        needle,
+        exists ? contents : "<missing file>",
+      )
+    }
+  }
+
+  return {
+    pass: checks.every((check) => check.pass),
+    checks,
+  }
+}
+
+function runOpencodeCase({ variant, variantDir, scenario, workspace, caseDir }) {
+  const args = [
+    "run",
+    "--format",
+    "json",
+    "--agent",
+    scenario.agent || "codex53-kimi",
+    "--dir",
+    workspace.workdir,
+  ]
+
+  if (variant?.cliModel) {
+    args.push("--model", variant.cliModel)
+  }
+
+  if (scenario.dangerouslySkipPermissions) {
+    args.push("--dangerously-skip-permissions")
+  }
+
+  args.push(scenario.prompt)
+
+  return new Promise((resolve) => {
+    const child = spawn("opencode", args, {
+      cwd: variantDir,
+      env: process.env,
+      stdio: ["ignore", "pipe", "pipe"],
+    })
+
+    let stdout = ""
+    let stderr = ""
+
+    child.stdout.on("data", (chunk) => {
+      const text = chunk.toString()
+      stdout += text
+    })
+
+    child.stderr.on("data", (chunk) => {
+      const text = chunk.toString()
+      stderr += text
+    })
+
+    child.on("error", (error) => {
+      stderr += `${error.stack || String(error)}\n`
+    })
+
+    child.on("close", (code) => {
+      writeText(path.join(caseDir, "events.jsonl"), stdout)
+      writeText(path.join(caseDir, "stderr.log"), stderr)
+      resolve({ exitCode: code ?? 0, stdout, stderr })
+    })
+  })
+}
+
+function renderSummaryMarkdown(summary) {
+  const lines = [
+    `# Opencode Eval Summary`,
+    "",
+    `- Run directory: \`${summary.runDirectory}\``,
+    `- Variants: ${summary.variants.join(", ")}`,
+    `- Scenarios: ${summary.scenarios.join(", ")}`,
+    `- Total cases: ${summary.results.length}`,
+    "",
+    "| Variant | Scenario | Pass | Duration (ms) | Tokens | Subagents | Assistant Model |",
+    "|---------|----------|------|---------------|--------|-----------|-----------------|",
+  ]
+
+  for (const result of summary.results) {
+    const subagents = result.summary.subagentCalls.map((call) => call.subagent).join(", ") || "-"
+    lines.push(
+      `| ${result.variant} | ${result.scenario} | ${result.evaluation.pass ? "PASS" : "FAIL"} | ${result.summary.durationMs ?? "-"} | ${result.summary.tokens.total} | ${subagents} | ${result.summary.assistantModel || "-"} |`,
+    )
+  }
+
+  lines.push("", "## Variant Totals", "")
+  lines.push("| Variant | Passed | Total |", "|---------|--------|-------|")
+  for (const item of summary.variantTotals) {
+    lines.push(`| ${item.variant} | ${item.passed} | ${item.total} |`)
+  }
+
+  return `${lines.join("\n")}\n`
+}
+
+function buildSummary(runDirectory, resultEntries) {
+  const byVariant = new Map()
+
+  for (const entry of resultEntries) {
+    if (!byVariant.has(entry.variant)) {
+      byVariant.set(entry.variant, { variant: entry.variant, passed: 0, total: 0 })
+    }
+    const item = byVariant.get(entry.variant)
+    item.total += 1
+    if (entry.evaluation.pass) {
+      item.passed += 1
+    }
+  }
+
+  return {
+    runDirectory,
+    variants: [...new Set(resultEntries.map((entry) => entry.variant))],
+    scenarios: [...new Set(resultEntries.map((entry) => entry.scenario))],
+    results: resultEntries,
+    variantTotals: [...byVariant.values()],
+  }
+}
+
+function printList(variantsPayload, scenariosPayload, target) {
+  if (!target || target === "variants") {
+    console.log("Variants")
+    for (const variant of variantsPayload.variants) {
+      console.log(`- ${variant.name}: ${variant.description || ""}`)
+    }
+    console.log("")
+  }
+
+  if (!target || target === "scenarios") {
+    console.log("Scenarios")
+    for (const scenario of scenariosPayload.scenarios) {
+      const tags = Array.isArray(scenario.tags) && scenario.tags.length ? ` [tags: ${scenario.tags.join(", ")}]` : ""
+      console.log(`- ${scenario.id}${tags}: ${scenario.description || ""}`)
+    }
+  }
+}
+
+async function runCommand(options) {
+  const variantsPayload = loadVariants(defaultVariantsPath)
+  const scenariosPayload = loadScenarios(defaultScenariosPath)
+
+  const variantPatterns = splitCsv(options.variants)
+  const scenarioPatterns = splitCsv(options.scenarios)
+  const tagPatterns = splitCsv(options.tags)
+  const effectiveTagPatterns = !scenarioPatterns.length && !tagPatterns.length ? ["starter"] : tagPatterns
+
+  const variants = filterVariants(variantsPayload.variants, variantPatterns)
+  const scenarios = filterScenarios(scenariosPayload.scenarios, scenarioPatterns, effectiveTagPatterns)
+
+  if (!variants.length) {
+    die("no variants matched the requested filters")
+  }
+
+  if (!scenarios.length) {
+    die("no scenarios matched the requested filters")
+  }
+
+  const runDirectory = options.out
+    ? path.resolve(repoRoot, options.out)
+    : path.join(defaultOutputRoot, timestampSlug())
+
+  const manifest = {
+    createdAt: new Date().toISOString(),
+    runDirectory,
+    variants: variants.map((variant) => variant.name),
+    scenarios: scenarios.map((scenario) => scenario.id),
+  }
+
+  if (options["dry-run"]) {
+    console.log(JSON.stringify(manifest, null, 2))
+    return
+  }
+
+  ensureDir(runDirectory)
+  ensureDir(path.join(runDirectory, "variants"))
+  ensureDir(path.join(runDirectory, "cases"))
+  writeJson(path.join(runDirectory, "manifest.json"), manifest)
+
+  const variantDirs = new Map()
+  for (const variant of variants) {
+    const variantDir = path.join(runDirectory, "variants", variant.name)
+    prepareVariantWorkspace(variant, variantDir)
+    variantDirs.set(variant.name, variantDir)
+  }
+
+  const results = []
+  for (const variant of variants) {
+    const variantDir = variantDirs.get(variant.name)
+
+    for (const scenario of scenarios) {
+      const caseId = `${variant.name}__${scenario.id}`
+      const caseDir = path.join(runDirectory, "cases", caseId)
+      ensureDir(caseDir)
+
+      const workspace = prepareScenarioWorkspace(scenario, caseDir, variantDir)
+      const runResult = await runOpencodeCase({ variant, variantDir, scenario, workspace, caseDir })
+      const events = extractEvents(runResult.stdout)
+      const sessionId = events.find((event) => event.sessionID)?.sessionID || null
+      const sessionExport = sessionId ? exportSession(sessionId, variantDir) : { raw: "", parsed: null, parseError: "no session id" }
+
+      writeText(path.join(caseDir, "session-export.txt"), sessionExport.raw || "")
+      if (sessionExport.parsed) {
+        writeJson(path.join(caseDir, "session.json"), sessionExport.parsed)
+      }
+
+      const summary = summarizeCase({ variant, scenario, runResult, events, sessionExport, workspace })
+      const evaluation = evaluateExpectations(scenario.expectations || {}, summary)
+      const resultEntry = {
+        variant: variant.name,
+        scenario: scenario.id,
+        evaluation,
+        summary,
+      }
+
+      writeJson(path.join(caseDir, "result.json"), resultEntry)
+      results.push(resultEntry)
+      console.log(`${evaluation.pass ? "PASS" : "FAIL"} ${variant.name} :: ${scenario.id}`)
+    }
+  }
+
+  const summary = buildSummary(runDirectory, results)
+  writeJson(path.join(runDirectory, "summary.json"), summary)
+  writeText(path.join(runDirectory, "summary.md"), renderSummaryMarkdown(summary))
+  console.log(`Summary written to ${relativeToRoot(path.join(runDirectory, "summary.md"))}`)
+}
+
+function reportCommand(runDirectoryArg) {
+  if (!runDirectoryArg) {
+    die("report requires a run directory")
+  }
+
+  const runDirectory = path.resolve(repoRoot, runDirectoryArg)
+  const casesDir = path.join(runDirectory, "cases")
+  if (!fileExists(casesDir)) {
+    die(`cases directory not found in ${runDirectoryArg}`)
+  }
+
+  const resultEntries = fs
+    .readdirSync(casesDir)
+    .map((entry) => path.join(casesDir, entry, "result.json"))
+    .filter((filePath) => fileExists(filePath))
+    .map((filePath) => readJson(filePath))
+
+  const summary = buildSummary(runDirectory, resultEntries)
+  writeJson(path.join(runDirectory, "summary.json"), summary)
+  writeText(path.join(runDirectory, "summary.md"), renderSummaryMarkdown(summary))
+  console.log(renderSummaryMarkdown(summary))
+}
+
+async function main() {
+  const { positionals, options } = parseArgs(process.argv.slice(2))
+  const command = positionals[0]
+
+  if (!command || command === "--help" || command === "help") {
+    usage()
+    return
+  }
+
+  if (command === "list") {
+    printList(loadVariants(defaultVariantsPath), loadScenarios(defaultScenariosPath), positionals[1])
+    return
+  }
+
+  if (command === "run") {
+    await runCommand(options)
+    return
+  }
+
+  if (command === "report") {
+    reportCommand(positionals[1])
+    return
+  }
+
+  die(`unknown command: ${command}`)
+}
+
+main().catch((error) => {
+  console.error(error.stack || String(error))
+  process.exit(1)
+})

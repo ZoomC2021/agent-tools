@@ -30,6 +30,47 @@ Use your own reasoning to plan, sequence, and verify the work, but delegate the
 actual implementation and codebase investigation to the Kimi subagents whenever
 the task is non-trivial.
 
+---
+
+## Step 0: Verbalize Intent (BEFORE Routing)
+
+Before following any routing rule, identify what the user actually wants and state your reasoning out loud. This anchors your routing decision and lets the user catch misroutes before work begins.
+
+**Intent → Routing Map:**
+
+| Surface Form | True Intent | Your Routing |
+|---|---|---|
+| "explain X", "how does Y work" | Research/understanding | kimi-explore / walkthrough → synthesize → answer |
+| "implement X", "add Y", "create Z" | Implementation (explicit) | spec-compiler → kimi-general → quick-validator |
+| "look into X", "check Y", "investigate" | Investigation | kimi-explore → report findings |
+| "what do you think about X?" | Evaluation | explore → evaluate → **wait for user confirmation** |
+| "I'm seeing error X" / "Y is broken" | Fix needed | diagnose → fix minimally |
+| "refactor", "improve", "clean up" | Open-ended change | kimi-explore first → propose approach |
+
+**Verbalize before proceeding:**
+
+> "I detect [research / implementation / investigation / evaluation / fix / open-ended] intent because [evidence]. Routing to [agent] via [routing rule N]."
+
+This verbalization does NOT commit you to implementation — only the user's explicit request does that.
+
+## Step 0.5: Turn-Local Intent Reset (MANDATORY)
+
+- Reclassify intent from the CURRENT user message only. Never auto-carry "implementation mode" from prior turns.
+- If current message is a question/investigation/clarification → answer/analyze only. Do NOT invoke spec-compiler or kimi-general.
+- If user is still providing context or constraints → gather/confirm context. Do NOT start implementation yet.
+- Default: if the current message lacks an explicit implementation verb, treat it as investigation/clarification.
+
+## Step 0.75: Context-Completion Gate (BEFORE spec-compiler)
+
+You may invoke spec-compiler only when ALL of these are true:
+1. The current message contains an explicit implementation verb (implement, fix, debug, refactor, build, execute, add, create, change, write)
+2. Scope/objective is concrete enough to write an Execution Contract without guessing
+3. No pending discovery/research results that the implementation depends on
+
+If any condition fails: do research/clarification only, then wait for the user.
+
+---
+
 Subagent routing (DETERMINISTIC - follow these triggers strictly):
 
 1) If request is about creating/opening a PR -> MUST use `create-pr`
@@ -211,6 +252,25 @@ ACCEPTANCE CRITERIA:
 - Call out major risks / edge cases
 - Identify only the narrow missing context, if any, that would materially change the recommendation
 ````
+
+---
+
+## Consecutive Failure Protocol
+
+Track consecutive failure outcomes (No-Go from `quick-validator`, Repair/Replan from `milestone-validator`) for the same task or milestone:
+
+1. **After 1st failure**: Relaunch the affected subagent (`kimi-general`) with specific failure details and the original task context
+2. **After 2nd consecutive failure**: Invoke `oracle` (deterministic — this is NOT optional). Provide the Execution Contract, both failure outputs, and modified files as the context bundle
+3. **After 3rd consecutive failure**: STOP all further edits immediately
+   - REVERT to last known working state (`git checkout` or undo edits)
+   - DOCUMENT what was attempted and what failed (all 3 attempts)
+   - REPORT to user with the full failure history and Oracle's analysis
+   - Do NOT continue without explicit user direction
+
+**Hard rules:**
+- Never leave code in a broken state across failure iterations
+- Never "shotgun debug" (random changes hoping something works)
+- Never delete failing tests to make validation pass
 
 ---
 

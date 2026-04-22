@@ -81,42 +81,30 @@ install_codex() {
 install_opencode() {
     log_info "Installing OpenCode..."
     local source_dir="$PROMPTS_DIR/opencode"
-    local agent_files=(
-        "codex53-kimi.md"
-        "kimi-general.md"
-        "kimi-explore.md"
-        "github-librarian.md"
-        "docs-research.md"
-        "walkthrough.md"
-        "oracle.md"
-    )
 
     if [[ ! -d "$source_dir" ]]; then
         log_warn "Source directory not found: $source_dir"
         return 0
     fi
 
-    # Install command prompts (workflows)
+    # Install command prompts from commands/ subdirectory
+    local commands_source="$source_dir/commands"
     local commands_dest="$HOME/.config/opencode/commands"
     mkdir -p "$commands_dest"
 
-    # Copy non-agent workflow prompts to commands/
-    for f in "$source_dir"/*.md; do
-        if [[ -f "$f" ]]; then
-            local basename=$(basename "$f")
-            local is_agent=false
-            for agent_file in "${agent_files[@]}"; do
-                if [[ "$basename" == "$agent_file" ]]; then
-                    is_agent=true
-                    break
-                fi
-            done
-            if [[ "$is_agent" == false ]]; then
-                cp "$f" "$commands_dest/"
-            fi
+    if [[ -d "$commands_source" ]]; then
+        shopt -s nullglob
+        local cmd_files=("$commands_source"/*.md)
+        shopt -u nullglob
+        if [[ ${#cmd_files[@]} -gt 0 ]]; then
+            cp "$commands_source"/*.md "$commands_dest/"
+            log_success "OpenCode commands: $commands_dest"
+        else
+            log_warn "No .md files found in $commands_source"
         fi
-    done
-    log_success "OpenCode commands: $commands_dest"
+    else
+        log_warn "Commands source directory not found: $commands_source"
+    fi
 
     # Keep legacy prompts/ in sync for backward compatibility with older configs
     local prompts_dest="$HOME/.config/opencode/prompts"
@@ -129,17 +117,24 @@ install_opencode() {
         log_success "OpenCode legacy prompts mirror: $prompts_dest"
     fi
 
-    # Install agent files to agent/
+    # Install agent files from agent/ subdirectory
+    local agent_source="$source_dir/agent"
     local agent_dest="$HOME/.config/opencode/agent"
     mkdir -p "$agent_dest"
 
-    # Copy agent-specific files
-    for agent_file in "${agent_files[@]}"; do
-        if [[ -f "$source_dir/$agent_file" ]]; then
-            cp "$source_dir/$agent_file" "$agent_dest/"
+    if [[ -d "$agent_source" ]]; then
+        shopt -s nullglob
+        local agent_md_files=("$agent_source"/*.md)
+        shopt -u nullglob
+        if [[ ${#agent_md_files[@]} -gt 0 ]]; then
+            cp "$agent_source"/*.md "$agent_dest/"
+            log_success "OpenCode agent files: $agent_dest"
+        else
+            log_warn "No .md files found in $agent_source"
         fi
-    done
-    log_success "OpenCode agent files: $agent_dest"
+    else
+        log_warn "Agent source directory not found: $agent_source"
+    fi
 
     # Install helper binaries
     local bin_source_dir="$source_dir/bin"
@@ -157,6 +152,22 @@ install_opencode() {
         else
             log_warn "No helper scripts found in $bin_source_dir"
         fi
+    fi
+
+    # Install evals harness (scenarios, variants, fixtures — not output)
+    local evals_source="$source_dir/evals"
+    if [[ -d "$evals_source" ]]; then
+        local evals_dest="$HOME/.config/opencode/evals"
+        mkdir -p "$evals_dest"
+
+        # Copy everything except the out/ directory
+        for entry in "$evals_source"/*; do
+            local entry_name=$(basename "$entry")
+            if [[ "$entry_name" != "out" ]]; then
+                cp -r "$entry" "$evals_dest/"
+            fi
+        done
+        log_success "OpenCode evals harness: $evals_dest"
     fi
 
     # Setup config directory and copy example config
