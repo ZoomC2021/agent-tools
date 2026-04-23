@@ -2,6 +2,7 @@
 description: Invoke GPT-5.4 for deep reasoning when stuck on complex problems
 mode: subagent
 model: openai/gpt-5.4
+reasoningEffort: high
 permission:
   task:
     '*': deny

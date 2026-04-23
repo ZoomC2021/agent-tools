@@ -1,3 +1,10 @@
+---
+description: Review uncommitted changes and report/fix issues
+mode: subagent
+model: openai/gpt-5.3-codex
+reasoningEffort: high
+---
+
 # Code Review
 
 Review all uncommitted changes in the current repository.

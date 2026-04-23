@@ -114,8 +114,35 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
     ├── create-pr.md
     ├── spec-compiler.md
     ├── quick-validator.md
-    └── change-auditor.md
+    ├── change-auditor.md
+    ├── plan-review.md
+    └── refactor.md
 ```
+
+### Subagent Reference
+
+| Subagent | Purpose | Model | Reasoning Effort |
+|----------|---------|-------|------------------|
+| **codex53-kimi** | Primary orchestrator (plans, routes, delegates) | GPT-5.3-Codex | High |
+| **codex53-kimi-turbo** | Alternative orchestrator using Kimi | Kimi K2.5 Turbo | — |
+| **kimi-general** | Implementation, debugging, refactoring execution | Kimi K2.5 Turbo | — |
+| **kimi-explore** | Local read-only codebase discovery and search | Kimi K2.5 Turbo | — |
+| **github-librarian** | Remote GitHub research (default branches, history) | Kimi K2.5 Turbo | — |
+| **docs-research** | Official docs, API behavior, release notes | Kimi K2.5 Turbo | — |
+| **walkthrough** | Architecture walkthroughs with Mermaid diagrams | Kimi K2.5 Turbo | — |
+| **oracle** | Deep reasoning for complex problems | GPT-5.4 | **High** |
+| **spec-compiler** | Compile Execution Contracts before implementation | Kimi K2.5 Turbo | — |
+| **plan-review** | Binary validation of Execution Contracts | Kimi K2.5 Turbo | — |
+| **quick-validator** | Fast validation of implementation output | Kimi K2.5 Turbo | — |
+| **mission-scrutiny** | Front-load scrutiny, milestone planning | GPT-5.3-Codex | — |
+| **milestone-validator** | Validate each milestone before advancing | GPT-5.3-Codex | — |
+| **change-auditor** | Deep audit for security, breaking changes | GPT-5.3-Codex | **High** |
+| **review** | Review uncommitted changes | GPT-5.3-Codex | **High** |
+| **deslop** | Code quality audit against principles | Kimi K2.5 Turbo | — |
+| **pr-reviewer** | Fetch PR comments and apply fixes | Kimi K2.5 Turbo | — |
+| **pr-reviewer-only** | Fetch PR comments, produce implementation prompt | Kimi K2.5 Turbo | — |
+| **create-pr** | Create PR with auto-generated title/description | Kimi K2.5 Turbo | — |
+| **refactor** | Analyze and prioritize refactoring opportunities | Kimi K2.5 Turbo | — |
 
 ### ⚠️ Security Warning
 

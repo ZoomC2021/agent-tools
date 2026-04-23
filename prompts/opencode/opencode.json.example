@@ -551,97 +551,8 @@
           "quick-validator": "allow",
           "change-auditor": "allow",
           "mission-scrutiny": "allow",
-          "milestone-validator": "allow"
-        }
-      },
-      "routing_policy": {
-        "description": "Deterministic agent selection based on request type. Always include 'Agent chosen + reason' in final response.",
-        "rules": [
-          {
-            "trigger": "PR creation or opening",
-            "keywords": ["create PR", "open PR", "pull request", "new PR"],
-            "agent": "create-pr",
-            "reason": "PR creation workflow requires specialized commit/branch/PR handling"
-          },
-          {
-            "trigger": "PR comments or feedback handling",
-            "keywords": ["PR comment", "review feedback", "address PR", "fix PR"],
-            "agent": "pr-reviewer",
-            "reason": "PR feedback requires GitHub API integration and structured response handling"
-          },
-          {
-            "trigger": "Plan/prompt-only PR review",
-            "keywords": ["PR review plan", "PR prompt only", "generate PR fix plan"],
-            "agent": "pr-reviewer-only",
-            "reason": "User requested implementation plan without direct changes"
-          },
-          {
-            "trigger": "Code quality or principles audit",
-            "keywords": ["audit", "code quality", "principles", "deslop", "clean code"],
-            "agent": "deslop",
-            "reason": "Quality audits require specialized coding principles analysis"
-          },
-          {
-            "trigger": "Uncommitted changes review",
-            "keywords": ["review changes", "uncommitted", "git diff review", "pre-commit review"],
-            "agent": "review",
-            "reason": "Review agent specializes in local change validation and quick remediation"
-          },
-          {
-            "trigger": "Remote GitHub code research",
-            "keywords": ["github.com/", "owner/repo", "upstream repo", "remote repo", "reference implementation"],
-            "agent": "github-librarian",
-            "reason": "Remote repository analysis should use a dedicated GitHub research worker"
-          },
-          {
-            "trigger": "Official docs, API behavior, migration notes, release notes",
-            "keywords": ["official docs", "documentation", "api docs", "migration guide", "release notes", "how does"],
-            "agent": "docs-research",
-            "reason": "External behavior questions should be grounded in authoritative documentation"
-          },
-          {
-            "trigger": "Local architecture walkthrough and diagrams",
-            "keywords": ["walk me through", "show the flow", "diagram", "architecture", "how does this work"],
-            "agent": "walkthrough",
-            "reason": "Architecture explanations deserve a dedicated evidence-backed walkthrough agent"
-          },
-          {
-            "trigger": "Discovery and search only",
-            "keywords": ["find", "search", "discover", "explore", "locate", "where is"],
-            "agent": "kimi-explore",
-            "reason": "Read-only exploration should use lightweight discovery agent"
-          },
-          {
-            "trigger": "Implementation, debugging, refactoring, execution",
-            "keywords": ["implement", "fix", "debug", "refactor", "build", "execute", "create", "add", "change"],
-            "agent": "kimi-general",
-            "reason": "General worker for concrete execution tasks when no specialized agent matches; large multi-step tasks add mission-scrutiny and milestone-validator around it"
-          }
-        ],
-        "fallback_rule": {
-          "condition": "No specialized agent matches the request type",
-          "action": "Use kimi-general for execution/debugging, kimi-explore for local read-only discovery, and specialized research agents for external docs or remote repositories"
-        },
-        "enforcement": {
-          "specialized_priority": "If a specialized agent exists for the request type, do NOT use kimi-general unless specialized agent returns BLOCKED",
-          "response_requirement": "Every final user-facing response MUST include: \"Agent chosen: <agent_name> + Reason: <routing_reason>\"; mission-style tasks should also report scrutiny and milestone outcomes"
-        },
-        "mission_workflow": {
-          "trigger": "Large or long-running multi-step implementation",
-          "conditions": [
-            "User explicitly asks for long-running, multi-step, migration, rewrite, prototype, or end-to-end work",
-            "Task includes 3+ deliverables or workstreams",
-            "Task spans 2+ major surfaces with dependencies",
-            "Scrutiny/contract estimates Large effort or more than 1 milestone"
-          ],
-          "phases": [
-            "mission-scrutiny",
-            "spec-compiler per milestone",
-            "kimi-general per milestone",
-            "milestone-validator per milestone",
-            "quick-validator final pass",
-            "change-auditor optional high-risk pass"
-          ]
+          "milestone-validator": "allow",
+          "plan-review": "allow"
         }
       },
       "description": "Primary orchestrator agent (GPT 5.3 Codex) - delegates to subagents for specialized tasks"
@@ -667,97 +578,8 @@
           "quick-validator": "allow",
           "change-auditor": "allow",
           "mission-scrutiny": "allow",
-          "milestone-validator": "allow"
-        }
-      },
-      "routing_policy": {
-        "description": "Deterministic agent selection based on request type. Always include 'Agent chosen + reason' in final response.",
-        "rules": [
-          {
-            "trigger": "PR creation or opening",
-            "keywords": ["create PR", "open PR", "pull request", "new PR"],
-            "agent": "create-pr",
-            "reason": "PR creation workflow requires specialized commit/branch/PR handling"
-          },
-          {
-            "trigger": "PR comments or feedback handling",
-            "keywords": ["PR comment", "review feedback", "address PR", "fix PR"],
-            "agent": "pr-reviewer",
-            "reason": "PR feedback requires GitHub API integration and structured response handling"
-          },
-          {
-            "trigger": "Plan/prompt-only PR review",
-            "keywords": ["PR review plan", "PR prompt only", "generate PR fix plan"],
-            "agent": "pr-reviewer-only",
-            "reason": "User requested implementation plan without direct changes"
-          },
-          {
-            "trigger": "Code quality or principles audit",
-            "keywords": ["audit", "code quality", "principles", "deslop", "clean code"],
-            "agent": "deslop",
-            "reason": "Quality audits require specialized coding principles analysis"
-          },
-          {
-            "trigger": "Uncommitted changes review",
-            "keywords": ["review changes", "uncommitted", "git diff review", "pre-commit review"],
-            "agent": "review",
-            "reason": "Review agent specializes in local change validation and quick remediation"
-          },
-          {
-            "trigger": "Remote GitHub code research",
-            "keywords": ["github.com/", "owner/repo", "upstream repo", "remote repo", "reference implementation"],
-            "agent": "github-librarian",
-            "reason": "Remote repository analysis should use a dedicated GitHub research worker"
-          },
-          {
-            "trigger": "Official docs, API behavior, migration notes, release notes",
-            "keywords": ["official docs", "documentation", "api docs", "migration guide", "release notes", "how does"],
-            "agent": "docs-research",
-            "reason": "External behavior questions should be grounded in authoritative documentation"
-          },
-          {
-            "trigger": "Local architecture walkthrough and diagrams",
-            "keywords": ["walk me through", "show the flow", "diagram", "architecture", "how does this work"],
-            "agent": "walkthrough",
-            "reason": "Architecture explanations deserve a dedicated evidence-backed walkthrough agent"
-          },
-          {
-            "trigger": "Discovery and search only",
-            "keywords": ["find", "search", "discover", "explore", "locate", "where is"],
-            "agent": "kimi-explore",
-            "reason": "Read-only exploration should use lightweight discovery agent"
-          },
-          {
-            "trigger": "Implementation, debugging, refactoring, execution",
-            "keywords": ["implement", "fix", "debug", "refactor", "build", "execute", "create", "add", "change"],
-            "agent": "kimi-general",
-            "reason": "General worker for concrete execution tasks when no specialized agent matches; large multi-step tasks add mission-scrutiny and milestone-validator around it"
-          }
-        ],
-        "fallback_rule": {
-          "condition": "No specialized agent matches the request type",
-          "action": "Use kimi-general for execution/debugging, kimi-explore for local read-only discovery, and specialized research agents for external docs or remote repositories"
-        },
-        "enforcement": {
-          "specialized_priority": "If a specialized agent exists for the request type, do NOT use kimi-general unless specialized agent returns BLOCKED",
-          "response_requirement": "Every final user-facing response MUST include: \"Agent chosen: <agent_name> + Reason: <routing_reason>\"; mission-style tasks should also report scrutiny and milestone outcomes"
-        },
-        "mission_workflow": {
-          "trigger": "Large or long-running multi-step implementation",
-          "conditions": [
-            "User explicitly asks for long-running, multi-step, migration, rewrite, prototype, or end-to-end work",
-            "Task includes 3+ deliverables or workstreams",
-            "Task spans 2+ major surfaces with dependencies",
-            "Scrutiny/contract estimates Large effort or more than 1 milestone"
-          ],
-          "phases": [
-            "mission-scrutiny",
-            "spec-compiler per milestone",
-            "kimi-general per milestone",
-            "milestone-validator per milestone",
-            "quick-validator final pass",
-            "change-auditor optional high-risk pass"
-          ]
+          "milestone-validator": "allow",
+          "plan-review": "allow"
         }
       },
       "description": "Primary orchestrator agent (Kimi 2.5 Turbo) - delegates to subagents for specialized tasks"
@@ -808,6 +630,7 @@
     "oracle": {
       "model": "openai/gpt-5.4",
       "prompt": "{file:./agent/oracle.md}",
+      "reasoningEffort": "high",
       "permission": {
         "task": {
           "*": "deny",
@@ -820,7 +643,8 @@
       "mode": "subagent",
       "model": "openai/gpt-5.3-codex",
       "hidden": true,
-      "prompt": "{file:./commands/review.md}"
+      "prompt": "{file:./commands/review.md}",
+      "reasoningEffort": "high"
     },
     "refactor": {
       "description": "Analyze and prioritize refactoring opportunities.",
@@ -908,7 +732,8 @@
       "mode": "subagent",
       "model": "openai/gpt-5.3-codex",
       "hidden": true,
-      "prompt": "{file:./commands/change-auditor.md}"
+      "prompt": "{file:./commands/change-auditor.md}",
+      "reasoningEffort": "high"
     },
     "mission-scrutiny": {
       "description": "Front-load scrutiny and milestone planning for long-running multi-step tasks.",
@@ -923,6 +748,22 @@
       "model": "openai/gpt-5.3-codex",
       "hidden": true,
       "prompt": "{file:./commands/milestone-validator.md}"
+    },
+    "plan-review": {
+      "description": "Binary validation of Execution Contracts (Momus-style: approve 80% clear plans, reject only true blockers).",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./commands/plan-review.md}",
+      "permission": {
+        "task": {
+          "*": "deny"
+        },
+        "read": "allow",
+        "bash": "allow",
+        "glob": "allow",
+        "grep": "allow"
+      }
     }
   }
 }

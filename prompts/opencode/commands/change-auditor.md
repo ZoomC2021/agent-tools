@@ -2,6 +2,7 @@
 description: Deep audit for high-risk areas (security, breaking changes, performance)
 mode: subagent
 model: openai/gpt-5.3-codex
+reasoningEffort: high
 permission:
   task:
     '*': deny

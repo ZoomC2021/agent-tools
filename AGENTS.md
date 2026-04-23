@@ -23,6 +23,7 @@ Guidance for coding agents working in this repository.
 - Prefer minimal, targeted edits over broad rewrites.
 - When changing install behavior, keep Linux and macOS paths aligned where applicable.
 - Never commit real secrets or API keys (for example in `opencode.json`-style config files).
+- `prompts/opencode/opencode.json.example` is the authoritative shipped OpenCode config. Any change to agents, commands, plugins, providers, models, permissions, or `{file:...}` references under `prompts/opencode/` must be reflected in the example in the same commit — the installer uses it as the source of truth to sync existing user configs.
 
 ## Validation
 
@@ -49,6 +50,16 @@ prompts/opencode/bin/opencode-eval list
 
 # Fast sanity check without running full cases
 prompts/opencode/bin/opencode-eval run --dry-run
+```
+
+When editing `prompts/opencode/opencode.json.example`, verify it parses and all `{file:...}` references resolve:
+
+```bash
+jq -e . prompts/opencode/opencode.json.example >/dev/null
+jq -r '.. | strings | select(test("^\\{file:[^}]+\\}$")) | capture("^\\{file:(?<p>[^}]+)\\}$").p' \
+  prompts/opencode/opencode.json.example | sort -u | while read ref; do
+    [ -f "prompts/opencode/${ref#./}" ] || echo "MISS $ref"
+  done
 ```
 
 ## Commit and PR Expectations

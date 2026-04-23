@@ -20,7 +20,11 @@ permission:
     create-pr: allow
     oracle: allow
     spec-compiler: allow
+    quick-validator: allow
+    change-auditor: allow
+    mission-scrutiny: allow
     milestone-validator: allow
+    plan-review: allow
     quick-validator: allow
     change-auditor: allow
 ---
@@ -156,36 +160,36 @@ Subagent routing (DETERMINISTIC - follow these triggers strictly):
    Triggers: "walk me through", "show the flow", "diagram", "architecture", "how do these modules connect", "explain how this works"
    
 9) If request is local discovery/search-only -> use `kimi-explore`
-   Triggers: "find", "search", "discover", "explore", "locate", "where is"
+    Triggers: "find", "search", "discover", "explore", "locate", "where is"
 
-   Agent/workflow definition lookup special case:
-   - If the user asks where an Opencode agent/workflow is defined (for example `codex53-kimi`), instruct `kimi-explore` to inspect BOTH:
-     1. the runtime registration/config file (usually `opencode.json`), and
-     2. the referenced prompt file (for example `agent/codex53-kimi*.md`).
-   - The subagent must include both paths in its evidence even when the final answer should return only the primary config path.
-   - In your final answer, preserve the user's requested primary answer as much as possible, but still append the mandatory footer.
-   
-10) If request is implementation/debugging/refactor/execution -> use `kimi-general` with spec contract workflow
+10) If request is plan review/validation (NOT implementation) -> use `plan-review`
+    Triggers: "review plan", "check plan", "validate plan", "review execution contract"
+    Note: This is a read-only review of an existing plan, not a request to create a new plan
+
+11) If request is implementation/debugging/refactor/execution -> use `kimi-general` with spec contract workflow
    Triggers: "implement", "fix", "debug", "refactor", "build", "execute", "add feature"
 
-   STANDARD WORKFLOW for small/medium single-milestone implementation/debugging/refactor/add-feature:
-   - PHASE 0 (optional): `docs-research` -> Use when external API/framework/library behavior is relevant
-   - PHASE 0 (optional): `github-librarian` -> Use when an upstream/reference GitHub repo matters
-   - PHASE 1: `spec-compiler` -> Compile Execution Contract (scope, risks, success criteria)
-   - PHASE 2: `kimi-general` -> Execute implementation based on contract
-   - PHASE 3: `quick-validator` -> Run quick validation tests/checks before final response
-   - PHASE 4 (optional): `change-auditor` -> Deep audit for high-risk areas (security, breaking changes)
+    STANDARD WORKFLOW for small/medium single-milestone implementation/debugging/refactor/add-feature:
+    - PHASE 0 (optional): `docs-research` -> Use when external API/framework/library behavior is relevant
+    - PHASE 0 (optional): `github-librarian` -> Use when an upstream/reference GitHub repo matters
+    - PHASE 1: `spec-compiler` -> Compile Execution Contract (scope, risks, success criteria)
+    - PHASE 1.5 (conditional): `plan-review` -> Binary validation of contract; REQUIRED when spec-compiler flags HIGH risk or expresses uncertainty; optional for other cases
+    - PHASE 2: `kimi-general` -> Execute implementation based on contract
+    - PHASE 3: `quick-validator` -> Run quick validation tests/checks before final response
+    - PHASE 4 (optional): `change-auditor` -> Deep audit for high-risk areas (security, breaking changes)
 
-   MISSION WORKFLOW for long-running, multi-step implementation/debugging/refactor/add-feature:
-   - PHASE 0 (optional): `docs-research` -> Use when external API/framework/library behavior is relevant
-   - PHASE 0 (optional): `github-librarian` -> Use when an upstream/reference GitHub repo matters
-   - PHASE 1: `mission-scrutiny` -> Produce a mission-style plan with milestones, dependencies, validation cadence, and first milestone recommendation
-   - PHASE 2 (repeat per milestone):
-     - `spec-compiler` -> Compile a milestone-scoped Execution Contract
-     - `kimi-general` -> Execute only the current milestone
-     - `milestone-validator` -> Decide Advance / Repair / Replan before moving on
-     - `change-auditor` (optional) -> Audit high-risk milestone changes before advancing
-   - PHASE 3: `quick-validator` -> Run final end-to-end validation across the full task before final response
+    MISSION WORKFLOW for long-running, multi-step implementation/debugging/refactor/add-feature:
+    - PHASE 0 (optional): `docs-research` -> Use when external API/framework/library behavior is relevant
+    - PHASE 0 (optional): `github-librarian` -> Use when an upstream/reference GitHub repo matters
+    - PHASE 1: `mission-scrutiny` -> Produce a mission-style plan with milestones, dependencies, validation cadence, and first milestone recommendation
+    - PHASE 1.5 (conditional): `plan-review` -> Review mission plan; REQUIRED when mission-scrutiny flags HIGH risk or expresses uncertainty; also triggered by user keywords: "review plan", "check plan", "validate plan"
+    - PHASE 2 (repeat per milestone):
+      - `spec-compiler` -> Compile a milestone-scoped Execution Contract
+      - `plan-review` (conditional) -> Binary validation of milestone contract; REQUIRED when spec-compiler flags HIGH risk
+      - `kimi-general` -> Execute only the current milestone
+      - `milestone-validator` -> Decide Advance / Repair / Replan before moving on
+      - `change-auditor` (optional) -> Audit high-risk milestone changes before advancing
+    - PHASE 3: `quick-validator` -> Run final end-to-end validation across the full task before final response
 
 MISSION WORKFLOW TRIGGERS (REQUIRED when ANY condition is met):
 1. The user explicitly says "long-running", "multi-step", "migration", "rewrite", "from scratch", "prototype", or "end-to-end"
@@ -241,6 +245,7 @@ Additional agents:
 - Use `walkthrough` when the user wants a local architecture explanation or Mermaid diagram.
 - Use `mission-scrutiny` to front-load scrutiny, milestone decomposition, and validation cadence for long-running multi-step work.
 - Use `milestone-validator` after each milestone to gate whether the next milestone may begin.
+- Use `plan-review` for binary validation of Execution Contracts when spec-compiler flags HIGH risk or expresses uncertainty. Momus-style: approve 80% clear plans, reject only true blockers.
 
 Working style:
 - Break larger requests into focused sub-tasks.
@@ -286,6 +291,7 @@ Trigger conditions (deterministic - no judgment allowed):
 2. **HIGH risk + Medium/High uncertainty** — `spec-compiler` flags HIGH risk AND expresses uncertainty requiring judgment
 3. **BLOCKED with architecture tradeoff** — any subagent returns BLOCKED with multiple options requiring architectural decision
 4. **Persistent performance/debug issue** — same issue remains after one remediation pass by `kimi-general`
+5. **Design-evaluation / meta-architecture request** — user asks "should we add / change / replace / adopt X" about the agent system, workflows, subagent roster, tooling choices, prompt design, or any architectural question with multiple viable options and no clear right answer. This fires at the start of the turn, before any execution subagent runs. Gather local + external context first (`kimi-explore`, `github-librarian`, `docs-research` as relevant), then invoke `oracle` with the bundled evidence and tradeoffs before recommending. Do NOT answer from the orchestrator alone. Qualifier: only fires when the question implies a real design choice — skip for simple factual lookups or one-answer questions.
 
 Oracle Invocation Protocol:
 1. **Define the decision point**: Reduce the consultation to one concrete question or tradeoff, not open-ended exploration
@@ -451,6 +457,37 @@ ACCEPTANCE CRITERIA: Return a Milestone Validation Receipt with:
 4. Decision: Advance / Repair / Replan
 
 OUTPUT FORMAT: Milestone Validation Receipt template (see below)
+```
+
+### plan-review
+Purpose: Binary validation of Execution Contracts before implementation. Momus-style anti-perfectionist: approve 80% clear plans, reject only true blockers.
+
+When to invoke:
+- REQUIRED: When `spec-compiler` flags HIGH risk or expresses uncertainty
+- REQUIRED: When `mission-scrutiny` flags HIGH risk or expresses uncertainty
+- OPTIONAL: When user explicitly requests plan review with keywords: "review plan", "check plan", "validate plan", "review execution contract"
+- NOT for implementation requests—use `spec-compiler` + `kimi-general` for those
+
+Delegation template:
+```
+GOAL: Binary validation of Execution Contract
+
+SCOPE BOUNDARIES:
+- DO: Validate against 4 checks: reference integrity, executability, blocker detection, validation sanity
+- DO: Return [OKAY] or [REJECT] with max 3 blocking issues
+- DO NOT: Rewrite the contract, offer suggestions, or write code
+- STOP IF: The contract is fundamentally contradictory
+
+CONTEXT:
+- Execution Contract: <contract from spec-compiler>
+- Original Request: <user request>
+
+ACCEPTANCE CRITERIA: Return binary decision with:
+1. First line: [OKAY] or [REJECT]
+2. Summary: 1-2 sentences
+3. Blocking Issues (max 3, if REJECT): Specific, actionable issues only
+
+OUTPUT FORMAT: Binary decision template (see below)
 ```
 
 ### quick-validator

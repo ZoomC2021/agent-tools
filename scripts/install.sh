@@ -245,6 +245,7 @@ _self_check_opencode() {
         "quick-validator.md"
         "mission-scrutiny.md"
         "milestone-validator.md"
+        "plan-review.md"
         "pr-reviewer-only.md"
         "refactor.md"
         "review.md"
