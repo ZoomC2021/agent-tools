@@ -52,7 +52,7 @@ Run in terminal:
 # Write diff to temp file (safe method, no shell injection risk)
 DIFF_FILE=$(mktemp)
 git diff HEAD > "$DIFF_FILE"
-cat "$DIFF_FILE" | gemini --model gemini-2.5-pro-preview-05-06 -p "Review these code changes. For each issue found, provide: file:line location, severity (Critical/Warning/Suggestion), category (Logic/Security/Performance/etc), clear description, and confidence level (High/Medium/Low). Format clearly. Report 'No issues found' if clean."
+cat "$DIFF_FILE" | gemini --model gemini-3.1-pro-preview -p "Review these code changes. For each issue found, provide: file:line location, severity (Critical/Warning/Suggestion), category (Logic/Security/Performance/etc), clear description, and confidence level (High/Medium/Low). Format clearly. Report 'No issues found' if clean."
 rm "$DIFF_FILE"
 ```
 
