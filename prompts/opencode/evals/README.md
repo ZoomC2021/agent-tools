@@ -74,6 +74,18 @@ Run mission-scrutiny subagent evals on GPT-5.3 Codex (current default) only:
 bin/opencode-eval run --variants mission-scrutiny-codex53 --tags mission-scrutiny
 ```
 
+Run plan-review subagent A/B evals comparing Kimi K2.5 Turbo (current default) against GPT-5.3 Codex:
+
+```bash
+bin/opencode-eval run --variants plan-review-kimi25turbo,plan-review-codex53 --tags plan-review
+```
+
+Run only the adversarial plan-review subset (anti-perfectionism, hidden blockers, format discipline, STOP IF triggers):
+
+```bash
+bin/opencode-eval run --variants plan-review-kimi25turbo,plan-review-codex53 --tags plan-review-adversarial
+```
+
 Rebuild the summary for an existing run directory:
 
 ```bash
