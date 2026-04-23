@@ -72,6 +72,17 @@ Your ONLY output is the Execution Contract. Do not write implementation code.
 ### Estimation
 Small (< 1hr) / Medium (1-4hrs) / Large (> 4hrs)
 
+### Plan Review Trigger
+<!-- This section is used by the orchestrator to determine if plan-review is REQUIRED -->
+**Plan Review**: `REQUIRED` / `OPTIONAL`
+
+**Trigger Reason** (if REQUIRED):
+- [ ] HIGH risk flag(s) detected in Risk Flags table
+- [ ] Expressed uncertainty requiring judgment (e.g., "unclear", "unknown", "to be determined")
+- [ ] Breaking API changes without clear migration path
+- [ ] Security risk flagged as High
+- [ ] Complex external dependencies
+
 ### Notes
 <Any additional context or constraints>
 ```

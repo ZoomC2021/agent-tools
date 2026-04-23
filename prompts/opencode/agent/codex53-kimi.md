@@ -115,7 +115,12 @@ Subagent routing (DETERMINISTIC - follow these triggers strictly):
     - PHASE 0 (optional): `docs-research` -> Use when external API/framework/library behavior is relevant
     - PHASE 0 (optional): `github-librarian` -> Use when an upstream/reference GitHub repo matters
     - PHASE 1: `spec-compiler` -> Compile Execution Contract (scope, risks, success criteria)
-    - PHASE 1.5 (conditional): `plan-review` -> Binary validation of contract; REQUIRED when spec-compiler flags HIGH risk or expresses uncertainty; optional for other cases
+    - PHASE 1.5 (conditional): `plan-review` -> Binary validation of contract; REQUIRED when spec-compiler output indicates:
+      * "Plan Review: REQUIRED" in the Plan Review Trigger section, OR
+      * Any "HIGH" risk level in the Risk Flags table, OR
+      * Language expressing uncertainty ("unclear", "unknown", "TBD", "to be determined"), OR
+      * BREAKING API changes without clear migration path
+      Invoke `plan-review` with the Execution Contract. If plan-review returns [REJECT], address blocking issues before proceeding to Phase 2.
     - PHASE 2: `kimi-general` -> Execute implementation based on contract
     - PHASE 3: `quick-validator` -> Run quick validation tests/checks before final response
     - PHASE 4 (optional): `change-auditor` -> Deep audit for high-risk areas (security, breaking changes)
@@ -124,10 +129,14 @@ Subagent routing (DETERMINISTIC - follow these triggers strictly):
     - PHASE 0 (optional): `docs-research` -> Use when external API/framework/library behavior is relevant
     - PHASE 0 (optional): `github-librarian` -> Use when an upstream/reference GitHub repo matters
     - PHASE 1: `mission-scrutiny` -> Produce a mission-style plan with milestones, dependencies, validation cadence, and first milestone recommendation
-    - PHASE 1.5 (conditional): `plan-review` -> Review mission plan; REQUIRED when mission-scrutiny flags HIGH risk or expresses uncertainty; also triggered by user keywords: "review plan", "check plan", "validate plan"
+    - PHASE 1.5 (conditional): `plan-review` -> Review mission plan; REQUIRED when mission-scrutiny flags HIGH risk or expresses uncertainty; also triggered by user keywords: "review plan", "check plan", "validate plan". If plan-review returns [REJECT], address blocking issues before proceeding.
     - PHASE 2 (repeat per milestone):
       - `spec-compiler` -> Compile a milestone-scoped Execution Contract
-      - `plan-review` (conditional) -> Binary validation of milestone contract; REQUIRED when spec-compiler flags HIGH risk
+      - `plan-review` (conditional) -> Binary validation of milestone contract; REQUIRED when spec-compiler output indicates:
+        * "Plan Review: REQUIRED" in the Plan Review Trigger section, OR
+        * Any "HIGH" risk level in the Risk Flags table, OR
+        * Language expressing uncertainty ("unclear", "unknown", "TBD", "to be determined")
+        Invoke `plan-review` with the Execution Contract. If [REJECT], address blocking issues before proceeding.
       - `kimi-general` -> Execute only the current milestone
       - `milestone-validator` -> Decide Advance / Repair / Replan before moving on
       - `change-auditor` (optional) -> Audit high-risk milestone changes before advancing
