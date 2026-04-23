@@ -792,6 +792,20 @@
         "glob": "allow",
         "grep": "allow"
       }
+    },
+    "handoff": {
+      "description": "Generate handoff context for continuing work in a new session",
+      "mode": "subagent",
+      "model": null,
+      "hidden": true,
+      "prompt": "{file:./commands/handoff.md}",
+      "permission": {
+        "read": "allow",
+        "bash": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "write": "deny"
+      }
     }
   }
 }
