@@ -1,7 +1,7 @@
 ---
 description: Generate handoff context for continuing work in a new session
 mode: subagent
-model: null
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 hidden: true
 permission:
   read: allow
