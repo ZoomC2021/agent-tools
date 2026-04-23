@@ -180,7 +180,7 @@ See `prompts/opencode/opencode.json.example` for the full configuration structur
 | [Cursor](https://cursor.com) | Editor | `~/.cursor/commands/` |
 | [Cline](https://cline.bot) | Editor | `~/Documents/Cline/Rules/` |
 | [Roo Code](https://roocode.com) | Editor | `~/.roo/commands/` |
-| [Windsurf](https://codeium.com/windsurf) | Editor | `~/.codeium/windsurf/memories/global_rules.md` |
+| [Windsurf](https://codeium.com/windsurf) | Editor | `~/.codeium/windsurf/skills/` |
 
 ## Quick Install
 
@@ -356,8 +356,11 @@ cp prompts/roocode/*.md ~/.roo/commands/
 <summary>Windsurf</summary>
 
 ```bash
-mkdir -p ~/.codeium/windsurf/memories
-cp prompts/windsurf/global_rules.md ~/.codeium/windsurf/memories/
+for skill_dir in prompts/windsurf/*/; do
+  skill_name=$(basename "$skill_dir")
+  mkdir -p ~/.codeium/windsurf/skills/$skill_name
+  cp "$skill_dir"* ~/.codeium/windsurf/skills/$skill_name/
+done
 ```
 </details>
 
@@ -514,8 +517,11 @@ cp prompts/roocode/*.md ~/.roo/commands/
 <summary>Windsurf</summary>
 
 ```bash
-mkdir -p ~/.codeium/windsurf/memories
-cp prompts/windsurf/global_rules.md ~/.codeium/windsurf/memories/
+for skill_dir in prompts/windsurf/*/; do
+  skill_name=$(basename "$skill_dir")
+  mkdir -p ~/.codeium/windsurf/skills/$skill_name
+  cp "$skill_dir"* ~/.codeium/windsurf/skills/$skill_name/
+done
 ```
 </details>
 

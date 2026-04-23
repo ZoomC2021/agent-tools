@@ -73,21 +73,36 @@ function Install-Cursor {
 }
 
 function Install-Windsurf {
-    Write-Info "Installing Windsurf global rules..."
+    Write-Info "Installing Windsurf skills..."
     
-    $SourceFile = Join-Path $PromptsDir "windsurf\global_rules.md"
+    $SourceDir = Join-Path $PromptsDir "windsurf"
     
-    if (-not (Test-Path $SourceFile)) {
-        Write-Warn "Source file not found: $SourceFile"
+    if (-not (Test-Path -PathType Container $SourceDir)) {
+        Write-Warn "Source directory not found: $SourceDir"
         return
     }
     
-    $DestDir = Join-Path $env:USERPROFILE ".codeium\windsurf\memories"
-    $DestFile = Join-Path $DestDir "global_rules.md"
+    $Dest = Join-Path $env:USERPROFILE ".codeium\windsurf\skills"
+    $SkillDirs = Get-ChildItem -Path $SourceDir -Directory
+    $skillsFound = 0
     
-    New-Item -ItemType Directory -Path $DestDir -Force | Out-Null
-    Copy-Item $SourceFile -Destination $DestFile -Force
-    Write-Success "Windsurf: $DestFile"
+    foreach ($dir in $SkillDirs) {
+        $skillName = $dir.Name
+        $skillMd = Join-Path $dir.FullName "SKILL.md"
+        if (-not (Test-Path $skillMd)) {
+            Write-Warn "Skipping Windsurf skill '$skillName': missing SKILL.md"
+            continue
+        }
+        $SkillDest = Join-Path $Dest $skillName
+        New-Item -ItemType Directory -Path $SkillDest -Force | Out-Null
+        Copy-Item "$($dir.FullName)\*" -Destination $SkillDest -Force
+        Write-Success "Windsurf skill '$skillName': $SkillDest"
+        $skillsFound++
+    }
+    
+    if ($skillsFound -eq 0) {
+        Write-Warn "No skills found in $SourceDir"
+    }
 }
 
 function Install-OpenCode {

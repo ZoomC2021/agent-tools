@@ -1,3 +1,8 @@
+---
+name: handoff
+description: Generate structured handoff context for continuing work in a new session
+---
+
 # Handoff Command
 
 Generate a structured handoff context for continuing work in a new session.
@@ -122,58 +127,3 @@ After generating the HANDOFF CONTEXT, provide clear continuation instructions:
 - Maximum 10 key files listed
 - Keep handoff self-contained and continuation-ready
 - Summarize code changes rather than pasting full diffs
-
-## Output Example
-
-```
-HANDOFF CONTEXT
-===============
-
-USER REQUESTS (AS-IS)
----------------------
-Add OAuth2 authentication to the API using JWT tokens
-
-GOAL
-----
-Implement secure authentication flow for API endpoints
-
-WORK COMPLETED
---------------
-- Created auth middleware in `src/middleware/auth.js`
-- Added JWT token generation in `src/utils/jwt.js`
-- Implemented login endpoint in `src/routes/auth.js`
-
-CURRENT STATE
--------------
-Login endpoint is functional and returns valid JWT tokens. Token verification middleware is implemented but not yet integrated with protected routes. Tests pass for login but are pending for protected endpoint access.
-
-PENDING TASKS
--------------
-1. Integrate auth middleware with existing API routes
-2. Add token refresh endpoint
-3. Write tests for protected routes
-4. Update API documentation
-
-KEY FILES (max 10)
-------------------
-1. `src/middleware/auth.js` - JWT verification middleware
-2. `src/utils/jwt.js` - Token generation utilities
-3. `src/routes/auth.js` - Login/logout endpoints
-4. `tests/auth.test.js` - Authentication tests
-
-IMPORTANT DECISIONS
--------------------
-- Using RS256 signing algorithm for production security
-- Tokens expire after 1 hour with refresh token support
-- Auth middleware will be opt-in per route (not global)
-
-EXPLICIT CONSTRAINTS
---------------------
-- Keep existing public endpoints accessible
-- Don't break existing API contracts
-- Follow existing error handling patterns
-
-CONTEXT FOR CONTINUATION
-------------------------
-I need to integrate the auth middleware with the existing API routes. Start by identifying which routes need protection, then apply the middleware selectively. The auth middleware is ready to use - import it and apply to route definitions. After integration, implement the refresh token endpoint following the pattern established in the login endpoint. Finally, write comprehensive tests for the protected routes.
-```

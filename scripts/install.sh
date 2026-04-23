@@ -624,20 +624,36 @@ install_roocode() {
     install_agent "Roo Code" "$PROMPTS_DIR/roocode" "$HOME/.roo/commands"
 }
 
-# Install Windsurf global rules
+# Install Windsurf skills
 install_windsurf() {
-    log_info "Installing Windsurf global rules..."
-    local source="$PROMPTS_DIR/windsurf/global_rules.md"
-    local dest="$HOME/.codeium/windsurf/memories"
+    log_info "Installing Windsurf skills..."
+    local source_dir="$PROMPTS_DIR/windsurf"
+    local dest="$HOME/.codeium/windsurf/skills"
     
-    if [[ ! -f "$source" ]]; then
-        log_warn "Source file not found: $source"
+    if [[ ! -d "$source_dir" ]]; then
+        log_warn "Source directory not found: $source_dir"
         return 0
     fi
     
-    mkdir -p "$dest"
-    cp "$source" "$dest/"
-    log_success "Windsurf: $dest/global_rules.md"
+    local skills_found=0
+    for skill_dir in "$source_dir"/*/; do
+        if [[ ! -d "$skill_dir" ]]; then
+            continue
+        fi
+        local skill_name=$(basename "$skill_dir")
+        if [[ ! -f "$skill_dir/SKILL.md" ]]; then
+            log_warn "Skipping Windsurf skill '$skill_name': missing SKILL.md"
+            continue
+        fi
+        mkdir -p "$dest/$skill_name"
+        cp "$skill_dir"* "$dest/$skill_name/"
+        log_success "Windsurf skill '$skill_name': $dest/$skill_name"
+        skills_found=1
+    done
+    
+    if [[ $skills_found -eq 0 ]]; then
+        log_warn "No skills found in $source_dir"
+    fi
 }
 
 # Main installation

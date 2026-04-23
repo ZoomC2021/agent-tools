@@ -1,3 +1,8 @@
+---
+name: ultrareview
+description: Run parallel dual-model code review using Claude and Gemini 3.1 Pro Preview simultaneously, then consolidate findings
+---
+
 # UltraReview: Parallel Dual-Model Code Review
 
 Run simultaneous code reviews using **GPT 5.4** AND **Gemini 3.1 Pro Preview** (via Gemini CLI), then consolidate findings into a unified report.
