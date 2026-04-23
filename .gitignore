@@ -165,3 +165,6 @@ prompts/opencode/antigravity-logs/
 prompts/opencode/node_modules/
 prompts/opencode/package-lock.json
 prompts/opencode/bun.lock
+
+# Gemini CLI local files
+.gemini/

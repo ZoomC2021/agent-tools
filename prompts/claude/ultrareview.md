@@ -1,13 +1,13 @@
 # UltraReview: Parallel Dual-Model Code Review
 
-Run simultaneous code reviews using **GPT 5.4** AND **Gemini 3.1 Pro Preview** (via Gemini CLI), then consolidate findings into a unified report.
+Run simultaneous code reviews using **Claude Opus 4.7** AND **Gemini 3.1 Pro Preview** (via Gemini CLI), then consolidate findings into a unified report.
 
 ⚠️ **Cost Warning**: This uses 2 high-tier models simultaneously. Use for critical reviews only.
 
 ## Overview
 
 This workflow performs parallel code reviews using two different AI models:
-1. **GPT 5.4** - Primary model for reasoning-heavy analysis
+1. **Claude Opus 4.7** - Primary model for reasoning-heavy analysis
 2. **Gemini 3.1 Pro Preview** - Secondary model for pattern recognition (via Gemini CLI)
 
 The results are consolidated to catch issues each model might miss and surface conflicting interpretations.
@@ -33,7 +33,7 @@ Capture the complete set of changed files and their contents.
 
 Launch TWO review processes concurrently:
 
-### Process 1: GPT 5.4 Review (This Platform)
+### Process 1: Claude Opus 4.7 Review (This Platform)
 
 **READ-ONLY REVIEW - Do NOT modify files during review**
 
@@ -61,12 +61,12 @@ rm "$DIFF_FILE"
 ## Phase 3: Wait for Both Results
 
 Collect findings from both reviews:
-- GPT 5.4 findings (from this platform)
+- Claude Opus 4.7 findings (from this platform)
 - Gemini 3.1 Pro findings (from CLI output)
 
 Handle failures gracefully:
-- If GPT 5.4 fails → Use Gemini results alone
-- If Gemini CLI fails → Use GPT 5.4 results alone
+- If Claude Opus 4.7 fails → Use Gemini results alone
+- If Gemini CLI fails → Use Claude Opus 4.7 results alone
 - If both fail → Report failure, suggest using standard `/review` instead
 
 ## Phase 4: Consolidate Findings
@@ -97,19 +97,19 @@ Issues found by BOTH models. Original severity preserved.
 Format:
 ```
 🔴 [<Original_Severity>] [Category] filename:line
-   Consensus: GPT 5.4 + Gemini 3.1 Pro
+    Consensus: Claude Opus 4.7 + Gemini 3.1 Pro
    Original Severity: <Critical/Warning/Suggestion>
    Problem: <description>
    Fix: <recommendation>
 ```
 
-#### Section 2: 🟠 GPT 5.4 Exclusive Findings
-Issues found ONLY by GPT 5.4.
+#### Section 2: 🟠 Claude Opus 4.7 Exclusive Findings
+Issues found ONLY by Claude Opus 4.7.
 
 Format:
 ```
 🟠 [<Severity>] [Category] filename:line
-   Source: GPT 5.4
+   Source: Claude Opus 4.7
    Confidence: <High/Medium/Low>
    Problem: <description>
    Fix: <recommendation>
@@ -144,7 +144,7 @@ Same code location, but models disagree.
 Format:
 ```
 ⚠️ filename:line
-   GPT 5.4: <assessment>
+   Claude Opus 4.7: <assessment>
    Gemini 3.1 Pro: <assessment>
    Human Review Recommended: The models disagree significantly.
 ```
@@ -154,7 +154,7 @@ Format:
 ```
 ## UltraReview Summary
 - Consensus Critical: <count>
-- GPT 5.4 Exclusive: <count>
+- Claude Opus 4.7 Exclusive: <count>
 - Gemini 3.1 Pro Exclusive: <count>
 - Lower Confidence: <count>
 - Divergent Assessments: <count>
@@ -182,7 +182,7 @@ Suggestion: Run `gemini login` to authenticate
 Continue with the successful model's results. Add warning: "⚠️ UltraReview degraded to single-model review."
 
 ### Both Models Failure
-Report: "UltraReview failed: Both GPT 5.4 and Gemini 3.1 Pro unavailable. Use standard /review instead."
+Report: "UltraReview failed: Both Claude Opus 4.7 and Gemini 3.1 Pro unavailable. Use standard /review instead."
 
 ## Divergence Resolution Policy
 
