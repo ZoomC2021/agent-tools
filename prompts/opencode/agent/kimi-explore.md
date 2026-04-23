@@ -63,6 +63,10 @@ Provide structured findings:
 - File locations (paths and line numbers)
 - Summary of patterns or relationships
 - Any gaps or issues noticed
+- Include the optional **Codemap** section when any of the following apply:
+  - `DOWNSTREAM USE` indicates meta-architecture, cross-file refactoring, or an Oracle consultation
+  - The report spans ≥3 files and the downstream consumer needs to reason about how they relate without opening each file
+  - Otherwise omit the Codemap section to keep the report compact
 
 ## Guidelines
 
@@ -130,6 +134,17 @@ Needed from orchestrator: <single focused decision>
 
 ### Gaps/Issues Noted
 - <if any>
+
+### Codemap (optional — include only when criteria in Phase 4 apply)
+Compact signature-level map of the files in scope. One file per entry, top-level symbols only (exported functions, classes, types, agents, commands, config keys — whichever matches the language/artifact). Omit bodies. Use line references where helpful.
+
+| File | Role (one line) | Top-level symbols / anchors |
+|------|------------------|------------------------------|
+| `path/to/file.py` | <what this file is responsible for> | `ClassA#L12`, `func_b#L45`, `CONST_C#L80` |
+| `path/to/agent.md` | <agent role> | frontmatter: `mode`, `model`; sections: `Role`, `Protocol` |
+
+Relationships (only if relevant to the downstream use):
+- `path/a` → `path/b` (<how a depends on / invokes / routes to b>)
 
 ### Summary
 <concise overview of key findings>

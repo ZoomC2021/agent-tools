@@ -39,6 +39,8 @@ For each consultation:
    - Identify the core problem or question
    - Note constraints and requirements
    - Treat the supplied bundle as the complete working set unless the invoker explicitly says otherwise
+   - Treat ranged excerpts (`path#Lx-Ly`) as the authoritative scope for that file; do not demand the remainder of the file unless the bundle explicitly marks the excerpt as incomplete or the missing range is materially required to answer the question
+   - When facts and hypotheses are separated in the bundle, reason from facts + receipts; treat hypotheses as claims to test, not premises to accept
 
 2. **Apply Domain Knowledge**
    - Draw on software engineering best practices

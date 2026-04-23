@@ -229,7 +229,7 @@ Trigger conditions (deterministic - no judgment allowed):
 Oracle Invocation Protocol:
 1. **Define the decision point**: Reduce the consultation to one concrete question or tradeoff, not open-ended exploration
 2. **Build the context bundle**: Include the relevant Execution Contract or Mission Scrutiny Report, milestone receipts if applicable, subagent outputs, current hypothesis, prior remediation attempts, constraints, and explicit decision options
-3. **Attach evidence, do not outsource discovery**: Include the 3-8 highest-signal files or excerpts with file paths and why each matters, plus the exact error logs/test output that frame the problem. Summarize large supporting material instead of pasting everything. Do not ask Oracle to inspect the repo, search directories, or infer context from filenames alone
+3. **Attach evidence, do not outsource discovery**: Include the 3-8 highest-signal files or excerpts as **ranged excerpts (`path#Lx-Ly`)** with file paths and why each matters, plus the exact error logs/test output that frame the problem. Summarize large supporting material instead of pasting everything. Attach a full file only when it is short and every part is materially relevant; otherwise cite specific line ranges. Do not ask Oracle to inspect the repo, search directories, or infer context from filenames alone
 4. **Invoke `oracle`**: Delegate with the bundled context and an explicit question that states the desired output (decision, risk analysis, debugging guidance, etc.)
 5. **Post-Oracle validation loop**: After receiving Oracle guidance, re-run the affected subagent with explicit constraints from the Oracle decision
 6. **Verify resolution**: Confirm the fix or decision holds before marking the task complete
@@ -244,9 +244,13 @@ WHY ORACLE NOW:
 QUESTION:
 - <one concrete question Oracle should answer>
 
-CURRENT UNDERSTANDING:
-- <what we believe is happening>
-- <what evidence already points to>
+FACTS (with receipts):
+- <observed behavior or state>, evidence: `<path#Lx-Ly>` or `<log/test line>`
+- <second fact with receipt>
+
+HYPOTHESES:
+- <candidate explanation 1> (confidence: low | medium | high)
+- <candidate explanation 2> (confidence: low | medium | high)
 
 WHAT WE TRIED:
 - <attempt 1 and outcome>
@@ -260,7 +264,8 @@ OPTIONS UNDER CONSIDERATION:
 - Option B: <summary>
 
 EVIDENCE BUNDLE:
-- `<path/to/file>` — <why it matters>
+- Cite excerpts as ranges (`path#Lx-Ly`); attach a full file only when it is short and every part is materially relevant.
+- `<path/to/file>#L<start>-L<end>` — <why this range matters>
 ```<language>
 <relevant excerpt>
 ```

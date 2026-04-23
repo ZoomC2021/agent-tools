@@ -22,6 +22,16 @@ git status --short
 
 Capture the complete set of changed files and their contents for both models.
 
+### Phase 1.5: Build the Shared Ranged-Excerpt Review Bundle
+
+Both models should review from the **same** input to make consensus detection in Phase 4 meaningful. The bundle is an extended-context diff (`git diff -U40 HEAD`) that carries each hunk together with ±40 lines of surrounding context, so reviewers see enough code around every change without reading whole files off disk for unchanged modules.
+
+Rules:
+- The extended-context diff is the **primary** input for both GPT 5.4 and Gemini 3.1 Pro.
+- GPT 5.4 may still read a modified file in full when a specific hunk requires it (e.g. cross-reference with a helper far from the change). Gemini receives only the bundle (chunked per Phase 2c when large).
+- Never replace the bundle with hand-edited excerpts; it must be deterministically generated from git so both models see identical content.
+- Subsequent phases (size preflight, chunking, retry) operate on this bundle, not on raw `-U3` diffs.
+
 ## Phase 2: Launch Parallel Reviews
 
 Launch TWO review processes concurrently using different invocation methods:
@@ -47,12 +57,12 @@ TOOLS ALLOWED: Read, Bash (for git commands only), Grep, Glob
 TOOLS FORBIDDEN: Edit, Write (must NOT modify any files)
 
 INPUT PROVIDED:
-- Complete git diff output from `git diff HEAD`
+- Shared ranged-excerpt review bundle from `git diff -U40 HEAD` (primary input)
 - List of changed files from `git status --short`
-- Full file contents of modified files (read for context)
+- Read access to modified files for targeted follow-up when a hunk requires cross-reference beyond ±40 lines
 
 EXECUTION STEPS:
-1. **Read all modified files** for full context (not just diff hunks)
+1. **Review from the shared bundle first**; read a full file only when a specific hunk needs context outside its ±40-line window
 2. **Analyze each file** for:
    - Logic errors, edge cases, null access risks
    - Error handling gaps, type safety issues
@@ -84,24 +94,24 @@ Report "No issues found" if clean.
 Check diff size to determine processing path:
 
 ```bash
-# Get diff size and file count
-DIFF_SIZE=$(git diff HEAD | wc -c)
+# Measure the shared ranged-excerpt bundle (same content both models receive)
+DIFF_SIZE=$(git diff -U40 HEAD | wc -c)
 FILE_COUNT=$(git diff HEAD --name-only | wc -l)
-echo "Diff size: ${DIFF_SIZE} bytes, Files: ${FILE_COUNT}"
+echo "Bundle size: ${DIFF_SIZE} bytes, Files: ${FILE_COUNT}"
 ```
 
-**Thresholds:**
-- Small diff: ≤50KB AND ≤10 files → Single call path
-- Large diff: >50KB OR >10 files → Chunked path
+**Thresholds (measured on the `-U40` bundle, not raw `-U3` diff):**
+- Small bundle: ≤50KB AND ≤10 files → Single call path
+- Large bundle: >50KB OR >10 files → Chunked path
 
 #### Step 2b: Small Diff Path (Single Call)
 
 For small diffs, use a single Gemini call with explicit timeout:
 
 ```bash
-# SAFE: Write diff to temp file first, then cat to gemini
+# SAFE: Write the shared ranged-excerpt bundle to a temp file first, then cat to gemini
 DIFF_FILE=$(mktemp)
-git diff HEAD > "$DIFF_FILE"
+git diff -U40 HEAD > "$DIFF_FILE"
 
 # Single call with 240s Gemini timeout, 300s bash timeout
 cat "$DIFF_FILE" | timeout 300s gemini --model gemini-3.1-pro-preview -p "Review these code changes. For each issue: file:line, severity (Critical/Warning/Suggestion), category, description, confidence (High/Medium/Low). Report 'No issues found' if clean." --timeout 240000
@@ -127,7 +137,7 @@ CHUNK_FILES_LIST="${CHUNK_DIR}/chunk_files.txt"
 > "$CHUNK_FILES_LIST"
 
 while read -r file; do
-    FILE_DIFF=$(git diff HEAD -- "$file" 2>/dev/null)
+    FILE_DIFF=$(git diff -U40 HEAD -- "$file" 2>/dev/null)
     FILE_SIZE=${#FILE_DIFF}
 
     # If single file exceeds 50KB, it gets its own chunk
@@ -213,10 +223,10 @@ if [[ -n "$FAILED_CHUNKS" ]]; then
         CHUNK_RETRY_DIR="${CHUNK_DIR}/retry_${chunk_idx}"
         mkdir -p "$CHUNK_RETRY_DIR"
 
-        # Split failed chunk into individual files for separate processing
+        # Split failed chunk into individual files for separate processing (preserve ±40-line context)
         grep '^diff --git' "$CHUNK_FILE" | while read -r diff_line; do
             file_path=$(echo "$diff_line" | sed 's|diff --git a/||;s| b/.*||')
-            file_diff=$(git diff HEAD -- "$file_path" 2>/dev/null)
+            file_diff=$(git diff -U40 HEAD -- "$file_path" 2>/dev/null)
             file_name=$(basename "$file_path")
             echo "$file_diff" > "${CHUNK_RETRY_DIR}/${file_name}.diff"
         done
