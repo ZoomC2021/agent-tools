@@ -251,6 +251,7 @@ function Test-OpenCodeInstallation {
         "pr-reviewer-only.md",
         "refactor.md",
         "review.md",
+        "ultrareview.md",
         "pr-reviewer.md",
         "change-auditor.md",
         "deslop.md",
@@ -467,6 +468,68 @@ function Install-RooCode {
     Write-Success "Roo Code: $Dest"
 }
 
+function Install-Gemini {
+    Write-Info "Installing Gemini CLI skills..."
+    
+    $SourceDir = Join-Path $PromptsDir "gemini"
+    
+    if (-not (Test-Path -PathType Container $SourceDir)) {
+        Write-Warn "Source directory not found: $SourceDir"
+        return
+    }
+    
+    $Dest = Join-Path $env:USERPROFILE ".gemini\skills"
+    $geminiCliPath = Get-Command "gemini" -ErrorAction SilentlyContinue
+    $SkillDirs = Get-ChildItem -Path $SourceDir -Directory
+    
+    if ($SkillDirs.Count -eq 0) {
+        Write-Warn "No skill directories found in $SourceDir"
+        return
+    }
+    
+    $skillsFound = 0
+    if ($geminiCliPath) {
+        foreach ($dir in $SkillDirs) {
+            $skillName = $dir.Name
+            try {
+                $process = Start-Process -FilePath "gemini" -ArgumentList "skills", "install", "`"$($dir.FullName)`"", "--scope", "user", "--consent" -Wait -NoNewWindow -PassThru
+                if ($process.ExitCode -eq 0) {
+                    Write-Success "Gemini CLI: Installed skill '$skillName'"
+                    $skillsFound++
+                } else {
+                    Write-Warn "Gemini CLI: Failed to install '$skillName' via CLI. Fallback to copy."
+                    $SkillDest = Join-Path $Dest $skillName
+                    New-Item -ItemType Directory -Path $SkillDest -Force | Out-Null
+                    Copy-Item "$($dir.FullName)\*" -Destination $SkillDest -Recurse -Force
+                    Write-Success "Gemini CLI: Copied skill '$skillName' to $Dest"
+                    $skillsFound++
+                }
+            } catch {
+                Write-Warn "Gemini CLI: Failed to install '$skillName' via CLI. Fallback to copy."
+                $SkillDest = Join-Path $Dest $skillName
+                New-Item -ItemType Directory -Path $SkillDest -Force | Out-Null
+                Copy-Item "$($dir.FullName)\*" -Destination $SkillDest -Recurse -Force
+                Write-Success "Gemini CLI: Copied skill '$skillName' to $Dest"
+                $skillsFound++
+            }
+        }
+    } else {
+        New-Item -ItemType Directory -Path $Dest -Force | Out-Null
+        foreach ($dir in $SkillDirs) {
+            $skillName = $dir.Name
+            $SkillDest = Join-Path $Dest $skillName
+            New-Item -ItemType Directory -Path $SkillDest -Force | Out-Null
+            Copy-Item "$($dir.FullName)\*" -Destination $SkillDest -Recurse -Force
+            Write-Success "Gemini CLI: Copied skill '$skillName' to $Dest"
+            $skillsFound++
+        }
+    }
+    
+    if ($skillsFound -eq 0) {
+        Write-Warn "No skills found in $SourceDir"
+    }
+}
+
 Write-Host ""
 Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host "       Agent Tools Installer (Windows)"
@@ -478,6 +541,7 @@ Install-Cursor
 Install-RooCode
 Install-Windsurf
 Install-OpenCode
+Install-Gemini
 
 Write-Host ""
 Write-Host "==========================================" -ForegroundColor Cyan

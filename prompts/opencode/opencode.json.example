@@ -646,6 +646,13 @@
       "prompt": "{file:./commands/review.md}",
       "reasoningEffort": "high"
     },
+    "ultrareview": {
+      "description": "Parallel dual-model review using GPT 5.4 (OpenCode) AND Gemini 3.1 Pro Preview (Gemini CLI).",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./commands/ultrareview.md}"
+    },
     "refactor": {
       "description": "Analyze and prioritize refactoring opportunities.",
       "mode": "subagent",

@@ -8,6 +8,7 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 |----------|-------------|
 | **refactor** | Analyze codebase for refactoring opportunities, prioritize by severity/effort |
 | **review** | Review uncommitted changes for bugs, regressions, and improvements |
+| **ultrareview** | Parallel dual-model review using GPT 5.4 + Gemini 3.1 Pro Preview simultaneously *(Not available: Gemini, Antigravity, Amp)* |
 | **pr-reviewer** | Fetch PR comments, summarize issues, address them, update PR |
 | **create-pr** | Create PR with auto-generated title and description |
 | **deslop** | Analyze code for quality issues using established software engineering principles |
@@ -107,6 +108,7 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 │   └── oracle.md             # Deep reasoning (GPT-5.4)
 └── commands/                  # Workflow prompts
     ├── review.md
+    ├── ultrareview.md
     ├── deslop.md
     ├── mission-scrutiny.md
     ├── milestone-validator.md
@@ -138,6 +140,7 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 | **milestone-validator** | Validate each milestone before advancing | GPT-5.3-Codex | — |
 | **change-auditor** | Deep audit for security, breaking changes | GPT-5.3-Codex | **High** |
 | **review** | Review uncommitted changes | GPT-5.3-Codex | **High** |
+| **ultrareview** | Parallel dual-model review (GPT 5.4 + Gemini 3.1 Pro Preview) | Kimi K2.5 Turbo | — |
 | **deslop** | Code quality audit against principles | Kimi K2.5 Turbo | — |
 | **pr-reviewer** | Fetch PR comments and apply fixes | Kimi K2.5 Turbo | — |
 | **pr-reviewer-only** | Fetch PR comments, produce implementation prompt | Kimi K2.5 Turbo | — |
@@ -307,7 +310,9 @@ cp -r prompts/amp/* ~/.config/agents/skills/
 <summary>Gemini CLI</summary>
 
 ```bash
-cp prompts/gemini/GEMINI.md ~/.gemini/
+for skill_dir in prompts/gemini/*/; do
+  gemini skills install "$skill_dir" --scope user --consent
+done
 ```
 </details>
 
@@ -463,7 +468,9 @@ cp -r prompts/amp/* ~/.config/agents/skills/
 <summary>Gemini CLI</summary>
 
 ```bash
-cp prompts/gemini/GEMINI.md ~/.gemini/
+for skill_dir in prompts/gemini/*/; do
+  gemini skills install "$skill_dir" --scope user --consent
+done
 ```
 </details>
 
@@ -533,6 +540,23 @@ Reviews uncommitted changes:
 3. **Checks for regressions**: Breaking API changes, removed functionality
 4. **Optimizes**: Finds redundant code, duplicate logic, performance issues
 5. **Fixes simple issues** automatically (≤5 straightforward fixes)
+
+### ultrareview
+
+⚠️ **Uses 2 high-tier models simultaneously** — use for critical reviews only.
+
+Runs parallel code reviews using **GPT 5.4** (via OpenCode) AND **Gemini 3.1 Pro Preview** (via Gemini CLI) simultaneously, then consolidates:
+
+1. **Launch parallel reviews**: Both models review the same changes concurrently
+2. **Consolidate findings**:
+   - 🔴 **Consensus Critical**: Issues found by BOTH models
+   - 🟠 **Model Exclusive**: Issues found by only one model with high confidence
+   - 🟡 **Lower Confidence**: Findings with medium/low confidence
+   - ⚠️ **Divergent Assessments**: Models disagree — human review recommended
+3. **Never auto-resolves conflicts**: Both perspectives shown when models disagree
+4. **Graceful fallback**: If one model fails, returns results from the other
+
+**Benefits**: Catches issues each model might miss, surfaces conflicting interpretations that need human attention.
 
 ### pr-reviewer
 

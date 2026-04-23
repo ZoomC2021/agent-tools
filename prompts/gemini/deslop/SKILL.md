@@ -1044,7 +1044,7 @@ Number.isFinite(value)
 | **Commented-out code** | Dead code polluting the file | Delete—git has history |
 | **Closing brace comments** | `} // end if` | Extract to smaller functions |
 | **Mandated comments** | Boilerplate on every method | Comment only when valuable |
-| **TODO graveyards** | `// TODO: fix this (2019)` | Create tickets or delete |
+| **TO-DO graveyards** | `// TO-DO: fix this (2019)` | Create tickets or delete |
 
 ```python
 # ❌ Wrong - Parrot comment
@@ -1106,7 +1106,7 @@ def calculate_shipping(order: Order) -> Decimal:
 1. **Code tells how, comments tell why** — Never explain what code does; explain why it does it
 2. **Documentation has layers** — README → API docs → docstrings → inline comments
 3. **Comments rot** — Review them during code review; delete rather than let them lie
-4. **Anti-patterns abound** — Parrot, journal, and TODO graveyard comments add noise
+4. **Anti-patterns abound** — Parrot, journal, and TO-DO graveyard comments add noise
 5. **When in doubt, refactor** — If you need a comment to explain what, the code is unclear
 
 ---

@@ -249,6 +249,7 @@ _self_check_opencode() {
         "pr-reviewer-only.md"
         "refactor.md"
         "review.md"
+        "ultrareview.md"
         "pr-reviewer.md"
         "change-auditor.md"
         "deslop.md"
@@ -555,20 +556,52 @@ install_amp() {
     log_success "Amp: $dest"
 }
 
-# Install Gemini CLI instructions
+# Install Gemini CLI skills
 install_gemini() {
-    log_info "Installing Gemini CLI instructions..."
-    local source="$PROMPTS_DIR/gemini/GEMINI.md"
-    local dest="$HOME/.gemini"
+    log_info "Installing Gemini CLI skills..."
+    local source_dir="$PROMPTS_DIR/gemini"
+    local dest="$HOME/.gemini/skills"
     
-    if [[ ! -f "$source" ]]; then
-        log_warn "Source file not found: $source"
+    if [[ ! -d "$source_dir" ]]; then
+        log_warn "Source directory not found: $source_dir"
         return 0
     fi
     
-    mkdir -p "$dest"
-    cp "$source" "$dest/"
-    log_success "Gemini CLI: $dest/GEMINI.md"
+    local skills_found=0
+    
+    # Try using the gemini CLI if it's available, otherwise fallback to copying
+    if command -v gemini >/dev/null 2>&1; then
+        for skill_dir in "$source_dir"/*/; do
+            if [[ -d "$skill_dir" ]]; then
+                local skill_name=$(basename "$skill_dir")
+                if gemini skills install "$skill_dir" --scope user --consent >/dev/null 2>&1; then
+                    log_success "Gemini CLI: Installed skill '$skill_name'"
+                    skills_found=1
+                else
+                    log_warn "Gemini CLI: Failed to install '$skill_name' via CLI. Fallback to copy."
+                    mkdir -p "$dest/$skill_name"
+                    cp -r "$skill_dir"* "$dest/$skill_name/"
+                    log_success "Gemini CLI: Copied skill '$skill_name' to $dest"
+                    skills_found=1
+                fi
+            fi
+        done
+    else
+        mkdir -p "$dest"
+        for skill_dir in "$source_dir"/*/; do
+            if [[ -d "$skill_dir" ]]; then
+                local skill_name=$(basename "$skill_dir")
+                mkdir -p "$dest/$skill_name"
+                cp -r "$skill_dir"* "$dest/$skill_name/"
+                log_success "Gemini CLI: Copied skill '$skill_name' to $dest"
+                skills_found=1
+            fi
+        done
+    fi
+    
+    if [[ $skills_found -eq 0 ]]; then
+        log_warn "No skills found in $source_dir"
+    fi
 }
 
 # Install Kilo Code prompts
