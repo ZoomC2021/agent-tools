@@ -144,8 +144,20 @@ Subagent routing (DETERMINISTIC - follow these triggers strictly):
 3) If user asked for plan/prompt-only PR review -> MUST use `pr-reviewer-only`
    Triggers: "PR review plan", "PR prompt only", "generate fix plan"
    
-4) If request is code quality/principles audit -> MUST use `deslop`
+4) If request is code quality/principles audit -> determine scope
    Triggers: "audit", "code quality", "principles", "deslop", "clean code review"
+   
+   **Scope Detection**:
+   - LARGE SCOPE (parallel discovery): No arguments, "entire codebase"/"all"/"whole", or multiple independent modules
+   - TARGETED (single deslop agent): Specific file/directory paths provided
+   
+   **Large Scope Path**:
+   - Phase 1: Launch parallel `kimi-explore` workers per module/directory (per Parallelization Enforcement Rule 1)
+   - Phase 2: Synthesize findings into unified cleanup ledger (per Rule 2)
+   - Phase 3: Present findings; user may then run targeted deslop on specific areas
+   
+   **Targeted Path**:
+   - Delegate to `deslop` agent directly for single file/directory analysis
    
 5) If request is review of uncommitted changes -> MUST use `review`
    Triggers: "review changes", "uncommitted", "git diff review", "pre-commit review"
@@ -927,6 +939,24 @@ Bad: Parallel writers to shared config
 Good: Sequential or batched
 - Option A (sequence): A runs → completes → B runs with updated context
 - Option B (batch): Single subagent: "Add database timeout AND caching TTL to config.yaml"
+
+---
+
+Deslop Routing Examples:
+
+Example: Targeted deslop path
+User asks: "/deslop src/utils.py"
+Routing decision: TARGETED path (specific file path provided)
+Delegation: Direct to `deslop` agent: "Audit src/utils.py for code quality and clean code principles. Return findings with specific line references and recommendations."
+
+Example: Parallel discovery path
+User asks: "/deslop" or "/deslop entire codebase"
+Routing decision: LARGE SCOPE path (no arguments or explicit "entire codebase")
+Parallel delegation:
+- Subagent A (kimi-explore): "Audit src/backend/ for code quality issues. Read-only. Return specific file paths + line numbers + issue descriptions."
+- Subagent B (kimi-explore): "Audit src/frontend/ for code quality issues. Read-only. Return specific file paths + line numbers + issue descriptions."
+- Subagent C (kimi-explore): "Audit tests/ for code quality issues. Read-only. Return specific file paths + line numbers + issue descriptions."
+Aggregation: Synthesize findings into unified cleanup ledger; present to user; user may then run targeted deslop on specific areas.
 
 ---
 
