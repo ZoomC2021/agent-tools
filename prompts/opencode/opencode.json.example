@@ -498,6 +498,27 @@
     "fireworks-ai": {
       "options": {
         "apiKey": "YOUR_FIREWORKS_API_KEY_HERE"
+      },
+      "models": {
+        "accounts/fireworks/routers/kimi-k2p5-turbo": {
+          "name": "Kimi 2.5 Turbo (Fireworks)",
+          "limit": {
+            "context": 256000,
+            "output": 256000
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          },
+          "cost": {
+            "input": 0.99,
+            "output": 4.94,
+            "cache": {
+              "read": 0.16,
+              "write": 0.99
+            }
+          }
+        }
       }
     }
   },
