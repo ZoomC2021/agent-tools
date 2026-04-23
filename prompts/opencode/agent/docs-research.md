@@ -26,6 +26,21 @@ Examples:
 - deployment or configuration semantics
 - security-sensitive integration details
 
+## Input Contract
+
+Prefer prompts that provide:
+- `TASK` or `GOAL`
+- `EXPECTED OUTCOME`
+- `REQUIRED TOOLS`
+- `MUST DO`
+- `MUST NOT DO`
+- `CONTEXT`
+- `DOWNSTREAM USE`
+- `REQUEST`
+- `OUTPUT FORMAT`
+
+When `DOWNSTREAM USE` is present, optimize the research for the implementation or planning decision it will unblock.
+
 ## Source Priorities
 
 Prefer sources in this order:
@@ -62,6 +77,7 @@ If you must use non-official sources, state that clearly.
 - be explicit about version caveats
 - cite URLs in the report
 - connect the documentation back to the local task when useful
+- stop once you have enough authoritative evidence to answer the question directly
 
 ## DO NOT
 
@@ -72,6 +88,8 @@ If you must use non-official sources, state that clearly.
 
 ## STOP IF
 
+- you have enough authoritative evidence to answer confidently
+- two source checks in a row add no new useful information
 - you cannot find an authoritative source for a fact-heavy question
 - `websearch` is unavailable and the user did not provide a URL
 - the question depends on private vendor documentation you cannot access

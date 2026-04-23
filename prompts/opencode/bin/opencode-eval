@@ -512,8 +512,36 @@ function evaluateExpectations(expectations, summary) {
   }
 
   for (const pattern of expectations.finalRegex || []) {
-    const regex = new RegExp(pattern, "m")
+    let regex
+    try {
+      regex = new RegExp(pattern, "m")
+    } catch (e) {
+      pushCheck(`finalRegex:${pattern}`, false, `valid regex: ${pattern}`, `invalid regex: ${e.message}`)
+      continue
+    }
     pushCheck(`finalRegex:${pattern}`, regex.test(summary.finalText), pattern, summary.finalText)
+  }
+
+  for (const pattern of expectations.textRegex || []) {
+    let regex
+    try {
+      regex = new RegExp(pattern, "m")
+    } catch (e) {
+      pushCheck(`textRegex:${pattern}`, false, `valid regex: ${pattern}`, `invalid regex: ${e.message}`)
+      continue
+    }
+    pushCheck(`textRegex:${pattern}`, regex.test(summary.finalText), pattern, summary.finalText)
+  }
+
+  for (const pattern of expectations.finalExcludesRegex || []) {
+    let regex
+    try {
+      regex = new RegExp(pattern, "m")
+    } catch (e) {
+      pushCheck(`finalExcludesRegex:${pattern}`, false, `valid regex: ${pattern}`, `invalid regex: ${e.message}`)
+      continue
+    }
+    pushCheck(`finalExcludesRegex:${pattern}`, !regex.test(summary.finalText), `not ${pattern}`, summary.finalText)
   }
 
   for (const needle of expectations.transcriptIncludes || []) {
@@ -521,7 +549,13 @@ function evaluateExpectations(expectations, summary) {
   }
 
   for (const pattern of expectations.transcriptRegex || []) {
-    const regex = new RegExp(pattern, "m")
+    let regex
+    try {
+      regex = new RegExp(pattern, "m")
+    } catch (e) {
+      pushCheck(`transcriptRegex:${pattern}`, false, `valid regex: ${pattern}`, `invalid regex: ${e.message}`)
+      continue
+    }
     pushCheck(`transcriptRegex:${pattern}`, regex.test(transcript), pattern, transcript)
   }
 
@@ -599,6 +633,31 @@ function evaluateExpectations(expectations, summary) {
     }
   }
 
+  for (const promptCheck of expectations.taskPromptRegex || []) {
+    const calls = summary.subagentCalls.filter((call) => call.subagent === promptCheck.subagent)
+    pushCheck(
+      `taskPromptRegexSubagent:${promptCheck.subagent}`,
+      calls.length > 0,
+      promptCheck.subagent,
+      summary.subagentCalls.map((call) => call.subagent),
+    )
+    for (const pattern of promptCheck.patterns || []) {
+      let regex
+      try {
+        regex = new RegExp(pattern, "m")
+      } catch (e) {
+        pushCheck(`taskPromptRegex:${promptCheck.subagent}:${pattern}`, false, `valid regex: ${pattern}`, `invalid regex: ${e.message}`)
+        continue
+      }
+      pushCheck(
+        `taskPromptRegex:${promptCheck.subagent}:${pattern}`,
+        calls.some((call) => regex.test(String(call.prompt || ""))),
+        pattern,
+        calls.map((call) => call.prompt || ""),
+      )
+    }
+  }
+
   for (const commandCheck of expectations.workspaceCommands || []) {
     const result = spawnSync(commandCheck.command, {
       cwd: summary.workdir,
@@ -624,7 +683,13 @@ function evaluateExpectations(expectations, summary) {
       )
     }
     for (const pattern of commandCheck.outputRegex || []) {
-      const regex = new RegExp(pattern, "m")
+      let regex
+      try {
+        regex = new RegExp(pattern, "m")
+      } catch (e) {
+        pushCheck(`workspaceCommand:${commandCheck.command}:outputRegex:${pattern}`, false, `valid regex: ${pattern}`, `invalid regex: ${e.message}`)
+        continue
+      }
       pushCheck(
         `workspaceCommand:${commandCheck.command}:outputRegex:${pattern}`,
         regex.test(output),
@@ -655,6 +720,38 @@ function evaluateExpectations(expectations, summary) {
         `fileExcludes:${fileCheck.path}:${needle}`,
         !contents.includes(needle),
         `not ${needle}`,
+        exists ? contents : "<missing file>",
+      )
+    }
+
+    for (const pattern of fileCheck.regex || []) {
+      let regex
+      try {
+        regex = new RegExp(pattern, "m")
+      } catch (e) {
+        pushCheck(`fileRegex:${fileCheck.path}:${pattern}`, false, `valid regex: ${pattern}`, `invalid regex: ${e.message}`)
+        continue
+      }
+      pushCheck(
+        `fileRegex:${fileCheck.path}:${pattern}`,
+        regex.test(contents),
+        pattern,
+        exists ? contents : "<missing file>",
+      )
+    }
+
+    for (const pattern of fileCheck.excludesRegex || []) {
+      let regex
+      try {
+        regex = new RegExp(pattern, "m")
+      } catch (e) {
+        pushCheck(`fileExcludesRegex:${fileCheck.path}:${pattern}`, false, `valid regex: ${pattern}`, `invalid regex: ${e.message}`)
+        continue
+      }
+      pushCheck(
+        `fileExcludesRegex:${fileCheck.path}:${pattern}`,
+        !regex.test(contents),
+        `not matching: ${pattern}`,
         exists ? contents : "<missing file>",
       )
     }

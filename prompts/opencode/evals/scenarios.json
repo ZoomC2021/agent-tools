@@ -58,7 +58,8 @@
       "tags": [
         "starter",
         "implementation",
-        "sandbox"
+        "sandbox",
+        "workflow-results"
       ],
       "sandbox": {
         "copyFrom": "${REPO_ROOT}/evals/fixtures/tiny-js-app"
@@ -73,12 +74,6 @@
           "Execution Contract",
           "Validation Receipt"
         ],
-        "requiredSubagents": [
-          "kimi-explore",
-          "spec-compiler",
-          "kimi-general",
-          "quick-validator"
-        ],
         "fileContains": [
           {
             "path": "src/math.js",
@@ -91,6 +86,19 @@
             "includes": [
               "multiply"
             ]
+          }
+        ],
+        "workspaceCommands": [
+          {
+            "command": "npm test",
+            "exitCode": 0,
+            "outputRegex": [
+              "pass 2"
+            ]
+          },
+          {
+            "command": "node -e \"const { sum, multiply } = require('./src/math'); if (sum(2,3) !== 5) process.exit(1); if (multiply(4,5) !== 20) process.exit(2);\"",
+            "exitCode": 0
           }
         ]
       }
@@ -416,7 +424,8 @@
         "hard",
         "reasoning",
         "debugging",
-        "sandbox"
+        "sandbox",
+        "workflow-results"
       ],
       "sandbox": {
         "copyFrom": "${REPO_ROOT}/evals/fixtures/tricky-js-app"
@@ -427,46 +436,14 @@
         "finalRegex": [
           "Agent chosen:.*kimi-general"
         ],
-        "finalIncludes": [
-          "Execution Contract",
-          "Validation Receipt"
-        ],
         "requiredSubagents": [
-          "spec-compiler",
-          "kimi-general",
-          "quick-validator"
+          "kimi-explore"
         ],
-        "taskPromptIncludes": [
-          {
-            "subagent": "kimi-explore",
-            "includes": [
-              "npm test",
-              "do not"
-            ]
-          },
-          {
-            "subagent": "spec-compiler",
-            "includes": [
-              "hard-code",
-              "public exports"
-            ]
-          },
-          {
-            "subagent": "kimi-general",
-            "includes": [
-              "priceAfterDiscount",
-              "test files",
-              "exports"
-            ]
-          },
-          {
-            "subagent": "quick-validator",
-            "includes": [
-              "Validation Receipt",
-              "npm test",
-              "priceAfterDiscount"
-            ]
-          }
+        "transcriptRegex": [
+          "Execution Contract",
+          "Validation Receipt",
+          "diagnos",
+          "root cause"
         ],
         "fileContains": [
           {
@@ -477,11 +454,11 @@
               "priceAfterDiscount",
               "formatCartSummary"
             ],
-            "excludes": [
-              "return 80",
-              "return 225",
-              "if (total === 100",
-              "if (percent === 20"
+            "excludesRegex": [
+              "return\\s+80\\b",
+              "return\\s+225\\b",
+              "if\\s*\\(total\\s*===\\s*100",
+              "if\\s*\\(percent\\s*===\\s*20"
             ]
           },
           {
@@ -854,7 +831,8 @@
         "state-machine",
         "workflow-hard",
         "spec-compliance-primary",
-        "sandbox"
+        "sandbox",
+        "workflow-results"
       ],
       "sandbox": {
         "copyFrom": "${REPO_ROOT}/evals/fixtures/workflow-js-app"
@@ -930,44 +908,6 @@
         ],
         "finalRegex": [
           "Agent chosen:.*kimi-general"
-        ],
-        "requiredSubagents": [
-          "kimi-explore",
-          "spec-compiler",
-          "kimi-general",
-          "quick-validator"
-        ],
-        "taskPromptIncludes": [
-          {
-            "subagent": "kimi-explore",
-            "includes": [
-              "SPEC.md"
-            ]
-          },
-          {
-            "subagent": "spec-compiler",
-            "includes": [
-              "SPEC.md",
-              "scripts/build.js",
-              "recoverExpiredLeases"
-            ]
-          },
-          {
-            "subagent": "kimi-general",
-            "includes": [
-              "SPEC.md",
-              "npm run build",
-              "recoverExpiredLeases"
-            ]
-          },
-          {
-            "subagent": "quick-validator",
-            "includes": [
-              "Validation Receipt",
-              "npm test",
-              "npm run build"
-            ]
-          }
         ]
       }
     },
@@ -1146,6 +1086,186 @@
           "task",
           "edit",
           "write"
+        ]
+      }
+    },
+    {
+      "id": "regex-assertions-text-and-excludes",
+      "description": "Validate textRegex and finalExcludesRegex assertion types work correctly.",
+      "agent": "kimi-explore",
+      "prompt": "Find where the `kimi-general` agent is defined in this repo. Return file path only.",
+      "tags": [
+        "regex",
+        "textRegex",
+        "finalExcludesRegex",
+        "read-only"
+      ],
+      "workingDirectory": "${VARIANT_ROOT}",
+      "expectations": {
+        "exitCode": 0,
+        "textRegex": [
+          "Agent chosen:.*kimi-explore",
+          "\\.md$"
+        ],
+        "finalExcludesRegex": [
+          "error",
+          "ERROR",
+          "exception"
+        ],
+        "requiredSubagents": [
+          "kimi-explore"
+        ]
+      }
+    },
+    {
+      "id": "regex-assertions-taskprompt-and-file",
+      "description": "Validate taskPromptRegex and fileContains[].regex assertion types work correctly.",
+      "agent": "codex53-kimi",
+      "prompt": "Add a new exported `power(base, exp)` helper in `src/math.js`, add tests for it, and keep existing `sum` behavior. Return the Implementation Summary.",
+      "tags": [
+        "regex",
+        "taskPromptRegex",
+        "fileRegex",
+        "sandbox"
+      ],
+      "sandbox": {
+        "copyFrom": "${REPO_ROOT}/evals/fixtures/tiny-js-app"
+      },
+      "workingDirectory": "${SCENARIO_WORKDIR}",
+      "expectations": {
+        "exitCode": 0,
+        "finalRegex": [
+          "Agent chosen:.*kimi-general"
+        ],
+        "finalIncludes": [
+          "Validation Receipt"
+        ],
+        "requiredSubagents": [
+          "spec-compiler",
+          "kimi-general",
+          "quick-validator"
+        ],
+        "taskPromptRegex": [
+          {
+            "subagent": "kimi-general",
+            "patterns": [
+              "power\\(base.*exp\\)",
+              "Execution Contract"
+            ]
+          }
+        ],
+        "fileContains": [
+          {
+            "path": "src/math.js",
+            "regex": [
+              "function power",
+              "Math\\.pow|\\*\\*"
+            ]
+          },
+          {
+            "path": "test/math.test.js",
+            "regex": [
+              "power\\s*\\(.*2.*3\\)|describe.*power|it.*power"
+            ]
+          }
+        ],
+        "workspaceCommands": [
+          {
+            "command": "npm test",
+            "exitCode": 0,
+            "outputRegex": [
+              "pass [2-9]|pass \\d{2,}"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "subagent-milestone-validator-happy-path",
+      "description": "Directly test milestone-validator returns 'Advance' for a correctly completed milestone with all checks passing.",
+      "agent": "milestone-validator",
+      "prompt": "GOAL: Validate the 'Add sum helper' milestone in this tiny-js-app project.\n\nMILESTONE CONTEXT:\n- The milestone was to add an exported `sum(a, b)` helper in `src/math.js`.\n- The implementation should pass `npm test`.\n\nVALIDATION CONTRACT:\n- DO: Run `npm test` to verify the milestone checks.\n- DO: Inspect the implementation in `src/math.js`.\n- DO: Verify test coverage in `test/math.test.js`.\n- DO: Check for integration/drift issues.\n- DO: Return a Validation Receipt with sections: Checks Run, Milestone Criteria, Integration/Drift Check, Decision.\n- DO: Decision must be 'Advance' if all criteria pass.\n\nOUTPUT FORMAT: Validation Receipt with explicit Decision: Advance.",
+      "timeoutMs": 60000,
+      "tags": [
+        "subagent",
+        "milestone-validator",
+        "validation",
+        "happy-path",
+        "sandbox"
+      ],
+      "sandbox": {
+        "copyFrom": "${REPO_ROOT}/evals/fixtures/tiny-js-app"
+      },
+      "workingDirectory": "${SCENARIO_WORKDIR}",
+      "expectations": {
+        "exitCode": 0,
+        "finalIncludes": [
+          "Validation Receipt",
+          "Checks Run",
+          "Milestone Criteria",
+          "Integration/Drift Check",
+          "Decision",
+          "Advance"
+        ],
+        "forbiddenTools": [
+          "task",
+          "edit",
+          "write"
+        ],
+        "workspaceCommands": [
+          {
+            "command": "npm test",
+            "exitCode": 0,
+            "outputRegex": [
+              "pass 1"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "subagent-milestone-validator-blocked-path",
+      "description": "Directly test milestone-validator returns 'Repair' when milestone has issues (failing tests, missing criteria).",
+      "agent": "milestone-validator",
+      "prompt": "GOAL: Validate the 'Fix cart discount' milestone in this tricky-js-app project.\n\nMILESTONE CONTEXT:\n- A previous attempt was made to implement `priceAfterDiscount(total, percent)` in `src/cart.js`.\n- The implementation appears to have a bug (treating percent as flat amount instead of percentage).\n- Tests in `test/cart.test.js` are currently failing.\n\nVALIDATION CONTRACT:\n- DO: Run `npm test` to verify the current state.\n- DO: Inspect the implementation and identify the defect.\n- DO: Verify what the milestone criteria require vs what is implemented.\n- DO: Return a Validation Receipt with sections: Checks Run, Milestone Criteria, Integration/Drift Check, Decision.\n- DO: Decision must be 'Repair' when criteria are not met.\n\nOUTPUT FORMAT: Validation Receipt with explicit Decision: Repair, and a brief rationale for the required fixes.",
+      "timeoutMs": 60000,
+      "tags": [
+        "subagent",
+        "milestone-validator",
+        "validation",
+        "blocked-path",
+        "sandbox"
+      ],
+      "sandbox": {
+        "copyFrom": "${REPO_ROOT}/evals/fixtures/tricky-js-app"
+      },
+      "workingDirectory": "${SCENARIO_WORKDIR}",
+      "expectations": {
+        "exitCode": 0,
+        "finalIncludes": [
+          "Validation Receipt",
+          "Checks Run",
+          "Milestone Criteria",
+          "Integration/Drift Check",
+          "Decision",
+          "Repair"
+        ],
+        "finalRegex": [
+          "percent.*100|divide.*100|/100"
+        ],
+        "forbiddenTools": [
+          "task",
+          "edit",
+          "write"
+        ],
+        "workspaceCommands": [
+          {
+            "command": "npm test",
+            "exitCode": 1,
+            "outputRegex": [
+              "fail [1-9]"
+            ]
+          }
         ]
       }
     }

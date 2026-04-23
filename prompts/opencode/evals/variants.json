@@ -130,6 +130,37 @@
           "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
         }
       }
+    },
+    {
+      "name": "mission-scrutiny-codex53",
+      "description": "Direct mission-scrutiny subagent eval using OpenAI GPT-5.3 Codex (current default).",
+      "configOverrides": {
+        "agent.mission-scrutiny.mode": "primary",
+        "agent.mission-scrutiny.hidden": false,
+        "agent.mission-scrutiny.model": "openai/gpt-5.3-codex"
+      },
+      "promptFrontmatterOverrides": {
+        "commands/mission-scrutiny.md": {
+          "mode": "primary",
+          "model": "openai/gpt-5.3-codex"
+        }
+      }
+    },
+    {
+      "name": "milestone-validator-kimi25turbo",
+      "description": "Direct milestone-validator subagent eval using Fireworks Kimi K2.5 Turbo only.",
+      "configOverrides": {
+        "agent.milestone-validator.mode": "primary",
+        "agent.milestone-validator.hidden": false,
+        "agent.milestone-validator.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+        "agent.milestone-validator.permission.bash": "allow"
+      },
+      "promptFrontmatterOverrides": {
+        "commands/milestone-validator.md": {
+          "mode": "primary",
+          "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+        }
+      }
     }
   ]
 }

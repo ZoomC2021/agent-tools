@@ -50,6 +50,12 @@ Run the default starter suite:
 bin/opencode-eval run
 ```
 
+Run the end-to-end primary workflow result suite across the current Codex 5.3 orchestrator and the Kimi Turbo orchestrator:
+
+```bash
+bin/opencode-eval run --variants baseline-codex53-primary,kimi25turbo-primary --tags workflow-results
+```
+
 Run only the GPT 5.4 primary variant against the sandbox implementation scenario:
 
 ```bash
@@ -61,6 +67,13 @@ Run mission-scrutiny subagent evals on Kimi K2.5 Turbo only:
 ```bash
 bin/opencode-eval run --variants mission-scrutiny-kimi25turbo --tags mission-scrutiny
 ```
+
+Run mission-scrutiny subagent evals on GPT-5.3 Codex (current default) only:
+
+```bash
+bin/opencode-eval run --variants mission-scrutiny-codex53 --tags mission-scrutiny
+```
+
 Rebuild the summary for an existing run directory:
 
 ```bash
@@ -68,6 +81,8 @@ bin/opencode-eval report evals/out/<run-id>
 ```
 
 By default, `run` executes scenarios tagged `starter`. Use `--tags extended` or `--scenarios <id>` for additional cases.
+
+The `workflow-results` tag focuses on end-to-end task outcomes through the primary `spec-compiler` -> `kimi-general` -> `quick-validator` path rather than routing-only checks. It intentionally evaluates final receipts, resulting file state, and executable behavior, not brittle internal assertions about exact subagent hop order or delegated prompt wording.
 
 ## Variant Format
 

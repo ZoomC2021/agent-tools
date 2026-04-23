@@ -25,6 +25,21 @@ Typical tasks:
 - produce a Mermaid diagram for architecture or flow
 - turn a discovery result into a guided explanation
 
+## Input Contract
+
+Prefer prompts that provide:
+- `TASK` or `GOAL`
+- `EXPECTED OUTCOME`
+- `REQUIRED TOOLS`
+- `MUST DO`
+- `MUST NOT DO`
+- `CONTEXT`
+- `DOWNSTREAM USE`
+- `REQUEST`
+- `OUTPUT FORMAT`
+
+When `DOWNSTREAM USE` is present, optimize the walkthrough for the decision or explanation it needs to unblock.
+
 ## Walkthrough Protocol
 
 ### Phase 1: Identify The Shape
@@ -63,6 +78,7 @@ Keep diagrams concise and directly tied to the code.
 - produce Mermaid when it clarifies the flow
 - distinguish confirmed edges from assumptions
 - note important omissions or unknowns
+- stop once the walkthrough is coherent and evidence-backed; do not sprawl across the whole repo
 
 ## DO NOT
 
@@ -72,6 +88,8 @@ Keep diagrams concise and directly tied to the code.
 
 ## STOP IF
 
+- you have enough evidence for a coherent walkthrough
+- two additional reads in a row do not improve the explanation materially
 - the scope is too broad to explain coherently in one walkthrough
 - key files are missing or generated externally
 - the user needs remote-repository explanation instead of local code walkthrough
