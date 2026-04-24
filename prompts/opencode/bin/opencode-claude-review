@@ -9,40 +9,13 @@ import argparse
 import time
 from pathlib import Path
 
-def git_output(path, args, text=True):
-    """Run a git command and return output."""
-    try:
-        result = subprocess.run(["git"] + args, cwd=path, capture_output=True, text=text, check=True)
-        return result.stdout
-    except FileNotFoundError:
-        raise RuntimeError("git command not found")
-    except subprocess.CalledProcessError as e:
-        err_msg = e.stderr.decode("utf-8", errors="replace") if isinstance(e.stderr, bytes) else e.stderr
-        raise RuntimeError(f"git command failed: {err_msg}")
-
-def classify_failure(stderr_output, exit_code):
-    """Classify the type of failure from stderr output."""
-    stderr_lower = stderr_output.lower()
-    # Tightened auth detection - avoid matching substrings like "author"
-    if "not authenticated" in stderr_lower:
-        return "auth"
-    if "authentication failed" in stderr_lower:
-        return "auth"
-    if "invalid api key" in stderr_lower:
-        return "auth"
-    if "401" in stderr_output:
-        return "auth"
-    if "rate limit" in stderr_lower:
-        return "rate_limited"
-    if "command not found" in stderr_lower:
-        return "missing_cli"
-    if exit_code == 127:
-        return "missing_cli"
-    if exit_code == 124:
-        return "timeout"
-    if "timeout" in stderr_lower:
-        return "timeout"
-    return "command_failed"
+from opencode_review_utils import (
+    git_output,
+    collect_untracked_files,
+    synthesize_diff_for_new_file,
+    classify_failure,
+    write_summary,
+)
 
 def run_claude(cli_path, prompt, timeout_seconds, model, output_path, stderr_path, 
                allowed_tools=None, bare=True, permission_mode=None, skip_permissions=True, effort="high"):
@@ -111,7 +84,7 @@ def run_claude(cli_path, prompt, timeout_seconds, model, output_path, stderr_pat
         with open(stderr_path, "wb") as f:
             f.write(stderr_str.encode("utf-8"))
     
-    reason = None if success else classify_failure(stderr_str, return_code)
+    reason = None if success else classify_failure(stderr_str, return_code, timeout_occurred=(return_code == 124))
     return {"success": success, "reason": reason, "stderr": stderr_str, "return_code": return_code}
 
 def main():
@@ -162,90 +135,34 @@ def main():
     log("Collecting git information...")
     try:
         # Get list of changed files (tracked)
-        files_out = git_output(repo_path, ["diff", args.ref, "--name-only"], text=True)
+        files_out = git_output(["diff", args.ref, "--name-only"], repo_path, remaining_seconds=args.max_total_seconds)
         changed_files = [f for f in files_out.splitlines() if f.strip()]
         
         # Get overall diff (tracked changes)
-        bundle_diff = git_output(repo_path, ["diff", f"-U{args.context_lines}", args.ref], text=False)
+        bundle_diff_bytes = git_output(["diff", f"-U{args.context_lines}", args.ref], repo_path, remaining_seconds=args.max_total_seconds)
+        # Ensure we have bytes for concatenation
+        if isinstance(bundle_diff_bytes, str):
+            bundle_diff = bundle_diff_bytes.encode("utf-8", errors="replace")
+        else:
+            bundle_diff = bundle_diff_bytes
         
         # Get untracked files (new files not yet staged)
-        # Use -z for safe filename parsing (handles special chars, spaces, unicode)
-        status_out = git_output(repo_path, ["status", "--porcelain", "-z"], text=False)
-        untracked_files = []
-        # -z output uses NUL separator, entries are "XY filename\0" or "XY orig\0filename\0" for renames
-        entries = status_out.split(b'\x00')
-        i = 0
-        while i < len(entries):
-            entry = entries[i]
-            if len(entry) < 3:
-                i += 1
-                continue
-            # Check status code (first 2 chars)
-            status_code = entry[:2].decode('ascii', errors='replace')
-            # Handle renamed/copied entries: consume 2 entries (orig + new)
-            # Match on X column (R/C) to catch all variants: R , RM, RD, C , CM, CD
-            if status_code and status_code[0] in ('R', 'C'):
-                i += 2  # Skip both orig and new path
-                continue
-            # Only process untracked entries (??)
-            if status_code == "??":
-                # Filename starts at position 3 (after "XY " with space separator)
-                filename_bytes = entry[3:]
-                if filename_bytes:
-                    try:
-                        filename = filename_bytes.decode("utf-8")
-                        untracked_files.append(filename)
-                    except UnicodeDecodeError:
-                        # Fall back to latin-1 which can decode any byte
-                        filename = filename_bytes.decode("latin-1")
-                        untracked_files.append(filename)
-            i += 1
+        seen_files = set(changed_files)
+        untracked = collect_untracked_files(
+            repo_path, 
+            args.max_total_seconds,
+            seen_files,
+            args.prompt_file
+        )
         
         # Append untracked files to bundle as "new file" diffs
-        if untracked_files:
-            log(f"Including {len(untracked_files)} untracked file(s)...")
+        if untracked:
+            log(f"Including {len(untracked)} untracked file(s)...")
             untracked_content = b"\n"
-            for uf in untracked_files:
-                file_path = repo_path / uf
-                if file_path.is_file():
-                    try:
-                        # Skip files that are too large (>1MB)
-                        file_size = file_path.stat().st_size
-                        if file_size > 1024 * 1024:
-                            log(f"Skipping large untracked file {uf} ({file_size} bytes)")
-                            continue
-                        
-                        with open(file_path, "rb") as f:
-                            content = f.read()
-                        
-                        # Skip binary files (contain NUL bytes)
-                        if b'\x00' in content[:1024]:
-                            log(f"Skipping binary untracked file {uf}")
-                            continue
-                        
-                        # Format as a diff for new file
-                        untracked_content += f"\ndiff --git a/{uf} b/{uf}\n".encode()
-                        untracked_content += f"new file mode 100644\n".encode()
-                        untracked_content += f"index 0000000..0000000\n".encode()
-                        untracked_content += f"--- /dev/null\n".encode()
-                        untracked_content += f"+++ b/{uf}\n".encode()
-                        # Add content as a single "added" hunk
-                        # Check if file ends with newline
-                        ends_with_newline = content.endswith(b"\n")
-                        lines = content.split(b"\n")
-                        # Remove trailing empty element only if file ends with newline
-                        if ends_with_newline and lines and lines[-1] == b"":
-                            lines = lines[:-1]
-                        untracked_content += f"@@ -0,0 +1,{len(lines)} @@\n".encode()
-                        for line in lines:
-                            untracked_content += b"+" + line + b"\n"
-                        # Add "No newline at end of file" marker if needed
-                        if not ends_with_newline:
-                            untracked_content += b"\\ No newline at end of file\n"
-                        untracked_content += b"\n"
-                        changed_files.append(uf + " (new)")
-                    except Exception as e:
-                        log(f"Warning: Could not read untracked file {uf}: {e}")
+            for uf, content in untracked:
+                # Generate synthetic diff with correct git index format
+                untracked_content += synthesize_diff_for_new_file(uf, content)
+                changed_files.append(uf + " (new)")
             
             bundle_diff = bundle_diff + untracked_content
         
@@ -275,14 +192,13 @@ def main():
         log("Error: --bare mode requires ANTHROPIC_API_KEY environment variable")
         print("Error: --bare mode requires ANTHROPIC_API_KEY environment variable", file=sys.stderr)
         # Write minimal summary before exit (maintains contract with callers)
-        fail_summary = {
-            "status": "failed",
-            "claude": {"bin": args.claude_bin, "bare_mode": args.bare},
-            "failure_reason": "auth_config",
-            "duration_seconds": round(time.time() - start_time, 2)
-        }
-        with open(summary_path, "w", encoding="utf-8") as f:
-            json.dump(fail_summary, f, indent=2)
+        write_summary(
+            summary_path,
+            status="failed",
+            claude={"bin": args.claude_bin, "bare_mode": args.bare},
+            failure_reason="auth_config",
+            duration_seconds=round(time.time() - start_time, 2)
+        )
         sys.exit(21)
     
     summary = {
@@ -310,10 +226,9 @@ def main():
     if elapsed_before >= args.max_total_seconds:
         log("Error: max-total-seconds exceeded before starting review")
         summary["status"] = "failed"
-        summary["failure_reason"] = "timeout"
+        summary["failure_reason"] = "budget_exhausted"
         summary["duration_seconds"] = round(elapsed_before, 2)
-        with open(summary_path, "w", encoding="utf-8") as f:
-            json.dump(summary, f, indent=2)
+        write_summary(summary_path, **summary)
         sys.exit(20)
     
     # Clamp claude_timeout to remaining budget
@@ -322,10 +237,9 @@ def main():
     if remaining_seconds < 5:
         log("Error: remaining time budget too small for meaningful review")
         summary["status"] = "failed"
-        summary["failure_reason"] = "timeout"
+        summary["failure_reason"] = "budget_exhausted"
         summary["duration_seconds"] = round(elapsed_before, 2)
-        with open(summary_path, "w", encoding="utf-8") as f:
-            json.dump(summary, f, indent=2)
+        write_summary(summary_path, **summary)
         sys.exit(20)
     effective_timeout = min(args.claude_timeout_seconds, remaining_seconds)
     
@@ -353,8 +267,7 @@ def main():
         summary["failure_reason"] = res["reason"]
     
     # Write summary
-    with open(summary_path, "w", encoding="utf-8") as f:
-        json.dump(summary, f, indent=2)
+    write_summary(summary_path, **summary)
     
     log(f"Complete. Summary: {summary_path}")
     

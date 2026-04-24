@@ -8,6 +8,14 @@ from pathlib import Path
 import tempfile
 import shutil
 
+from opencode_review_utils import (
+    git_output,
+    collect_untracked_files,
+    synthesize_diff_for_new_file,
+    classify_failure,
+    write_summary,
+)
+
 def build_chunks(files, chunk_bytes):
     chunks = []
     current_chunk = {"files": [], "size_bytes": 0}
@@ -29,30 +37,6 @@ def build_chunks(files, chunk_bytes):
         chunks.append(current_chunk)
         
     return chunks
-
-def classify_failure(stderr_output, is_timeout):
-    stderr_output = stderr_output.lower()
-    if "please run gemini login first" in stderr_output:
-        return "auth"
-    if "model is unavailable for this account" in stderr_output:
-        return "model_unavailable"
-    if "quota exceeded" in stderr_output or "rate limit hit" in stderr_output:
-        return "rate_limited"
-    if "gemini: command not found" in stderr_output:
-        return "missing_cli"
-    if is_timeout:
-        return "timeout"
-    return "command_failed"
-
-def git_output(path, args, text=True):
-    try:
-        result = subprocess.run(["git"] + args, cwd=path, capture_output=True, text=text, check=True)
-        return result.stdout
-    except FileNotFoundError:
-        raise RuntimeError("git command not found")
-    except subprocess.CalledProcessError as e:
-        err_msg = e.stderr.decode("utf-8", errors="replace") if isinstance(e.stderr, bytes) else e.stderr
-        raise RuntimeError(f"git command failed: {err_msg}")
 
 def run_gemini(cli_path, model, prompt_text, timeout_seconds, input_bytes, stdout_path, stderr_path):
     cmd = [cli_path, "--model", model, "-p", prompt_text]
@@ -95,7 +79,7 @@ def run_gemini(cli_path, model, prompt_text, timeout_seconds, input_bytes, stdou
         with open(stderr_path, "wb") as f:
             f.write(stderr_str.encode("utf-8"))
             
-    reason = None if success else classify_failure(stderr_str, is_timeout)
+    reason = None if success else classify_failure(stderr_str, 124 if is_timeout else (0 if success else 1), is_timeout)
     return {"success": success, "reason": reason}
 
 def make_section(title, files, content):
@@ -136,107 +120,47 @@ def main():
         "units": {"successful": 0, "total": 0},
         "files": {"successful": [], "failed": []}
     }
-    
-    def write_summary():
-        with open(summary_path, "w", encoding="utf-8") as f:
-            json.dump(summary, f, indent=2)
 
     try:
         with open(args.prompt_file, "r", encoding="utf-8") as f:
             prompt_text = f.read().strip()
     except Exception as e:
         summary["failure_reason"] = "prompt_load_error"
-        write_summary()
+        write_summary(summary_path, **summary)
         print(f"Error loading prompt: {e}", file=sys.stderr)
         sys.exit(21)
         
     try:
         # Get list of changed files (tracked)
-        files_out = git_output(repo_path, ["diff", args.ref, "--name-only"], text=True)
+        files_out = git_output(["diff", args.ref, "--name-only"], repo_path, remaining_seconds=30)
         changed_files = [f for f in files_out.splitlines() if f.strip()]
         # Note: summary["files"]["failed"] will be set after untracked files are processed
         
         # Get overall diff (tracked changes)
-        bundle_diff = git_output(repo_path, ["diff", f"-U{args.context_lines}", args.ref], text=False)
+        bundle_diff_bytes = git_output(["diff", f"-U{args.context_lines}", args.ref], repo_path, remaining_seconds=30)
+        # Ensure we have bytes for concatenation
+        if isinstance(bundle_diff_bytes, str):
+            bundle_diff = bundle_diff_bytes.encode("utf-8", errors="replace")
+        else:
+            bundle_diff = bundle_diff_bytes
         
         # Get untracked files (new files not yet staged)
-        # Use -z for safe filename parsing (handles special chars, spaces, unicode)
-        status_out = git_output(repo_path, ["status", "--porcelain", "-z"], text=False)
-        untracked_files = []
-        # -z output uses NUL separator, entries are "XY filename\0" or "XY orig\0filename\0" for renames
-        entries = status_out.split(b'\x00')
-        i = 0
-        while i < len(entries):
-            entry = entries[i]
-            if len(entry) < 3:
-                i += 1
-                continue
-            # Check status code (first 2 chars)
-            status_code = entry[:2].decode('ascii', errors='replace')
-            # Handle renamed/copied entries: consume 2 entries (orig + new)
-            # Match on X column (R/C) to catch all variants: R , RM, RD, C , CM, CD
-            if status_code and status_code[0] in ('R', 'C'):
-                i += 2  # Skip both orig and new path
-                continue
-            # Only process untracked entries (??)
-            if status_code == "??":
-                # Filename starts at position 3 (after "XY " with space separator)
-                filename_bytes = entry[3:]
-                if filename_bytes:
-                    try:
-                        filename = filename_bytes.decode("utf-8")
-                        untracked_files.append(filename)
-                    except UnicodeDecodeError:
-                        # Fall back to latin-1 which can decode any byte
-                        filename = filename_bytes.decode("latin-1")
-                        untracked_files.append(filename)
-            i += 1
+        seen_files = set(changed_files)
+        untracked = collect_untracked_files(
+            repo_path,
+            30,  # timeout
+            seen_files,
+            args.prompt_file
+        )
         
         # Append untracked files to bundle as "new file" diffs
-        if untracked_files:
-            print(f"Including {len(untracked_files)} untracked file(s)...", file=sys.stderr)
+        if untracked:
+            print(f"Including {len(untracked)} untracked file(s)...", file=sys.stderr)
             untracked_content = b"\n"
-            for uf in untracked_files:
-                file_path = repo_path / uf
-                if file_path.is_file():
-                    try:
-                        # Skip files that are too large (>1MB)
-                        file_size = file_path.stat().st_size
-                        if file_size > 1024 * 1024:
-                            print(f"Skipping large untracked file {uf} ({file_size} bytes)", file=sys.stderr)
-                            continue
-                        
-                        with open(file_path, "rb") as f:
-                            content = f.read()
-                        
-                        # Skip binary files (contain NUL bytes)
-                        if b'\x00' in content[:1024]:
-                            print(f"Skipping binary untracked file {uf}", file=sys.stderr)
-                            continue
-                        
-                        # Format as a diff for new file
-                        untracked_content += f"\ndiff --git a/{uf} b/{uf}\n".encode()
-                        untracked_content += f"new file mode 100644\n".encode()
-                        untracked_content += f"index 0000000..0000000\n".encode()
-                        untracked_content += f"--- /dev/null\n".encode()
-                        untracked_content += f"+++ b/{uf}\n".encode()
-                        # Add content as a single "added" hunk
-                        # Check if file ends with newline
-                        ends_with_newline = content.endswith(b"\n")
-                        lines = content.split(b"\n")
-                        # Remove trailing empty element only if file ends with newline
-                        if ends_with_newline and lines and lines[-1] == b"":
-                            lines = lines[:-1]
-                        untracked_content += f"@@ -0,0 +1,{len(lines)} @@\n".encode()
-                        for line in lines:
-                            untracked_content += b"+" + line + b"\n"
-                        # Add "No newline at end of file" marker if needed
-                        if not ends_with_newline:
-                            untracked_content += b"\\ No newline at end of file\n"
-                        untracked_content += b"\n"
-                        changed_files.append(uf + " (new)")
-                    except Exception as e:
-                        print(f"Warning: Could not read untracked file {uf}: {e}", file=sys.stderr)
+            for uf, content in untracked:
+                # Generate synthetic diff with correct git index format
+                untracked_content += synthesize_diff_for_new_file(uf, content)
+                changed_files.append(uf + " (new)")
             
             bundle_diff = bundle_diff + untracked_content
         
@@ -245,7 +169,7 @@ def main():
         
     except RuntimeError as e:
         summary["failure_reason"] = "git_error"
-        write_summary()
+        write_summary(summary_path, **summary)
         print(f"Error running git: {e}", file=sys.stderr)
         sys.exit(21)
         
@@ -260,7 +184,7 @@ def main():
     
     if not changed_files:
         summary["status"] = "success"
-        write_summary()
+        write_summary(summary_path, **summary)
         sys.exit(0)
 
     cli_path = args.gemini_bin
@@ -282,12 +206,12 @@ def main():
                 stdout_content = f_in.read()
             with open(combined_output_path, "wb") as f_out:
                 f_out.write(make_section("FULL BUNDLE REVIEW", changed_files, stdout_content.decode("utf-8", errors="replace")))
-            write_summary()
+            write_summary(summary_path, **summary)
             sys.exit(0)
         else:
             summary["status"] = "failed"
             summary["failure_reason"] = res["reason"]
-            write_summary()
+            write_summary(summary_path, **summary)
             sys.exit(20)
             
     # Chunked mode
@@ -365,17 +289,17 @@ def main():
         
     if len(failed_files) == 0 and summary["units"]["successful"] > 0:
         summary["status"] = "success"
-        write_summary()
+        write_summary(summary_path, **summary)
         sys.exit(0)
     elif summary["units"]["successful"] > 0 or len(successful_files) > 0:
         summary["status"] = "partial"
         summary["failure_reason"] = overall_failure_reason
-        write_summary()
+        write_summary(summary_path, **summary)
         sys.exit(10)
     else:
         summary["status"] = "failed"
         summary["failure_reason"] = overall_failure_reason
-        write_summary()
+        write_summary(summary_path, **summary)
         sys.exit(20)
 
 if __name__ == "__main__":

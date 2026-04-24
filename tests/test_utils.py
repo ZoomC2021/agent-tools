@@ -15,7 +15,11 @@ from utils import parse_date
 
 
 def _load_opencode_gemini_review_module():
-    script_path = Path(__file__).resolve().parent.parent / "prompts" / "opencode" / "bin" / "opencode-gemini-review"
+    bin_path = Path(__file__).resolve().parent.parent / "prompts" / "opencode" / "bin"
+    # Add bin directory to path so imports work
+    if str(bin_path) not in sys.path:
+        sys.path.insert(0, str(bin_path))
+    script_path = bin_path / "opencode-gemini-review"
     loader = SourceFileLoader("opencode_gemini_review", str(script_path))
     spec = importlib.util.spec_from_loader(loader.name, loader)
     module = importlib.util.module_from_spec(spec)
@@ -158,12 +162,12 @@ def test_opencode_gemini_review_classify_failure_cases():
     """Common Gemini CLI error shapes should map to stable failure reasons."""
     module = _load_opencode_gemini_review_module()
 
-    assert module.classify_failure("Please run gemini login first", False) == "auth"
-    assert module.classify_failure("Model is unavailable for this account", False) == "model_unavailable"
-    assert module.classify_failure("quota exceeded / rate limit hit", False) == "rate_limited"
-    assert module.classify_failure("gemini: command not found", False) == "missing_cli"
-    assert module.classify_failure("anything", True) == "timeout"
-    assert module.classify_failure("internal server error: 500", False) == "command_failed"
+    assert module.classify_failure("Please run gemini login first", 1, False) == "auth"
+    assert module.classify_failure("Model is unavailable for this account", 1, False) == "model_unavailable"
+    assert module.classify_failure("quota exceeded / rate limit hit", 1, False) == "rate_limited"
+    assert module.classify_failure("gemini: command not found", 1, False) == "missing_cli"
+    assert module.classify_failure("anything", 124, True) == "timeout"
+    assert module.classify_failure("internal server error: 500", 1, False) == "command_failed"
 
 
 def test_opencode_gemini_review_git_output_handles_missing_git():
@@ -177,7 +181,7 @@ def test_opencode_gemini_review_git_output_handles_missing_git():
     module.subprocess.run = _missing_git
     try:
         try:
-            module.git_output(Path("."), ["status"], text=True)
+            module.git_output(["status"], Path("."), 30)
             assert False, "Expected RuntimeError"
         except RuntimeError as exc:
             assert "git command not found" in str(exc)
