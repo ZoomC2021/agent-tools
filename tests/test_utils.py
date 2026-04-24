@@ -1,13 +1,26 @@
-"""Tests for utility functions."""
+"""Tests for utility functions and helper scripts."""
 
 from datetime import date
 import sys
 import os
+import importlib.util
+from importlib.machinery import SourceFileLoader
+from pathlib import Path
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from utils import parse_date
+
+
+def _load_opencode_gemini_review_module():
+    script_path = Path(__file__).resolve().parent.parent / "prompts" / "opencode" / "bin" / "opencode-gemini-review"
+    loader = SourceFileLoader("opencode_gemini_review", str(script_path))
+    spec = importlib.util.spec_from_loader(loader.name, loader)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
 
 
 def test_parse_date_ymd_dash():
@@ -107,6 +120,50 @@ def test_parse_date_invalid_date_raises_valueerror():
         pass  # Expected
 
 
+def test_opencode_gemini_review_build_chunks_respects_file_boundaries():
+    """Large files should get their own chunk; smaller files should pack together."""
+    module = _load_opencode_gemini_review_module()
+    chunks = module.build_chunks(
+        [
+            {"path": "a.py", "diff_bytes": b"a" * 20, "size_bytes": 20},
+            {"path": "b.py", "diff_bytes": b"b" * 40, "size_bytes": 40},
+            {"path": "c.py", "diff_bytes": b"c" * 90, "size_bytes": 90},
+            {"path": "d.py", "diff_bytes": b"d" * 10, "size_bytes": 10},
+        ],
+        chunk_bytes=50,
+    )
+
+    assert [chunk["files"] for chunk in chunks] == [["a.py"], ["b.py"], ["c.py"], ["d.py"]]
+    assert [chunk["size_bytes"] for chunk in chunks] == [20, 40, 90, 10]
+
+
+def test_opencode_gemini_review_build_chunks_groups_small_files():
+    """Small file diffs should share a chunk until the size threshold is reached."""
+    module = _load_opencode_gemini_review_module()
+    chunks = module.build_chunks(
+        [
+            {"path": "a.py", "diff_bytes": b"a" * 20, "size_bytes": 20},
+            {"path": "b.py", "diff_bytes": b"b" * 20, "size_bytes": 20},
+            {"path": "c.py", "diff_bytes": b"c" * 15, "size_bytes": 15},
+        ],
+        chunk_bytes=50,
+    )
+
+    assert [chunk["files"] for chunk in chunks] == [["a.py", "b.py"], ["c.py"]]
+    assert [chunk["size_bytes"] for chunk in chunks] == [40, 15]
+
+
+def test_opencode_gemini_review_classify_failure_cases():
+    """Common Gemini CLI error shapes should map to stable failure reasons."""
+    module = _load_opencode_gemini_review_module()
+
+    assert module.classify_failure("Please run gemini login first", False) == "auth"
+    assert module.classify_failure("Model is unavailable for this account", False) == "model_unavailable"
+    assert module.classify_failure("quota exceeded / rate limit hit", False) == "rate_limited"
+    assert module.classify_failure("gemini: command not found", False) == "missing_cli"
+    assert module.classify_failure("anything", True) == "timeout"
+
+
 if __name__ == "__main__":
     # Run all tests
     tests = [
@@ -124,6 +181,9 @@ if __name__ == "__main__":
         test_parse_date_strips_whitespace,
         test_parse_date_leap_year,
         test_parse_date_invalid_date_raises_valueerror,
+        test_opencode_gemini_review_build_chunks_respects_file_boundaries,
+        test_opencode_gemini_review_build_chunks_groups_small_files,
+        test_opencode_gemini_review_classify_failure_cases,
     ]
 
     passed = 0

@@ -170,7 +170,7 @@ function Install-OpenCode {
         }
     }
 
-    # Install helper scripts to bin/
+    # Install helper scripts and prompt assets to bin/
     $BinSourceDir = Join-Path $SourceDir "bin"
     if (Test-Path -PathType Container $BinSourceDir) {
         $BinDest = Join-Path $env:USERPROFILE ".config\opencode\bin"
@@ -277,6 +277,23 @@ function Test-OpenCodeInstallation {
         $fullPath = Join-Path $CommandsDest $file
         if (-not (Test-Path $fullPath)) {
             Write-Err "Missing command file: $fullPath"
+            $failed++
+        }
+    }
+
+    # Check required helper files
+    $requiredHelperFiles = @(
+        "opencode-gh-librarian",
+        "opencode-eval",
+        "opencode-gemini-review",
+        "opencode-gemini-review-prompt.txt"
+    )
+
+    $helpersDir = Join-Path (Split-Path -Parent $ConfigFile) "bin"
+    foreach ($file in $requiredHelperFiles) {
+        $fullPath = Join-Path $helpersDir $file
+        if (-not (Test-Path $fullPath)) {
+            Write-Err "Missing helper file: $fullPath"
             $failed++
         }
     }

@@ -155,16 +155,22 @@ install_opencode() {
 
     # Install helper binaries
     local bin_source_dir="$source_dir/bin"
+    local bin_dest="$HOME/.config/opencode/bin"
     if [[ -d "$bin_source_dir" ]]; then
-        local bin_dest="$HOME/.config/opencode/bin"
         mkdir -p "$bin_dest"
         shopt -s nullglob
-        local bin_files=("$bin_source_dir"/*)
+        local bin_entries=("$bin_source_dir"/*)
         shopt -u nullglob
+        local copied_bin_files=0
 
-        if [[ ${#bin_files[@]} -gt 0 ]]; then
-            cp "$bin_source_dir"/* "$bin_dest/"
-            chmod +x "$bin_dest"/*
+        for bin_entry in "${bin_entries[@]}"; do
+            [[ -f "$bin_entry" ]] || continue
+            cp "$bin_entry" "$bin_dest/"
+            chmod +x "$bin_dest/$(basename "$bin_entry")"
+            copied_bin_files=1
+        done
+
+        if [[ $copied_bin_files -eq 1 ]]; then
             log_success "OpenCode helper scripts: $bin_dest"
         else
             log_warn "No helper scripts found in $bin_source_dir"
@@ -208,14 +214,15 @@ install_opencode() {
     log_warn "  ⚠️  IMPORTANT: Edit $config_file and replace YOUR_FIREWORKS_API_KEY_HERE with your actual API key (DO NOT commit)"
 
     # Self-check: verify installed files
-    _self_check_opencode "$agent_dest" "$commands_dest" "$config_file"
+    _self_check_opencode "$agent_dest" "$commands_dest" "$bin_dest" "$config_file"
 }
 
 # Self-check function for OpenCode installation
 _self_check_opencode() {
     local agent_dest="$1"
     local commands_dest="$2"
-    local config_file="$3"
+    local bin_dest="$3"
+    local config_file="$4"
     local failed=0
 
     log_info "Running OpenCode self-check..."
@@ -259,6 +266,21 @@ _self_check_opencode() {
     for f in "${required_command_files[@]}"; do
         if [[ ! -f "$commands_dest/$f" ]]; then
             log_error "Missing command file: $commands_dest/$f"
+            ((failed++))
+        fi
+    done
+
+    # Check required helper binaries and support files
+    local required_bin_files=(
+        "opencode-eval"
+        "opencode-gh-librarian"
+        "opencode-gemini-review"
+        "opencode-gemini-review-prompt.txt"
+    )
+
+    for f in "${required_bin_files[@]}"; do
+        if [[ ! -f "$bin_dest/$f" ]]; then
+            log_error "Missing helper file: $bin_dest/$f"
             ((failed++))
         fi
     done

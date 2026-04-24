@@ -87,192 +87,94 @@ Report "No issues found" if clean.
 
 ### Process 2: Gemini 3.1 Pro Review (Gemini CLI)
 
-**IMPORTANT**: Gemini 3.1 Pro Preview is NOT available via OpenCode's model override. Use the Gemini CLI in non-interactive mode.
+**IMPORTANT**: Gemini 3.1 Pro Preview is NOT available via OpenCode's model override. Use the Gemini CLI in non-interactive mode via the OpenCode helper so bundle generation, chunking, retries, and output capture stay deterministic.
 
-#### Step 2a: Diff Size Preflight
+#### Step 2a: Run the Helper
 
-Check diff size to determine processing path:
-
-```bash
-# Measure the shared ranged-excerpt bundle (same content both models receive)
-DIFF_SIZE=$(git diff -U40 HEAD | wc -c)
-FILE_COUNT=$(git diff HEAD --name-only | wc -l)
-echo "Bundle size: ${DIFF_SIZE} bytes, Files: ${FILE_COUNT}"
-```
-
-**Thresholds (measured on the `-U40` bundle, not raw `-U3` diff):**
-- Small bundle: ≤50KB AND ≤10 files → Single call path
-- Large bundle: >50KB OR >10 files → Chunked path
-
-#### Step 2b: Small Diff Path (Single Call)
-
-For small diffs, use a single Gemini call with explicit timeout:
+Use the helper binary instead of hand-writing Gemini shell pipelines:
 
 ```bash
-# SAFE: Write the shared ranged-excerpt bundle to a temp file first, then cat to gemini
-DIFF_FILE=$(mktemp)
-git diff -U40 HEAD > "$DIFF_FILE"
+GEMINI_HELPER="${HOME}/.config/opencode/bin/opencode-gemini-review"
+GEMINI_PROMPT="${HOME}/.config/opencode/bin/opencode-gemini-review-prompt.txt"
+GEMINI_OUT_DIR=$(mktemp -d)
 
-# Single call with 240s Gemini timeout, 300s bash timeout
-cat "$DIFF_FILE" | timeout 300s gemini --model gemini-3.1-pro-preview -p "Review these code changes. For each issue: file:line, severity (Critical/Warning/Suggestion), category, description, confidence (High/Medium/Low). Report 'No issues found' if clean." --timeout 240000
+"$GEMINI_HELPER" \
+  --repo . \
+  --ref HEAD \
+  --context-lines 40 \
+  --single-call-bytes 51200 \
+  --single-call-files 10 \
+  --chunk-bytes 51200 \
+  --gemini-timeout-seconds 240 \
+  --retry-timeout-seconds 180 \
+  --model gemini-3.1-pro-preview \
+  --prompt-file "$GEMINI_PROMPT" \
+  --output-dir "$GEMINI_OUT_DIR"
 
 GEMINI_EXIT=$?
-rm "$DIFF_FILE"
+GEMINI_SUMMARY="${GEMINI_OUT_DIR}/summary.json"
+GEMINI_OUTPUT="${GEMINI_OUT_DIR}/combined_output.txt"
 ```
 
-#### Step 2c: Large Diff Path (Chunked Processing)
+The helper always writes:
+- `bundle.diff` - the shared `git diff -U40 HEAD` bundle Gemini reviewed
+- `files.txt` - changed files included in the bundle
+- `summary.json` - machine-readable status, thresholds, retry results, failed files, and artifact paths
+- `combined_output.txt` - merged Gemini findings from the successful full-bundle/chunk/retry runs
 
-For large diffs, split by file boundaries with chunk size limit:
+#### Step 2b: Interpret Exit Codes and Summary
+
+The helper returns stable exit codes:
+
+| Exit | Meaning | Action |
+|------|---------|--------|
+| `0` | Full Gemini review succeeded | Use `combined_output.txt` normally |
+| `10` | Partial success after chunking/retries | Use successful Gemini output and show warning banner |
+| `20` | Gemini review failed | Fallback to GPT 5.4-only result |
+| `21` | Usage/setup problem (bad repo/prompt args) | Treat as Gemini failure and report setup issue |
+
+Read the summary before consolidation:
 
 ```bash
-# Create temp directory for chunks
-CHUNK_DIR=$(mktemp -d)
-git diff HEAD --name-only > "${CHUNK_DIR}/files.txt"
+python - <<'PY' "$GEMINI_SUMMARY"
+import json
+import pathlib
+import sys
 
-# Build chunks respecting file boundaries (max 50KB per chunk)
-CHUNK_INDEX=0
-CURRENT_CHUNK_SIZE=0
-CURRENT_CHUNK_FILE="${CHUNK_DIR}/chunk_${CHUNK_INDEX}.diff"
-CHUNK_FILES_LIST="${CHUNK_DIR}/chunk_files.txt"
-> "$CHUNK_FILES_LIST"
-
-while read -r file; do
-    FILE_DIFF=$(git diff -U40 HEAD -- "$file" 2>/dev/null)
-    FILE_SIZE=${#FILE_DIFF}
-
-    # If single file exceeds 50KB, it gets its own chunk
-    if [[ $FILE_SIZE -gt 51200 ]]; then
-        if [[ $CURRENT_CHUNK_SIZE -gt 0 ]]; then
-            ((CHUNK_INDEX++))
-            CURRENT_CHUNK_FILE="${CHUNK_DIR}/chunk_${CHUNK_INDEX}.diff"
-        fi
-        echo "$FILE_DIFF" > "$CURRENT_CHUNK_FILE"
-        echo "$file" >> "$CHUNK_FILES_LIST"
-        ((CHUNK_INDEX++))
-        CURRENT_CHUNK_FILE="${CHUNK_DIR}/chunk_${CHUNK_INDEX}.diff"
-        CURRENT_CHUNK_SIZE=0
-    elif [[ $((CURRENT_CHUNK_SIZE + FILE_SIZE)) -gt 51200 ]]; then
-        # Start new chunk
-        ((CHUNK_INDEX++))
-        CURRENT_CHUNK_FILE="${CHUNK_DIR}/chunk_${CHUNK_INDEX}.diff"
-        echo "$FILE_DIFF" > "$CURRENT_CHUNK_FILE"
-        echo "$file" >> "$CHUNK_FILES_LIST"
-        CURRENT_CHUNK_SIZE=$FILE_SIZE
-    else
-        # Add to current chunk
-        echo "$FILE_DIFF" >> "$CURRENT_CHUNK_FILE"
-        echo "$file" >> "$CHUNK_FILES_LIST"
-        CURRENT_CHUNK_SIZE=$((CURRENT_CHUNK_SIZE + FILE_SIZE))
-    fi
-done < "${CHUNK_DIR}/files.txt"
-
-TOTAL_CHUNKS=$((CHUNK_INDEX + 1))
-echo "Total chunks created: $TOTAL_CHUNKS"
+summary_path = pathlib.Path(sys.argv[1])
+summary = json.loads(summary_path.read_text())
+print(f"Gemini status: {summary['status']}")
+print(f"Gemini mode: {summary['mode']}")
+print(f"Bundle bytes: {summary['bundle']['size_bytes']}")
+print(f"Bundle files: {summary['bundle']['file_count']}")
+units = summary.get('units', {})
+if units:
+    print(f"Units: {units.get('successful', 0)}/{units.get('total', 0)} successful")
+failed_files = summary.get('files', {}).get('failed', [])
+if failed_files:
+    print("Failed Gemini files:")
+    for file_path in failed_files:
+        print(f"- {file_path}")
+PY
 ```
 
-Process each chunk with explicit timeouts:
+#### Step 2c: Use the Produced Artifacts
 
-```bash
-# Initialize tracking arrays
-CHUNK_RESULTS="${CHUNK_DIR}/results.txt"
-> "$CHUNK_RESULTS"
-SUCCESS_COUNT=0
-FAILED_CHUNKS=""
-
-for i in $(seq 0 $CHUNK_INDEX); do
-    CHUNK_FILE="${CHUNK_DIR}/chunk_${i}.diff"
-    CHUNK_OUTPUT="${CHUNK_DIR}/chunk_${i}_output.txt"
-
-    if [[ -s "$CHUNK_FILE" ]]; then
-        # Process chunk with 240s Gemini timeout, 300s bash timeout
-        timeout 300s gemini --model gemini-3.1-pro-preview \
-            -p "Review these code changes. For each issue: file:line, severity (Critical/Warning/Suggestion), category, description, confidence (High/Medium/Low). Report 'No issues found' if clean." \
-            --timeout 240000 < "$CHUNK_FILE" > "$CHUNK_OUTPUT" 2>&1
-
-        CHUNK_EXIT=$?
-
-        if [[ $CHUNK_EXIT -eq 0 ]] && [[ -s "$CHUNK_OUTPUT" ]]; then
-            echo "CHUNK_${i}:SUCCESS" >> "$CHUNK_RESULTS"
-            ((SUCCESS_COUNT++))
-        else
-            echo "CHUNK_${i}:FAILED:exit_${CHUNK_EXIT}" >> "$CHUNK_RESULTS"
-            FAILED_CHUNKS="${FAILED_CHUNKS}${i},"
-        fi
-    fi
-done
-
-echo "Chunks successful: $SUCCESS_COUNT/$TOTAL_CHUNKS"
-```
-
-#### Step 2d: Retry Failed Chunks (Once)
-
-For any failed chunks, retry once with smaller file sets:
-
-```bash
-# Retry logic for failed chunks
-if [[ -n "$FAILED_CHUNKS" ]]; then
-    echo "Retrying failed chunks..."
-    RETRY_FAILED=""
-
-    # Remove trailing comma and iterate
-    FAILED_LIST="${FAILED_CHUNKS%,}"
-
-    for chunk_idx in $(echo "$FAILED_LIST" | tr ',' ' '); do
-        CHUNK_FILE="${CHUNK_DIR}/chunk_${chunk_idx}.diff"
-        CHUNK_OUTPUT="${CHUNK_DIR}/chunk_${chunk_idx}_output.txt"
-        CHUNK_RETRY_DIR="${CHUNK_DIR}/retry_${chunk_idx}"
-        mkdir -p "$CHUNK_RETRY_DIR"
-
-        # Split failed chunk into individual files for separate processing (preserve ±40-line context)
-        grep '^diff --git' "$CHUNK_FILE" | while read -r diff_line; do
-            file_path=$(echo "$diff_line" | sed 's|diff --git a/||;s| b/.*||')
-            file_diff=$(git diff -U40 HEAD -- "$file_path" 2>/dev/null)
-            file_name=$(basename "$file_path")
-            echo "$file_diff" > "${CHUNK_RETRY_DIR}/${file_name}.diff"
-        done
-
-        # Process each file separately with shorter timeout
-        RETRY_SUCCESS=0
-        for retry_file in "${CHUNK_RETRY_DIR}"/*.diff; do
-            if [[ -f "$retry_file" ]]; then
-                retry_output="${retry_file%.diff}.out"
-                timeout 240s gemini --model gemini-3.1-pro-preview \
-                    -p "Review these code changes. For each issue: file:line, severity (Critical/Warning/Suggestion), category, description, confidence (High/Medium/Low). Report 'No issues found' if clean." \
-                    --timeout 180000 < "$retry_file" > "$retry_output" 2>&1
-
-                if [[ $? -eq 0 ]] && [[ -s "$retry_output" ]]; then
-                    cat "$retry_output" >> "$CHUNK_OUTPUT"
-                    RETRY_SUCCESS=1
-                fi
-            fi
-        done
-
-        if [[ $RETRY_SUCCESS -eq 1 ]]; then
-            # Update result to success
-            sed -i "s/CHUNK_${chunk_idx}:FAILED.*/CHUNK_${chunk_idx}:SUCCESS/" "$CHUNK_RESULTS"
-            ((SUCCESS_COUNT++))
-        else
-            RETRY_FAILED="${RETRY_FAILED}${chunk_idx},"
-        fi
-    done
-
-    # Update final failed list
-    FAILED_CHUNKS="$RETRY_FAILED"
-    echo "Final chunks successful after retry: $SUCCESS_COUNT/$TOTAL_CHUNKS"
-fi
-```
+- Use `combined_output.txt` as the Gemini findings input for Phase 4.
+- Use `summary.json` for partial-success metrics and failed-file reporting.
+- If the helper reports `missing_cli`, `auth`, `model_unavailable`, or another failure reason, treat that as a Gemini failure and continue with GPT 5.4 alone.
 
 **CRITICAL SECURITY NOTES:**
-- **NEVER** use `echo "$variable"` with untrusted diff content - prevents shell injection
-- **ALWAYS** use `cat file | gemini` or file redirection, never variable interpolation
-- The temp file approach ensures special characters in diffs are handled safely
+- **NEVER** interpolate diff contents into shell arguments.
+- The helper feeds Gemini via subprocess stdin only; the diff bundle is written to files for reproducibility, not shell expansion.
+- Prompt text is read from a shipped file so the non-interactive Gemini invocation stays consistent across runs.
 
-**REQUIRED CLI OPTIONS:**
-- `-m, --model gemini-3.1-pro-preview` - Use the Gemini 2.5 Pro Preview model
-- `-p, --prompt <prompt>` - Run in non-interactive (headless) mode
-- Input via stdin from `cat` command (safe file reading)
+**REQUIRED CLI OPTIONS (handled by the helper):**
+- `--model gemini-3.1-pro-preview`
+- `-p/--prompt` with a fixed review prompt file
+- stdin input using the generated bundle or chunk files
 
-**NOTE**: The gemini CLI must be installed and authenticated separately. If CLI is unavailable, report this as a Gemini failure and fallback to single-model review.
+**NOTE**: The Gemini CLI must still be installed and authenticated separately. If the CLI is unavailable, report this as a Gemini failure and fallback to single-model review.
 
 ## Phase 3: Wait for Both Results
 
@@ -291,30 +193,24 @@ Track which chunks succeeded or failed:
 | All chunks failed | Treat as Gemini failure, fallback to GPT 5.4 |
 
 **Chunk Result Aggregation:**
+The helper already aggregates every successful chunk/retry into `combined_output.txt` and records per-unit status in `summary.json`.
+
 ```bash
-# Aggregate results from all successful chunks
-COMBINED_GEMINI_OUTPUT="${CHUNK_DIR}/combined_gemini_results.txt"
-> "$COMBINED_GEMINI_OUTPUT"
+COMBINED_GEMINI_OUTPUT="$GEMINI_OUTPUT"
 
-if [[ -f "$CHUNK_RESULTS" ]]; then
-    while read -r result_line; do
-        chunk_idx=$(echo "$result_line" | cut -d: -f1 | sed 's/CHUNK_//')
-        status=$(echo "$result_line" | cut -d: -f2)
+PARTIAL_SUCCESS_COUNT=$(python - <<'PY' "$GEMINI_SUMMARY"
+import json, sys
+summary = json.load(open(sys.argv[1]))
+print(summary.get("units", {}).get("successful", 0))
+PY
+)
 
-        if [[ "$status" == "SUCCESS" ]]; then
-            chunk_output="${CHUNK_DIR}/chunk_${chunk_idx}_output.txt"
-            if [[ -s "$chunk_output" ]]; then
-                echo "=== CHUNK $chunk_idx OUTPUT ===" >> "$COMBINED_GEMINI_OUTPUT"
-                cat "$chunk_output" >> "$COMBINED_GEMINI_OUTPUT"
-                echo "" >> "$COMBINED_GEMINI_OUTPUT"
-            fi
-        fi
-    done < "$CHUNK_RESULTS"
-fi
-
-# Store partial success metrics for reporting
-PARTIAL_SUCCESS_COUNT=$SUCCESS_COUNT
-PARTIAL_TOTAL_COUNT=$TOTAL_CHUNKS
+PARTIAL_TOTAL_COUNT=$(python - <<'PY' "$GEMINI_SUMMARY"
+import json, sys
+summary = json.load(open(sys.argv[1]))
+print(summary.get("units", {}).get("total", 0))
+PY
+)
 ```
 
 Handle failures gracefully:
@@ -325,10 +221,10 @@ Handle failures gracefully:
 - If both fail → Report failure, suggest using `/review` instead
 
 **Gemini CLI Specific Errors:**
-- `gemini: command not found` → CLI not installed, treat as Gemini failure
-- Authentication errors → Treat as Gemini failure
-- Model not available → Treat as Gemini failure
-- Chunk timeout → Mark chunk failed, attempt retry, track for partial success
+- `missing_cli` → CLI not installed, treat as Gemini failure
+- `auth` → authentication/login issue, treat as Gemini failure
+- `model_unavailable` → treat as Gemini failure
+- `timeout` / `rate_limited` / `command_failed` → use helper summary and fallback rules
 
 ## Phase 4: Consolidate Findings
 
@@ -477,13 +373,22 @@ When Gemini CLI uses chunked processing, some chunks may succeed while others fa
 
 **Implementation:**
 ```bash
-# Display partial success warning if applicable
-if [[ -n "$FAILED_CHUNKS" ]] && [[ $PARTIAL_SUCCESS_COUNT -gt 0 ]]; then
-    echo "⚠️ UltraReview partial: ${PARTIAL_SUCCESS_COUNT}/${PARTIAL_TOTAL_COUNT} chunks completed"
-    echo "- Successfully reviewed files from successful chunks"
-    echo "- Failed chunks: ${FAILED_CHUNKS%,}"  # Remove trailing comma
-    echo "- Gemini results incomplete; using available chunks only"
-fi
+python - <<'PY' "$GEMINI_SUMMARY"
+import json
+import sys
+
+summary = json.load(open(sys.argv[1]))
+units = summary.get("units", {})
+failed_files = summary.get("files", {}).get("failed", [])
+if summary.get("status") == "partial" and units.get("successful", 0) > 0:
+    print(f"⚠️ UltraReview partial: {units.get('successful', 0)}/{units.get('total', 0)} units completed")
+    print(f"- Successfully reviewed files: {len(summary.get('files', {}).get('successful', []))}")
+    if failed_files:
+        print("- Failed Gemini files:")
+        for file_path in failed_files:
+            print(f"  - {file_path}")
+    print("- Gemini results incomplete; using available chunks only")
+PY
 ```
 
 **Phase 4 Compatibility:**

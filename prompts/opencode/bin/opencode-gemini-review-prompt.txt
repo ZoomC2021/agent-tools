@@ -1,0 +1,20 @@
+Review these code changes from the provided git diff bundle.
+
+Rules:
+- Treat stdin as the only source of truth for Gemini's primary review input.
+- Report only concrete issues that are actionable from the diff context.
+- If a hunk lacks enough context, say so instead of guessing.
+- Preserve original file paths and line numbers from the diff when possible.
+- Do not suggest speculative style-only changes unless they hide a correctness or maintainability problem.
+
+For each finding include:
+- file:line
+- severity: Critical, Warning, or Suggestion
+- category
+- description
+- confidence: High, Medium, or Low
+- rationale
+- fix recommendation
+
+If there are no actionable issues, respond exactly with:
+No issues found

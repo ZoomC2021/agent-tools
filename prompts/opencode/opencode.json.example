@@ -668,7 +668,7 @@
       "reasoningEffort": "high"
     },
     "ultrareview": {
-      "description": "Parallel dual-model review using GPT 5.4 (OpenCode) AND Gemini 3.1 Pro Preview (Gemini CLI).",
+      "description": "Parallel dual-model review using GPT 5.4 (OpenCode) AND Gemini 3.1 Pro Preview (Gemini CLI with helper-managed bundling/chunking/retries).",
       "mode": "subagent",
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "hidden": true,

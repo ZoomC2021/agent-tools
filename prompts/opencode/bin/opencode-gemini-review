@@ -1,0 +1,659 @@
+#!/usr/bin/env python3
+
+"""Robust non-interactive Gemini CLI review helper for OpenCode UltraReview."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+
+DEFAULT_MODEL = "gemini-3.1-pro-preview"
+DEFAULT_PROMPT = (
+    "Review these code changes. For each issue include: file:line, severity "
+    "(Critical/Warning/Suggestion), category, description, confidence "
+    "(High/Medium/Low), rationale, and a concrete fix recommendation. "
+    "Report 'No issues found' if clean."
+)
+
+EXIT_SUCCESS = 0
+EXIT_PARTIAL = 10
+EXIT_FAILED = 20
+EXIT_USAGE = 21
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description=(
+            "Build a shared git diff bundle and run Gemini CLI reviews with "
+            "chunking, retries, and artifact capture."
+        )
+    )
+    parser.add_argument("--repo", default=".", help="Git repository to review.")
+    parser.add_argument("--ref", default="HEAD", help="Diff baseline ref.")
+    parser.add_argument(
+        "--context-lines",
+        type=int,
+        default=40,
+        help="Context lines for git diff bundle generation.",
+    )
+    parser.add_argument(
+        "--single-call-bytes",
+        type=int,
+        default=50 * 1024,
+        help="Maximum bundle size for a single Gemini call.",
+    )
+    parser.add_argument(
+        "--single-call-files",
+        type=int,
+        default=10,
+        help="Maximum changed file count for a single Gemini call.",
+    )
+    parser.add_argument(
+        "--chunk-bytes",
+        type=int,
+        default=50 * 1024,
+        help="Maximum chunk size when splitting by file boundaries.",
+    )
+    parser.add_argument(
+        "--gemini-bin",
+        default=os.environ.get("GEMINI_BIN", "gemini"),
+        help="Gemini CLI executable or absolute path.",
+    )
+    parser.add_argument(
+        "--model",
+        default=os.environ.get("GEMINI_MODEL", DEFAULT_MODEL),
+        help="Gemini model id.",
+    )
+    parser.add_argument(
+        "--prompt",
+        default=DEFAULT_PROMPT,
+        help="Prompt to pass to Gemini CLI.",
+    )
+    parser.add_argument(
+        "--prompt-file",
+        help="Optional prompt file; overrides --prompt when supplied.",
+    )
+    parser.add_argument(
+        "--gemini-timeout-seconds",
+        type=int,
+        default=240,
+        help="Inner Gemini CLI timeout and subprocess timeout.",
+    )
+    parser.add_argument(
+        "--retry-timeout-seconds",
+        type=int,
+        default=180,
+        help="Timeout for per-file retries after chunk failure.",
+    )
+    parser.add_argument(
+        "--output-dir",
+        help="Directory where bundle, chunk, and summary artifacts are written.",
+    )
+    return parser.parse_args()
+
+
+def resolve_executable(executable: str) -> str | None:
+    if os.sep in executable or (os.altsep and os.altsep in executable):
+        path = Path(executable).expanduser()
+        if path.is_file() and os.access(path, os.X_OK):
+            return str(path)
+        return None
+    return shutil.which(executable)
+
+
+def write_text(path: Path, content: str) -> None:
+    path.write_text(content, encoding="utf-8")
+
+
+def decode_bytes(content: bytes) -> str:
+    return content.decode("utf-8", errors="replace")
+
+
+def git_output(repo: Path, args: list[str], *, text: bool) -> str | bytes:
+    cmd = ["git", "-C", str(repo), *args]
+    completed = subprocess.run(
+        cmd,
+        capture_output=True,
+        check=False,
+        text=text,
+    )
+    if completed.returncode != 0:
+        stderr = completed.stderr if text else decode_bytes(completed.stderr)
+        raise RuntimeError(
+            f"git command failed ({' '.join(cmd)}): {stderr.strip() or 'unknown error'}"
+        )
+    return completed.stdout
+
+
+def load_prompt(args: argparse.Namespace) -> str:
+    if args.prompt_file:
+        return Path(args.prompt_file).read_text(encoding="utf-8")
+    return args.prompt
+
+
+def collect_diff_inputs(
+    repo: Path, ref: str, context_lines: int, output_dir: Path
+) -> tuple[list[str], bytes, list[dict[str, object]]]:
+    changed_files_output = git_output(repo, ["diff", ref, "--name-only"], text=True)
+    changed_files = [line for line in changed_files_output.splitlines() if line.strip()]
+    bundle = git_output(repo, ["diff", f"-U{context_lines}", ref], text=False)
+
+    write_text(output_dir / "files.txt", "\n".join(changed_files) + ("\n" if changed_files else ""))
+    (output_dir / "bundle.diff").write_bytes(bundle)
+
+    file_diffs: list[dict[str, object]] = []
+    for file_path in changed_files:
+        diff_bytes = git_output(
+            repo,
+            ["diff", f"-U{context_lines}", ref, "--", file_path],
+            text=False,
+        )
+        if not diff_bytes:
+            continue
+        file_diffs.append(
+            {
+                "path": file_path,
+                "diff_bytes": diff_bytes,
+                "size_bytes": len(diff_bytes),
+            }
+        )
+
+    return changed_files, bundle, file_diffs
+
+
+def build_chunks(
+    file_diffs: list[dict[str, object]], chunk_bytes: int
+) -> list[dict[str, object]]:
+    chunks: list[dict[str, object]] = []
+    current_files: list[str] = []
+    current_parts: list[bytes] = []
+    current_size = 0
+
+    def flush_chunk() -> None:
+        nonlocal current_files, current_parts, current_size
+        if not current_files:
+            return
+        chunk_index = len(chunks)
+        data = b"".join(current_parts)
+        chunks.append(
+            {
+                "index": chunk_index,
+                "files": list(current_files),
+                "input_bytes": data,
+                "size_bytes": len(data),
+            }
+        )
+        current_files = []
+        current_parts = []
+        current_size = 0
+
+    for file_diff in file_diffs:
+        file_bytes = file_diff["diff_bytes"]
+        file_size = int(file_diff["size_bytes"])
+        file_path = str(file_diff["path"])
+
+        if file_size > chunk_bytes:
+            flush_chunk()
+            chunks.append(
+                {
+                    "index": len(chunks),
+                    "files": [file_path],
+                    "input_bytes": file_bytes,
+                    "size_bytes": file_size,
+                }
+            )
+            continue
+
+        if current_files and current_size + file_size > chunk_bytes:
+            flush_chunk()
+
+        current_files.append(file_path)
+        current_parts.append(file_bytes)
+        current_size += file_size
+
+    flush_chunk()
+    return chunks
+
+
+def classify_failure(stderr_text: str, timed_out: bool) -> str:
+    lowered = stderr_text.lower()
+    if timed_out:
+        return "timeout"
+    if "not found" in lowered or "no such file" in lowered:
+        return "missing_cli"
+    if "auth" in lowered or "login" in lowered or "credential" in lowered:
+        return "auth"
+    if "model" in lowered and ("not found" in lowered or "unavailable" in lowered):
+        return "model_unavailable"
+    if "rate limit" in lowered or "quota" in lowered:
+        return "rate_limited"
+    return "command_failed"
+
+
+def run_gemini(
+    gemini_bin: str,
+    model: str,
+    prompt: str,
+    timeout_seconds: int,
+    input_bytes: bytes,
+    stdout_path: Path,
+    stderr_path: Path,
+) -> dict[str, object]:
+    started_at = time.time()
+    subprocess_timeout = timeout_seconds + 15
+    cmd = [
+        gemini_bin,
+        "--model",
+        model,
+        "-p",
+        prompt,
+        "--timeout",
+        str(timeout_seconds * 1000),
+    ]
+
+    timed_out = False
+    missing_cli = False
+    try:
+        completed = subprocess.run(
+            cmd,
+            input=input_bytes,
+            capture_output=True,
+            check=False,
+            timeout=subprocess_timeout,
+        )
+        return_code = completed.returncode
+        stdout = completed.stdout or b""
+        stderr = completed.stderr or b""
+    except FileNotFoundError as exc:
+        missing_cli = True
+        return_code = 127
+        stdout = b""
+        stderr = str(exc).encode("utf-8")
+    except subprocess.TimeoutExpired as exc:
+        timed_out = True
+        return_code = 124
+        stdout = exc.stdout or b""
+        stderr = (exc.stderr or b"") + f"\nTimed out after {timeout_seconds}s".encode("utf-8")
+
+    stdout_path.write_bytes(stdout)
+    stderr_path.write_bytes(stderr)
+
+    stderr_text = decode_bytes(stderr)
+    success = return_code == 0 and bool(stdout.strip())
+    failure_reason = None if success else classify_failure(stderr_text, timed_out)
+    if missing_cli:
+        failure_reason = "missing_cli"
+
+    return {
+        "command": cmd,
+        "exit_code": return_code,
+        "timed_out": timed_out,
+        "success": success,
+        "failure_reason": failure_reason,
+        "stdout_path": str(stdout_path),
+        "stderr_path": str(stderr_path),
+        "stdout_bytes": len(stdout),
+        "stderr_bytes": len(stderr),
+        "duration_seconds": round(time.time() - started_at, 3),
+        "stdout_text": decode_bytes(stdout),
+        "stderr_text": stderr_text,
+    }
+
+
+def make_section(title: str, files: list[str], content: str) -> str:
+    lines = [f"=== {title} ==="]
+    if files:
+        lines.append("Files:")
+        lines.extend(f"- {file_path}" for file_path in files)
+    lines.append("")
+    lines.append(content.rstrip())
+    lines.append("")
+    return "\n".join(lines) + "\n"
+
+
+def write_summary(output_dir: Path, summary: dict[str, object]) -> None:
+    write_text(output_dir / "summary.json", json.dumps(summary, indent=2, sort_keys=True) + "\n")
+
+
+def write_failure_bundle(output_dir: Path, summary: dict[str, object], message: str) -> int:
+    write_text(output_dir / "combined_output.txt", message.rstrip() + "\n")
+    write_summary(output_dir, summary)
+    print(
+        f"opencode-gemini-review: {summary['status']} "
+        f"(summary: {output_dir / 'summary.json'})",
+        file=sys.stderr,
+    )
+    return int(summary["exit_code"])
+
+
+def summarize_paths(output_dir: Path) -> dict[str, str]:
+    return {
+        "bundle_path": str(output_dir / "bundle.diff"),
+        "changed_files_path": str(output_dir / "files.txt"),
+        "combined_output_path": str(output_dir / "combined_output.txt"),
+        "summary_path": str(output_dir / "summary.json"),
+    }
+
+
+def main() -> int:
+    args = parse_args()
+    repo = Path(args.repo).resolve()
+    output_dir = (
+        Path(args.output_dir).expanduser().resolve()
+        if args.output_dir
+        else Path(tempfile.mkdtemp(prefix="opencode-gemini-review-")).resolve()
+    )
+    output_dir.mkdir(parents=True, exist_ok=True)
+    prompt_preview = ""
+
+    summary: dict[str, object] = {
+        "status": "failed",
+        "exit_code": EXIT_FAILED,
+        "mode": "none",
+        "repo": str(repo),
+        "ref": args.ref,
+        "prompt_source": args.prompt_file or "inline",
+        "gemini": {
+            "bin": args.gemini_bin,
+            "resolved_bin": None,
+            "model": args.model,
+            "prompt_preview": prompt_preview,
+            "timeout_seconds": args.gemini_timeout_seconds,
+            "retry_timeout_seconds": args.retry_timeout_seconds,
+        },
+        "thresholds": {
+            "context_lines": args.context_lines,
+            "single_call_bytes": args.single_call_bytes,
+            "single_call_files": args.single_call_files,
+            "chunk_bytes": args.chunk_bytes,
+        },
+        "artifacts": summarize_paths(output_dir),
+    }
+
+    try:
+        prompt = load_prompt(args)
+    except OSError as exc:
+        summary["failure_reason"] = "prompt_load_error"
+        summary["error"] = str(exc)
+        summary["exit_code"] = EXIT_USAGE
+        return write_failure_bundle(
+            output_dir,
+            summary,
+            f"Gemini review helper failed to load the prompt: {exc}",
+        )
+    summary["gemini"]["prompt_preview"] = prompt[:120]
+
+    try:
+        repo_root = git_output(repo, ["rev-parse", "--show-toplevel"], text=True).strip()
+    except RuntimeError as exc:
+        summary["failure_reason"] = "git_repo_error"
+        summary["error"] = str(exc)
+        summary["exit_code"] = EXIT_USAGE
+        return write_failure_bundle(output_dir, summary, f"Gemini review helper failed: {exc}")
+
+    summary["repo_root"] = repo_root
+
+    try:
+        changed_files, bundle_bytes, file_diffs = collect_diff_inputs(
+            repo,
+            args.ref,
+            args.context_lines,
+            output_dir,
+        )
+    except RuntimeError as exc:
+        summary["failure_reason"] = "git_diff_error"
+        summary["error"] = str(exc)
+        summary["exit_code"] = EXIT_USAGE
+        return write_failure_bundle(output_dir, summary, f"Gemini review helper failed: {exc}")
+
+    summary["bundle"] = {
+        "size_bytes": len(bundle_bytes),
+        "file_count": len(changed_files),
+        "changed_files": changed_files,
+    }
+
+    if not changed_files or not bundle_bytes.strip():
+        summary["status"] = "no_changes"
+        summary["mode"] = "none"
+        summary["exit_code"] = EXIT_SUCCESS
+        summary["failure_reason"] = None
+        return write_failure_bundle(
+            output_dir,
+            summary,
+            "No issues found (no git changes to review).",
+        )
+
+    resolved_bin = resolve_executable(args.gemini_bin)
+    summary["gemini"]["resolved_bin"] = resolved_bin
+    if not resolved_bin:
+        summary["failure_reason"] = "missing_cli"
+        summary["error"] = f"Gemini CLI not found: {args.gemini_bin}"
+        summary["exit_code"] = EXIT_FAILED
+        return write_failure_bundle(
+            output_dir,
+            summary,
+            "Gemini CLI is unavailable. Install @google/gemini-cli and run `gemini login`.",
+        )
+
+    gemini_bin = resolved_bin
+    combined_output_path = output_dir / "combined_output.txt"
+
+    if len(bundle_bytes) <= args.single_call_bytes and len(changed_files) <= args.single_call_files:
+        summary["mode"] = "single"
+        attempt = run_gemini(
+            gemini_bin,
+            args.model,
+            prompt,
+            args.gemini_timeout_seconds,
+            bundle_bytes,
+            output_dir / "bundle.stdout.txt",
+            output_dir / "bundle.stderr.txt",
+        )
+        summary["single_run"] = attempt
+
+        if attempt["success"]:
+            write_text(
+                combined_output_path,
+                make_section("FULL BUNDLE REVIEW", changed_files, str(attempt["stdout_text"])),
+            )
+            summary["status"] = "success"
+            summary["exit_code"] = EXIT_SUCCESS
+            summary["units"] = {"successful": 1, "partial": 0, "failed": 0, "total": 1}
+            summary["files"] = {
+                "successful": changed_files,
+                "failed": [],
+                "total": changed_files,
+            }
+            write_summary(output_dir, summary)
+            print(
+                f"opencode-gemini-review: success (summary: {output_dir / 'summary.json'})",
+                file=sys.stderr,
+            )
+            return EXIT_SUCCESS
+
+        summary["status"] = "failed"
+        summary["failure_reason"] = attempt["failure_reason"]
+        summary["exit_code"] = EXIT_FAILED
+        summary["units"] = {"successful": 0, "partial": 0, "failed": 1, "total": 1}
+        summary["files"] = {
+            "successful": [],
+            "failed": changed_files,
+            "total": changed_files,
+        }
+        return write_failure_bundle(
+            output_dir,
+            summary,
+            "Gemini CLI review failed for the full bundle. Inspect summary.json and bundle.stderr.txt for details.",
+        )
+
+    summary["mode"] = "chunked"
+    chunks_dir = output_dir / "chunks"
+    chunks_dir.mkdir(parents=True, exist_ok=True)
+    chunks = build_chunks(file_diffs, args.chunk_bytes)
+
+    chunk_summaries: list[dict[str, object]] = []
+    combined_sections: list[str] = []
+    successful_files: list[str] = []
+    failed_files: list[str] = []
+    success_units = 0
+    partial_units = 0
+
+    for chunk in chunks:
+        chunk_index = int(chunk["index"])
+        chunk_name = f"chunk_{chunk_index:03d}"
+        chunk_input_path = chunks_dir / f"{chunk_name}.diff"
+        chunk_input_path.write_bytes(chunk["input_bytes"])
+
+        chunk_summary: dict[str, object] = {
+            "index": chunk_index,
+            "files": list(chunk["files"]),
+            "size_bytes": int(chunk["size_bytes"]),
+            "input_path": str(chunk_input_path),
+            "attempts": [],
+            "status": "failed",
+            "successful_files": [],
+            "failed_files": list(chunk["files"]),
+        }
+
+        primary_attempt = run_gemini(
+            gemini_bin,
+            args.model,
+            prompt,
+            args.gemini_timeout_seconds,
+            chunk["input_bytes"],
+            chunks_dir / f"{chunk_name}.stdout.txt",
+            chunks_dir / f"{chunk_name}.stderr.txt",
+        )
+        chunk_summary["attempts"].append(primary_attempt)
+
+        if primary_attempt["success"]:
+            chunk_summary["status"] = "success"
+            chunk_summary["successful_files"] = list(chunk["files"])
+            chunk_summary["failed_files"] = []
+            successful_files.extend(chunk["files"])
+            combined_sections.append(
+                make_section(
+                    f"CHUNK {chunk_index}",
+                    list(chunk["files"]),
+                    str(primary_attempt["stdout_text"]),
+                )
+            )
+            success_units += 1
+            chunk_summaries.append(chunk_summary)
+            continue
+
+        retry_successful_files: list[str] = []
+        retry_failed_files: list[str] = []
+
+        for file_path in chunk["files"]:
+            file_diff = next(item for item in file_diffs if item["path"] == file_path)
+            safe_name = file_path.replace("/", "__")
+            retry_attempt = run_gemini(
+                gemini_bin,
+                args.model,
+                prompt,
+                args.retry_timeout_seconds,
+                file_diff["diff_bytes"],
+                chunks_dir / f"{chunk_name}.{safe_name}.retry.stdout.txt",
+                chunks_dir / f"{chunk_name}.{safe_name}.retry.stderr.txt",
+            )
+            retry_attempt["retry_file"] = file_path
+            chunk_summary["attempts"].append(retry_attempt)
+
+            if retry_attempt["success"]:
+                retry_successful_files.append(file_path)
+                combined_sections.append(
+                    make_section(
+                        f"RETRY {file_path}",
+                        [file_path],
+                        str(retry_attempt["stdout_text"]),
+                    )
+                )
+            else:
+                retry_failed_files.append(file_path)
+
+        chunk_summary["successful_files"] = retry_successful_files
+        chunk_summary["failed_files"] = retry_failed_files
+
+        if retry_successful_files and not retry_failed_files:
+            chunk_summary["status"] = "success"
+            success_units += 1
+        elif retry_successful_files:
+            chunk_summary["status"] = "partial"
+            partial_units += 1
+        else:
+            chunk_summary["status"] = "failed"
+
+        successful_files.extend(retry_successful_files)
+        failed_files.extend(retry_failed_files or list(chunk["files"]))
+        chunk_summaries.append(chunk_summary)
+
+    dedup_successful_files = sorted(dict.fromkeys(successful_files))
+    dedup_failed_files = sorted(
+        file_path
+        for file_path in dict.fromkeys(failed_files)
+        if file_path not in dedup_successful_files
+    )
+
+    write_text(combined_output_path, "".join(combined_sections).rstrip() + ("\n" if combined_sections else ""))
+
+    summary["chunks"] = chunk_summaries
+    summary["units"] = {
+        "successful": success_units,
+        "partial": partial_units,
+        "failed": len(chunks) - success_units - partial_units,
+        "total": len(chunks),
+    }
+    summary["files"] = {
+        "successful": dedup_successful_files,
+        "failed": dedup_failed_files,
+        "total": changed_files,
+    }
+
+    if len(dedup_successful_files) == len(changed_files):
+        summary["status"] = "success"
+        summary["exit_code"] = EXIT_SUCCESS
+        summary["failure_reason"] = None
+        write_summary(output_dir, summary)
+        print(
+            f"opencode-gemini-review: success (summary: {output_dir / 'summary.json'})",
+            file=sys.stderr,
+        )
+        return EXIT_SUCCESS
+
+    if dedup_successful_files:
+        summary["status"] = "partial"
+        summary["exit_code"] = EXIT_PARTIAL
+        summary["failure_reason"] = "partial_results"
+        write_summary(output_dir, summary)
+        print(
+            f"opencode-gemini-review: partial (summary: {output_dir / 'summary.json'})",
+            file=sys.stderr,
+        )
+        return EXIT_PARTIAL
+
+    summary["status"] = "failed"
+    summary["exit_code"] = EXIT_FAILED
+    primary_failures = [
+        chunk_summary["attempts"][0]["failure_reason"]
+        for chunk_summary in chunk_summaries
+        if chunk_summary["attempts"]
+    ]
+    summary["failure_reason"] = primary_failures[0] if primary_failures else "command_failed"
+    return write_failure_bundle(
+        output_dir,
+        summary,
+        "Gemini CLI review failed for every chunk. Inspect summary.json and chunk stderr files for details.",
+    )
+
+
+if __name__ == "__main__":
+    sys.exit(main())
