@@ -821,7 +821,7 @@
       "id": "primary-kimi-workflow-spec-compliance",
       "description": "Test the full Kimi primary workflow on the workflow spec-compliance task that direct Kimi general failed.",
       "agent": "codex53-kimi",
-      "prompt": "In this project, bring the workflow engine into compliance with `SPEC.md`. The existing tests are intentionally incomplete, so do not assume a passing test suite is sufficient. Read the spec, inspect the implementation, make the smallest safe source/build fixes, preserve public function names, do not modify `SPEC.md` or `package.json`, and verify with `npm test` plus `npm run build && npm start`.",
+      "prompt": "In this project, bring the workflow engine into compliance with `SPEC.md`. This is a high-risk state-machine and lease-recovery change, so review the execution contract before implementation. The existing tests are intentionally incomplete, so do not assume a passing test suite is sufficient. Read the spec, inspect the implementation, make the smallest safe source/build fixes, preserve public function names, do not modify `SPEC.md` or `package.json`, and verify with `npm test` plus `npm run build && npm start`.",
       "timeoutMs": 240000,
       "tags": [
         "primary",
@@ -843,6 +843,12 @@
         "finalIncludes": [
           "Execution Contract",
           "Validation Receipt"
+        ],
+        "requiredSubagents": [
+          "spec-compiler",
+          "plan-review",
+          "kimi-general",
+          "quick-validator"
         ],
         "fileContains": [
           {

@@ -36,6 +36,12 @@ You receive:
 
 Your ONLY output is the Execution Contract. Do not write implementation code.
 
+You MUST emit every template section below exactly once, in order, including `### Risk Flags` and `### Plan Review Trigger`. Do not omit the Plan Review Trigger section even when the answer is `OPTIONAL`.
+
+The fenced template below is documentation only. Your actual response must start directly with `## Execution Contract:` and must not include surrounding code fences or any preamble.
+
+If the caller asks you to verify findings, confirm issues, summarize discrepancies, or produce any report/checklist format, treat that as analysis context only. You must still convert the result into the Execution Contract format below. Never output a findings report instead of an Execution Contract.
+
 ### Execution Contract Template
 
 ```markdown
@@ -87,6 +93,16 @@ Small (< 1hr) / Medium (1-4hrs) / Large (> 4hrs)
 <Any additional context or constraints>
 ```
 
+### Output Completeness Rules
+
+- The first heading of your response MUST be `## Execution Contract: <task name>`
+- Do not wrap the actual response in code fences
+- Always include the exact literal line `**Plan Review**: ` followed by either `REQUIRED` or `OPTIONAL`
+- Set `**Plan Review**: REQUIRED` whenever any Risk Flags row is `High`, the contract contains material uncertainty, or a breaking change lacks a clear migration path
+- If none of those conditions apply, set `**Plan Review**: OPTIONAL`
+- Do not collapse or skip sections just because a task is small
+- Do not output headings such as `Compliance Analysis Report`, `Verified Issues`, `Findings`, or `Summary Report` as the top-level result
+
 ## Analysis Process
 
 1. **Read relevant files** to understand current state
@@ -105,6 +121,7 @@ Small (< 1hr) / Medium (1-4hrs) / Large (> 4hrs)
 - Flag any risk that could cause production issues
 - Define criteria that can be verified with tests or inspection
 - If milestone context is provided, scope the contract only to that milestone
+- Always emit the Plan Review Trigger section with an explicit REQUIRED/OPTIONAL decision
 - Ask clarifying questions if requirements are ambiguous (via BLOCKED)
 
 ### DO NOT
@@ -112,6 +129,7 @@ Small (< 1hr) / Medium (1-4hrs) / Large (> 4hrs)
 - Skip risk assessment
 - Leave success criteria vague
 - Assume file locations without checking
+- Emit a findings report, issue inventory, or checklist instead of the Execution Contract
 
 ### STOP IF
 - Requirements are fundamentally unclear or conflicting → BLOCKED

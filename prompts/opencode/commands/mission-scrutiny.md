@@ -61,9 +61,23 @@ Your ONLY output is the Mission Scrutiny Report. Do not write implementation cod
 - Milestone validation runs: <count>
 - Additional likely remediation loops: <count or note>
 
+### Plan Review Trigger
+**Plan Review**: `REQUIRED` / `OPTIONAL`
+
+**Trigger Reason** (if REQUIRED):
+- [ ] HIGH risk flagged in Major Risks
+- [ ] Material uncertainty or unresolved architectural choice
+- [ ] Cross-surface dependency could invalidate milestone ordering
+
 ### Recommended First Milestone
 - <why this is the right starting point>
 ```
+
+## Output Completeness Rules
+
+- Always emit the `### Plan Review Trigger` section, even when the answer is `OPTIONAL`
+- Set `**Plan Review**: REQUIRED` whenever any Major Risks row is `High`, the plan includes material uncertainty, or milestone ordering depends on an unresolved architectural decision
+- If none of those conditions apply, set `**Plan Review**: OPTIONAL`
 
 ## Scrutiny Process
 
@@ -80,6 +94,7 @@ Your ONLY output is the Mission Scrutiny Report. Do not write implementation cod
 - Separate foundational work from feature layering when possible
 - Make milestone deliverables observable and verifiable
 - Call out dependencies explicitly
+- Always emit the Plan Review Trigger section with an explicit REQUIRED/OPTIONAL decision
 
 ### DO NOT
 - Write code

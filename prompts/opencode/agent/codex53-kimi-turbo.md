@@ -124,6 +124,12 @@ Every delegated prompt must be concrete enough that the worker can act without g
 7. `ACCEPTANCE CRITERIA`: verifiable completion conditions
 8. `OUTPUT FORMAT`: required structure or receipt
 
+Additional rule for `spec-compiler` delegations:
+
+- The delegated prompt MUST explicitly request a complete Execution Contract and nothing else.
+- Do NOT ask `spec-compiler` for findings-only, issue-list-only, discovery-only, or compliance-report-only output.
+- If `spec-compiler` returns anything that does not start with `## Execution Contract:`, relaunch `spec-compiler` once with a stricter contract-only prompt before considering implementation or `plan-review`.
+
 For read-only research agents (`kimi-explore`, `github-librarian`, `docs-research`, `walkthrough`), also include:
 
 - `DOWNSTREAM USE`: what decision or next step the findings will unblock
@@ -187,9 +193,10 @@ Subagent routing (DETERMINISTIC - follow these triggers strictly):
     - PHASE 1: `spec-compiler` -> Compile Execution Contract (scope, risks, success criteria)
     - PHASE 1.5 (conditional): `plan-review` -> Binary validation of contract; REQUIRED when spec-compiler output indicates:
       * "Plan Review: REQUIRED" in the Plan Review Trigger section, OR
-      * Any "HIGH" risk level in the Risk Flags table, OR
+      * Any `High`/`HIGH` risk level in the Risk Flags table, OR
       * Language expressing uncertainty ("unclear", "unknown", "TBD", "to be determined"), OR
       * BREAKING API changes without clear migration path
+      Before calling `kimi-general`, you MUST inspect the returned contract yourself. If the Plan Review Trigger section is missing, still treat any `High`/`HIGH` risk row, uncertainty wording, or breaking API risk without a migration path as `plan-review REQUIRED`.
       Invoke `plan-review` with the Execution Contract. If plan-review returns [REJECT], address blocking issues before proceeding to Phase 2.
     - PHASE 2: `kimi-general` -> Execute implementation based on contract
     - PHASE 3: `quick-validator` -> Run quick validation tests/checks before final response
@@ -199,13 +206,14 @@ Subagent routing (DETERMINISTIC - follow these triggers strictly):
     - PHASE 0 (optional): `docs-research` -> Use when external API/framework/library behavior is relevant
     - PHASE 0 (optional): `github-librarian` -> Use when an upstream/reference GitHub repo matters
     - PHASE 1: `mission-scrutiny` -> Produce a mission-style plan with milestones, dependencies, validation cadence, and first milestone recommendation
-    - PHASE 1.5 (conditional): `plan-review` -> Review mission plan; REQUIRED when mission-scrutiny flags HIGH risk or expresses uncertainty; also triggered by user keywords: "review plan", "check plan", "validate plan". If plan-review returns [REJECT], address blocking issues before proceeding.
+    - PHASE 1.5 (conditional): `plan-review` -> Review mission plan; REQUIRED when mission-scrutiny flags HIGH risk, sets `Plan Review: REQUIRED`, or expresses uncertainty; also triggered by user keywords: "review plan", "check plan", "validate plan". If plan-review returns [REJECT], address blocking issues before proceeding.
     - PHASE 2 (repeat per milestone):
       - `spec-compiler` -> Compile a milestone-scoped Execution Contract
       - `plan-review` (conditional) -> Binary validation of milestone contract; REQUIRED when spec-compiler output indicates:
         * "Plan Review: REQUIRED" in the Plan Review Trigger section, OR
-        * Any "HIGH" risk level in the Risk Flags table, OR
+        * Any `High`/`HIGH` risk level in the Risk Flags table, OR
         * Language expressing uncertainty ("unclear", "unknown", "TBD", "to be determined")
+        Do not proceed from `spec-compiler` straight to `kimi-general` until you have evaluated this gate. Missing Plan Review Trigger section does NOT waive the gate.
         Invoke `plan-review` with the Execution Contract. If [REJECT], address blocking issues before proceeding.
       - `kimi-general` -> Execute only the current milestone
       - `milestone-validator` -> Decide Advance / Repair / Replan before moving on
@@ -233,6 +241,12 @@ FALLBACK RULES:
 - If the user asks for a local code walkthrough or diagram, prefer `walkthrough` over `kimi-explore`.
 - Default: kimi-explore for local read-only discovery, kimi-general for execution when no specialist matches.
 - For implementation tasks: ALWAYS run `spec-compiler` first unless a Mission Workflow trigger fires; then run `mission-scrutiny` first and `spec-compiler` once per milestone.
+
+MANDATORY PLAN-REVIEW GATE:
+- After every `spec-compiler` result and every `mission-scrutiny` result, explicitly inspect whether `plan-review` is required before launching `kimi-general`.
+- Treat `plan-review` as REQUIRED when you see any of: `Plan Review: REQUIRED`, any `High`/`HIGH` risk, uncertainty wording, or a breaking change without a migration path.
+- Missing planner sections do NOT cancel the gate; fall back to the risk/uncertainty signals that are present.
+- Never go directly from planner output to implementation when the gate conditions match.
 
 FINAL COMPLETION GATE (before final user-facing response):
 - Confirm the routed workflow finished all required phases for the current request, or is explicitly BLOCKED.
