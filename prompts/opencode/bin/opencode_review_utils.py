@@ -7,14 +7,15 @@ import os
 from pathlib import Path
 
 
-def git_output(args, cwd, timeout, env=None):
+def git_output(args, cwd, timeout=None, env=None, remaining_seconds=None):
     """Run a git command and return output.
     
     Args:
         args: List of git command arguments (e.g., ["status", "--porcelain"])
         cwd: Working directory for the git command
-        timeout: Timeout in seconds
+        timeout: Timeout in seconds (positional for backward compatibility)
         env: Optional environment variables dict
+        remaining_seconds: Alternative way to specify timeout (keyword arg)
         
     Returns:
         Command output as string (if text=True implied) or bytes
@@ -22,6 +23,11 @@ def git_output(args, cwd, timeout, env=None):
     Raises:
         RuntimeError: If git command not found or command fails
     """
+    # Support both timeout as positional and remaining_seconds as keyword
+    if remaining_seconds is not None:
+        timeout = remaining_seconds
+    if timeout is None:
+        timeout = 30  # Default timeout
     # Determine if we should return text based on caller needs
     # Default to text=True for backward compatibility
     text = True
