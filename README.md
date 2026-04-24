@@ -8,7 +8,7 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 |----------|-------------|
 | **refactor** | Analyze codebase for refactoring opportunities, prioritize by severity/effort |
 | **review** | Review uncommitted changes for bugs, regressions, and improvements |
-| **ultrareview** | Parallel dual-model review using GPT 5.4 + Gemini 3.1 Pro Preview simultaneously *(Not available: Gemini, Antigravity, Amp)* |
+| **ultrareview** | Parallel dual-model review using GPT 5.4 + Gemini 3.1 Pro Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
 | **pr-reviewer** | Fetch PR comments, summarize issues, address them, update PR |
 | **create-pr** | Create PR with auto-generated title and description |
 | **deslop** | Analyze code for quality issues using established software engineering principles |
@@ -232,23 +232,25 @@ mkdir -p ~/.config/opencode/agent
 mkdir -p ~/.config/opencode/bin
 
 # Copy workflow prompts to commands/
-for f in prompts/opencode/review.md prompts/opencode/deslop.md \
-         prompts/opencode/mission-scrutiny.md prompts/opencode/milestone-validator.md \
-         prompts/opencode/pr-reviewer.md prompts/opencode/create-pr.md \
-         prompts/opencode/spec-compiler.md prompts/opencode/quick-validator.md \
-         prompts/opencode/change-auditor.md; do
+for f in prompts/opencode/commands/review.md prompts/opencode/commands/deslop.md \
+         prompts/opencode/commands/mission-scrutiny.md prompts/opencode/commands/milestone-validator.md \
+         prompts/opencode/commands/pr-reviewer.md prompts/opencode/commands/create-pr.md \
+         prompts/opencode/commands/spec-compiler.md prompts/opencode/commands/quick-validator.md \
+         prompts/opencode/commands/change-auditor.md prompts/opencode/commands/ultrareview.md \
+         prompts/opencode/commands/refactor.md prompts/opencode/commands/plan-review.md \
+         prompts/opencode/commands/pr-reviewer-only.md; do
   [ -f "$f" ] && cp "$f" ~/.config/opencode/commands/
 done
 
 # Copy agent definitions to agent/
-for f in prompts/opencode/codex53-kimi.md prompts/opencode/kimi-general.md \
-         prompts/opencode/kimi-explore.md prompts/opencode/github-librarian.md \
-         prompts/opencode/docs-research.md prompts/opencode/walkthrough.md \
-         prompts/opencode/oracle.md; do
+for f in prompts/opencode/agent/codex53-kimi.md prompts/opencode/agent/codex53-kimi-turbo.md \
+         prompts/opencode/agent/kimi-general.md prompts/opencode/agent/kimi-explore.md \
+         prompts/opencode/agent/github-librarian.md prompts/opencode/agent/docs-research.md \
+         prompts/opencode/agent/walkthrough.md prompts/opencode/agent/oracle.md; do
   [ -f "$f" ] && cp "$f" ~/.config/opencode/agent/
 done
 
-# Copy helper scripts used by subagents
+# Copy helper scripts and Gemini prompt assets used by subagents
 cp prompts/opencode/bin/* ~/.config/opencode/bin/
 chmod +x ~/.config/opencode/bin/*
 
@@ -394,23 +396,25 @@ mkdir -p ~/.config/opencode/agent
 mkdir -p ~/.config/opencode/bin
 
 # Copy workflow prompts to commands/
-for f in prompts/opencode/review.md prompts/opencode/deslop.md \
-         prompts/opencode/mission-scrutiny.md prompts/opencode/milestone-validator.md \
-         prompts/opencode/pr-reviewer.md prompts/opencode/create-pr.md \
-         prompts/opencode/spec-compiler.md prompts/opencode/quick-validator.md \
-         prompts/opencode/change-auditor.md; do
+for f in prompts/opencode/commands/review.md prompts/opencode/commands/deslop.md \
+         prompts/opencode/commands/mission-scrutiny.md prompts/opencode/commands/milestone-validator.md \
+         prompts/opencode/commands/pr-reviewer.md prompts/opencode/commands/create-pr.md \
+         prompts/opencode/commands/spec-compiler.md prompts/opencode/commands/quick-validator.md \
+         prompts/opencode/commands/change-auditor.md prompts/opencode/commands/ultrareview.md \
+         prompts/opencode/commands/refactor.md prompts/opencode/commands/plan-review.md \
+         prompts/opencode/commands/pr-reviewer-only.md; do
   [ -f "$f" ] && cp "$f" ~/.config/opencode/commands/
 done
 
 # Copy agent definitions to agent/
-for f in prompts/opencode/codex53-kimi.md prompts/opencode/kimi-general.md \
-         prompts/opencode/kimi-explore.md prompts/opencode/github-librarian.md \
-         prompts/opencode/docs-research.md prompts/opencode/walkthrough.md \
-         prompts/opencode/oracle.md; do
+for f in prompts/opencode/agent/codex53-kimi.md prompts/opencode/agent/codex53-kimi-turbo.md \
+         prompts/opencode/agent/kimi-general.md prompts/opencode/agent/kimi-explore.md \
+         prompts/opencode/agent/github-librarian.md prompts/opencode/agent/docs-research.md \
+         prompts/opencode/agent/walkthrough.md prompts/opencode/agent/oracle.md; do
   [ -f "$f" ] && cp "$f" ~/.config/opencode/agent/
 done
 
-# Copy helper scripts used by subagents
+# Copy helper scripts and Gemini prompt assets used by subagents
 cp prompts/opencode/bin/* ~/.config/opencode/bin/
 chmod +x ~/.config/opencode/bin/*
 
@@ -561,6 +565,7 @@ Runs parallel code reviews using **GPT 5.4** (via OpenCode) AND **Gemini 3.1 Pro
    - ⚠️ **Divergent Assessments**: Models disagree — human review recommended
 3. **Never auto-resolves conflicts**: Both perspectives shown when models disagree
 4. **Graceful fallback**: If one model fails, returns results from the other
+5. **Robust Gemini execution**: OpenCode ships an `opencode-gemini-review` helper that deterministically builds the shared `git diff -U40 HEAD` bundle, splits large reviews on file boundaries, retries failed chunks per file, and records machine-readable status in `summary.json`
 
 **Benefits**: Catches issues each model might miss, surfaces conflicting interpretations that need human attention.
 
@@ -601,6 +606,7 @@ Analyzes code for quality issues using established software engineering principl
 - **GitHub CLI (`gh`)** for PR operations and `github-librarian`
 - **OpenCode `webfetch`** for `docs-research`
 - **OpenCode `websearch`** for best `docs-research` discovery results when URLs are not provided
+- **Gemini CLI (`gemini`)** plus `gemini login` for `ultrareview`'s secondary review lane
 - The respective coding agent installed and configured
 
 ## Example OpenCode Prompts

@@ -170,10 +170,10 @@ function Install-OpenCode {
         }
     }
 
-    # Install helper scripts to bin/
+    # Install helper scripts and prompt assets to bin/
     $BinSourceDir = Join-Path $SourceDir "bin"
+    $BinDest = Join-Path $env:USERPROFILE ".config\opencode\bin"
     if (Test-Path -PathType Container $BinSourceDir) {
-        $BinDest = Join-Path $env:USERPROFILE ".config\opencode\bin"
         New-Item -ItemType Directory -Path $BinDest -Force | Out-Null
 
         $BinFiles = Get-ChildItem -Path $BinSourceDir -File
@@ -223,13 +223,14 @@ function Install-OpenCode {
     Write-Warn "  ⚠️  IMPORTANT: Edit $ConfigFile and replace YOUR_FIREWORKS_API_KEY_HERE with your actual API key (DO NOT commit)"
 
     # Self-check: verify installed files
-    Test-OpenCodeInstallation -AgentDest $AgentDest -CommandsDest $CommandsDest -ConfigFile $ConfigFile
+    Test-OpenCodeInstallation -AgentDest $AgentDest -CommandsDest $CommandsDest -BinDest $BinDest -ConfigFile $ConfigFile
 }
 
 function Test-OpenCodeInstallation {
     param(
         [string]$AgentDest,
         [string]$CommandsDest,
+        [string]$BinDest,
         [string]$ConfigFile
     )
 
@@ -277,6 +278,22 @@ function Test-OpenCodeInstallation {
         $fullPath = Join-Path $CommandsDest $file
         if (-not (Test-Path $fullPath)) {
             Write-Err "Missing command file: $fullPath"
+            $failed++
+        }
+    }
+
+    # Check required helper files
+    $requiredHelperFiles = @(
+        "opencode-gh-librarian",
+        "opencode-eval",
+        "opencode-gemini-review",
+        "opencode-gemini-review-prompt.txt"
+    )
+
+    foreach ($file in $requiredHelperFiles) {
+        $fullPath = Join-Path $BinDest $file
+        if (-not (Test-Path $fullPath)) {
+            Write-Err "Missing helper file: $fullPath"
             $failed++
         }
     }
