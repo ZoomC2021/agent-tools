@@ -262,6 +262,7 @@ _self_check_opencode() {
         "review.md"
         "ultrareview.md"
         "ultrareview-lite.md"
+        "cc.md"
         "pr-reviewer.md"
         "change-auditor.md"
         "deslop.md"
@@ -281,6 +282,8 @@ _self_check_opencode() {
         "opencode-gh-librarian"
         "opencode-gemini-review"
         "opencode-gemini-review-prompt.txt"
+        "opencode-claude-review"
+        "opencode-claude-review-prompt.txt"
     )
 
     for f in "${required_bin_files[@]}"; do
@@ -715,6 +718,7 @@ main() {
     echo "  - review           : Review uncommitted changes"
     echo "  - ultrareview      : Parallel dual-model review (GPT 5.4 + Gemini 3.1 Pro)"
     echo "  - ultrareview-lite : Parallel dual-model review (Kimi 2.5 Turbo + Gemini 3 Flash Preview)"
+    echo "  - cc               : Execute Claude CLI commands and code reviews"
     echo "  - pr-reviewer      : Address PR review feedback"
     echo "  - pr-reviewer-only : Generate implementation prompt for PR feedback"
     echo "  - create-pr        : Create PR from current changes"

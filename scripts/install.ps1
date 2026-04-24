@@ -269,6 +269,7 @@ function Test-OpenCodeInstallation {
         "review.md",
         "ultrareview.md",
         "ultrareview-lite.md",
+        "cc.md",
         "pr-reviewer.md",
         "change-auditor.md",
         "deslop.md",
@@ -288,7 +289,9 @@ function Test-OpenCodeInstallation {
         "opencode-gh-librarian",
         "opencode-eval",
         "opencode-gemini-review",
-        "opencode-gemini-review-prompt.txt"
+        "opencode-gemini-review-prompt.txt",
+        "opencode-claude-review",
+        "opencode-claude-review-prompt.txt"
     )
 
     foreach ($file in $requiredHelperFiles) {
@@ -586,6 +589,7 @@ Write-Host "  - Refactor         : Analyze codebase for refactoring opportunitie
 Write-Host "  - Review           : Review uncommitted changes"
 Write-Host "  - UltraReview      : Parallel dual-model review (GPT 5.4 + Gemini 3.1 Pro)"
 Write-Host "  - UltraReview-Lite : Parallel dual-model review (Kimi 2.5 Turbo + Gemini 3 Flash Preview)"
+Write-Host "  - CC               : Execute Claude CLI commands and code reviews"
 Write-Host "  - PR-Reviewer      : Address PR review feedback"
 Write-Host "  - PR-Reviewer-Only : Generate implementation prompt for PR feedback"
 Write-Host "  - Create-PR        : Create PR from current changes"

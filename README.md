@@ -586,6 +586,18 @@ Runs parallel code reviews using **Kimi 2.5 Turbo** (via OpenCode) AND **Gemini 
 4. **Graceful fallback and partial reporting**: if Gemini lane is partial or unavailable, report `failure_reason` and proceed with available results
 5. **Lower operating cost** than `ultrareview` by replacing GPT 5.4 with Kimi in the OpenCode lane
 
+### cc (Claude CLI)
+
+Execute **Claude Code CLI** commands and code reviews from OpenCode:
+
+1. **Direct CLI access**: Run `claude -p` commands with proper flag handling
+2. **Code review mode**: Helper script for comprehensive reviews with artifact capture
+3. **Tool control**: Configure `--allowedTools`, `--permission-mode`, `--bare` mode
+4. **Structured output**: JSON responses for programmatic use
+5. **Multi-step workflows**: Continue conversations across prompts
+
+Requires Claude CLI installed and authenticated.
+
 ### pr-reviewer
 
 Addresses PR review feedback:
