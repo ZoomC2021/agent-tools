@@ -473,7 +473,8 @@ def main() -> int:
             summary["files"] = {
                 "successful": changed_files,
                 "failed": [],
-                "total": changed_files,
+                "all": changed_files,
+                "total": len(changed_files),
             }
             write_summary(output_dir, summary)
             print(
@@ -489,7 +490,8 @@ def main() -> int:
         summary["files"] = {
             "successful": [],
             "failed": changed_files,
-            "total": changed_files,
+            "all": changed_files,
+            "total": len(changed_files),
         }
         return write_failure_bundle(
             output_dir,
@@ -625,7 +627,8 @@ def main() -> int:
     summary["files"] = {
         "successful": dedup_successful_files,
         "failed": dedup_failed_files,
-        "total": changed_files,
+        "all": changed_files,
+        "total": len(changed_files),
         "empty_diff": empty_diff_files,
     }
 

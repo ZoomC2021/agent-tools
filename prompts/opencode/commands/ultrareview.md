@@ -116,6 +116,9 @@ GEMINI_SUMMARY="${GEMINI_OUT_DIR}/summary.json"
 GEMINI_OUTPUT="${GEMINI_OUT_DIR}/combined_output.txt"
 ```
 
+Windows note:
+- The helper is installed as `opencode-gemini-review` (Unix shebang script). On Windows, run this workflow from WSL or Git Bash so `"$GEMINI_HELPER"` executes correctly.
+
 The helper always writes:
 - `bundle.diff` - the shared `git diff -U40 HEAD` bundle Gemini reviewed
 - `files.txt` - changed files included in the bundle
@@ -199,24 +202,16 @@ The helper already aggregates every successful chunk/retry into `combined_output
 ```bash
 COMBINED_GEMINI_OUTPUT="$GEMINI_OUTPUT"
 
-PARTIAL_SUCCESS_COUNT=$(python - <<'PY' "$GEMINI_SUMMARY"
+read -r PARTIAL_SUCCESS_COUNT PARTIAL_TOTAL_COUNT GEMINI_FAILURE_REASON < <(python - <<'PY' "$GEMINI_SUMMARY"
 import json, sys
-summary = json.load(open(sys.argv[1]))
-print(summary.get("units", {}).get("successful", 0))
-PY
+with open(sys.argv[1], encoding="utf-8") as f:
+    summary = json.load(f)
+units = summary.get("units", {})
+print(
+    units.get("successful", 0),
+    units.get("total", 0),
+    summary.get("failure_reason") or "none",
 )
-
-PARTIAL_TOTAL_COUNT=$(python - <<'PY' "$GEMINI_SUMMARY"
-import json, sys
-summary = json.load(open(sys.argv[1]))
-print(summary.get("units", {}).get("total", 0))
-PY
-)
-
-GEMINI_FAILURE_REASON=$(python - <<'PY' "$GEMINI_SUMMARY"
-import json, sys
-summary = json.load(open(sys.argv[1]))
-print(summary.get("failure_reason") or "none")
 PY
 )
 ```

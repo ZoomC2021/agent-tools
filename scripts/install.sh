@@ -166,7 +166,11 @@ install_opencode() {
         for bin_entry in "${bin_entries[@]}"; do
             [[ -f "$bin_entry" ]] || continue
             cp "$bin_entry" "$bin_dest/"
-            chmod +x "$bin_dest/$(basename "$bin_entry")"
+            local first_line
+            first_line="$(sed -n '1{s/\r$//;p;}' "$bin_entry")"
+            if [[ "$first_line" == '#!'* ]]; then
+                chmod +x "$bin_dest/$(basename "$bin_entry")"
+            fi
             copied_bin_files=1
         done
 

@@ -163,6 +163,7 @@ def test_opencode_gemini_review_classify_failure_cases():
     assert module.classify_failure("quota exceeded / rate limit hit", False) == "rate_limited"
     assert module.classify_failure("gemini: command not found", False) == "missing_cli"
     assert module.classify_failure("anything", True) == "timeout"
+    assert module.classify_failure("internal server error: 500", False) == "command_failed"
 
 
 def test_opencode_gemini_review_git_output_handles_missing_git():
