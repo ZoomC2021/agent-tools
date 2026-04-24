@@ -32,153 +32,150 @@ Rules:
 - Never replace the bundle with hand-edited excerpts; it must be deterministically generated from git so both models see identical content.
 - Subsequent phases (size preflight, chunking, retry) operate on this bundle, not on raw `-U3` diffs.
 
+### Phase 1.6: Non-Interactive Path Policy
+
+Use workspace-local temp paths only to avoid permission stalls in non-interactive runs.
+
+```bash
+REVIEW_TMP_ROOT="${PWD}/.opencode/tmp"
+mkdir -p "$REVIEW_TMP_ROOT"
+```
+
+Rules:
+- Do NOT read or write `/tmp` or any other external directory.
+- Keep temporary review artifacts under `${REVIEW_TMP_ROOT}` only.
+- If a command example uses temp files, rewrite it to `${REVIEW_TMP_ROOT}` before execution.
+
 ## Phase 2: Launch Parallel Reviews
 
-Launch TWO review processes concurrently using different invocation methods:
+You can call multiple tools in a single response. When multiple independent pieces of information are requested and all commands are likely to succeed, run multiple tool calls in parallel for optimal performance.
 
-### Process 1: GPT 5.4 Review (Native OpenCode)
+**CRITICAL**: Launch BOTH review tasks in the SAME response for true parallel execution. Do NOT wait for one to complete before starting the other.
 
-**IMPORTANT**: Use a READ-ONLY review approach. Do NOT use the standard `review` agent as it may auto-fix issues.
+### Task 1: GPT 5.4 Review (Read-Only)
 
-Use bash to run GPT 5.4 review directly:
+Launch this task using the `task` tool:
 
-```bash
-# Get the diff content
-DIFF_CONTENT=$(git diff HEAD)
+```
+description: GPT 5.4 read-only code review
+subagent_type: review
+prompt: |
+  TASK: Perform READ-ONLY code review using GPT 5.4
+  MODEL OVERRIDE: openai/gpt-5.4
+  TOOLS ALLOWED: Read, Bash (for git commands only), Grep, Glob
+  TOOLS FORBIDDEN: Edit, Write (must NOT modify any files)
 
-# Launch GPT 5.4 review via OpenCode with read-only constraints
+  INPUT PROVIDED:
+  - Shared ranged-excerpt review bundle from `git diff -U40 HEAD` (primary input)
+  - List of changed files from `git status --short`
+  - Read access to modified files for targeted follow-up when a hunk requires cross-reference beyond ±40 lines
+
+  EXECUTION STEPS:
+  1. Review from the shared bundle first; read a full file only when a specific hunk needs context outside its ±40-line window
+  2. Analyze each file for:
+     - Logic errors, edge cases, null access risks
+     - Error handling gaps, type safety issues
+     - Security vulnerabilities
+     - Regressions (breaking API changes, removed functionality)
+     - Optimization opportunities (redundancy, duplication, complexity, performance)
+  3. Run lint/build checks if available (read-only, don't fix)
+  4. DO NOT modify any files - this is analysis only
+  5. Use workspace-local temp paths only:
+     - `REVIEW_TMP_ROOT="${PWD}/.opencode/tmp"`
+     - `mkdir -p "$REVIEW_TMP_ROOT"`
+     - Never use `/tmp` or other external directories
+
+  OUTPUT FORMAT - For each finding include:
+  - File:line location
+  - Severity: Critical/Warning/Suggestion (preserve original severity)
+  - Category: Logic/Security/Performance/Regression/etc
+  - Description: Clear explanation
+  - Confidence: High/Medium/Low
+  - Rationale: Why this is an issue
+
+  Report "No issues found" if clean.
 ```
 
-**READ-ONLY EXECUTION PATTERN:**
+**⚠️ CRITICAL**: The review agent used here must NOT have Edit/Write permissions.
+
+### Task 2: Gemini 3.1 Pro Review (Gemini CLI Helper)
+
+Launch this task using the `task` tool:
+
 ```
-TASK: Perform READ-ONLY code review using GPT 5.4
-MODEL OVERRIDE: openai/gpt-5.4
-TOOLS ALLOWED: Read, Bash (for git commands only), Grep, Glob
-TOOLS FORBIDDEN: Edit, Write (must NOT modify any files)
-
-INPUT PROVIDED:
-- Shared ranged-excerpt review bundle from `git diff -U40 HEAD` (primary input)
-- List of changed files from `git status --short`
-- Read access to modified files for targeted follow-up when a hunk requires cross-reference beyond ±40 lines
-
-EXECUTION STEPS:
-1. **Review from the shared bundle first**; read a full file only when a specific hunk needs context outside its ±40-line window
-2. **Analyze each file** for:
-   - Logic errors, edge cases, null access risks
-   - Error handling gaps, type safety issues
-   - Security vulnerabilities
-   - Regressions (breaking API changes, removed functionality)
-   - Optimization opportunities (redundancy, duplication, complexity, performance)
-3. **Run lint/build checks** if available (read-only, don't fix)
-4. **DO NOT modify any files** - this is analysis only
-
-OUTPUT FORMAT - For each finding include:
-- File:line location
-- Severity: Critical/Warning/Suggestion (preserve original severity)
-- Category: Logic/Security/Performance/Regression/etc
-- Description: Clear explanation
-- Confidence: High/Medium/Low
-- Rationale: Why this is an issue
-
-Report "No issues found" if clean.
+description: Gemini 3.1 Pro CLI review via helper
+subagent_type: kimi-general
+prompt: |
+  TASK: Execute Gemini 3.1 Pro Preview review via CLI helper
+  TOOLS ALLOWED: Bash, Read
+  
+  EXECUTION STEPS:
+  1. Run the Gemini CLI helper to perform the review:
+  
+  ```bash
+  REVIEW_TMP_ROOT="${PWD}/.opencode/tmp"
+  mkdir -p "$REVIEW_TMP_ROOT"
+  GEMINI_HELPER="${HOME}/.config/opencode/bin/opencode-gemini-review"
+  GEMINI_PROMPT="${HOME}/.config/opencode/bin/opencode-gemini-review-prompt.txt"
+  GEMINI_OUT_DIR="${REVIEW_TMP_ROOT}/gemini-$(date +%Y%m%d-%H%M%S)-$$"
+  mkdir -p "$GEMINI_OUT_DIR"
+  
+  # Use generous timeouts for file-based review (avoids shell code path extraction issues)
+  timeout 180 "$GEMINI_HELPER" \
+    --repo . \
+    --ref HEAD \
+    --context-lines 40 \
+    --single-call-bytes 200000 \
+    --single-call-files 20 \
+    --chunk-bytes 200000 \
+    --gemini-timeout-seconds 120 \
+    --retry-timeout-seconds 60 \
+    --max-total-seconds 180 \
+    --model gemini-3.1-pro-preview \
+    --prompt-file "$GEMINI_PROMPT" \
+    --output-dir "$GEMINI_OUT_DIR" \
+    --verbose 2>&1 || true
+  
+  GEMINI_EXIT=$?
+  GEMINI_SUMMARY="${GEMINI_OUT_DIR}/summary.json"
+  GEMINI_OUTPUT="${GEMINI_OUT_DIR}/combined_output.txt"
+  ```
+  
+  2. Read and interpret the summary.json to determine success/partial/failure:
+  
+  The helper returns stable exit codes:
+  - Exit 0: Full Gemini review succeeded
+  - Exit 10: Partial success after chunking/retries
+  - Exit 20: Gemini review failed
+  - Exit 21: Usage/setup problem
+  
+  The helper always writes:
+  - `bundle.diff` - the shared `git diff -U40 HEAD` bundle
+  - `files.txt` - changed files included in the bundle
+  - `summary.json` - machine-readable status, thresholds, retry results, failed files, and artifact paths
+  - `combined_output.txt` - merged Gemini findings from successful runs
+  
+  3. Return the following information:
+     - Exit code from the helper
+     - Path to summary.json
+     - Path to combined_output.txt
+     - Summary of Gemini status, mode, and any failure_reason
+     - Count of successful vs total units (if chunked)
+     - List of failed files (if any)
+  
+  NOTES:
+  - The helper writes bundles to `~/.gemini/tmp/agent-tools/` (Gemini CLI's allowed workspace) 
+  - Uses `--yolo --skip-trust` flags for non-interactive approval
+  - File-based review prevents shell code path extraction issues that occurred with stdin piping
+  - Signal handlers ensure summary.json is written even on interrupt/timeout
+  - Use workspace-local temp paths only (`${PWD}/.opencode/tmp`), never `/tmp`
+  - If Gemini CLI is unavailable (missing_cli, auth, model_unavailable), report as Gemini failure
 ```
 
-**⚠️ CRITICAL**: The review agent used here must NOT have Edit/Write permissions. If using `review` agent, verify it's configured as read-only for this task.
-
-### Process 2: Gemini 3.1 Pro Review (Gemini CLI)
-
-**IMPORTANT**: Gemini 3.1 Pro Preview is NOT available via OpenCode's model override. Use the Gemini CLI in non-interactive mode via the OpenCode helper so bundle generation, chunking, retries, and output capture stay deterministic.
-
-#### Step 2a: Run the Helper
-
-Use the helper binary instead of hand-writing Gemini shell pipelines:
-
-```bash
-GEMINI_HELPER="${HOME}/.config/opencode/bin/opencode-gemini-review"
-GEMINI_PROMPT="${HOME}/.config/opencode/bin/opencode-gemini-review-prompt.txt"
-GEMINI_OUT_DIR=$(mktemp -d)
-
-"$GEMINI_HELPER" \
-  --repo . \
-  --ref HEAD \
-  --context-lines 40 \
-  --single-call-bytes 51200 \
-  --single-call-files 10 \
-  --chunk-bytes 51200 \
-  --gemini-timeout-seconds 240 \
-  --retry-timeout-seconds 180 \
-  --model gemini-3.1-pro-preview \
-  --prompt-file "$GEMINI_PROMPT" \
-  --output-dir "$GEMINI_OUT_DIR"
-
-GEMINI_EXIT=$?
-GEMINI_SUMMARY="${GEMINI_OUT_DIR}/summary.json"
-GEMINI_OUTPUT="${GEMINI_OUT_DIR}/combined_output.txt"
-```
+**IMPORTANT**: Gemini 3.1 Pro Preview is NOT available via OpenCode's model override. The helper binary must be used for deterministic bundle generation, chunking, retries, and output capture.
 
 Windows note:
 - The helper is installed as `opencode-gemini-review` (Unix shebang script). On Windows, run this workflow from WSL or Git Bash so `"$GEMINI_HELPER"` executes correctly.
-
-The helper always writes:
-- `bundle.diff` - the shared `git diff -U40 HEAD` bundle Gemini reviewed
-- `files.txt` - changed files included in the bundle
-- `summary.json` - machine-readable status, thresholds, retry results, failed files, and artifact paths
-- `combined_output.txt` - merged Gemini findings from the successful full-bundle/chunk/retry runs
-
-#### Step 2b: Interpret Exit Codes and Summary
-
-The helper returns stable exit codes:
-
-| Exit | Meaning | Action |
-|------|---------|--------|
-| `0` | Full Gemini review succeeded | Use `combined_output.txt` normally |
-| `10` | Partial success after chunking/retries | Use successful Gemini output and show warning banner |
-| `20` | Gemini review failed | Fallback to GPT 5.4-only result |
-| `21` | Usage/setup problem (bad repo/prompt args) | Treat as Gemini failure and report setup issue |
-
-Read the summary before consolidation:
-
-```bash
-python - <<'PY' "$GEMINI_SUMMARY"
-import json
-import pathlib
-import sys
-
-summary_path = pathlib.Path(sys.argv[1])
-summary = json.loads(summary_path.read_text())
-print(f"Gemini status: {summary['status']}")
-print(f"Gemini mode: {summary['mode']}")
-print(f"Gemini failure reason: {summary.get('failure_reason') or 'none'}")
-print(f"Bundle bytes: {summary['bundle']['size_bytes']}")
-print(f"Bundle files: {summary['bundle']['file_count']}")
-units = summary.get('units', {})
-if units:
-    print(f"Units: {units.get('successful', 0)}/{units.get('total', 0)} successful")
-failed_files = summary.get('files', {}).get('failed', [])
-if failed_files:
-    print("Failed Gemini files:")
-    for file_path in failed_files:
-        print(f"- {file_path}")
-PY
-```
-
-#### Step 2c: Use the Produced Artifacts
-
-- Use `combined_output.txt` as the Gemini findings input for Phase 4.
-- Use `summary.json` for partial-success metrics, `failure_reason`, and failed-file reporting.
-- If the helper reports `missing_cli`, `auth`, `model_unavailable`, or another failure reason, treat that as a Gemini failure and continue with GPT 5.4 alone.
-
-**CRITICAL SECURITY NOTES:**
-- **NEVER** interpolate diff contents into shell arguments.
-- The helper feeds Gemini via subprocess stdin only; the diff bundle is written to files for reproducibility, not shell expansion.
-- Prompt text is read from a shipped file so the non-interactive Gemini invocation stays consistent across runs.
-
-**REQUIRED CLI OPTIONS (handled by the helper):**
-- `--model gemini-3.1-pro-preview`
-- `-p/--prompt` with a fixed review prompt file
-- stdin input using the generated bundle or chunk files
-
-**NOTE**: The Gemini CLI must still be installed and authenticated separately. If the CLI is unavailable, report this as a Gemini failure and fallback to single-model review.
 
 ## Phase 3: Wait for Both Results
 

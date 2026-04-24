@@ -9,6 +9,7 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 | **refactor** | Analyze codebase for refactoring opportunities, prioritize by severity/effort |
 | **review** | Review uncommitted changes for bugs, regressions, and improvements |
 | **ultrareview** | Parallel dual-model review using GPT 5.4 + Gemini 3.1 Pro Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
+| **ultrareview-lite** | Parallel dual-model review using Kimi 2.5 Turbo + Gemini 3 Flash Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
 | **pr-reviewer** | Fetch PR comments, summarize issues, address them, update PR |
 | **create-pr** | Create PR with auto-generated title and description |
 | **deslop** | Analyze code for quality issues using established software engineering principles |
@@ -109,6 +110,7 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 └── commands/                  # Workflow prompts
     ├── review.md
     ├── ultrareview.md
+    ├── ultrareview-lite.md
     ├── deslop.md
     ├── mission-scrutiny.md
     ├── milestone-validator.md
@@ -141,6 +143,7 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 | **change-auditor** | Deep audit for security, breaking changes | GPT-5.3-Codex | **High** |
 | **review** | Review uncommitted changes | GPT-5.3-Codex | **High** |
 | **ultrareview** | Parallel dual-model review (GPT 5.4 + Gemini 3.1 Pro Preview) | Kimi K2.5 Turbo | — |
+| **ultrareview-lite** | Parallel dual-model review (Kimi 2.5 Turbo + Gemini 3 Flash Preview) | Kimi K2.5 Turbo | — |
 | **deslop** | Code quality audit against principles | Kimi K2.5 Turbo | — |
 | **pr-reviewer** | Fetch PR comments and apply fixes | Kimi K2.5 Turbo | — |
 | **pr-reviewer-only** | Fetch PR comments, produce implementation prompt | Kimi K2.5 Turbo | — |
@@ -237,6 +240,7 @@ for f in prompts/opencode/commands/review.md prompts/opencode/commands/deslop.md
          prompts/opencode/commands/pr-reviewer.md prompts/opencode/commands/create-pr.md \
          prompts/opencode/commands/spec-compiler.md prompts/opencode/commands/quick-validator.md \
          prompts/opencode/commands/change-auditor.md prompts/opencode/commands/ultrareview.md \
+         prompts/opencode/commands/ultrareview-lite.md \
          prompts/opencode/commands/refactor.md prompts/opencode/commands/plan-review.md \
          prompts/opencode/commands/pr-reviewer-only.md; do
   [ -f "$f" ] && cp "$f" ~/.config/opencode/commands/
@@ -401,6 +405,7 @@ for f in prompts/opencode/commands/review.md prompts/opencode/commands/deslop.md
          prompts/opencode/commands/pr-reviewer.md prompts/opencode/commands/create-pr.md \
          prompts/opencode/commands/spec-compiler.md prompts/opencode/commands/quick-validator.md \
          prompts/opencode/commands/change-auditor.md prompts/opencode/commands/ultrareview.md \
+         prompts/opencode/commands/ultrareview-lite.md \
          prompts/opencode/commands/refactor.md prompts/opencode/commands/plan-review.md \
          prompts/opencode/commands/pr-reviewer-only.md; do
   [ -f "$f" ] && cp "$f" ~/.config/opencode/commands/
@@ -569,6 +574,18 @@ Runs parallel code reviews using **GPT 5.4** (via OpenCode) AND **Gemini 3.1 Pro
 
 **Benefits**: Catches issues each model might miss, surfaces conflicting interpretations that need human attention.
 
+### ultrareview-lite
+
+Lower-cost dual-model variant of `ultrareview`.
+
+Runs parallel code reviews using **Kimi 2.5 Turbo** (via OpenCode) AND **Gemini 3 Flash Preview** (via Gemini CLI), then consolidates using the same consensus/exclusive/divergent reporting structure.
+
+1. **Launch parallel reviews**: Both models review the same `git diff -U40 HEAD` bundle
+2. **Consolidate findings** with identical severity-preserving rules from `ultrareview`
+3. **Use helper-managed Gemini execution**: deterministic bundle generation, chunking, retries, and `summary.json` status/failure metadata
+4. **Graceful fallback and partial reporting**: if Gemini lane is partial or unavailable, report `failure_reason` and proceed with available results
+5. **Lower operating cost** than `ultrareview` by replacing GPT 5.4 with Kimi in the OpenCode lane
+
 ### pr-reviewer
 
 Addresses PR review feedback:
@@ -606,7 +623,7 @@ Analyzes code for quality issues using established software engineering principl
 - **GitHub CLI (`gh`)** for PR operations and `github-librarian`
 - **OpenCode `webfetch`** for `docs-research`
 - **OpenCode `websearch`** for best `docs-research` discovery results when URLs are not provided
-- **Gemini CLI (`gemini`)** plus `gemini login` for `ultrareview`'s secondary review lane
+- **Gemini CLI (`gemini`)** plus `gemini login` for `ultrareview` and `ultrareview-lite` secondary review lanes
 - The respective coding agent installed and configured
 
 ## Example OpenCode Prompts

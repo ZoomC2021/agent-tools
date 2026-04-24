@@ -168,3 +168,7 @@ prompts/opencode/bun.lock
 
 # Gemini CLI local files
 .gemini/
+
+# Local temp artifacts
+/tmp/
+/.opencode/tmp/

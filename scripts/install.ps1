@@ -268,6 +268,7 @@ function Test-OpenCodeInstallation {
         "refactor.md",
         "review.md",
         "ultrareview.md",
+        "ultrareview-lite.md",
         "pr-reviewer.md",
         "change-auditor.md",
         "deslop.md",
@@ -583,6 +584,8 @@ Write-Host ""
 Write-Host "Installed workflows:"
 Write-Host "  - Refactor         : Analyze codebase for refactoring opportunities"
 Write-Host "  - Review           : Review uncommitted changes"
+Write-Host "  - UltraReview      : Parallel dual-model review (GPT 5.4 + Gemini 3.1 Pro)"
+Write-Host "  - UltraReview-Lite : Parallel dual-model review (Kimi 2.5 Turbo + Gemini 3 Flash Preview)"
 Write-Host "  - PR-Reviewer      : Address PR review feedback"
 Write-Host "  - PR-Reviewer-Only : Generate implementation prompt for PR feedback"
 Write-Host "  - Create-PR        : Create PR from current changes"
