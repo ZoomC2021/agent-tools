@@ -119,12 +119,17 @@ def decode_bytes(content: bytes) -> str:
 
 def git_output(repo: Path, args: list[str], *, text: bool) -> str | bytes:
     cmd = ["git", "-C", str(repo), *args]
-    completed = subprocess.run(
-        cmd,
-        capture_output=True,
-        check=False,
-        text=text,
-    )
+    try:
+        completed = subprocess.run(
+            cmd,
+            capture_output=True,
+            check=False,
+            text=text,
+        )
+    except FileNotFoundError:
+        raise RuntimeError(
+            "git command not found. Please ensure git is installed and available in your PATH."
+        ) from None
     if completed.returncode != 0:
         stderr = completed.stderr if text else decode_bytes(completed.stderr)
         raise RuntimeError(
@@ -255,8 +260,6 @@ def run_gemini(
         model,
         "-p",
         prompt,
-        "--timeout",
-        str(timeout_seconds * 1000),
     ]
 
     timed_out = False
@@ -498,10 +501,14 @@ def main() -> int:
     chunks_dir = output_dir / "chunks"
     chunks_dir.mkdir(parents=True, exist_ok=True)
     chunks = build_chunks(file_diffs, args.chunk_bytes)
+    file_diff_map = {str(item["path"]): item for item in file_diffs}
+    empty_diff_files = sorted(
+        file_path for file_path in changed_files if file_path not in file_diff_map
+    )
 
     chunk_summaries: list[dict[str, object]] = []
     combined_sections: list[str] = []
-    successful_files: list[str] = []
+    successful_files: list[str] = list(empty_diff_files)
     failed_files: list[str] = []
     success_units = 0
     partial_units = 0
@@ -554,7 +561,10 @@ def main() -> int:
         retry_failed_files: list[str] = []
 
         for file_path in chunk["files"]:
-            file_diff = next(item for item in file_diffs if item["path"] == file_path)
+            file_diff = file_diff_map.get(str(file_path))
+            if file_diff is None:
+                retry_failed_files.append(str(file_path))
+                continue
             safe_name = file_path.replace("/", "__")
             retry_attempt = run_gemini(
                 gemini_bin,
@@ -593,7 +603,7 @@ def main() -> int:
             chunk_summary["status"] = "failed"
 
         successful_files.extend(retry_successful_files)
-        failed_files.extend(retry_failed_files or list(chunk["files"]))
+        failed_files.extend(retry_failed_files)
         chunk_summaries.append(chunk_summary)
 
     dedup_successful_files = sorted(dict.fromkeys(successful_files))
@@ -616,6 +626,7 @@ def main() -> int:
         "successful": dedup_successful_files,
         "failed": dedup_failed_files,
         "total": changed_files,
+        "empty_diff": empty_diff_files,
     }
 
     if len(dedup_successful_files) == len(changed_files):

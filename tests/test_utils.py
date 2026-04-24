@@ -3,6 +3,7 @@
 from datetime import date
 import sys
 import os
+import tempfile
 import importlib.util
 from importlib.machinery import SourceFileLoader
 from pathlib import Path
@@ -164,6 +165,64 @@ def test_opencode_gemini_review_classify_failure_cases():
     assert module.classify_failure("anything", True) == "timeout"
 
 
+def test_opencode_gemini_review_git_output_handles_missing_git():
+    """git_output should return a clear RuntimeError when git is unavailable."""
+    module = _load_opencode_gemini_review_module()
+    original_run = module.subprocess.run
+
+    def _missing_git(*args, **kwargs):  # noqa: ANN002, ANN003
+        raise FileNotFoundError("git")
+
+    module.subprocess.run = _missing_git
+    try:
+        try:
+            module.git_output(Path("."), ["status"], text=True)
+            assert False, "Expected RuntimeError"
+        except RuntimeError as exc:
+            assert "git command not found" in str(exc)
+    finally:
+        module.subprocess.run = original_run
+
+
+def test_opencode_gemini_review_run_gemini_uses_subprocess_timeout_only():
+    """run_gemini should avoid unsupported CLI timeout flags."""
+    module = _load_opencode_gemini_review_module()
+    original_run = module.subprocess.run
+    observed: dict[str, object] = {}
+
+    class _Completed:
+        returncode = 0
+        stdout = b"ok"
+        stderr = b""
+
+    def _fake_run(cmd, **kwargs):  # noqa: ANN001, ANN003
+        observed["cmd"] = cmd
+        observed["timeout"] = kwargs.get("timeout")
+        return _Completed()
+
+    module.subprocess.run = _fake_run
+    try:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            stdout_path = Path(temp_dir) / "stdout.txt"
+            stderr_path = Path(temp_dir) / "stderr.txt"
+            result = module.run_gemini(
+                "gemini",
+                "gemini-3.1-pro-preview",
+                "prompt text",
+                120,
+                b"diff",
+                stdout_path,
+                stderr_path,
+            )
+    finally:
+        module.subprocess.run = original_run
+
+    cmd = observed.get("cmd", [])
+    assert "--timeout" not in cmd
+    assert observed.get("timeout") == 135
+    assert result["success"] is True
+
+
 if __name__ == "__main__":
     # Run all tests
     tests = [
@@ -184,6 +243,8 @@ if __name__ == "__main__":
         test_opencode_gemini_review_build_chunks_respects_file_boundaries,
         test_opencode_gemini_review_build_chunks_groups_small_files,
         test_opencode_gemini_review_classify_failure_cases,
+        test_opencode_gemini_review_git_output_handles_missing_git,
+        test_opencode_gemini_review_run_gemini_uses_subprocess_timeout_only,
     ]
 
     passed = 0

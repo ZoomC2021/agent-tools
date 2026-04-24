@@ -145,6 +145,7 @@ summary_path = pathlib.Path(sys.argv[1])
 summary = json.loads(summary_path.read_text())
 print(f"Gemini status: {summary['status']}")
 print(f"Gemini mode: {summary['mode']}")
+print(f"Gemini failure reason: {summary.get('failure_reason') or 'none'}")
 print(f"Bundle bytes: {summary['bundle']['size_bytes']}")
 print(f"Bundle files: {summary['bundle']['file_count']}")
 units = summary.get('units', {})
@@ -161,7 +162,7 @@ PY
 #### Step 2c: Use the Produced Artifacts
 
 - Use `combined_output.txt` as the Gemini findings input for Phase 4.
-- Use `summary.json` for partial-success metrics and failed-file reporting.
+- Use `summary.json` for partial-success metrics, `failure_reason`, and failed-file reporting.
 - If the helper reports `missing_cli`, `auth`, `model_unavailable`, or another failure reason, treat that as a Gemini failure and continue with GPT 5.4 alone.
 
 **CRITICAL SECURITY NOTES:**
@@ -211,13 +212,20 @@ summary = json.load(open(sys.argv[1]))
 print(summary.get("units", {}).get("total", 0))
 PY
 )
+
+GEMINI_FAILURE_REASON=$(python - <<'PY' "$GEMINI_SUMMARY"
+import json, sys
+summary = json.load(open(sys.argv[1]))
+print(summary.get("failure_reason") or "none")
+PY
+)
 ```
 
 Handle failures gracefully:
 
 - If GPT 5.4 fails → Return Gemini CLI results alone with warning
 - If Gemini CLI fails (not installed, auth error, or model error) → Return GPT 5.4 results alone with warning
-- If Gemini CLI has **partial success** (some chunks succeeded) → Use successful chunks with warning banner
+- If Gemini CLI has **partial success** (some chunks succeeded) → Use successful chunks with the standardized partial warning banner
 - If both fail → Report failure, suggest using `/review` instead
 
 **Gemini CLI Specific Errors:**
@@ -347,7 +355,7 @@ Present the consolidated report with:
 If one review process fails during Phase 2:
 1. Log the failure (including CLI errors for Gemini)
 2. Continue with the successful model's results
-3. Add warning banner: "⚠️ UltraReview degraded to single-model review due to <model> failure"
+3. Add warning banner: "⚠️ UltraReview degraded to single-model review due to <model> failure (reason: <failure_reason>)"
 4. Present remaining results with full consolidation format (but only one source)
 
 **Common Gemini CLI Failures:**
@@ -363,12 +371,13 @@ When Gemini CLI uses chunked processing, some chunks may succeed while others fa
 3. **Warning Banner**: Display partial completion status
 4. **Report Failed Chunks**: List which files/chunks could not be reviewed
 
-**Warning Banner Format:**
+**Warning Banner Format (use exactly this shape):**
 ```
-⚠️ UltraReview partial: X/Y chunks completed
-- Successfully reviewed: <file list or count>
-- Failed chunks: <chunk indices or file list>
-- Gemini results may be incomplete; GPT 5.4 results are complete
+⚠️ UltraReview partial (Gemini): X/Y units completed
+- Failure reason: <summary.failure_reason or partial_results>
+- Successfully reviewed files: <count>
+- Failed Gemini files: <file list or "none">
+- Consolidation uses available Gemini results plus full GPT 5.4 results
 ```
 
 **Implementation:**
@@ -380,14 +389,18 @@ import sys
 summary = json.load(open(sys.argv[1]))
 units = summary.get("units", {})
 failed_files = summary.get("files", {}).get("failed", [])
+failure_reason = summary.get("failure_reason") or "partial_results"
 if summary.get("status") == "partial" and units.get("successful", 0) > 0:
-    print(f"⚠️ UltraReview partial: {units.get('successful', 0)}/{units.get('total', 0)} units completed")
+    print(f"⚠️ UltraReview partial (Gemini): {units.get('successful', 0)}/{units.get('total', 0)} units completed")
+    print(f"- Failure reason: {failure_reason}")
     print(f"- Successfully reviewed files: {len(summary.get('files', {}).get('successful', []))}")
     if failed_files:
         print("- Failed Gemini files:")
         for file_path in failed_files:
             print(f"  - {file_path}")
-    print("- Gemini results incomplete; using available chunks only")
+    else:
+        print('- Failed Gemini files: none')
+    print("- Consolidation uses available Gemini results plus full GPT 5.4 results")
 PY
 ```
 
