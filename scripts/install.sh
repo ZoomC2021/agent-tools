@@ -639,6 +639,11 @@ install_kilocode() {
     install_agent "Kilo Code" "$PROMPTS_DIR/kilocode" "$HOME/.kilocode/prompts"
 }
 
+# Install Pi prompt templates
+install_pi() {
+    install_agent "Pi" "$PROMPTS_DIR/pi" "$HOME/.pi/agent/prompts"
+}
+
 # Install Cursor commands
 install_cursor() {
     install_agent "Cursor" "$PROMPTS_DIR/cursor" "$HOME/.cursor/commands"
@@ -703,6 +708,7 @@ main() {
     install_amp
     install_gemini
     install_kilocode
+    install_pi
     install_cursor
     install_cline
     install_roocode
@@ -744,6 +750,7 @@ else
             amp) install_amp ;;
             gemini) install_gemini ;;
             kilocode) install_kilocode ;;
+            pi) install_pi ;;
             cursor) install_cursor ;;
             cline) install_cline ;;
             roocode) install_roocode ;;

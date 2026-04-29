@@ -1,5 +1,5 @@
 # Agent Tools Installer for Windows
-# Installs VSCode Copilot prompts
+# Installs custom prompts/skills for supported coding agents
 
 $ErrorActionPreference = "Stop"
 
@@ -70,6 +70,29 @@ function Install-Cursor {
     New-Item -ItemType Directory -Path $Dest -Force | Out-Null
     Copy-Item "$SourceDir\*.md" -Destination $Dest -Force
     Write-Success "Cursor: $Dest"
+}
+
+function Install-Pi {
+    Write-Info "Installing Pi prompt templates..."
+
+    $SourceDir = Join-Path $PromptsDir "pi"
+
+    if (-not (Test-Path -PathType Container $SourceDir)) {
+        Write-Warn "Source directory not found: $SourceDir"
+        return
+    }
+
+    $SourceFiles = Get-ChildItem -Path $SourceDir -Filter "*.md"
+    if ($SourceFiles.Count -eq 0) {
+        Write-Warn "No .md files found in $SourceDir"
+        return
+    }
+
+    $Dest = Join-Path $env:USERPROFILE ".pi\agent\prompts"
+
+    New-Item -ItemType Directory -Path $Dest -Force | Out-Null
+    Copy-Item "$SourceDir\*.md" -Destination $Dest -Force
+    Write-Success "Pi: $Dest"
 }
 
 function Install-Windsurf {
@@ -574,6 +597,7 @@ Write-Host ""
 
 Install-VSCodeCopilot
 Install-Cursor
+Install-Pi
 Install-RooCode
 Install-Windsurf
 Install-OpenCode

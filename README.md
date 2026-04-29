@@ -174,6 +174,7 @@ See `prompts/opencode/opencode.json.example` for the full configuration structur
 | [Claude Code](https://claude.ai) | CLI | `~/.claude/commands/` |
 | [Codex](https://github.com/openai/codex) | CLI | `~/.codex/skills/` |
 | [OpenCode](https://opencode.ai) | CLI | `~/.config/opencode/commands/` |
+| [Pi](https://pi.dev) | CLI | `~/.pi/agent/prompts/` |
 | [Antigravity](https://antigravity.dev) | Editor | `~/.antigravity/prompts/` or `~/Library/.../Antigravity/User/prompts/` |
 | [VSCode Copilot](https://github.com/features/copilot) | Editor | `~/.config/Code/User/prompts/` or `~/Library/.../Code/User/prompts/` |
 | [Copilot CLI](https://githubnext.com/projects/copilot-cli) | CLI | `~/.copilot/agents/` |
@@ -201,7 +202,7 @@ cd agent-tools
 ./scripts/install.sh claude codex amp
 ```
 
-Available options: `claude`, `codex`, `opencode`, `antigravity`, `vscode`, `copilot-cli`, `amp`, `gemini`, `kilocode`, `cursor`, `cline`, `roocode`, `windsurf`
+Available options: `claude`, `codex`, `opencode`, `pi`, `antigravity`, `vscode`, `copilot-cli`, `amp`, `gemini`, `kilocode`, `cursor`, `cline`, `roocode`, `windsurf`
 
 ## Manual Installation
 
@@ -267,6 +268,15 @@ cp prompts/opencode/opencode.json.example ~/.config/opencode/opencode.json
 **Note**: `github-librarian` requires `gh` to be installed and authenticated. `docs-research` works best when `websearch` is available, which OpenCode enables when using the OpenCode provider or when `OPENCODE_ENABLE_EXA=1` is set.
 
 See [Opencode Codex53-Kimi Setup](#opencode-codex53-kimi-setup-primary-agent-architecture) for architecture details.
+</details>
+
+<details>
+<summary>Pi</summary>
+
+```bash
+mkdir -p ~/.pi/agent/prompts
+cp prompts/pi/*.md ~/.pi/agent/prompts/
+```
 </details>
 
 <details>
@@ -432,6 +442,15 @@ cp prompts/opencode/opencode.json.example ~/.config/opencode/opencode.json
 **Note**: `github-librarian` requires `gh` to be installed and authenticated. `docs-research` works best when `websearch` is available, which OpenCode enables when using the OpenCode provider or when `OPENCODE_ENABLE_EXA=1` is set.
 
 See [Opencode Codex53-Kimi Setup](#opencode-codex53-kimi-setup-primary-agent-architecture) for architecture details.
+</details>
+
+<details>
+<summary>Pi</summary>
+
+```bash
+mkdir -p ~/.pi/agent/prompts
+cp prompts/pi/*.md ~/.pi/agent/prompts/
+```
 </details>
 
 <details>
