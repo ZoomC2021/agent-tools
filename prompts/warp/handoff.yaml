@@ -1,0 +1,51 @@
+name: Handoff
+description: Summarize current work so another session or agent can continue without losing context.
+tags:
+  - ai
+  - context
+  - handoff
+command: |
+  Generate a structured handoff context for continuing the current work in a new session.
+
+  Process:
+  1. Review the session context, outstanding work, modified files, and current git status.
+  2. Capture what the user asked for, what has already been completed, and the exact current state.
+  3. Identify the immediate next step, any blockers, key decisions, and validation already run.
+  4. Write the handoff in first-person continuation style so the next agent can resume work directly.
+
+  Format the result as:
+
+  HANDOFF CONTEXT
+  ===============
+
+  USER REQUESTS (AS-IS)
+  ---------------------
+  [verbatim request]
+
+  GOAL
+  ----
+  [one-line summary]
+
+  WORK COMPLETED
+  --------------
+  - [completed item]
+
+  CURRENT STATE
+  -------------
+  [where the work stands now]
+
+  PENDING TASKS
+  -------------
+  1. [next step]
+
+  BLOCKERS / RISKS
+  ----------------
+  - [if any]
+
+  KEY FILES
+  ---------
+  - [path]: [why it matters]
+
+  VALIDATION
+  ----------
+  - [commands run and results]

@@ -1,0 +1,29 @@
+name: PR Reviewer Only
+description: Fetch PR comments, summarize the issues, and produce an implementation prompt for another agent.
+tags:
+  - ai
+  - github
+  - pr
+  - review
+arguments:
+  - name: pr_number
+    description: The GitHub pull request number to review.
+command: |
+  Review GitHub pull request `{{pr_number}}`, summarize the review feedback, and generate a detailed implementation prompt for another coding agent.
+
+  Workflow:
+  1. Inspect repository info with `gh repo view --json owner,name`.
+  2. Fetch PR review comments and discussion for PR `{{pr_number}}`.
+  3. Tag comments as human or bot, then deduplicate overlapping feedback.
+  4. Read the referenced files in the current worktree so the implementation prompt includes the real local context.
+  5. Group issues by severity and explain the underlying problem, not just the comment text.
+  6. Produce a self-contained implementation prompt another agent can execute directly.
+
+  The final output must be a fenced code block containing:
+  - The problem summary.
+  - Required code changes.
+  - Relevant file paths and context.
+  - Constraints and non-goals.
+  - Validation commands to run.
+
+  Do not implement fixes yourself in this workflow. Only produce the implementation prompt.

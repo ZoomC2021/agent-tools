@@ -1,0 +1,33 @@
+name: Refactor
+description: Find and prioritize refactoring opportunities in a defined scope.
+tags:
+  - ai
+  - refactor
+  - code-health
+arguments:
+  - name: scope
+    description: File, directory, or module to analyze.
+    default_value: .
+command: |
+  Analyze `{{scope}}` and identify the most valuable refactoring opportunities.
+
+  Guard rails:
+  - Preserve behavior exactly.
+  - Do not mix refactoring with feature work.
+  - Require tests or another reliable validation approach before touching critical paths.
+  - Skip stable code that is unlikely to change again.
+  - Prefer deleting code and simplifying logic over adding new abstractions.
+
+  Workflow:
+  1. Inspect the scope and nearby code for duplication, complexity, churn, and maintenance pain.
+  2. Identify concrete refactoring opportunities.
+  3. Rank them by impact, risk, and effort.
+  4. Recommend the smallest high-value refactorings first.
+  5. If a refactor is obviously safe and requested, implement it and validate it.
+
+  Output format:
+  - Opportunity.
+  - Why it matters.
+  - Risk level.
+  - Estimated effort.
+  - Recommended next step.

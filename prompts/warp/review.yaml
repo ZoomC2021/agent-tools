@@ -1,0 +1,23 @@
+name: Review
+description: Review all uncommitted changes, fix straightforward issues, and report the rest by severity.
+tags:
+  - ai
+  - review
+  - git
+command: |
+  Review all uncommitted changes in the current repository.
+
+  Workflow:
+  1. Inspect `git diff HEAD`, `git diff --cached`, and `git status --short`.
+  2. Read the full changed files for context, not just the diff.
+  3. Look for logic bugs, regressions, unsafe assumptions, missing validation, broken contracts, and unnecessary complexity.
+  4. Run the smallest relevant lint, build, or test commands.
+  5. If there are only a few straightforward issues, fix them directly.
+  6. Report remaining issues by severity with clear file references and recommendations.
+
+  Report format:
+  - Critical
+  - Warning
+  - Suggestion
+
+  End with a short summary covering fixes made, remaining issues, and overall assessment.

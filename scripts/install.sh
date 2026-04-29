@@ -644,6 +644,38 @@ install_pi() {
     install_agent "Pi" "$PROMPTS_DIR/pi" "$HOME/.pi/agent/prompts"
 }
 
+# Install Warp workflows
+install_warp() {
+    log_info "Installing Warp workflows..."
+    local source_dir="$PROMPTS_DIR/warp"
+
+    if [[ ! -d "$source_dir" ]]; then
+        log_warn "Source directory not found: $source_dir"
+        return 0
+    fi
+
+    shopt -s nullglob
+    local files=("$source_dir"/*.yaml "$source_dir"/*.yml)
+    shopt -u nullglob
+
+    if [[ ${#files[@]} -eq 0 ]]; then
+        log_warn "No .yaml or .yml files found in $source_dir"
+        return 0
+    fi
+
+    local dest
+    if [[ "$OS" == "macos" ]]; then
+        dest="$HOME/.warp/workflows"
+    else
+        dest="${XDG_DATA_HOME:-$HOME/.local/share}/warp-terminal/workflows"
+    fi
+
+    mkdir -p "$dest"
+    cp "${files[@]}" "$dest/"
+
+    log_success "Warp: $dest"
+}
+
 # Install Cursor commands
 install_cursor() {
     install_agent "Cursor" "$PROMPTS_DIR/cursor" "$HOME/.cursor/commands"
@@ -709,6 +741,7 @@ main() {
     install_gemini
     install_kilocode
     install_pi
+    install_warp
     install_cursor
     install_cline
     install_roocode
@@ -751,6 +784,7 @@ else
             gemini) install_gemini ;;
             kilocode) install_kilocode ;;
             pi) install_pi ;;
+            warp) install_warp ;;
             cursor) install_cursor ;;
             cline) install_cline ;;
             roocode) install_roocode ;;

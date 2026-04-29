@@ -1,0 +1,37 @@
+name: Deslop
+description: Run a focused code-quality pass that improves clarity without speculative refactoring.
+tags:
+  - ai
+  - quality
+  - refactor
+  - review
+arguments:
+  - name: target
+    description: File, directory, or code area to analyze.
+    default_value: .
+command: |
+  Run a focused deslop pass on `{{target}}`.
+
+  Goal:
+  Improve code quality with the smallest cohesive set of changes that materially reduces complexity, duplication, confusion, or maintenance burden.
+
+  Working rules:
+  - Start with a quick scan only. Learn the repository shape, the likely validation commands, and the files in scope before editing.
+  - Prefer small, local improvements over speculative abstractions.
+  - Preserve existing behavior unless a bug is clearly part of the problem.
+  - Reduce cognitive load: simpler control flow, clearer naming, less indirection, fewer moving pieces.
+  - Remove dead code, obvious duplication, and unnecessary helpers when it makes the code easier to understand.
+  - Keep one-time logic inline unless extracting it hides real complexity or names a real domain concept.
+  - Do not clean up unrelated areas.
+
+  Process:
+  1. Inspect the target and surrounding files.
+  2. Identify the highest-leverage issues worth fixing now.
+  3. Apply the smallest useful batch of fixes.
+  4. Run the smallest relevant validation commands.
+  5. Summarize what changed, what improved, and any issues intentionally left alone.
+
+  Report:
+  - Fixed issues.
+  - Remaining issues worth future attention.
+  - Validation performed.

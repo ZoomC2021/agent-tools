@@ -1,0 +1,26 @@
+name: PR Reviewer
+description: Fetch PR comments, apply the fixes, and summarize what changed.
+tags:
+  - ai
+  - github
+  - pr
+  - review
+arguments:
+  - name: pr_number
+    description: The GitHub pull request number to review.
+command: |
+  Review GitHub pull request `{{pr_number}}`, address the review feedback, and summarize the outcome.
+
+  Workflow:
+  1. Inspect repository info with `gh repo view --json owner,name`.
+  2. Fetch PR review comments and discussion for PR `{{pr_number}}`.
+  3. Tag comments as human or bot, then deduplicate overlapping feedback.
+  4. Read the referenced files in the current worktree before making changes.
+  5. Apply the smallest correct fixes for the valid issues.
+  6. Run the smallest relevant validation commands.
+  7. Summarize what was fixed, any comments that were intentionally not addressed, and any follow-up risks.
+
+  Constraints:
+  - Preserve behavior unless the review is explicitly pointing out a bug.
+  - Do not rewrite unrelated code.
+  - If feedback conflicts, explain the conflict before choosing a direction.

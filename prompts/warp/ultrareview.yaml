@@ -1,0 +1,22 @@
+name: UltraReview
+description: Run a dual-model review using Warp's current model plus Gemini CLI and consolidate the findings.
+tags:
+  - ai
+  - review
+  - gemini
+  - git
+command: |
+  Run a dual-model review of the current uncommitted changes using Warp's current agent model and Gemini CLI, then consolidate the results.
+
+  Workflow:
+  1. Gather context with `git diff HEAD`, `git diff --cached`, and `git status --short`.
+  2. Save the combined diff to a temporary file.
+  3. Review the changes yourself for correctness, regressions, and risk.
+  4. In parallel or sequence, run Gemini CLI against the saved diff using a strong review prompt.
+  5. Compare the findings from both reviews.
+  6. Merge the results into a single report that calls out duplicates, conflicts, and highest-confidence issues first.
+
+  Constraints:
+  - Prefer concrete, actionable findings with file references.
+  - Report "No issues found" if both reviews are clean.
+  - Mention if Gemini CLI is unavailable or unauthenticated.

@@ -95,6 +95,31 @@ function Install-Pi {
     Write-Success "Pi: $Dest"
 }
 
+function Install-Warp {
+    Write-Info "Installing Warp workflows..."
+
+    $SourceDir = Join-Path $PromptsDir "warp"
+
+    if (-not (Test-Path -PathType Container $SourceDir)) {
+        Write-Warn "Source directory not found: $SourceDir"
+        return
+    }
+
+    $SourceFiles = Get-ChildItem -Path $SourceDir -File | Where-Object {
+        $_.Extension -in ".yaml", ".yml"
+    }
+    if ($SourceFiles.Count -eq 0) {
+        Write-Warn "No .yaml or .yml files found in $SourceDir"
+        return
+    }
+
+    $Dest = Join-Path $env:APPDATA "warp\Warp\data\workflows"
+
+    New-Item -ItemType Directory -Path $Dest -Force | Out-Null
+    Copy-Item $SourceFiles.FullName -Destination $Dest -Force
+    Write-Success "Warp: $Dest"
+}
+
 function Install-Windsurf {
     Write-Info "Installing Windsurf skills..."
     
@@ -598,6 +623,7 @@ Write-Host ""
 Install-VSCodeCopilot
 Install-Cursor
 Install-Pi
+Install-Warp
 Install-RooCode
 Install-Windsurf
 Install-OpenCode

@@ -175,6 +175,7 @@ See `prompts/opencode/opencode.json.example` for the full configuration structur
 | [Codex](https://github.com/openai/codex) | CLI | `~/.codex/skills/` |
 | [OpenCode](https://opencode.ai) | CLI | `~/.config/opencode/commands/` |
 | [Pi](https://pi.dev) | CLI | `~/.pi/agent/prompts/` |
+| [Warp](https://www.warp.dev) | CLI/Editor | `~/.warp/workflows/` or `${XDG_DATA_HOME:-$HOME/.local/share}/warp-terminal/workflows/` or `%APPDATA%\warp\Warp\data\workflows\` |
 | [Antigravity](https://antigravity.dev) | Editor | `~/.antigravity/prompts/` or `~/Library/.../Antigravity/User/prompts/` |
 | [VSCode Copilot](https://github.com/features/copilot) | Editor | `~/.config/Code/User/prompts/` or `~/Library/.../Code/User/prompts/` |
 | [Copilot CLI](https://githubnext.com/projects/copilot-cli) | CLI | `~/.copilot/agents/` |
@@ -199,10 +200,10 @@ cd agent-tools
 ### Specific Agents
 
 ```bash
-./scripts/install.sh claude codex amp
+./scripts/install.sh claude codex amp warp
 ```
 
-Available options: `claude`, `codex`, `opencode`, `pi`, `antigravity`, `vscode`, `copilot-cli`, `amp`, `gemini`, `kilocode`, `cursor`, `cline`, `roocode`, `windsurf`
+Available options: `claude`, `codex`, `opencode`, `pi`, `warp`, `antigravity`, `vscode`, `copilot-cli`, `amp`, `gemini`, `kilocode`, `cursor`, `cline`, `roocode`, `windsurf`
 
 ## Manual Installation
 
@@ -277,6 +278,17 @@ See [Opencode Codex53-Kimi Setup](#opencode-codex53-kimi-setup-primary-agent-arc
 mkdir -p ~/.pi/agent/prompts
 cp prompts/pi/*.md ~/.pi/agent/prompts/
 ```
+</details>
+
+<details>
+<summary>Warp</summary>
+
+```bash
+mkdir -p ~/.warp/workflows
+cp prompts/warp/*.yaml ~/.warp/workflows/
+```
+
+Open Warp Command Palette or Workflow Search, select the workflow, and run it in Agent Mode.
 </details>
 
 <details>
@@ -451,6 +463,17 @@ See [Opencode Codex53-Kimi Setup](#opencode-codex53-kimi-setup-primary-agent-arc
 mkdir -p ~/.pi/agent/prompts
 cp prompts/pi/*.md ~/.pi/agent/prompts/
 ```
+</details>
+
+<details>
+<summary>Warp</summary>
+
+```bash
+mkdir -p ${XDG_DATA_HOME:-$HOME/.local/share}/warp-terminal/workflows
+cp prompts/warp/*.yaml ${XDG_DATA_HOME:-$HOME/.local/share}/warp-terminal/workflows/
+```
+
+Open Warp Command Palette or Workflow Search, select the workflow, and run it in Agent Mode.
 </details>
 
 <details>

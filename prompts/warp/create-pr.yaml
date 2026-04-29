@@ -1,0 +1,28 @@
+name: Create PR
+description: Stage, commit, push, and open a GitHub pull request from the current branch.
+tags:
+  - ai
+  - git
+  - github
+  - pr
+arguments:
+  - name: base_branch
+    description: The branch to compare against when drafting the PR.
+    default_value: main
+command: |
+  Create a pull request from the current git changes.
+
+  Workflow:
+  1. Check `git status --short` and `git branch --show-current`.
+  2. If the current branch is `main` or `master`, create a descriptive feature branch first.
+  3. Stage all changes with `git add -A`.
+  4. Review the staged diff and generate a conventional commit message.
+  5. Commit and push the branch.
+  6. Compare against `{{base_branch}}` to draft a clear PR title and body.
+  7. Create the PR with `gh pr create`.
+  8. Report the branch name, PR URL, PR title, and any validation you ran.
+
+  Constraints:
+  - Run the smallest relevant build, lint, or test commands if they are available.
+  - Never force-push or rewrite shared history.
+  - If a PR already exists for this branch, return that URL instead of creating a duplicate.
