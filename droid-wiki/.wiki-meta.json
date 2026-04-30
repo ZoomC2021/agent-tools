@@ -2,7 +2,7 @@
   "generatedAt": "2026-04-30T00:00:00Z",
   "commitHash": "afb5d32707fd7b4da539318443cda2457365a81f",
   "branch": "main",
-  "pageCount": 47,
+  "pageCount": 48,
   "topLevelSections": [
     "overview",
     "by-the-numbers",
@@ -12,6 +12,7 @@
     "features",
     "agent-targets",
     "cleanup-opportunities",
+    "deployment",
     "reference",
     "maintainers"
   ],
@@ -56,6 +57,7 @@
     "agent-targets/copilot-cli.md",
     "agent-targets/antigravity.md",
     "cleanup-opportunities/index.md",
+    "deployment.md",
     "reference/index.md",
     "reference/configuration.md",
     "reference/data-models.md",
