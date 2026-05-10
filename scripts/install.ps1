@@ -663,13 +663,13 @@ function Install-Droid {
         Write-Warn "No skills found in $SkillsSource"
     }
 
-    # Install Droid dependency for github-librarian droid
-    $GhLibrarianSource = Join-Path $PromptsDir "opencode\bin\opencode-gh-librarian"
-    $GhLibrarianDest = Join-Path $env:USERPROFILE ".config\opencode\bin"
+    # Install Droid-specific helper for github-librarian droid
+    $GhLibrarianSource = Join-Path $SourceDir "bin\droid-gh-librarian"
+    $GhLibrarianDest = Join-Path $env:USERPROFILE ".factory\bin"
     if (Test-Path $GhLibrarianSource) {
         New-Item -ItemType Directory -Path $GhLibrarianDest -Force | Out-Null
         Copy-Item $GhLibrarianSource -Destination $GhLibrarianDest -Force
-        Write-Success "Droid helper script 'opencode-gh-librarian': $GhLibrarianDest"
+        Write-Success "Droid helper script 'droid-gh-librarian': $GhLibrarianDest"
     } else {
         Write-Warn "Droid helper script not found: $GhLibrarianSource"
     }

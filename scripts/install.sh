@@ -685,14 +685,14 @@ install_droid() {
         log_warn "No skills found in $skills_source"
     fi
 
-    # Install Droid dependency for github-librarian droid
-    local gh_librarian_source="$PROMPTS_DIR/opencode/bin/opencode-gh-librarian"
-    local gh_librarian_dest="$HOME/.config/opencode/bin"
+    # Install Droid-specific helper for github-librarian droid
+    local gh_librarian_source="$source_dir/bin/droid-gh-librarian"
+    local gh_librarian_dest="$HOME/.factory/bin"
     if [[ -f "$gh_librarian_source" ]]; then
         mkdir -p "$gh_librarian_dest"
         cp "$gh_librarian_source" "$gh_librarian_dest/"
-        chmod +x "$gh_librarian_dest/opencode-gh-librarian"
-        log_success "Droid helper script 'opencode-gh-librarian': $gh_librarian_dest"
+        chmod +x "$gh_librarian_dest/droid-gh-librarian"
+        log_success "Droid helper script 'droid-gh-librarian': $gh_librarian_dest"
     else
         log_warn "Droid helper script not found: $gh_librarian_source"
     fi
