@@ -634,6 +634,70 @@ install_gemini() {
     fi
 }
 
+# Install Factory Droid custom droids and skills
+install_droid() {
+    log_info "Installing Droid droids and skills..."
+    local source_dir="$PROMPTS_DIR/droid"
+
+    if [[ ! -d "$source_dir" ]]; then
+        log_warn "Source directory not found: $source_dir"
+        return 0
+    fi
+
+    local droids_source="$source_dir/droids"
+    local droids_dest="$HOME/.factory/droids"
+    if [[ -d "$droids_source" ]]; then
+        shopt -s nullglob
+        local droid_files=("$droids_source"/*.md)
+        shopt -u nullglob
+        if [[ ${#droid_files[@]} -gt 0 ]]; then
+            mkdir -p "$droids_dest"
+            cp "$droids_source"/*.md "$droids_dest/"
+            log_success "Droid custom droids: $droids_dest"
+        else
+            log_warn "No .md files found in $droids_source"
+        fi
+    else
+        log_warn "Droid droids source directory not found: $droids_source"
+    fi
+
+    local skills_source="$source_dir/skills"
+    local skills_dest="$HOME/.factory/skills"
+    local skills_found=0
+    if [[ -d "$skills_source" ]]; then
+        for skill_dir in "$skills_source"/*/; do
+            if [[ ! -d "$skill_dir" ]]; then
+                continue
+            fi
+            local skill_name=$(basename "$skill_dir")
+            if [[ ! -f "$skill_dir/SKILL.md" ]]; then
+                log_warn "Skipping Droid skill '$skill_name': missing SKILL.md"
+                continue
+            fi
+            mkdir -p "$skills_dest/$skill_name"
+            cp -r "$skill_dir"* "$skills_dest/$skill_name/"
+            log_success "Droid skill '$skill_name': $skills_dest/$skill_name"
+            skills_found=1
+        done
+    fi
+
+    if [[ $skills_found -eq 0 ]]; then
+        log_warn "No skills found in $skills_source"
+    fi
+
+    # Install Droid dependency for github-librarian droid
+    local gh_librarian_source="$PROMPTS_DIR/opencode/bin/opencode-gh-librarian"
+    local gh_librarian_dest="$HOME/.config/opencode/bin"
+    if [[ -f "$gh_librarian_source" ]]; then
+        mkdir -p "$gh_librarian_dest"
+        cp "$gh_librarian_source" "$gh_librarian_dest/"
+        chmod +x "$gh_librarian_dest/opencode-gh-librarian"
+        log_success "Droid helper script 'opencode-gh-librarian': $gh_librarian_dest"
+    else
+        log_warn "Droid helper script not found: $gh_librarian_source"
+    fi
+}
+
 # Install Kilo Code prompts
 install_kilocode() {
     install_agent "Kilo Code" "$PROMPTS_DIR/kilocode" "$HOME/.kilocode/prompts"
@@ -739,6 +803,7 @@ main() {
     install_copilot_cli
     install_amp
     install_gemini
+    install_droid
     install_kilocode
     install_pi
     install_warp
@@ -762,6 +827,11 @@ main() {
     echo "  - pr-reviewer-only : Generate implementation prompt for PR feedback"
     echo "  - create-pr        : Create PR from current changes"
     echo "  - deslop           : Analyze code for quality issues using coding principles"
+    echo "  - oracle           : Consult a deep-reasoning oracle subagent"
+    echo "  - predict-issues   : Predict likely future code issues"
+    echo "  - github-librarian : Remote GitHub code research droid"
+    echo "  - docs-research    : Official docs and API research droid"
+    echo "  - walkthrough      : Local architecture walkthrough droid"
     echo ""
     echo "You may need to restart your editors/terminals"
     echo "to pick up the new prompts/skills."
@@ -782,6 +852,7 @@ else
             copilot-cli) install_copilot_cli ;;
             amp) install_amp ;;
             gemini) install_gemini ;;
+            droid|factory) install_droid ;;
             kilocode) install_kilocode ;;
             pi) install_pi ;;
             warp) install_warp ;;

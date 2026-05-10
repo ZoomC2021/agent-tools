@@ -614,6 +614,67 @@ function Install-Gemini {
     }
 }
 
+function Install-Droid {
+    Write-Info "Installing Droid droids and skills..."
+
+    $SourceDir = Join-Path $PromptsDir "droid"
+
+    if (-not (Test-Path -PathType Container $SourceDir)) {
+        Write-Warn "Source directory not found: $SourceDir"
+        return
+    }
+
+    $DroidsSource = Join-Path $SourceDir "droids"
+    $DroidsDest = Join-Path $env:USERPROFILE ".factory\droids"
+    if (Test-Path -PathType Container $DroidsSource) {
+        $DroidFiles = Get-ChildItem -Path $DroidsSource -Filter "*.md"
+        if ($DroidFiles.Count -eq 0) {
+            Write-Warn "No .md files found in $DroidsSource"
+        } else {
+            New-Item -ItemType Directory -Path $DroidsDest -Force | Out-Null
+            Copy-Item $DroidFiles.FullName -Destination $DroidsDest -Force
+            Write-Success "Droid custom droids: $DroidsDest"
+        }
+    } else {
+        Write-Warn "Droid droids source directory not found: $DroidsSource"
+    }
+
+    $SkillsSource = Join-Path $SourceDir "skills"
+    $SkillsDest = Join-Path $env:USERPROFILE ".factory\skills"
+    $skillsFound = 0
+    if (Test-Path -PathType Container $SkillsSource) {
+        $SkillDirs = Get-ChildItem -Path $SkillsSource -Directory
+        foreach ($dir in $SkillDirs) {
+            $skillName = $dir.Name
+            $skillMd = Join-Path $dir.FullName "SKILL.md"
+            if (-not (Test-Path $skillMd)) {
+                Write-Warn "Skipping Droid skill '$skillName': missing SKILL.md"
+                continue
+            }
+            $SkillDest = Join-Path $SkillsDest $skillName
+            New-Item -ItemType Directory -Path $SkillDest -Force | Out-Null
+            Copy-Item "$($dir.FullName)\*" -Destination $SkillDest -Recurse -Force
+            Write-Success "Droid skill '$skillName': $SkillDest"
+            $skillsFound++
+        }
+    }
+
+    if ($skillsFound -eq 0) {
+        Write-Warn "No skills found in $SkillsSource"
+    }
+
+    # Install Droid dependency for github-librarian droid
+    $GhLibrarianSource = Join-Path $PromptsDir "opencode\bin\opencode-gh-librarian"
+    $GhLibrarianDest = Join-Path $env:USERPROFILE ".config\opencode\bin"
+    if (Test-Path $GhLibrarianSource) {
+        New-Item -ItemType Directory -Path $GhLibrarianDest -Force | Out-Null
+        Copy-Item $GhLibrarianSource -Destination $GhLibrarianDest -Force
+        Write-Success "Droid helper script 'opencode-gh-librarian': $GhLibrarianDest"
+    } else {
+        Write-Warn "Droid helper script not found: $GhLibrarianSource"
+    }
+}
+
 Write-Host ""
 Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host "       Agent Tools Installer (Windows)"
@@ -628,6 +689,7 @@ Install-RooCode
 Install-Windsurf
 Install-OpenCode
 Install-Gemini
+Install-Droid
 
 Write-Host ""
 Write-Host "==========================================" -ForegroundColor Cyan
@@ -644,6 +706,11 @@ Write-Host "  - PR-Reviewer      : Address PR review feedback"
 Write-Host "  - PR-Reviewer-Only : Generate implementation prompt for PR feedback"
 Write-Host "  - Create-PR        : Create PR from current changes"
 Write-Host "  - Deslop           : Analyze code for quality issues using coding principles"
+Write-Host "  - Oracle           : Consult a deep-reasoning oracle subagent"
+Write-Host "  - Predict-Issues   : Predict likely future code issues"
+Write-Host "  - GitHub-Librarian : Remote GitHub code research droid"
+Write-Host "  - Docs-Research    : Official docs and API research droid"
+Write-Host "  - Walkthrough      : Local architecture walkthrough droid"
 Write-Host ""
 Write-Host "You may need to restart your editors to pick up the new prompts."
 Write-Host ""

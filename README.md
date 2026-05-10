@@ -11,8 +11,14 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 | **ultrareview** | Parallel dual-model review using GPT 5.4 + Gemini 3.1 Pro Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
 | **ultrareview-lite** | Parallel dual-model review using Kimi 2.5 Turbo + Gemini 3 Flash Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
 | **pr-reviewer** | Fetch PR comments, summarize issues, address them, update PR |
+| **pr-reviewer-only** | Fetch PR comments, summarize issues, generate implementation prompt for another agent |
 | **create-pr** | Create PR with auto-generated title and description |
 | **deslop** | Analyze code for quality issues using established software engineering principles |
+| **predict-issues** | Analyze codebase to predict potential problems before they impact the project |
+| **oracle** | Consult a deep-reasoning oracle subagent for complex bugs, architecture tradeoffs, and risky reviews |
+| **github-librarian** | Read-only remote GitHub code research on default-branch snapshots |
+| **docs-research** | Research official documentation and external API behavior using web sources |
+| **walkthrough** | Explain local architecture and code flow with evidence-backed walkthroughs |
 
 ## Opencode Codex53-Kimi Setup (Primary Agent Architecture)
 
@@ -181,6 +187,7 @@ See `prompts/opencode/opencode.json.example` for the full configuration structur
 | [Copilot CLI](https://githubnext.com/projects/copilot-cli) | CLI | `~/.copilot/agents/` |
 | [Amp](https://ampcode.com) | CLI/Editor | `~/.config/agents/skills/` |
 | [Gemini CLI](https://github.com/google-gemini/gemini-cli) | CLI | `~/.gemini/skills/` |
+| [Droid](https://factory.ai) | CLI/Editor | `~/.factory/droids/` and `~/.factory/skills/` |
 | [Kilo Code](https://kilocode.com) | CLI | `~/.kilocode/prompts/` |
 | [Cursor](https://cursor.com) | Editor | `~/.cursor/commands/` |
 | [Cline](https://cline.bot) | Editor | `~/Documents/Cline/Rules/` |
@@ -203,7 +210,7 @@ cd agent-tools
 ./scripts/install.sh claude codex amp warp
 ```
 
-Available options: `claude`, `codex`, `opencode`, `pi`, `warp`, `antigravity`, `vscode`, `copilot-cli`, `amp`, `gemini`, `kilocode`, `cursor`, `cline`, `roocode`, `windsurf`
+Available options: `claude`, `codex`, `opencode`, `pi`, `warp`, `antigravity`, `vscode`, `copilot-cli`, `amp`, `gemini`, `droid`, `kilocode`, `cursor`, `cline`, `roocode`, `windsurf`
 
 ## Manual Installation
 
@@ -342,6 +349,24 @@ for skill_dir in prompts/gemini/*/; do
   gemini skills install "$skill_dir" --scope user --consent
 done
 ```
+</details>
+
+<details>
+<summary>Droid</summary>
+
+```bash
+mkdir -p ~/.factory/droids ~/.factory/skills ~/.config/opencode/bin
+cp prompts/droid/droids/*.md ~/.factory/droids/
+cp -r prompts/droid/skills/* ~/.factory/skills/
+cp prompts/opencode/bin/opencode-gh-librarian ~/.config/opencode/bin/
+chmod +x ~/.config/opencode/bin/opencode-gh-librarian
+```
+
+**Droids:** `oracle` (deep reasoning), `gemini-3-1-pro-reviewer` (Gemini 3.1 Pro read-only review), `github-librarian` (remote GitHub research), `docs-research` (official docs/API research), `walkthrough` (architecture walkthroughs with Mermaid diagrams)
+
+**Skills:** `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`
+
+The shipped `oracle` droid uses Factory's built-in `gpt-5.4` with `reasoningEffort: high`. If your Factory plan or workspace cannot access `gpt-5.4`, change `~/.factory/droids/oracle.md` to `model: inherit` or to a configured BYOK model such as `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
 </details>
 
 <details>
@@ -526,6 +551,24 @@ for skill_dir in prompts/gemini/*/; do
   gemini skills install "$skill_dir" --scope user --consent
 done
 ```
+</details>
+
+<details>
+<summary>Droid</summary>
+
+```bash
+mkdir -p ~/.factory/droids ~/.factory/skills ~/.config/opencode/bin
+cp prompts/droid/droids/*.md ~/.factory/droids/
+cp -r prompts/droid/skills/* ~/.factory/skills/
+cp prompts/opencode/bin/opencode-gh-librarian ~/.config/opencode/bin/
+chmod +x ~/.config/opencode/bin/opencode-gh-librarian
+```
+
+**Droids:** `oracle` (deep reasoning), `gemini-3-1-pro-reviewer` (Gemini 3.1 Pro read-only review), `github-librarian` (remote GitHub research), `docs-research` (official docs/API research), `walkthrough` (architecture walkthroughs with Mermaid diagrams)
+
+**Skills:** `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`
+
+The shipped `oracle` droid uses Factory's built-in `gpt-5.4` with `reasoningEffort: high`. If your Factory plan or workspace cannot access `gpt-5.4`, change `~/.factory/droids/oracle.md` to `model: inherit` or to a configured BYOK model such as `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
 </details>
 
 <details>
