@@ -1,3 +1,8 @@
+---
+name: ultrareview
+description: Run a dual-model review with Droid-native GPT-5.4 and Gemini 3.1 Pro subagents.
+---
+
 # ultrareview
 
 Run a dual-model review with Droid-native subagents: GPT-5.4 high-reasoning and Gemini 3.1 Pro.

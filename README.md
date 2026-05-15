@@ -364,7 +364,7 @@ chmod +x ~/.config/opencode/bin/opencode-gh-librarian
 
 **Droids:** `oracle` (deep reasoning), `gemini-3-1-pro-reviewer` (Gemini 3.1 Pro read-only review), `github-librarian` (remote GitHub research), `docs-research` (official docs/API research), `walkthrough` (architecture walkthroughs with Mermaid diagrams)
 
-**Skills:** `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`
+**Skills:** `oracle`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`
 
 The shipped `oracle` droid uses Factory's built-in `gpt-5.4` with `reasoningEffort: high`. If your Factory plan or workspace cannot access `gpt-5.4`, change `~/.factory/droids/oracle.md` to `model: inherit` or to a configured BYOK model such as `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
 </details>
@@ -566,7 +566,7 @@ chmod +x ~/.config/opencode/bin/opencode-gh-librarian
 
 **Droids:** `oracle` (deep reasoning), `gemini-3-1-pro-reviewer` (Gemini 3.1 Pro read-only review), `github-librarian` (remote GitHub research), `docs-research` (official docs/API research), `walkthrough` (architecture walkthroughs with Mermaid diagrams)
 
-**Skills:** `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`
+**Skills:** `oracle`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`
 
 The shipped `oracle` droid uses Factory's built-in `gpt-5.4` with `reasoningEffort: high`. If your Factory plan or workspace cannot access `gpt-5.4`, change `~/.factory/droids/oracle.md` to `model: inherit` or to a configured BYOK model such as `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
 </details>

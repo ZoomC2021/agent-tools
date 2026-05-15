@@ -1,3 +1,8 @@
+---
+name: predict-issues
+description: Analyze a codebase to predict potential problems before they impact the project.
+---
+
 # Predictive Code Analysis
 
 Analyze codebase to predict potential problems before they impact the project.

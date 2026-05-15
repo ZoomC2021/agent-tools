@@ -1,3 +1,8 @@
+---
+name: pr-reviewer
+description: Fetch PR comments, summarize issues, address them, commit and update PR.
+---
+
 # PR Reviewer
 
 Fetch all comments from a GitHub PR, summarize issues, address them, and update the PR.

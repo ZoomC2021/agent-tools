@@ -1,3 +1,8 @@
+---
+name: pr-reviewer-only
+description: Fetch PR comments, summarize issues, and generate implementation prompt for another agent.
+---
+
 # PR Reviewer (Review Only)
 
 Fetch all comments from a GitHub PR, summarize issues, and generate a detailed implementation prompt for a coding agent to resolve them.
