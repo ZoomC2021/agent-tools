@@ -581,7 +581,7 @@ install_amp() {
         fi
         local skill_name=$(basename "$skill_dir")
         mkdir -p "$dest/$skill_name"
-        cp "$skill_dir"* "$dest/$skill_name/"
+        cp -r "$skill_dir"* "$dest/$skill_name/"
     done
     log_success "Amp: $dest"
 }
@@ -777,7 +777,7 @@ install_windsurf() {
             continue
         fi
         mkdir -p "$dest/$skill_name"
-        cp "$skill_dir"* "$dest/$skill_name/"
+        cp -r "$skill_dir"* "$dest/$skill_name/"
         log_success "Windsurf skill '$skill_name': $dest/$skill_name"
         skills_found=1
     done

@@ -702,6 +702,48 @@
       "hidden": true,
       "prompt": "{file:./commands/deslop.md}"
     },
+    "diagnose": {
+      "description": "Debug bugs and performance regressions with a disciplined reproduce/minimize/hypothesize/instrument/fix/regression-test loop.",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./commands/diagnose.md}"
+    },
+    "tdd": {
+      "description": "Build features or fixes using a test-driven red-green-refactor workflow.",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./commands/tdd.md}"
+    },
+    "grill-me": {
+      "description": "Stress-test a plan or design through structured questioning before implementation.",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./commands/grill-me.md}"
+    },
+    "to-prd": {
+      "description": "Convert current context into a product requirements document.",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./commands/to-prd.md}"
+    },
+    "to-issues": {
+      "description": "Break a plan or PRD into independently shippable vertical-slice issues.",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./commands/to-issues.md}"
+    },
+    "triage": {
+      "description": "Triage issues through a state machine of readiness roles.",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./commands/triage.md}"
+    },
     "pr-reviewer": {
       "description": "Fetch PR feedback and apply fixes on the PR branch.",
       "mode": "subagent",

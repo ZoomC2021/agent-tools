@@ -143,7 +143,7 @@ function Install-Windsurf {
         }
         $SkillDest = Join-Path $Dest $skillName
         New-Item -ItemType Directory -Path $SkillDest -Force | Out-Null
-        Copy-Item "$($dir.FullName)\*" -Destination $SkillDest -Force
+        Copy-Item "$($dir.FullName)\*" -Destination $SkillDest -Recurse -Force
         Write-Success "Windsurf skill '$skillName': $SkillDest"
         $skillsFound++
     }
