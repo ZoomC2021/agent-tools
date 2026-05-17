@@ -744,6 +744,27 @@
       "hidden": true,
       "prompt": "{file:./commands/triage.md}"
     },
+    "create-cli": {
+      "description": "Design CLI UX/specs covering args, flags, help, output, errors, config, dry-run, and exit codes.",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./commands/create-cli.md}"
+    },
+    "frontend-design": {
+      "description": "Build distinctive production frontend UI for pages, apps, and components without generic AI-slop design.",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./commands/frontend-design.md}"
+    },
+    "markdown-converter": {
+      "description": "Convert PDFs, Office docs, HTML, data files, media, ZIPs, and YouTube URLs to Markdown using markitdown.",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./commands/markdown-converter.md}"
+    },
     "pr-reviewer": {
       "description": "Fetch PR feedback and apply fixes on the PR branch.",
       "mode": "subagent",
