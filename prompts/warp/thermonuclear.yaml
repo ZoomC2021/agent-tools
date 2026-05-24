@@ -1,0 +1,66 @@
+name: Thermonuclear
+description: Run an extremely strict maintainability review for abstraction quality, giant files, and spaghetti-condition growth.
+tags:
+  - ai
+  - quality
+  - review
+arguments:
+  - name: target
+    description: File, directory, or code area to analyze.
+    default_value: .
+command: |
+  Run a thermo-nuclear code quality review on `{{target}}`.
+
+  Goal:
+  Perform a deep code quality audit focused on implementation quality, maintainability, abstraction quality, and codebase health.
+
+  Be ambitious about structural simplification. Look for "code judo" moves: restructurings that preserve behavior while making the implementation dramatically simpler, smaller, more direct, and more elegant.
+
+  Standards:
+  - Do not let a PR push a file from under 1k lines to over 1k lines without a very strong reason
+  - Do not allow random spaghetti growth in existing code
+  - Bias toward cleaning the design, not just accepting working code
+  - Prefer direct, boring, maintainable code over hacky or magical code
+  - Push hard on type and boundary cleanliness when they affect maintainability
+  - Keep logic in the canonical layer and reuse existing helpers
+  - Treat unnecessary sequential orchestration and non-atomic updates as design smells
+
+  Review questions:
+  - Is there a "code judo" move that would make this dramatically simpler?
+  - Can this change be reframed so fewer concepts, branches, or helper layers are needed?
+  - Does this improve or worsen the local architecture?
+  - Did the diff add branching complexity where a better abstraction should exist?
+  - Did a previously cohesive module become more coupled, more stateful, or harder to scan?
+  - Is this logic living in the right file and layer?
+  - Did this change enlarge a file or component past a healthy size boundary?
+  - Are there repeated conditionals that signal a missing model or missing helper?
+  - Is the implementation direct and legible?
+  - Is this abstraction actually earning its keep, or is it just a wrapper?
+  - Did the diff introduce casts, optionality, or ad-hoc object shapes that obscure the real invariant?
+  - Is this orchestration more sequential or less atomic than it needs to be?
+
+  Flag aggressively:
+  - Files crossing 1000 lines due to the PR
+  - New conditionals bolted onto unrelated code paths
+  - Feature-specific logic leaking into general-purpose modules
+  - Generic "magic" handling that hides simple structure
+  - Thin wrappers or identity abstractions without simplifying anything
+  - Unnecessary casts, any, unknown, or optional params
+  - Copy-pasted logic instead of extracted helpers
+  - Bespoke helpers where the codebase already has a canonical utility
+  - Logic added in the wrong layer/package
+  - Sequential async flow where independent work could run in parallel
+  - Partial-update logic that leaves state less atomic than necessary
+
+  Output priorities:
+  1. Structural code-quality regressions
+  2. Missed opportunities for dramatic simplification / code-judo
+  3. Spaghetti / branching complexity increases
+  4. Boundary / abstraction / type-contract problems
+  5. File-size and decomposition concerns
+  6. Modularity and abstraction issues
+  7. Legibility and maintainability concerns
+
+  Do not approve merely because behavior seems correct. The bar for approval requires no clear structural regression, no obvious missed simplification opportunity, no unjustified file-size explosion, and no obvious spaghetti-growth.
+
+  Be direct, serious, and demanding about quality.
