@@ -78,7 +78,6 @@ python tests/test_utils.py
 | Gemini CLI | `gemini` CLI installed |
 | Warp | Warp terminal |
 | Cline | VSCode with Cline extension |
-| Roo Code | VSCode with Roo Code extension |
 | Kilo Code | VSCode with Kilo Code extension |
 | Pi | pi CLI tool |
 | Copilot CLI | `gh copilot` CLI |

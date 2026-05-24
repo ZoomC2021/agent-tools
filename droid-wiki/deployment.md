@@ -17,7 +17,6 @@ The "deployment" of Agent Tools is the installation of prompts across 15+ agent 
 | OpenCode | Copy + config setup | `~/.config/opencode/` |
 | Cursor | Copy `.md` files | `~/.cursor/commands/` |
 | Cline | Copy `.md` files | `~/Documents/Cline/Rules/` |
-| Roo Code | Copy `.md` files | `~/.roo/commands/` |
 | And 9 more... | Various | Platform-specific |
 
 ## Installation (User Deployment)
@@ -133,7 +132,6 @@ jq -e . prompts/opencode/opencode.json.example
 | OpenCode | `~/.config/opencode/` |
 | Cursor | `~/.cursor/commands/` |
 | Cline | `~/Documents/Cline/Rules/` |
-| Roo Code | `~/.roo/commands/` |
 | Warp | `~/.warp/workflows/` |
 | VSCode Copilot | `~/Library/Application Support/Code/User/prompts/` |
 | Windsurf | `~/.codeium/windsurf/skills/` |
@@ -147,7 +145,6 @@ jq -e . prompts/opencode/opencode.json.example
 | OpenCode | `~/.config/opencode/` |
 | Cursor | `~/.cursor/commands/` |
 | Cline | `~/Documents/Cline/Rules/` |
-| Roo Code | `~/.roo/commands/` |
 | Warp | `~/.local/share/warp-terminal/workflows/` |
 | VSCode Copilot | `~/.config/Code/User/prompts/` |
 | Windsurf | `~/.codeium/windsurf/skills/` |

@@ -58,7 +58,7 @@ Type `pr-reviewer` in agent mode
 
 ## Available in
 
-All 15 agent targets. See [Agent targets](../agent-targets/index.md).
+All 14 agent targets. See [Agent targets](../agent-targets/index.md).
 
 ## Requirements
 

@@ -750,11 +750,6 @@ install_cline() {
     install_agent "Cline" "$PROMPTS_DIR/cline" "$HOME/Documents/Cline/Rules"
 }
 
-# Install Roo Code commands
-install_roocode() {
-    install_agent "Roo Code" "$PROMPTS_DIR/roocode" "$HOME/.roo/commands"
-}
-
 # Install Windsurf skills
 install_windsurf() {
     log_info "Installing Windsurf skills..."
@@ -809,7 +804,6 @@ main() {
     install_warp
     install_cursor
     install_cline
-    install_roocode
     install_windsurf
     
     echo ""
@@ -858,7 +852,7 @@ else
             warp) install_warp ;;
             cursor) install_cursor ;;
             cline) install_cline ;;
-            roocode) install_roocode ;;
+
             windsurf) install_windsurf ;;
             *) log_error "Unknown agent: $agent" ;;
         esac

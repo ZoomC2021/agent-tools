@@ -1,6 +1,6 @@
 # Agent targets
 
-The 15 AI coding agent platforms supported by agent-tools.
+The 14 AI coding agent platforms supported by agent-tools.
 
 ## Overview
 
@@ -13,7 +13,6 @@ The 15 AI coding agent platforms supported by agent-tools.
 | [Pi](pi.md) | CLI | `prompts/pi/` | Markdown |
 | [Warp](warp.md) | CLI/Editor | `prompts/warp/` | YAML |
 | [Cline](cline.md) | Editor | `prompts/cline/` | Markdown |
-| [Roo Code](roocode.md) | Editor | `prompts/roocode/` | Markdown |
 | [Windsurf](windsurf.md) | Editor | `prompts/windsurf/` | SKILL.md |
 | [Amp](amp.md) | CLI/Editor | `prompts/amp/` | SKILL.md |
 | [Gemini CLI](gemini.md) | CLI | `prompts/gemini/` | SKILL.md |
@@ -58,14 +57,14 @@ The 15 AI coding agent platforms supported by agent-tools.
 
 | Workflow | Count |
 |----------|-------|
-| review | 15/15 |
-| refactor | 15/15 |
-| create-pr | 15/15 |
-| pr-reviewer | 15/15 |
-| deslop | 14/15 |
-| ultrareview | 9/15 |
-| handoff | 8/15 |
-| predict-issues | 3/15 |
+| review | 14/14 |
+| refactor | 14/14 |
+| create-pr | 14/14 |
+| pr-reviewer | 14/14 |
+| deslop | 13/14 |
+| ultrareview | 9/14 |
+| handoff | 8/14 |
+| predict-issues | 3/14 |
 
 ## Related pages
 

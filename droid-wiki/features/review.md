@@ -46,7 +46,7 @@ Slash command from `~/.claude/commands/review.md`
 Type `review` in Cursor agent mode
 
 ### Other agents
-Available in all 15 supported agent platforms. See [Agent targets](../agent-targets/index.md) for specifics.
+Available in all 14 supported agent platforms. See [Agent targets](../agent-targets/index.md) for specifics.
 
 ## Implementation
 

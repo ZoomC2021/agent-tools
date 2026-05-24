@@ -529,29 +529,6 @@ function Test-OpenCodeConfigFileReferences {
     return $missing
 }
 
-function Install-RooCode {
-    Write-Info "Installing Roo Code commands..."
-    
-    $SourceDir = Join-Path $PromptsDir "roocode"
-    
-    if (-not (Test-Path -PathType Container $SourceDir)) {
-        Write-Warn "Source directory not found: $SourceDir"
-        return
-    }
-    
-    $SourceFiles = Get-ChildItem -Path $SourceDir -Filter "*.md"
-    if ($SourceFiles.Count -eq 0) {
-        Write-Warn "No .md files found in $SourceDir"
-        return
-    }
-    
-    $Dest = Join-Path $env:USERPROFILE ".roo\commands"
-    
-    New-Item -ItemType Directory -Path $Dest -Force | Out-Null
-    Copy-Item "$SourceDir\*.md" -Destination $Dest -Force
-    Write-Success "Roo Code: $Dest"
-}
-
 function Install-Gemini {
     Write-Info "Installing Gemini CLI skills..."
     
@@ -685,7 +662,6 @@ Install-VSCodeCopilot
 Install-Cursor
 Install-Pi
 Install-Warp
-Install-RooCode
 Install-Windsurf
 Install-OpenCode
 Install-Gemini

@@ -1,6 +1,6 @@
 # Agent Tools
 
-Agent-tools provides custom prompts, skills, and workflows for AI coding agents. It enables consistent developer workflows across 15+ coding assistants including OpenCode, Claude Code, Codex, Cursor, Pi, Warp, and others.
+Agent-tools provides custom prompts, skills, and workflows for AI coding agents. It enables consistent developer workflows across 14+ coding assistants including OpenCode, Claude Code, Codex, Cursor, Pi, Warp, and others.
 
 The repository centers around the **OpenCode Codex53-Kimi architecture** — a sophisticated orchestrator pattern using GPT-5.3-Codex for planning and routing, with Fireworks Kimi K2.5 Turbo subagents for execution and research tasks.
 

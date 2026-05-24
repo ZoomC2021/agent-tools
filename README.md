@@ -191,7 +191,6 @@ See `prompts/opencode/opencode.json.example` for the full configuration structur
 | [Kilo Code](https://kilocode.com) | CLI | `~/.kilocode/prompts/` |
 | [Cursor](https://cursor.com) | Editor | `~/.cursor/commands/` |
 | [Cline](https://cline.bot) | Editor | `~/Documents/Cline/Rules/` |
-| [Roo Code](https://roocode.com) | Editor | `~/.roo/commands/` |
 | [Windsurf](https://codeium.com/windsurf) | Editor | `~/.codeium/windsurf/skills/` |
 
 ## Quick Install
@@ -210,7 +209,7 @@ cd agent-tools
 ./scripts/install.sh claude codex amp warp
 ```
 
-Available options: `claude`, `codex`, `opencode`, `pi`, `warp`, `antigravity`, `vscode`, `copilot-cli`, `amp`, `gemini`, `droid`, `kilocode`, `cursor`, `cline`, `roocode`, `windsurf`
+Available options: `claude`, `codex`, `opencode`, `pi`, `warp`, `antigravity`, `vscode`, `copilot-cli`, `amp`, `gemini`, `droid`, `kilocode`, `cursor`, `cline`, `windsurf`
 
 ## Manual Installation
 
@@ -393,15 +392,6 @@ cp prompts/cursor/*.md ~/.cursor/commands/
 ```bash
 mkdir -p ~/Documents/Cline/Rules
 cp prompts/cline/*.md ~/Documents/Cline/Rules/
-```
-</details>
-
-<details>
-<summary>Roo Code</summary>
-
-```bash
-mkdir -p ~/.roo/commands
-cp prompts/roocode/*.md ~/.roo/commands/
 ```
 </details>
 
@@ -595,15 +585,6 @@ cp prompts/cursor/*.md ~/.cursor/commands/
 ```bash
 mkdir -p ~/Documents/Cline/Rules
 cp prompts/cline/*.md ~/Documents/Cline/Rules/
-```
-</details>
-
-<details>
-<summary>Roo Code</summary>
-
-```bash
-mkdir -p ~/.roo/commands
-cp prompts/roocode/*.md ~/.roo/commands/
 ```
 </details>
 

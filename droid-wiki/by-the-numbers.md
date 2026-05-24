@@ -59,17 +59,17 @@ Markdown dominates because the repository is primarily prompt and documentation 
 
 ### Agent targets supported
 
-15 agent platforms: amp, antigravity, claude, cline, codex, copilot-cli, cursor, gemini, kilocode, opencode, pi, roocode, vscode-copilot, warp, windsurf
+14 agent platforms: amp, antigravity, claude, cline, codex, copilot-cli, cursor, gemini, kilocode, opencode, pi, vscode-copilot, warp, windsurf
 
 ### Workflow coverage
 
 | Workflow | Agents supporting |
 |----------|-------------------|
-| review | All 15 agents |
-| refactor | All 15 agents |
-| create-pr | All 15 agents |
-| pr-reviewer | All 15 agents |
-| deslop | 14 agents (not Warp) |
+| review | All 14 agents |
+| refactor | All 14 agents |
+| create-pr | All 14 agents |
+| pr-reviewer | All 14 agents |
+| deslop | 13 agents (not Warp) |
 | ultrareview | 9 agents |
 | handoff | 8 agents |
 | predict-issues | 3 agents (claude, cursor, pi) |

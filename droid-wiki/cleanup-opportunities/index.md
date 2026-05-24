@@ -25,7 +25,7 @@ All TODO/FIXME references found were in:
 
 ## What the prompts say about TODOs
 
-The deslop and refactor workflows across all 15 agent targets include TODO detection as a standard practice:
+The deslop and refactor workflows across all 14 agent targets include TODO detection as a standard practice:
 
 | Workflow | Action |
 |----------|--------|
