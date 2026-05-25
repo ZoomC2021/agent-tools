@@ -151,7 +151,7 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 | **ultrareview** | Parallel dual-model review (GPT 5.4 + Gemini 3.1 Pro Preview) | Kimi K2.5 Turbo | — |
 | **ultrareview-lite** | Parallel dual-model review (Kimi 2.5 Turbo + Gemini 3 Flash Preview) | Kimi K2.5 Turbo | — |
 | **deslop** | Code quality audit against principles | Kimi K2.5 Turbo | — |
-| **imagegen** | Generate/edit images with xAI Grok Imagine | Kimi K2.5 Turbo | — |
+| **imagegen** | Generate/edit images with xAI Grok Imagine | xAI Grok Imagine Image Quality | — |
 | **pr-reviewer** | Fetch PR comments and apply fixes | Kimi K2.5 Turbo | — |
 | **pr-reviewer-only** | Fetch PR comments, produce implementation prompt | Kimi K2.5 Turbo | — |
 | **create-pr** | Create PR with auto-generated title/description | Kimi K2.5 Turbo | — |
