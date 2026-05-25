@@ -151,6 +151,7 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 | **ultrareview** | Parallel dual-model review (GPT 5.4 + Gemini 3.1 Pro Preview) | Kimi K2.5 Turbo | — |
 | **ultrareview-lite** | Parallel dual-model review (Kimi 2.5 Turbo + Gemini 3 Flash Preview) | Kimi K2.5 Turbo | — |
 | **deslop** | Code quality audit against principles | Kimi K2.5 Turbo | — |
+| **imagegen** | Generate/edit images with xAI Grok Imagine | Kimi K2.5 Turbo | — |
 | **pr-reviewer** | Fetch PR comments and apply fixes | Kimi K2.5 Turbo | — |
 | **pr-reviewer-only** | Fetch PR comments, produce implementation prompt | Kimi K2.5 Turbo | — |
 | **create-pr** | Create PR with auto-generated title/description | Kimi K2.5 Turbo | — |
@@ -664,6 +665,17 @@ Execute **Claude Code CLI** commands and code reviews from OpenCode:
 
 Requires Claude CLI installed and authenticated.
 
+### imagegen
+
+Generates and edits images from OpenCode using **xAI Grok Imagine**:
+
+1. **Text-to-image**: Calls `https://api.x.ai/v1/images/generations` with `grok-imagine-image-quality`
+2. **Image editing**: Calls `https://api.x.ai/v1/images/edits` with public image URLs or base64 data URIs
+3. **Local output**: Requests `b64_json` output and writes image files immediately because xAI URLs are temporary
+4. **Format choices**: Guides aspect ratio, resolution, and variation count based on the requested asset
+
+Requires `XAI_API_KEY`, `curl`, `jq`, and `python3`.
+
 ### pr-reviewer
 
 Addresses PR review feedback:
@@ -702,6 +714,7 @@ Analyzes code for quality issues using established software engineering principl
 - **OpenCode `webfetch`** for `docs-research`
 - **OpenCode `websearch`** for best `docs-research` discovery results when URLs are not provided
 - **Gemini CLI (`gemini`)** plus `gemini login` for `ultrareview` and `ultrareview-lite` secondary review lanes
+- **`XAI_API_KEY`**, `curl`, `jq`, and `python3` for OpenCode `imagegen`
 - The respective coding agent installed and configured
 
 ## Example OpenCode Prompts
