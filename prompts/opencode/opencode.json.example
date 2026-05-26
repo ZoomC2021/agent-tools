@@ -775,12 +775,19 @@
       "hidden": true,
       "prompt": "{file:./commands/markdown-converter.md}"
     },
-    "imagegen": {
+    "imagegen-grok": {
       "description": "Generate and edit images with xAI Grok Imagine from OpenCode.",
       "mode": "subagent",
       "model": "xai/grok-imagine-image-quality",
       "hidden": true,
-      "prompt": "{file:./commands/imagegen.md}"
+      "prompt": "{file:./commands/imagegen-grok.md}"
+    },
+    "imagegen-google": {
+      "description": "Generate and edit images with Google Nano Banana Pro (Gemini 3 Pro Image) from OpenCode.",
+      "mode": "subagent",
+      "model": "google/gemini-3-pro-image-preview",
+      "hidden": true,
+      "prompt": "{file:./commands/imagegen-google.md}"
     },
     "pr-reviewer": {
       "description": "Fetch PR feedback and apply fixes on the PR branch.",

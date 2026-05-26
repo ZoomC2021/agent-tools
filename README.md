@@ -151,7 +151,8 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 | **ultrareview** | Parallel dual-model review (GPT 5.4 + Gemini 3.1 Pro Preview) | Kimi K2.5 Turbo | — |
 | **ultrareview-lite** | Parallel dual-model review (Kimi 2.5 Turbo + Gemini 3 Flash Preview) | Kimi K2.5 Turbo | — |
 | **deslop** | Code quality audit against principles | Kimi K2.5 Turbo | — |
-| **imagegen** | Generate/edit images with xAI Grok Imagine | xAI Grok Imagine Image Quality | — |
+| **imagegen-grok** | Generate/edit images with xAI Grok Imagine | xAI Grok Imagine Image Quality | — |
+| **imagegen-google** | Generate/edit images with Google Nano Banana Pro | Gemini 3 Pro Image Preview | — |
 | **pr-reviewer** | Fetch PR comments and apply fixes | Kimi K2.5 Turbo | — |
 | **pr-reviewer-only** | Fetch PR comments, produce implementation prompt | Kimi K2.5 Turbo | — |
 | **create-pr** | Create PR with auto-generated title/description | Kimi K2.5 Turbo | — |
@@ -665,16 +666,27 @@ Execute **Claude Code CLI** commands and code reviews from OpenCode:
 
 Requires Claude CLI installed and authenticated.
 
-### imagegen
+### imagegen-grok
 
-Generates and edits images from OpenCode using **xAI Grok Imagine**:
+Generates and edits images using **xAI Grok Imagine** (OpenCode only):
 
 1. **Text-to-image**: Calls `https://api.x.ai/v1/images/generations` with `grok-imagine-image-quality`
 2. **Image editing**: Calls `https://api.x.ai/v1/images/edits` with public image URLs or base64 data URIs
 3. **Local output**: Requests `b64_json` output and writes image files immediately because xAI URLs are temporary
 4. **Format choices**: Guides aspect ratio, resolution, and variation count based on the requested asset
 
-Requires `XAI_API_KEY`, `curl`, `jq`, and `python3`.
+Grok Imagine is reachable two ways from OpenCode: a raw `XAI_API_KEY` (required for the curl workflow in the skill), or a SuperGrok subscription signed in through OpenCode (resolves the `xai/grok-imagine-image-quality` model without an API key, but the curl path doesn't use it). Also requires `curl`, `jq`, and `python3` for the direct-API path.
+
+### imagegen-google
+
+Generates and edits images using **Google Nano Banana Pro** (`gemini-3-pro-image-preview`) via the Vertex AI Express mode of the `google-genai` SDK. Shipped to every supported harness (OpenCode subagent, Claude command, Codex skill, Warp workflow, Amp/Gemini/Windsurf/Droid skills, etc.):
+
+1. **Text-to-image**: `client.models.generate_content` with `response_modalities=["IMAGE"]` and an `ImageConfig` aspect ratio
+2. **Image editing / composition**: Passes up to 14 reference images as inline `Part`s alongside the prompt
+3. **Local output**: Writes the returned `inline_data.data` bytes directly to disk
+4. **Format choices**: Guides aspect ratio and variation count, leans on Nano Banana Pro's strong in-image text rendering
+
+Requires `GOOGLE_API_KEY` (a Vertex AI Express key, prefix `AQ.`), `python3`, and the `google-genai` package.
 
 ### pr-reviewer
 
@@ -714,7 +726,8 @@ Analyzes code for quality issues using established software engineering principl
 - **OpenCode `webfetch`** for `docs-research`
 - **OpenCode `websearch`** for best `docs-research` discovery results when URLs are not provided
 - **Gemini CLI (`gemini`)** plus `gemini login` for `ultrareview` and `ultrareview-lite` secondary review lanes
-- **`XAI_API_KEY`**, `curl`, `jq`, and `python3` for OpenCode `imagegen`
+- **`XAI_API_KEY`** *(or a SuperGrok subscription signed into OpenCode — note the curl workflow still needs the raw API key)*, `curl`, `jq`, and `python3` for OpenCode `imagegen-grok`
+- **`GOOGLE_API_KEY`** (Vertex AI Express), `python3`, and `google-genai` for OpenCode `imagegen-google`
 - The respective coding agent installed and configured
 
 ## Example OpenCode Prompts

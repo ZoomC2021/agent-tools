@@ -8,12 +8,14 @@ model: xai/grok-imagine-image-quality
 
 Generate or edit images from OpenCode using xAI Grok Imagine.
 
-Use this when the user asks to generate an image, create visual assets, make concept art, produce mockups, create app icons, create hero images, or edit/reference an existing image and explicitly wants `/imagegen` or Grok Imagine.
+Use this when the user asks to generate an image, create visual assets, make concept art, produce mockups, create app icons, create hero images, or edit/reference an existing image and explicitly wants `/imagegen-grok` or Grok Imagine.
 
 ## Requirements
 
-- `XAI_API_KEY` must be set in the shell environment.
-- `curl`, `jq`, and `python3` should be available.
+- The Grok Imagine model is reachable from OpenCode in two ways:
+  - **Direct xAI API** — set `XAI_API_KEY` in the shell environment. The curl workflow below uses this path.
+  - **SuperGrok subscription via OpenCode** — sign in with your SuperGrok account in OpenCode (`/login` → xAI) so the `xai/grok-imagine-image-quality` model resolves through OpenCode's auth. This is enough for the subagent's model field, but the curl commands in this skill bypass OpenCode and still need `XAI_API_KEY`. If you only have SuperGrok, route the request through an OpenCode-native invocation of the model rather than the curl path.
+- `curl`, `jq`, and `python3` should be available for the direct-API path.
 - Default model: `grok-imagine-image-quality`.
 - Do not use deprecated `grok-imagine-image-pro` for new requests.
 
