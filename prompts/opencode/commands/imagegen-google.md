@@ -6,16 +6,26 @@ model: google/gemini-3-pro-image-preview
 
 # Imagegen (Google)
 
-Generate or edit images from OpenCode using Google Nano Banana Pro via the Vertex AI Express mode of the `google-genai` Python SDK.
+Generate or edit images using **Google Nano Banana Pro** (`gemini-3-pro-image-preview`) via the Vertex AI Express mode of the `google-genai` Python SDK.
 
 Use this when the user asks to generate an image, create visual assets, make concept art, produce mockups, create app icons, create hero images, or edit/reference an existing image and explicitly wants `/imagegen-google` or Nano Banana Pro / Gemini image generation.
 
 ## Requirements
 
 - `GOOGLE_API_KEY` must be set in the shell environment with a Vertex AI Express API key (starts with `AQ.`).
-- `python3` and the `google-genai` package must be available. Install with `pip install --upgrade google-genai pillow` if missing.
+- A dedicated Python venv with `google-genai` (and Pillow for image edits) must exist at `~/.local/share/imagegen-google/venv`. The skill invokes that interpreter directly, not whatever `python3` happens to resolve to.
 - Default model: `gemini-3-pro-image-preview` (Nano Banana Pro).
 - For lower cost / faster turnaround the user may request `gemini-2.5-flash-image-preview` (Nano Banana); otherwise stay on Pro.
+
+### One-time setup
+
+```bash
+mkdir -p ~/.local/share/imagegen-google
+uv venv ~/.local/share/imagegen-google/venv --python 3.14 --seed
+uv pip install --python ~/.local/share/imagegen-google/venv/bin/python google-genai pillow
+```
+
+If `uv` is not installed, use `python3 -m venv ~/.local/share/imagegen-google/venv && ~/.local/share/imagegen-google/venv/bin/pip install --upgrade google-genai pillow` instead.
 
 ## Workflow
 
@@ -30,9 +40,11 @@ Use this when the user asks to generate an image, create visual assets, make con
 ## Text-to-Image
 
 ```bash
+IMAGEGEN_PY="$HOME/.local/share/imagegen-google/venv/bin/python"
 test -n "$GOOGLE_API_KEY" || { echo "GOOGLE_API_KEY is not set" >&2; exit 1; }
+test -x "$IMAGEGEN_PY" || { echo "imagegen-google venv missing at $IMAGEGEN_PY — see Requirements" >&2; exit 1; }
 
-python3 - <<'PY'
+"$IMAGEGEN_PY" - <<'PY'
 import os, sys
 from google import genai
 from google.genai import types
@@ -75,12 +87,14 @@ For multiple variations, set `number_of_images` in `ImageConfig` and write each 
 
 ## Image Editing / Multi-Image Composition
 
-Nano Banana Pro accepts up to 14 reference images in a single call. Pass each reference as a `Part` with inline image bytes (or as a PIL image) alongside the prompt. Describe the role of every reference explicitly (subject, style, color palette, layout) and say what must remain unchanged.
+Nano Banana Pro accepts up to 14 reference images in a single call. Pass each reference as a `Part` with inline image bytes alongside the prompt. Describe the role of every reference explicitly (subject, style, color palette, layout) and say what must remain unchanged.
 
 ```bash
+IMAGEGEN_PY="$HOME/.local/share/imagegen-google/venv/bin/python"
 test -n "$GOOGLE_API_KEY" || { echo "GOOGLE_API_KEY is not set" >&2; exit 1; }
+test -x "$IMAGEGEN_PY" || { echo "imagegen-google venv missing at $IMAGEGEN_PY — see Requirements" >&2; exit 1; }
 
-python3 - <<'PY'
+"$IMAGEGEN_PY" - <<'PY'
 import mimetypes, os, sys
 from google import genai
 from google.genai import types
