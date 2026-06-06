@@ -1,0 +1,23 @@
+name: Predict-Issues
+description: Analyze the codebase to predict potential performance, security, and maintainability issues before they impact the project.
+tags:
+  - ai
+  - predict
+  - analysis
+command: |
+  Analyze the codebase to predict potential problems before they impact the project.
+
+  Strategic Thinking Process:
+  1. Pattern Recognition: Identify problematic patterns, complexity hotspots, and anti-patterns.
+  2. Risk Assessment Framework: Assess issues by Likelihood, Impact, Timeline, and Effort.
+  3. Common Problem Categories: Performance, Maintainability, Security, and Scalability.
+  4. Prediction Strategy: Focus on highest risk areas first (critical path code, scaling hotspots, brittleness).
+
+  Examine:
+  - Code complexity trends and potential hotspots
+  - Performance bottleneck patterns forming
+  - Maintenance difficulty indicators
+  - Architecture stress points and scaling issues
+  - Error handling gaps
+
+  For each prediction, show specific code locations with file references, explain why it's likely to cause future issues, estimate potential timeline and impact, and suggest preventive measures.
