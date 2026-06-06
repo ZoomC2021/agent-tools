@@ -1,10 +1,10 @@
 # Widereview workflow
 
-Wide fan-out code review across four independent cheap-model CLIs run in parallel.
+Wide fan-out code review across three independent cheap-model CLIs run in parallel.
 
 ## Purpose
 
-Widereview runs four low-cost models on the same code changes simultaneously, then consolidates findings into a vote-weighted report. Where [ultrareview](ultrareview.md) favors depth (two premium models), widereview favors **breadth** — many independent reviewers at near-zero cost. The host agent acts as orchestrator only; it does not review the code itself.
+Widereview runs three low-cost models on the same code changes simultaneously, then consolidates findings into a vote-weighted report. Where [ultrareview](ultrareview.md) favors depth (two premium models), widereview favors **breadth** — several independent reviewers at near-zero cost. The host agent acts as orchestrator only; it does not review the code itself.
 
 ## Modes
 
@@ -19,21 +19,20 @@ Only Phase 1 (context gathering) and the lane prompt differ between modes; the p
 
 ```
 1. Gather context for the mode:
-   - Diff: shared git diff bundle (git status + git diff HEAD -U40 + git diff --cached -U40); timeout 480/lane
+   - Diff: `git add -N .` (so untracked files appear) + shared git diff bundle
+            (git status + git diff HEAD -U40 + git diff --cached -U40); timeout 480/lane
    - Full: deterministic file manifest via `git ls-files` (fallback find), stripping vendor/build
             noise (.venv, node_modules, dist, build, site-packages, __pycache__, vendor, lock files);
             optional path arg; scale guard at ~150 files; timeout 720/lane
 2. Pre-flight:
-   - jq-merge reasoningEffort["deepseek/deepseek-v4-pro"]="max" into ~/.commandcode/config.json
-   - Detect available lanes with `command -v`
-3. Launch parallel lanes (each with timeout 480, own output file):
-   - Lane A: deepseek-v4-pro   (cmd -p --model deepseek/deepseek-v4-pro --skip-onboarding -t)
-   - Lane B: Qwen3.7-Max       (qodercli -p --model "Qwen3.7-Max" --reasoning-effort max --dangerously-skip-permissions)
-   - Lane C: FirePass / K2.6   (droid exec -m custom:FirePass-0 --skip-permissions-unsafe)
-   - Lane D: Gemini 3.5 Flash  (agy -p --model "Gemini 3.5 Flash (High)" --dangerously-skip-permissions)
+   - Detect available lanes with `command -v` (no per-lane config required)
+3. Launch parallel lanes (each with the mode's timeout, own output file):
+   - Lane A: Grok Composer 2.5 (grok -p -m grok-composer-2.5-fast --always-approve --cwd <root>)
+   - Lane B: Qwen3.7-Max       (qodercli -p --model "Qwen3.7-Max" --reasoning-effort max --dangerously-skip-permissions --cwd <root>)
+   - Lane C: FirePass / K2.6   (droid exec -m custom:FirePass-0 --skip-permissions-unsafe --cwd <root>)
 4. Collect exit codes (0=ok, 124=timeout, other=failed); parse pipe-delimited findings, discard narration
 5. Consolidate by vote count:
-   - 🔴🔴 Strong Consensus: 3-4 lanes agree
+   - 🔴🔴 Strong Consensus: all 3 lanes agree
    - 🔴 Consensus: 2 lanes agree
    - 🟠 Exclusive: 1 lane, high confidence
    - 🟡 Lower Confidence: 1 lane, medium/low confidence
@@ -46,10 +45,9 @@ Only Phase 1 (context gathering) and the lane prompt differ between modes; the p
 
 | Lane | CLI | Model | Reasoning effort | Effort mechanism |
 |------|-----|-------|------------------|------------------|
-| A | `cmd` (Command Code) | `deepseek/deepseek-v4-pro` | max | `~/.commandcode/config.json` |
+| A | `grok` (Grok) | `grok-composer-2.5-fast` | model default | n/a |
 | B | `qodercli` (Qoder) | `Qwen3.7-Max` | max | `--reasoning-effort` flag |
 | C | `droid exec` (Factory) | `custom:FirePass-0` (Kimi K2.6 router) | n/a | router model |
-| D | `agy` | `Gemini 3.5 Flash (High)` | high | baked into model name |
 
 ## Strict finding format
 
@@ -59,21 +57,21 @@ Each lane is given one prompt that forces a parseable, pipe-delimited line per i
 SEVERITY | CATEGORY | file:line | description | CONFIDENCE
 ```
 
-with `NO_ISSUES` for a clean lane. This makes the free-form text lanes (A and D) parseable and lets the orchestrator strip agentic narration. The parser must also strip markdown code fences and preambles — some lanes wrap their findings in a ``` block or prepend a sentence before the lines.
+with `NO_ISSUES` for a clean lane. The parser must strip markdown code fences, preambles, and stray log/tool-error lines — some lanes wrap their findings in a ``` block, prepend a sentence, or emit stderr noise before the lines.
 
-In **full mode** the prompt is additionally hardened and manifest-anchored: "review ONLY the files in the manifest; do NOT run git, do NOT explore unrelated directories, do NOT describe your plan or summarize your work." Without this anchor the `agy`/Gemini lane tends to wander (running `git status`, narrating steps) and produce no findings.
+In **full mode** the prompt is additionally hardened and manifest-anchored: "review ONLY the files in the manifest; do NOT run git, do NOT explore unrelated directories, do NOT describe your plan or summarize your work." This keeps the agentic lanes on task instead of wandering the tree.
 
 ## Known lane behavior
 
-- **Lane A (deepseek via `cmd`)** is the slowest — it can exceed the diff timeout on a full review. Raise `WR_TIMEOUT` if it keeps timing out (`124`).
-- **Lane D (agy / Gemini 3.5 Flash)** is the most prone to wandering; the hardened full-mode prompt mitigates this, but treat it as best-effort.
-- A review with only **2 of 4 lanes** succeeding is still valuable — the lanes tend to cover complementary ground (e.g. one backend-heavy, one frontend-heavy).
+- **Lane A (Grok Composer 2.5 via `grok`)** replaced the original `cmd`/deepseek lane, which was the slowest and timed out on full reviews. Grok is fast, supports native `--cwd`, and needs no effort pre-flight.
+- A review with only **2 of 3 lanes** succeeding is still valuable — the lanes tend to cover complementary ground (e.g. one backend-heavy, one frontend-heavy).
+- An `agy`/Gemini 3.5 Flash lane was trialled and **dropped**: it wandered (running `git status`, narrating steps, announcing its model) and produced no findings in both diff and full modes, even with the hardened prompt.
 
 ## Consolidation rules
 
 | Finding type | Criteria | Action |
 |--------------|----------|--------|
-| Strong Consensus | Found by 3-4 lanes | Highest priority, very likely a real issue |
+| Strong Consensus | Found by all 3 lanes | Highest priority, very likely a real issue |
 | Consensus | Found by 2 lanes | High priority |
 | Exclusive | 1 lane, high confidence | Include with lane attribution |
 | Lower Confidence | 1 lane, medium/low confidence | Include for consideration |
@@ -91,8 +89,7 @@ Original per-lane severities are always preserved; agreement is additional metad
 ```
 
 ### Requirements
-- One or more of: `cmd`, `qodercli`, `droid`, `agy` installed and authenticated
-- `jq` (for the cmd effort pre-flight)
+- One or more of: `grok`, `qodercli`, `droid` installed and authenticated
 - Git repository (diff mode needs changes to review; full mode uses `git ls-files`, falling back to `find`)
 
 ## Secret hygiene

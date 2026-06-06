@@ -692,7 +692,7 @@
       "prompt": "{file:./commands/ultrareview-lite.md}"
     },
     "widereview": {
-      "description": "Wide fan-out review across four cheap-model CLIs (deepseek-v4-pro via cmd, Qwen3.7-Max via qodercli, FirePass via droid, Gemini 3.5 Flash via agy) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (--full).",
+      "description": "Wide fan-out review across three cheap-model CLIs (Grok Composer 2.5 via grok, Qwen3.7-Max via qodercli, FirePass via droid) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (--full).",
       "mode": "subagent",
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "hidden": true,

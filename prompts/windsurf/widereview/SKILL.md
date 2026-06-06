@@ -1,13 +1,13 @@
 ---
 name: widereview
-description: Wide fan-out code review across four cheap-model CLIs (deepseek-v4-pro, Qwen3.7-Max, FirePass, Gemini 3.5 Flash) run in parallel, then consolidated into a vote-weighted report. Supports diff mode (default) and full-codebase mode (--full).
+description: Wide fan-out code review across three cheap-model CLIs (Grok Composer 2.5, Qwen3.7-Max, FirePass) run in parallel, then consolidated into a vote-weighted report. Supports diff mode (default) and full-codebase mode (--full).
 ---
 
 # WideReview: Wide Fan-Out Cheap-Model Code Review
 
-Run code reviews across **four independent cheap-model CLIs in parallel** — `deepseek-v4-pro`, `Qwen3.7-Max`, `FirePass` (Kimi K2.6), and `Gemini 3.5 Flash` — then consolidate the findings into a single vote-weighted report.
+Run code reviews across **three independent cheap-model CLIs in parallel** — `Grok Composer 2.5`, `Qwen3.7-Max`, and `FirePass` (Kimi K2.6) — then consolidate the findings into a single vote-weighted report.
 
-💡 **Cost note**: All four are low-cost models. Unlike `ultrareview` (2 premium models, depth), WideReview favors **breadth** — many independent reviewers at near-zero cost. Use it for broad coverage and cheap second opinions.
+💡 **Cost note**: All three are low-cost models. Unlike `ultrareview` (2 premium models, depth), WideReview favors **breadth** — several independent reviewers at near-zero cost. Use it for broad coverage and cheap second opinions.
 
 ## Modes
 
@@ -24,32 +24,30 @@ Pick the mode from the user's request, then follow Phase 1 for that mode. Phases
 
 | Lane | CLI | Model | Reasoning effort |
 |------|-----|-------|------------------|
-| A | `cmd` | `deepseek/deepseek-v4-pro` | max (config file) |
+| A | `grok` | `grok-composer-2.5-fast` | model default |
 | B | `qodercli` | `Qwen3.7-Max` | max (flag) |
 | C | `droid exec` | `custom:FirePass-0` (Kimi K2.6 router) | n/a (router) |
-| D | `agy` | `Gemini 3.5 Flash (High)` | high (in model name) |
 
-Consolidating four independent reviewers catches issues any single model misses and surfaces conflicting interpretations.
+Consolidating three independent reviewers catches issues any single model misses and surfaces conflicting interpretations.
 
 ## Prerequisites
 
 Each lane is optional. Missing or unauthenticated CLIs are **skipped**, and the review proceeds with whatever is available (at least one lane is required).
 
-- `cmd` (Command Code) — `command -v cmd`
+- `grok` (Grok) — `command -v grok`
 - `qodercli` (Qoder) — `command -v qodercli`
 - `droid` (Factory) — `command -v droid`
-- `agy` — `command -v agy`
-- `jq` — required for the cmd effort pre-flight
 
 ⚠️ **Secret hygiene**: The FirePass lane is backed by a custom model whose API key is stored in `~/.factory/settings.json`. Reference the model id `custom:FirePass-0` only — never read, print, or copy that settings file.
 
 ## Phase 1 (Diff mode): Gather Context
 
-Capture the uncommitted changes into one shared diff bundle:
+Capture the uncommitted changes into one shared diff bundle. Use `git add -N` first so newly created (untracked) files appear in the diff:
 
 ```bash
 WR_DIR=$(mktemp -d)
 BUNDLE="$WR_DIR/bundle.diff"
+git add -N . 2>/dev/null   # intent-to-add: surfaces untracked files in the diff
 {
   echo "===== git status --short ====="
   git status --short
@@ -82,7 +80,7 @@ fi \
   | grep -vE '\.(lock|map|min\.js)$|/(package-lock\.json|uv\.lock|poetry\.lock|yarn\.lock|pnpm-lock\.yaml)$' \
   > "$MANIFEST"
 
-# Full reviews need more headroom than diffs; cmd/deepseek in particular is slow.
+# Full reviews need more headroom than diffs (the agentic lanes read many files).
 WR_TIMEOUT=${WR_TIMEOUT:-720}
 ```
 
@@ -90,19 +88,11 @@ WR_TIMEOUT=${WR_TIMEOUT:-720}
 
 ## Phase 2: Pre-flight
 
-Set the deepseek effort to `max` for the `cmd` lane (idempotent merge — does not clobber other keys):
-
-```bash
-CFG="$HOME/.commandcode/config.json"
-[ -f "$CFG" ] || echo '{}' > "$CFG"
-tmp=$(mktemp) && jq '.reasoningEffort["deepseek/deepseek-v4-pro"]="max"' "$CFG" > "$tmp" && mv "$tmp" "$CFG"
-```
-
-Detect available lanes with `command -v` and build the active lane list. Note any skipped lanes for the final report.
+Detect available lanes with `command -v` (`grok`, `qodercli`, `droid`) and build the active lane list. Note any skipped lanes for the final report. No per-lane configuration is required — each lane sets its model and effort on the command line.
 
 ## Phase 3: Launch Parallel Reviews
 
-Build the strict-format review prompt for the selected mode. The pipe-delimited format makes the free-form text lanes (A and D) parseable.
+Build the strict-format review prompt for the selected mode. The pipe-delimited format makes the free-form text output parseable.
 
 **Diff mode prompt:**
 
@@ -114,7 +104,7 @@ $WR_FORMAT
 EOF
 ```
 
-**Full mode prompt** — firmer and manifest-anchored (this is what keeps the `agy`/Gemini lane on task):
+**Full mode prompt** — firmer and manifest-anchored (this is what keeps the agentic lanes on task):
 
 ```bash
 read -r -d '' WR_PROMPT <<EOF
@@ -140,17 +130,15 @@ Do not include headings, summaries, prose, code fences, or markdown — only the
 EOF
 ```
 
-Launch each available lane in the background, each with the mode's timeout, writing to its own output file. Use each CLI's native working-directory flag where available so the lane runs in the target repo:
+Launch each available lane in the background, each with the mode's timeout, writing to its own output file. Each lane uses its native working-directory flag so it runs in the target repo:
 
 ```bash
-timeout "$WR_TIMEOUT" bash -c "cd '$ROOT' 2>/dev/null; cmd -p \"\$0\" --model deepseek/deepseek-v4-pro --skip-onboarding -t" "$WR_PROMPT" \
+timeout "$WR_TIMEOUT" grok -p "$WR_PROMPT" -m grok-composer-2.5-fast --always-approve --cwd "${ROOT:-.}" \
   > "$WR_DIR/laneA.txt" 2>&1 & A=$!
 timeout "$WR_TIMEOUT" qodercli -p --model "Qwen3.7-Max" --reasoning-effort max --dangerously-skip-permissions --cwd "${ROOT:-.}" "$WR_PROMPT" \
   > "$WR_DIR/laneB.txt" 2>&1 & B=$!
 timeout "$WR_TIMEOUT" droid exec -m custom:FirePass-0 --skip-permissions-unsafe --cwd "${ROOT:-.}" "$WR_PROMPT" \
   > "$WR_DIR/laneC.txt" 2>&1 & C=$!
-timeout "$WR_TIMEOUT" bash -c "cd '$ROOT' 2>/dev/null; agy -p --model 'Gemini 3.5 Flash (High)' --dangerously-skip-permissions \"\$0\"" "$WR_PROMPT" \
-  > "$WR_DIR/laneD.txt" 2>&1 & D=$!
 wait
 ```
 
@@ -159,7 +147,7 @@ wait
 ## Phase 4: Collect and Parse
 
 For each lane output file:
-1. **Strip wrappers**: remove markdown code fences (```` ``` ````) and any preamble/narration prose. Lanes B–D may wrap findings in a fence or prepend "Now I have enough context…"; lane D (agy) may emit step narration — discard all of it.
+1. **Strip wrappers**: remove markdown code fences (```` ``` ````), tool-error/log lines, and any preamble/narration prose. Lanes may wrap findings in a fence, prepend "Now I have enough context…", or emit stray log lines on stderr — discard all of it.
 2. Keep only lines matching `SEVERITY | CATEGORY | file:line | description | CONFIDENCE`.
 3. Treat `NO_ISSUES` (and a lane that produced only narration) as a clean/empty lane.
 4. Normalize file paths (strip leading `./`).
@@ -172,7 +160,7 @@ Build a normalized signature for each finding: `file:line:category` (fuzzy-match
 
 | Agreement | Status | Icon |
 |-----------|--------|------|
-| ≥3 lanes report it | **Strong Consensus** | 🔴🔴 |
+| All 3 lanes report it | **Strong Consensus** | 🔴🔴 |
 | 2 lanes report it | **Consensus** | 🔴 |
 | 1 lane, High confidence | **Exclusive** | 🟠 |
 | 1 lane, Medium/Low confidence | **Lower Confidence** | 🟡 |
@@ -184,22 +172,21 @@ Build a normalized signature for each finding: `file:line:category` (fuzzy-match
 
 ```
 ## WideReview Summary  (<mode>: diff | full)
-- Strong Consensus (3-4 lanes): <count>
-- Consensus (2 lanes):          <count>
-- Exclusive (high conf):        <count>
-- Lower Confidence:             <count>
-- Divergent:                    <count>
+- Strong Consensus (3 lanes): <count>
+- Consensus (2 lanes):        <count>
+- Exclusive (high conf):      <count>
+- Lower Confidence:           <count>
+- Divergent:                  <count>
 
 ### Lane status
 | Lane | Model              | Status        | Findings |
 |------|--------------------|---------------|----------|
-| A    | deepseek-v4-pro    | ok/timeout/.. | <n>      |
+| A    | Grok Composer 2.5  | ok/timeout/.. | <n>      |
 | B    | Qwen3.7-Max        | ...           | <n>      |
 | C    | FirePass           | ...           | <n>      |
-| D    | Gemini 3.5 Flash   | ...           | <n>      |
 
-- Lanes used: <k>/4
-- Cost Level: Low (4 cheap models)
+- Lanes used: <k>/3
+- Cost Level: Low (3 cheap models)
 
 Recommendation: <prioritized next steps — consensus issues first>
 ```
@@ -207,7 +194,7 @@ Recommendation: <prioritized next steps — consensus issues first>
 Then list findings grouped by the buckets in Phase 5, each as:
 
 ```
-<icon> [<Severity>] [Category] file:line   (agreement: <k>/4 lanes)
+<icon> [<Severity>] [Category] file:line   (agreement: <k>/3 lanes)
    Sources: <lanes that reported it>
    Problem: <description>
    Fix: <recommendation>
@@ -218,7 +205,7 @@ Finally, clean up: `rm -rf "$WR_DIR"`.
 ## Error Handling
 
 - **A CLI is missing/unauthenticated** → skip that lane, note it in the report, continue.
-- **A lane times out (`124`) or errors** → mark it failed, continue with the rest. (deepseek-via-`cmd` is the slowest lane on full reviews; raise `WR_TIMEOUT` if it keeps timing out.)
-- **A lane returns only narration / no conforming lines** → mark it empty, continue. (The `agy` lane is most prone to this; the full-mode prompt is hardened to prevent it.)
+- **A lane times out (`124`) or errors** → mark it failed, continue with the rest. (Raise `WR_TIMEOUT` if a lane keeps timing out on large full-mode reviews.)
+- **A lane returns only narration / no conforming lines** → mark it empty, continue.
 - **All lanes fail/empty** → report failure and suggest the standard `/review` instead.
 - **Divergence** → never auto-resolve; always surface both/all assessments for human review.
