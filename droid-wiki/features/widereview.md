@@ -1,10 +1,10 @@
 # Widereview workflow
 
-Wide fan-out code review across three independent cheap-model CLIs run in parallel.
+Wide fan-out code review across four independent cheap-model CLIs run in parallel.
 
 ## Purpose
 
-Widereview runs three low-cost models on the same code changes simultaneously, then consolidates findings into a vote-weighted report. Where [ultrareview](ultrareview.md) favors depth (two premium models), widereview favors **breadth** — several independent reviewers at near-zero cost. The host agent acts as orchestrator only; it does not review the code itself.
+Widereview runs four low-cost models on the same code changes simultaneously, then consolidates findings into a vote-weighted report. Where [ultrareview](ultrareview.md) favors depth (two premium models), widereview favors **breadth** — several independent reviewers at near-zero cost. The host agent acts as orchestrator only; it does not review the code itself.
 
 ## Modes
 
@@ -30,9 +30,10 @@ Only Phase 1 (context gathering) and the lane prompt differ between modes; the p
    - Lane A: Grok Composer 2.5 (grok -p -m grok-composer-2.5-fast --always-approve --cwd <root>)
    - Lane B: Qwen3.7-Max       (qodercli -p --model "Qwen3.7-Max" --reasoning-effort max --dangerously-skip-permissions --cwd <root>)
    - Lane C: FirePass / K2.6   (droid exec -m custom:FirePass-0 --skip-permissions-unsafe --cwd <root>)
+   - Lane D: MiMo v2.5 Pro     (cmd -p --model xiaomi/mimo-v2.5-pro --skip-onboarding -t; subshell cd <root>)
 4. Collect exit codes (0=ok, 124=timeout, other=failed); parse pipe-delimited findings, discard narration
 5. Consolidate by vote count:
-   - 🔴🔴 Strong Consensus: all 3 lanes agree
+   - 🔴🔴 Strong Consensus: 3-4 lanes agree
    - 🔴 Consensus: 2 lanes agree
    - 🟠 Exclusive: 1 lane, high confidence
    - 🟡 Lower Confidence: 1 lane, medium/low confidence
@@ -48,6 +49,7 @@ Only Phase 1 (context gathering) and the lane prompt differ between modes; the p
 | A | `grok` (Grok) | `grok-composer-2.5-fast` | model default | n/a |
 | B | `qodercli` (Qoder) | `Qwen3.7-Max` | max | `--reasoning-effort` flag |
 | C | `droid exec` (Factory) | `custom:FirePass-0` (Kimi K2.6 router) | n/a | router model |
+| D | `cmd` (Command Code) | `xiaomi/mimo-v2.5-pro` | model default | n/a |
 
 ## Strict finding format
 
@@ -63,15 +65,16 @@ In **full mode** the prompt is additionally hardened and manifest-anchored: "rev
 
 ## Known lane behavior
 
-- **Lane A (Grok Composer 2.5 via `grok`)** replaced the original `cmd`/deepseek lane, which was the slowest and timed out on full reviews. Grok is fast, supports native `--cwd`, and needs no effort pre-flight.
-- A review with only **2 of 3 lanes** succeeding is still valuable — the lanes tend to cover complementary ground (e.g. one backend-heavy, one frontend-heavy).
+- **Lane A (Grok Composer 2.5 via `grok`)** replaced the original deepseek-via-`cmd` lane, which was the slowest and timed out on full reviews. Grok is fast, supports native `--cwd`, and needs no effort pre-flight.
+- **Lane D (MiMo v2.5 Pro via `cmd`)** returns `cmd` to the lineup with a faster model (mimo-v2.5-pro) and no effort pre-flight. `cmd` has no `--cwd`, so it runs in a subshell `cd`; bundle/manifest paths are absolute so reads still work.
+- A review with only some lanes succeeding is still valuable — the lanes tend to cover complementary ground (e.g. one backend-heavy, one frontend-heavy).
 - An `agy`/Gemini 3.5 Flash lane was trialled and **dropped**: it wandered (running `git status`, narrating steps, announcing its model) and produced no findings in both diff and full modes, even with the hardened prompt.
 
 ## Consolidation rules
 
 | Finding type | Criteria | Action |
 |--------------|----------|--------|
-| Strong Consensus | Found by all 3 lanes | Highest priority, very likely a real issue |
+| Strong Consensus | Found by 3-4 lanes | Highest priority, very likely a real issue |
 | Consensus | Found by 2 lanes | High priority |
 | Exclusive | 1 lane, high confidence | Include with lane attribution |
 | Lower Confidence | 1 lane, medium/low confidence | Include for consideration |
@@ -89,7 +92,7 @@ Original per-lane severities are always preserved; agreement is additional metad
 ```
 
 ### Requirements
-- One or more of: `grok`, `qodercli`, `droid` installed and authenticated
+- One or more of: `grok`, `qodercli`, `droid`, `cmd` installed and authenticated
 - Git repository (diff mode needs changes to review; full mode uses `git ls-files`, falling back to `find`)
 
 ## Secret hygiene

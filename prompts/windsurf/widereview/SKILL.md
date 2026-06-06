@@ -1,13 +1,13 @@
 ---
 name: widereview
-description: Wide fan-out code review across three cheap-model CLIs (Grok Composer 2.5, Qwen3.7-Max, FirePass) run in parallel, then consolidated into a vote-weighted report. Supports diff mode (default) and full-codebase mode (--full).
+description: Wide fan-out code review across four cheap-model CLIs (Grok Composer 2.5, Qwen3.7-Max, FirePass, MiMo v2.5 Pro) run in parallel, then consolidated into a vote-weighted report. Supports diff mode (default) and full-codebase mode (--full).
 ---
 
 # WideReview: Wide Fan-Out Cheap-Model Code Review
 
-Run code reviews across **three independent cheap-model CLIs in parallel** — `Grok Composer 2.5`, `Qwen3.7-Max`, and `FirePass` (Kimi K2.6) — then consolidate the findings into a single vote-weighted report.
+Run code reviews across **four independent cheap-model CLIs in parallel** — `Grok Composer 2.5`, `Qwen3.7-Max`, `FirePass` (Kimi K2.6), and `MiMo v2.5 Pro` — then consolidate the findings into a single vote-weighted report.
 
-💡 **Cost note**: All three are low-cost models. Unlike `ultrareview` (2 premium models, depth), WideReview favors **breadth** — several independent reviewers at near-zero cost. Use it for broad coverage and cheap second opinions.
+💡 **Cost note**: All four are low-cost models. Unlike `ultrareview` (2 premium models, depth), WideReview favors **breadth** — several independent reviewers at near-zero cost. Use it for broad coverage and cheap second opinions.
 
 ## Modes
 
@@ -27,8 +27,9 @@ Pick the mode from the user's request, then follow Phase 1 for that mode. Phases
 | A | `grok` | `grok-composer-2.5-fast` | model default |
 | B | `qodercli` | `Qwen3.7-Max` | max (flag) |
 | C | `droid exec` | `custom:FirePass-0` (Kimi K2.6 router) | n/a (router) |
+| D | `cmd` | `xiaomi/mimo-v2.5-pro` | model default |
 
-Consolidating three independent reviewers catches issues any single model misses and surfaces conflicting interpretations.
+Consolidating four independent reviewers catches issues any single model misses and surfaces conflicting interpretations.
 
 ## Prerequisites
 
@@ -37,6 +38,7 @@ Each lane is optional. Missing or unauthenticated CLIs are **skipped**, and the 
 - `grok` (Grok) — `command -v grok`
 - `qodercli` (Qoder) — `command -v qodercli`
 - `droid` (Factory) — `command -v droid`
+- `cmd` (Command Code) — `command -v cmd`
 
 ⚠️ **Secret hygiene**: The FirePass lane is backed by a custom model whose API key is stored in `~/.factory/settings.json`. Reference the model id `custom:FirePass-0` only — never read, print, or copy that settings file.
 
@@ -88,7 +90,7 @@ WR_TIMEOUT=${WR_TIMEOUT:-720}
 
 ## Phase 2: Pre-flight
 
-Detect available lanes with `command -v` (`grok`, `qodercli`, `droid`) and build the active lane list. Note any skipped lanes for the final report. No per-lane configuration is required — each lane sets its model and effort on the command line.
+Detect available lanes with `command -v` (`grok`, `qodercli`, `droid`, `cmd`) and build the active lane list. Note any skipped lanes for the final report. No per-lane configuration is required — each lane sets its model on the command line.
 
 ## Phase 3: Launch Parallel Reviews
 
@@ -130,7 +132,7 @@ Do not include headings, summaries, prose, code fences, or markdown — only the
 EOF
 ```
 
-Launch each available lane in the background, each with the mode's timeout, writing to its own output file. Each lane uses its native working-directory flag so it runs in the target repo:
+Launch each available lane in the background, each with the mode's timeout, writing to its own output file. Lanes with a native working-directory flag use it; `cmd` has none, so it runs in a subshell `cd` (the bundle/manifest paths are absolute, so reads work regardless):
 
 ```bash
 timeout "$WR_TIMEOUT" grok -p "$WR_PROMPT" -m grok-composer-2.5-fast --always-approve --cwd "${ROOT:-.}" \
@@ -139,6 +141,8 @@ timeout "$WR_TIMEOUT" qodercli -p --model "Qwen3.7-Max" --reasoning-effort max -
   > "$WR_DIR/laneB.txt" 2>&1 & B=$!
 timeout "$WR_TIMEOUT" droid exec -m custom:FirePass-0 --skip-permissions-unsafe --cwd "${ROOT:-.}" "$WR_PROMPT" \
   > "$WR_DIR/laneC.txt" 2>&1 & C=$!
+timeout "$WR_TIMEOUT" bash -c "cd '${ROOT:-.}' 2>/dev/null; cmd -p \"\$0\" --model xiaomi/mimo-v2.5-pro --skip-onboarding -t" "$WR_PROMPT" \
+  > "$WR_DIR/laneD.txt" 2>&1 & D=$!
 wait
 ```
 
@@ -160,7 +164,7 @@ Build a normalized signature for each finding: `file:line:category` (fuzzy-match
 
 | Agreement | Status | Icon |
 |-----------|--------|------|
-| All 3 lanes report it | **Strong Consensus** | 🔴🔴 |
+| ≥3 lanes report it | **Strong Consensus** | 🔴🔴 |
 | 2 lanes report it | **Consensus** | 🔴 |
 | 1 lane, High confidence | **Exclusive** | 🟠 |
 | 1 lane, Medium/Low confidence | **Lower Confidence** | 🟡 |
@@ -172,11 +176,11 @@ Build a normalized signature for each finding: `file:line:category` (fuzzy-match
 
 ```
 ## WideReview Summary  (<mode>: diff | full)
-- Strong Consensus (3 lanes): <count>
-- Consensus (2 lanes):        <count>
-- Exclusive (high conf):      <count>
-- Lower Confidence:           <count>
-- Divergent:                  <count>
+- Strong Consensus (3-4 lanes): <count>
+- Consensus (2 lanes):          <count>
+- Exclusive (high conf):        <count>
+- Lower Confidence:             <count>
+- Divergent:                    <count>
 
 ### Lane status
 | Lane | Model              | Status        | Findings |
@@ -184,9 +188,10 @@ Build a normalized signature for each finding: `file:line:category` (fuzzy-match
 | A    | Grok Composer 2.5  | ok/timeout/.. | <n>      |
 | B    | Qwen3.7-Max        | ...           | <n>      |
 | C    | FirePass           | ...           | <n>      |
+| D    | MiMo v2.5 Pro      | ...           | <n>      |
 
-- Lanes used: <k>/3
-- Cost Level: Low (3 cheap models)
+- Lanes used: <k>/4
+- Cost Level: Low (4 cheap models)
 
 Recommendation: <prioritized next steps — consensus issues first>
 ```
@@ -194,7 +199,7 @@ Recommendation: <prioritized next steps — consensus issues first>
 Then list findings grouped by the buckets in Phase 5, each as:
 
 ```
-<icon> [<Severity>] [Category] file:line   (agreement: <k>/3 lanes)
+<icon> [<Severity>] [Category] file:line   (agreement: <k>/4 lanes)
    Sources: <lanes that reported it>
    Problem: <description>
    Fix: <recommendation>
