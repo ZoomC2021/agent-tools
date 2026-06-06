@@ -1,0 +1,36 @@
+name: WideReview
+description: Wide fan-out code review across four cheap-model CLIs (deepseek-v4-pro, Qwen3.7-Max, FirePass, Gemini 3.5 Flash) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode.
+tags:
+  - ai
+  - review
+  - git
+command: |
+  Run a wide fan-out code review across four independent cheap-model CLIs in parallel, then consolidate the findings. You are the orchestrator only — you do not review the code yourself.
+
+  Modes:
+  - Diff (default): review uncommitted changes.
+  - Full (when the user says "full codebase", "--full", or passes a path): review the entire application source (or just that path).
+
+  Lanes (each optional; skip any whose CLI is missing or unauthenticated, continue with the rest, require at least one):
+  - A: `cmd -p --model deepseek/deepseek-v4-pro --skip-onboarding -t`  (set effort first: jq-merge .reasoningEffort["deepseek/deepseek-v4-pro"]="max" into ~/.commandcode/config.json). Slowest lane — give it the most timeout headroom.
+  - B: `qodercli -p --model "Qwen3.7-Max" --reasoning-effort max --dangerously-skip-permissions --cwd <root>`
+  - C: `droid exec -m custom:FirePass-0 --skip-permissions-unsafe --cwd <root>`  (reference the model id only; never read ~/.factory/settings.json)
+  - D: `agy -p --model "Gemini 3.5 Flash (High)" --dangerously-skip-permissions`
+
+  Workflow:
+  1. Gather context for the mode:
+     - Diff: `git diff HEAD -U40`, `git diff --cached -U40`, `git status --short` -> temp bundle file. Stop if empty. Use timeout 480 per lane.
+     - Full: build a deterministic file manifest with `git ls-files` (fallback `find`), stripping vendor/build noise (.venv, venv, node_modules, dist, build, .git, site-packages, __pycache__, vendor, third_party, migrations, lock files). Optional path arg narrows scope. If >150 files, warn and tell lanes to surface only highest-value findings. Use timeout 720 per lane.
+  2. Pre-flight: set the cmd deepseek effort to max; detect available lanes with `command -v`.
+  3. Launch each available lane in the background with the mode's timeout, feeding the same strict-format prompt. For FULL mode the prompt must be firmly anchored: "Review ONLY the files in the manifest at <path>. Do NOT run git commands, do NOT explore unrelated directories, do NOT describe your plan or summarize your work." (This keeps the agy/Gemini lane on task.) Output contract for both modes: "For each issue output exactly one pipe-delimited line: SEVERITY | CATEGORY | file:line | description | CONFIDENCE (SEVERITY: Critical|Warning|Suggestion; CATEGORY: Logic|Security|Performance|Regression|Style|Other; CONFIDENCE: High|Medium|Low). If none, output NO_ISSUES. No prose, no code fences." Each lane writes to its own output file.
+  4. Wait for all lanes; record each exit code (0=ok, 124=timeout, other=failed).
+  5. Parse each output: strip code fences and narration, keep only conforming pipe-delimited lines, normalize paths.
+  6. Consolidate by counting how many lanes report each file:line:category signature: 3-4 lanes = Strong Consensus, 2 = Consensus, 1 high-confidence = Exclusive, 1 medium/low = Lower Confidence, conflicting at same location = Divergent. Preserve each lane's original severity. Never auto-resolve divergences.
+
+  Output: a summary with the mode, bucket counts, a per-lane status table (model + status + finding count + lanes used k/4), "Cost Level: Low (4 cheap models)", then findings grouped by bucket with agreement ratio and source lanes, consensus first.
+
+  Constraints:
+  - Prefer concrete, actionable findings with file:line references.
+  - Report "No issues found" if all available lanes are clean.
+  - Mention any lane that was skipped, timed out, failed, or returned only narration.
+  - If all lanes fail, suggest the standard review workflow instead.

@@ -10,6 +10,7 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 | **review** | Review uncommitted changes for bugs, regressions, and improvements |
 | **ultrareview** | Parallel dual-model review using GPT 5.4 + Gemini 3.1 Pro Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
 | **ultrareview-lite** | Parallel dual-model review using Kimi 2.5 Turbo + Gemini 3 Flash Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
+| **widereview** | Wide fan-out review across four cheap-model CLIs (deepseek-v4-pro, Qwen3.7-Max, FirePass, Gemini 3.5 Flash) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (`--full`) *(Not available: Gemini, Antigravity, Amp)* |
 | **pr-reviewer** | Fetch PR comments, summarize issues, address them, update PR |
 | **pr-reviewer-only** | Fetch PR comments, summarize issues, generate implementation prompt for another agent |
 | **create-pr** | Create PR with auto-generated title and description |
@@ -117,6 +118,7 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
     ├── review.md
     ├── ultrareview.md
     ├── ultrareview-lite.md
+    ├── widereview.md
     ├── deslop.md
     ├── mission-scrutiny.md
     ├── milestone-validator.md
@@ -150,6 +152,7 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 | **review** | Review uncommitted changes | GPT-5.3-Codex | **High** |
 | **ultrareview** | Parallel dual-model review (GPT 5.4 + Gemini 3.1 Pro Preview) | Kimi K2.5 Turbo | — |
 | **ultrareview-lite** | Parallel dual-model review (Kimi 2.5 Turbo + Gemini 3 Flash Preview) | Kimi K2.5 Turbo | — |
+| **widereview** | Wide fan-out review across 4 cheap-model CLIs (deepseek-v4-pro + Qwen3.7-Max + FirePass + Gemini 3.5 Flash); diff or full-codebase (`--full`) | Kimi K2.5 Turbo | — |
 | **deslop** | Code quality audit against principles | Kimi K2.5 Turbo | — |
 | **imagegen-grok** | Generate/edit images with xAI Grok Imagine | xAI Grok Imagine Image Quality | — |
 | **imagegen-google** | Generate/edit images with Google Nano Banana Pro | Gemini 3 Pro Image Preview | — |
@@ -250,7 +253,7 @@ for f in prompts/opencode/commands/review.md prompts/opencode/commands/deslop.md
          prompts/opencode/commands/pr-reviewer.md prompts/opencode/commands/create-pr.md \
          prompts/opencode/commands/spec-compiler.md prompts/opencode/commands/quick-validator.md \
          prompts/opencode/commands/change-auditor.md prompts/opencode/commands/ultrareview.md \
-         prompts/opencode/commands/ultrareview-lite.md \
+         prompts/opencode/commands/ultrareview-lite.md prompts/opencode/commands/widereview.md \
          prompts/opencode/commands/refactor.md prompts/opencode/commands/plan-review.md \
          prompts/opencode/commands/pr-reviewer-only.md; do
   [ -f "$f" ] && cp "$f" ~/.config/opencode/commands/
@@ -365,7 +368,7 @@ chmod +x ~/.config/opencode/bin/opencode-gh-librarian
 
 **Droids:** `oracle` (deep reasoning), `gemini-3-1-pro-reviewer` (Gemini 3.1 Pro read-only review), `github-librarian` (remote GitHub research), `docs-research` (official docs/API research), `walkthrough` (architecture walkthroughs with Mermaid diagrams)
 
-**Skills:** `oracle`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`
+**Skills:** `oracle`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`, `widereview`
 
 The shipped `oracle` droid uses Factory's built-in `gpt-5.4` with `reasoningEffort: high`. If your Factory plan or workspace cannot access `gpt-5.4`, change `~/.factory/droids/oracle.md` to `model: inherit` or to a configured BYOK model such as `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
 </details>
@@ -444,7 +447,7 @@ for f in prompts/opencode/commands/review.md prompts/opencode/commands/deslop.md
          prompts/opencode/commands/pr-reviewer.md prompts/opencode/commands/create-pr.md \
          prompts/opencode/commands/spec-compiler.md prompts/opencode/commands/quick-validator.md \
          prompts/opencode/commands/change-auditor.md prompts/opencode/commands/ultrareview.md \
-         prompts/opencode/commands/ultrareview-lite.md \
+         prompts/opencode/commands/ultrareview-lite.md prompts/opencode/commands/widereview.md \
          prompts/opencode/commands/refactor.md prompts/opencode/commands/plan-review.md \
          prompts/opencode/commands/pr-reviewer-only.md; do
   [ -f "$f" ] && cp "$f" ~/.config/opencode/commands/
@@ -558,7 +561,7 @@ chmod +x ~/.config/opencode/bin/opencode-gh-librarian
 
 **Droids:** `oracle` (deep reasoning), `gemini-3-1-pro-reviewer` (Gemini 3.1 Pro read-only review), `github-librarian` (remote GitHub research), `docs-research` (official docs/API research), `walkthrough` (architecture walkthroughs with Mermaid diagrams)
 
-**Skills:** `oracle`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`
+**Skills:** `oracle`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`, `widereview`
 
 The shipped `oracle` droid uses Factory's built-in `gpt-5.4` with `reasoningEffort: high`. If your Factory plan or workspace cannot access `gpt-5.4`, change `~/.factory/droids/oracle.md` to `model: inherit` or to a configured BYOK model such as `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
 </details>
