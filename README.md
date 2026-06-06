@@ -193,6 +193,7 @@ See `prompts/opencode/opencode.json.example` for the full configuration structur
 | [Copilot CLI](https://githubnext.com/projects/copilot-cli) | CLI | `~/.copilot/agents/` |
 | [Amp](https://ampcode.com) | CLI/Editor | `~/.config/agents/skills/` |
 | [Gemini CLI](https://github.com/google-gemini/gemini-cli) | CLI | `~/.gemini/skills/` |
+| [Grok CLI (grok)](https://x.ai) | CLI | `~/.grok/skills/` |
 | [Droid](https://factory.ai) | CLI/Editor | `~/.factory/droids/` and `~/.factory/skills/` |
 | [Kilo Code](https://kilocode.com) | CLI | `~/.kilocode/prompts/` |
 | [Cursor](https://cursor.com) | Editor | `~/.cursor/commands/` |
@@ -216,7 +217,7 @@ cd agent-tools
 ./scripts/install.sh claude codex amp warp
 ```
 
-Available options: `claude`, `codex`, `opencode`, `pi`, `warp`, `antigravity`, `agy`, `vscode`, `copilot-cli`, `cmd`, `amp`, `gemini`, `droid`, `kilocode`, `cursor`, `cline`, `windsurf`
+Available options: `claude`, `codex`, `opencode`, `pi`, `warp`, `antigravity`, `agy`, `vscode`, `copilot-cli`, `cmd`, `grok`, `amp`, `gemini`, `droid`, `kilocode`, `cursor`, `cline`, `windsurf`
 
 ## Manual Installation
 
@@ -365,6 +366,18 @@ cp -r prompts/amp/* ~/.config/agents/skills/
 ```bash
 for skill_dir in prompts/gemini/*/; do
   gemini skills install "$skill_dir" --scope user --consent
+done
+```
+</details>
+
+<details>
+<summary>Grok CLI (grok)</summary>
+
+```bash
+for skill_dir in prompts/grok/*/; do
+  skill_name=$(basename "$skill_dir")
+  mkdir -p ~/.grok/skills/$skill_name
+  cp -r "$skill_dir"* ~/.grok/skills/$skill_name/
 done
 ```
 </details>
@@ -582,6 +595,18 @@ cp -r prompts/amp/* ~/.config/agents/skills/
 ```bash
 for skill_dir in prompts/gemini/*/; do
   gemini skills install "$skill_dir" --scope user --consent
+done
+```
+</details>
+
+<details>
+<summary>Grok CLI (grok)</summary>
+
+```bash
+for skill_dir in prompts/grok/*/; do
+  skill_name=$(basename "$skill_dir")
+  mkdir -p ~/.grok/skills/$skill_name
+  cp -r "$skill_dir"* ~/.grok/skills/$skill_name/
 done
 ```
 </details>

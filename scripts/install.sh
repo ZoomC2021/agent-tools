@@ -841,6 +841,35 @@ install_cmd() {
     fi
 }
 
+# Install Grok CLI (grok) skills
+install_grok() {
+    log_info "Installing Grok CLI (grok) skills..."
+    local source_dir="$PROMPTS_DIR/grok"
+    local dest="$HOME/.grok/skills"
+    
+    if [[ ! -d "$source_dir" ]]; then
+        log_warn "Source directory not found: $source_dir"
+        return 0
+    fi
+    
+    local skills_found=0
+    mkdir -p "$dest"
+    
+    for skill_dir in "$source_dir"/*/; do
+        if [[ -d "$skill_dir" ]]; then
+            local skill_name=$(basename "$skill_dir")
+            mkdir -p "$dest/$skill_name"
+            cp -r "$skill_dir"* "$dest/$skill_name/"
+            log_success "Grok CLI (grok): Copied skill '$skill_name' to $dest"
+            skills_found=1
+        fi
+    done
+    
+    if [[ $skills_found -eq 0 ]]; then
+        log_warn "No skills found in $source_dir"
+    fi
+}
+
 # Main installation
 main() {
     echo ""
@@ -857,6 +886,7 @@ main() {
     install_vscode_copilot
     install_copilot_cli
     install_cmd
+    install_grok
     install_amp
     install_gemini
     install_droid
@@ -909,6 +939,7 @@ else
             vscode|vscode-copilot) install_vscode_copilot ;;
             copilot-cli) install_copilot_cli ;;
             cmd) install_cmd ;;
+            grok) install_grok ;;
             amp) install_amp ;;
             gemini) install_gemini ;;
             droid|factory) install_droid ;;
