@@ -652,6 +652,74 @@ function Install-Droid {
     }
 }
 
+function Install-Agy {
+    Write-Info "Installing Antigravity CLI (agy) skills..."
+    
+    $SourceDir = Join-Path $PromptsDir "agy"
+    
+    if (-not (Test-Path -PathType Container $SourceDir)) {
+        Write-Warn "Source directory not found: $SourceDir"
+        return
+    }
+    
+    $Dest = Join-Path $env:USERPROFILE ".gemini\antigravity-cli\skills"
+    $SkillDirs = Get-ChildItem -Path $SourceDir -Directory
+    
+    if ($SkillDirs.Count -eq 0) {
+        Write-Warn "No skill directories found in $SourceDir"
+        return
+    }
+    
+    New-Item -ItemType Directory -Path $Dest -Force | Out-Null
+    $skillsFound = 0
+    foreach ($dir in $SkillDirs) {
+        $skillName = $dir.Name
+        $SkillDest = Join-Path $Dest $skillName
+        New-Item -ItemType Directory -Path $SkillDest -Force | Out-Null
+        Copy-Item "$($dir.FullName)\*" -Destination $SkillDest -Recurse -Force
+        Write-Success "Antigravity CLI (agy): Copied skill '$skillName' to $Dest"
+        $skillsFound++
+    }
+    
+    if ($skillsFound -eq 0) {
+        Write-Warn "No skills found in $SourceDir"
+    }
+}
+
+function Install-Cmd {
+    Write-Info "Installing Command Code (cmd) skills..."
+    
+    $SourceDir = Join-Path $PromptsDir "cmd"
+    
+    if (-not (Test-Path -PathType Container $SourceDir)) {
+        Write-Warn "Source directory not found: $SourceDir"
+        return
+    }
+    
+    $Dest = Join-Path $env:USERPROFILE ".commandcode\skills"
+    $SkillDirs = Get-ChildItem -Path $SourceDir -Directory
+    
+    if ($SkillDirs.Count -eq 0) {
+        Write-Warn "No skill directories found in $SourceDir"
+        return
+    }
+    
+    New-Item -ItemType Directory -Path $Dest -Force | Out-Null
+    $skillsFound = 0
+    foreach ($dir in $SkillDirs) {
+        $skillName = $dir.Name
+        $SkillDest = Join-Path $Dest $skillName
+        New-Item -ItemType Directory -Path $SkillDest -Force | Out-Null
+        Copy-Item "$($dir.FullName)\*" -Destination $SkillDest -Recurse -Force
+        Write-Success "Command Code (cmd): Copied skill '$skillName' to $Dest"
+        $skillsFound++
+    }
+    
+    if ($skillsFound -eq 0) {
+        Write-Warn "No skills found in $SourceDir"
+    }
+}
+
 Write-Host ""
 Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host "       Agent Tools Installer (Windows)"
@@ -666,6 +734,8 @@ Install-Windsurf
 Install-OpenCode
 Install-Gemini
 Install-Droid
+Install-Agy
+Install-Cmd
 
 Write-Host ""
 Write-Host "==========================================" -ForegroundColor Cyan

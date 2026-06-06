@@ -188,6 +188,7 @@ See `prompts/opencode/opencode.json.example` for the full configuration structur
 | [Pi](https://pi.dev) | CLI | `~/.pi/agent/prompts/` |
 | [Warp](https://www.warp.dev) | CLI/Editor | `~/.warp/workflows/` or `${XDG_DATA_HOME:-$HOME/.local/share}/warp-terminal/workflows/` or `%APPDATA%\warp\Warp\data\workflows\` |
 | [Antigravity](https://antigravity.dev) | Editor | `~/.antigravity/prompts/` or `~/Library/.../Antigravity/User/prompts/` |
+| [agy](https://antigravity.dev) | CLI | `~/.gemini/antigravity-cli/skills/` |
 | [VSCode Copilot](https://github.com/features/copilot) | Editor | `~/.config/Code/User/prompts/` or `~/Library/.../Code/User/prompts/` |
 | [Copilot CLI](https://githubnext.com/projects/copilot-cli) | CLI | `~/.copilot/agents/` |
 | [Amp](https://ampcode.com) | CLI/Editor | `~/.config/agents/skills/` |
@@ -196,6 +197,7 @@ See `prompts/opencode/opencode.json.example` for the full configuration structur
 | [Kilo Code](https://kilocode.com) | CLI | `~/.kilocode/prompts/` |
 | [Cursor](https://cursor.com) | Editor | `~/.cursor/commands/` |
 | [Cline](https://cline.bot) | Editor | `~/Documents/Cline/Rules/` |
+| [cmd](https://commandcode.ai) | CLI | `~/.commandcode/skills/` |
 | [Windsurf](https://codeium.com/windsurf) | Editor | `~/.codeium/windsurf/skills/` |
 
 ## Quick Install
@@ -214,7 +216,7 @@ cd agent-tools
 ./scripts/install.sh claude codex amp warp
 ```
 
-Available options: `claude`, `codex`, `opencode`, `pi`, `warp`, `antigravity`, `vscode`, `copilot-cli`, `amp`, `gemini`, `droid`, `kilocode`, `cursor`, `cline`, `windsurf`
+Available options: `claude`, `codex`, `opencode`, `pi`, `warp`, `antigravity`, `agy`, `vscode`, `copilot-cli`, `cmd`, `amp`, `gemini`, `droid`, `kilocode`, `cursor`, `cline`, `windsurf`
 
 ## Manual Installation
 
@@ -312,6 +314,18 @@ cp prompts/antigravity/*.md ~/Library/Application\ Support/Antigravity/User/prom
 </details>
 
 <details>
+<summary>agy (Antigravity CLI)</summary>
+
+```bash
+for skill_dir in prompts/agy/*/; do
+  skill_name=$(basename "$skill_dir")
+  mkdir -p ~/.gemini/antigravity-cli/skills/$skill_name
+  cp -r "$skill_dir"* ~/.gemini/antigravity-cli/skills/$skill_name/
+done
+```
+</details>
+
+<details>
 <summary>VSCode Copilot</summary>
 
 ```bash
@@ -397,6 +411,18 @@ cp prompts/cursor/*.md ~/.cursor/commands/
 ```bash
 mkdir -p ~/Documents/Cline/Rules
 cp prompts/cline/*.md ~/Documents/Cline/Rules/
+```
+</details>
+
+<details>
+<summary>cmd (Command Code)</summary>
+
+```bash
+for skill_dir in prompts/cmd/*/; do
+  skill_name=$(basename "$skill_dir")
+  mkdir -p ~/.commandcode/skills/$skill_name
+  cp -r "$skill_dir"* ~/.commandcode/skills/$skill_name/
+done
 ```
 </details>
 
@@ -506,6 +532,18 @@ cp prompts/antigravity/*.md ~/.antigravity/prompts/
 </details>
 
 <details>
+<summary>agy (Antigravity CLI)</summary>
+
+```bash
+for skill_dir in prompts/agy/*/; do
+  skill_name=$(basename "$skill_dir")
+  mkdir -p ~/.gemini/antigravity-cli/skills/$skill_name
+  cp -r "$skill_dir"* ~/.gemini/antigravity-cli/skills/$skill_name/
+done
+```
+</details>
+
+<details>
 <summary>VSCode Copilot</summary>
 
 ```bash
@@ -590,6 +628,18 @@ cp prompts/cursor/*.md ~/.cursor/commands/
 ```bash
 mkdir -p ~/Documents/Cline/Rules
 cp prompts/cline/*.md ~/Documents/Cline/Rules/
+```
+</details>
+
+<details>
+<summary>cmd (Command Code)</summary>
+
+```bash
+for skill_dir in prompts/cmd/*/; do
+  skill_name=$(basename "$skill_dir")
+  mkdir -p ~/.commandcode/skills/$skill_name
+  cp -r "$skill_dir"* ~/.commandcode/skills/$skill_name/
+done
 ```
 </details>
 

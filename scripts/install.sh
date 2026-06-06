@@ -783,6 +783,64 @@ install_windsurf() {
     fi
 }
 
+# Install Antigravity CLI (agy) skills
+install_agy() {
+    log_info "Installing Antigravity CLI (agy) skills..."
+    local source_dir="$PROMPTS_DIR/agy"
+    local dest="$HOME/.gemini/antigravity-cli/skills"
+    
+    if [[ ! -d "$source_dir" ]]; then
+        log_warn "Source directory not found: $source_dir"
+        return 0
+    fi
+    
+    local skills_found=0
+    mkdir -p "$dest"
+    
+    for skill_dir in "$source_dir"/*/; do
+        if [[ -d "$skill_dir" ]]; then
+            local skill_name=$(basename "$skill_dir")
+            mkdir -p "$dest/$skill_name"
+            cp -r "$skill_dir"* "$dest/$skill_name/"
+            log_success "Antigravity CLI (agy): Copied skill '$skill_name' to $dest"
+            skills_found=1
+        fi
+    done
+    
+    if [[ $skills_found -eq 0 ]]; then
+        log_warn "No skills found in $source_dir"
+    fi
+}
+
+# Install Command Code (cmd) skills
+install_cmd() {
+    log_info "Installing Command Code (cmd) skills..."
+    local source_dir="$PROMPTS_DIR/cmd"
+    local dest="$HOME/.commandcode/skills"
+    
+    if [[ ! -d "$source_dir" ]]; then
+        log_warn "Source directory not found: $source_dir"
+        return 0
+    fi
+    
+    local skills_found=0
+    mkdir -p "$dest"
+    
+    for skill_dir in "$source_dir"/*/; do
+        if [[ -d "$skill_dir" ]]; then
+            local skill_name=$(basename "$skill_dir")
+            mkdir -p "$dest/$skill_name"
+            cp -r "$skill_dir"* "$dest/$skill_name/"
+            log_success "Command Code (cmd): Copied skill '$skill_name' to $dest"
+            skills_found=1
+        fi
+    done
+    
+    if [[ $skills_found -eq 0 ]]; then
+        log_warn "No skills found in $source_dir"
+    fi
+}
+
 # Main installation
 main() {
     echo ""
@@ -795,8 +853,10 @@ main() {
     install_codex
     install_opencode
     install_antigravity
+    install_agy
     install_vscode_copilot
     install_copilot_cli
+    install_cmd
     install_amp
     install_gemini
     install_droid
@@ -845,8 +905,10 @@ else
             codex) install_codex ;;
             opencode) install_opencode ;;
             antigravity) install_antigravity ;;
+            agy) install_agy ;;
             vscode|vscode-copilot) install_vscode_copilot ;;
             copilot-cli) install_copilot_cli ;;
+            cmd) install_cmd ;;
             amp) install_amp ;;
             gemini) install_gemini ;;
             droid|factory) install_droid ;;
@@ -855,7 +917,6 @@ else
             warp) install_warp ;;
             cursor) install_cursor ;;
             cline) install_cline ;;
-
             windsurf) install_windsurf ;;
             *) log_error "Unknown agent: $agent" ;;
         esac
