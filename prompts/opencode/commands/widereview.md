@@ -140,9 +140,9 @@ timeout "$WR_TIMEOUT" grok -p "$WR_PROMPT" -m grok-composer-2.5-fast --always-ap
   > "$WR_DIR/laneA.txt" 2>&1 & A=$!
 timeout "$WR_TIMEOUT" qodercli -p --model "Qwen3.7-Max" --reasoning-effort max --dangerously-skip-permissions --cwd "${ROOT:-.}" "$WR_PROMPT" \
   > "$WR_DIR/laneB.txt" 2>&1 & B=$!
-timeout "$WR_TIMEOUT" opencode run "$WR_PROMPT" -m fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo --dir "${ROOT:-.}" --dangerously-skip-permissions -f "${BUNDLE:-$MANIFEST}" \
+timeout "$WR_TIMEOUT" opencode run "$WR_PROMPT" --pure -m fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo --dir "${ROOT:-.}" --dangerously-skip-permissions -f "${BUNDLE:-$MANIFEST}" \
   > "$WR_DIR/laneC.txt" 2>&1 & C=$!
-timeout "$WR_TIMEOUT" bash -c "cd '${ROOT:-.}' 2>/dev/null; cmd -p \"\$0\" --model xiaomi/mimo-v2.5-pro --skip-onboarding --max-turns 120 -t" "$WR_PROMPT" \
+timeout "$WR_TIMEOUT" bash -c "cd '${ROOT:-.}' 2>/dev/null; cmd -p \"\$0\" --model xiaomi/mimo-v2.5-pro --skip-onboarding --max-turns 120 --add-dir '$WR_DIR' --yolo -t" "$WR_PROMPT" \
   > "$WR_DIR/laneD.txt" 2>&1 & D=$!
 wait
 ```
