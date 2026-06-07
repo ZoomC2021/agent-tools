@@ -397,7 +397,7 @@ chmod +x ~/.config/opencode/bin/opencode-gh-librarian
 
 **Skills:** `oracle`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`, `widereview`
 
-The shipped `oracle` droid uses Factory's built-in `gpt-5.4` with `reasoningEffort: high`. If your Factory plan or workspace cannot access `gpt-5.4`, change `~/.factory/droids/oracle.md` to `model: inherit` or to a configured BYOK model such as `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
+The shipped `oracle` droid inherits your parent Droid model with `reasoningEffort: high`, so it works with your available Factory plan, credits, or BYOK configuration. To force Factory's built-in GPT-5.4, change `~/.factory/droids/oracle.md` to `model: gpt-5.4`; for BYOK use `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
 </details>
 
 <details>
@@ -626,7 +626,7 @@ chmod +x ~/.config/opencode/bin/opencode-gh-librarian
 
 **Skills:** `oracle`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`, `widereview`
 
-The shipped `oracle` droid uses Factory's built-in `gpt-5.4` with `reasoningEffort: high`. If your Factory plan or workspace cannot access `gpt-5.4`, change `~/.factory/droids/oracle.md` to `model: inherit` or to a configured BYOK model such as `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
+The shipped `oracle` droid inherits your parent Droid model with `reasoningEffort: high`, so it works with your available Factory plan, credits, or BYOK configuration. To force Factory's built-in GPT-5.4, change `~/.factory/droids/oracle.md` to `model: gpt-5.4`; for BYOK use `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
 </details>
 
 <details>

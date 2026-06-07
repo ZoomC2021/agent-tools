@@ -1,17 +1,17 @@
 ---
 name: ultrareview
-description: Run a dual-model review with Droid-native GPT-5.4 and Gemini 3.1 Pro subagents.
+description: Run a dual-model review with Droid-native oracle and Gemini 3.1 Pro subagents.
 ---
 
 # ultrareview
 
-Run a dual-model review with Droid-native subagents: GPT-5.4 high-reasoning and Gemini 3.1 Pro.
+Run a dual-model review with Droid-native subagents: the high-reasoning oracle droid and Gemini 3.1 Pro.
 
 This mirrors the OpenCode UltraReview workflow but **must not** use Gemini CLI helpers or external CLI review processes.
 
 ## Models Used
 
-1. `oracle` droid (`gpt-5.4`, `reasoningEffort: high`)
+1. `oracle` droid (`model: inherit`, `reasoningEffort: high`)
 2. `gemini-3-1-pro-reviewer` droid (`gemini-3.1-pro-preview`)
 
 ## Workflow
@@ -33,7 +33,7 @@ Use `git diff -U40 HEAD` as the primary bundle for both models so consensus matc
 
 Use two `Task` tool calls in the same response:
 
-- `subagent_type: oracle` for GPT-5.4 high-reasoning review
+- `subagent_type: oracle` for high-reasoning review
 - `subagent_type: gemini-3-1-pro-reviewer` for Gemini 3.1 Pro review
 
 Each prompt should require read-only analysis and this output shape per finding:
@@ -51,7 +51,7 @@ Normalize and compare findings by `file:line:category:description` (fuzzy matchi
 
 Report sections:
 1. Consensus issues (both models)
-2. GPT-5.4-only issues
+2. Oracle-only issues
 3. Gemini-only issues
 4. Lower-confidence issues
 5. Divergent assessments

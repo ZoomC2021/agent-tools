@@ -21,6 +21,7 @@ Use this skill when the user asks to consult an oracle, get a second opinion fro
 
 3. **Invoke the custom droid**
    - Use the Task tool with `subagent_type: oracle`.
+   - In non-interactive `droid exec` read-only mode, enable the Task tool when needed, for example `droid exec --enabled-tools Task "..."`.
    - Give the oracle a self-contained prompt with sections like:
 
 ```markdown
@@ -67,4 +68,4 @@ cp prompts/droid/skills/oracle/SKILL.md ~/.factory/skills/oracle/SKILL.md
 
 ## Model Configuration Note
 
-The shipped oracle droid uses Factory's built-in `gpt-5.4` with `reasoningEffort: high`. If the user's Factory plan or workspace cannot access `gpt-5.4`, they should edit `~/.factory/droids/oracle.md` to use `model: inherit` or a configured BYOK model such as `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not an API credential for Droid.
+The shipped oracle droid inherits the parent Droid's configured model and uses `reasoningEffort: high`, so it should work with the user's available Factory plan, credits, or BYOK configuration. If the user specifically wants Factory's built-in `gpt-5.4` and their workspace can access it, they can edit `~/.factory/droids/oracle.md` to use `model: gpt-5.4`; for BYOK use a configured model such as `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not an API credential for Droid.

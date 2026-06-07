@@ -782,6 +782,22 @@
       "hidden": true,
       "prompt": "{file:./commands/markdown-converter.md}"
     },
+    "agent-browser": {
+      "description": "Use the agent-browser CLI for browser automation, screenshots, web app QA, Electron/Slack automation, and cloud browser sessions.",
+      "mode": "subagent",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "hidden": true,
+      "prompt": "{file:./commands/agent-browser.md}",
+      "permission": {
+        "task": {
+          "*": "deny"
+        },
+        "read": "allow",
+        "bash": "allow",
+        "glob": "allow",
+        "grep": "allow"
+      }
+    },
     "imagegen-grok": {
       "description": "Generate and edit images with xAI Grok Imagine from OpenCode.",
       "mode": "subagent",

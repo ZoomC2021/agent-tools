@@ -913,6 +913,7 @@ main() {
     echo "  - pr-reviewer-only : Generate implementation prompt for PR feedback"
     echo "  - create-pr        : Create PR from current changes"
     echo "  - deslop           : Analyze code for quality issues using coding principles"
+    echo "  - agent-browser    : Browser automation with the agent-browser CLI"
     echo "  - imagegen-google  : Generate/edit images with Google Nano Banana Pro (Vertex AI)"
     echo "  - oracle           : Consult a deep-reasoning oracle subagent"
     echo "  - predict-issues   : Predict likely future code issues"
