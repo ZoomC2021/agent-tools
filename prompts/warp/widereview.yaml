@@ -14,14 +14,14 @@ command: |
   Lanes (each optional; skip any whose CLI is missing or unauthenticated, continue with the rest, require at least one):
   - A: `grok -p "<prompt>" -m grok-composer-2.5-fast --always-approve --cwd <root>`
   - B: `qodercli -p --model "Qwen3.7-Max" --reasoning-effort max --dangerously-skip-permissions --cwd <root>`
-  - C: `droid exec -m custom:FirePass-0 --skip-permissions-unsafe --cwd <root>`  (reference the model id only; never read ~/.factory/settings.json)
-  - D: `cmd -p "<prompt>" --model xiaomi/mimo-v2.5-pro --skip-onboarding -t`  (cmd has no --cwd; run it via a subshell `cd <root>`)
+  - C: `opencode run "<prompt>" -m fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo --dir <root> --dangerously-skip-permissions -f <bundle-or-manifest>`  (reference the model id only; never read or print provider API keys)
+  - D: `cmd -p "<prompt>" --model xiaomi/mimo-v2.5-pro --skip-onboarding --max-turns 120 -t`  (cmd has no --cwd; run it via a subshell `cd <root>`)
 
   Workflow:
   1. Gather context for the mode:
      - Diff: `git add -N .` (so untracked files show up), then `git diff HEAD -U40`, `git diff --cached -U40`, `git status --short` -> temp bundle file. Stop if empty. Use timeout 480 per lane.
      - Full: build a deterministic file manifest with `git ls-files` (fallback `find`), stripping vendor/build noise (.venv, venv, node_modules, dist, build, .git, site-packages, __pycache__, vendor, third_party, migrations, lock files). Optional path arg narrows scope. If >150 files, warn and tell lanes to surface only highest-value findings. Use timeout 720 per lane.
-  2. Pre-flight: detect available lanes with `command -v` (grok, qodercli, droid, cmd). No per-lane configuration is required.
+  2. Pre-flight: detect available lanes with `command -v` (grok, qodercli, opencode, cmd). No per-lane configuration is required.
   3. Launch each available lane in the background with the mode's timeout, feeding the same strict-format prompt. For FULL mode the prompt must be firmly anchored: "Review ONLY the files in the manifest at <path>. Do NOT run git commands, do NOT explore unrelated directories, do NOT describe your plan or summarize your work." (This keeps the agentic lanes on task.) Output contract for both modes: "For each issue output exactly one pipe-delimited line: SEVERITY | CATEGORY | file:line | description | CONFIDENCE (SEVERITY: Critical|Warning|Suggestion; CATEGORY: Logic|Security|Performance|Regression|Style|Other; CONFIDENCE: High|Medium|Low). If none, output NO_ISSUES. No prose, no code fences." Each lane writes to its own output file.
   4. Wait for all lanes; record each exit code (0=ok, 124=timeout, other=failed).
   5. Parse each output: strip code fences and narration, keep only conforming pipe-delimited lines, normalize paths.

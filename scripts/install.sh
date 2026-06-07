@@ -907,7 +907,7 @@ main() {
     echo "  - review           : Review uncommitted changes"
     echo "  - ultrareview      : Parallel dual-model review (GPT 5.4 + Gemini 3.1 Pro)"
     echo "  - ultrareview-lite : Parallel dual-model review (Kimi 2.5 Turbo + Gemini 3 Flash Preview)"
-    echo "  - widereview       : Wide fan-out review across 4 cheap-model CLIs (Grok Composer 2.5 + Qwen3.7-Max + FirePass + MiMo v2.5 Pro); diff or full-codebase (--full)"
+    echo "  - widereview       : Wide fan-out review across 4 cheap-model CLIs (Grok Composer 2.5 + Qwen3.7-Max + FirePass/Kimi K2.6 via OpenCode + MiMo v2.5 Pro); diff or full-codebase (--full)"
     echo "  - cc               : Execute Claude CLI commands and code reviews"
     echo "  - pr-reviewer      : Address PR review feedback"
     echo "  - pr-reviewer-only : Generate implementation prompt for PR feedback"

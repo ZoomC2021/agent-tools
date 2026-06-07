@@ -27,7 +27,7 @@ Pick the mode from the user's request, then follow Phase 1 for that mode. Phases
 |------|-----|-------|------------------|
 | A | `grok` | `grok-composer-2.5-fast` | model default |
 | B | `qodercli` | `Qwen3.7-Max` | max (flag) |
-| C | `droid exec` | `custom:FirePass-0` (Kimi K2.6 router) | n/a (router) |
+| C | `opencode run` | `fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo` (FirePass/Kimi K2.6 router) | model default |
 | D | `cmd` | `xiaomi/mimo-v2.5-pro` | model default |
 
 Consolidating four independent reviewers catches issues any single model misses and surfaces conflicting interpretations.
@@ -38,10 +38,10 @@ Each lane is optional. Missing or unauthenticated CLIs are **skipped**, and the 
 
 - `grok` (Grok) — `command -v grok`
 - `qodercli` (Qoder) — `command -v qodercli`
-- `droid` (Factory) — `command -v droid`
+- `opencode` (FirePass/Kimi K2.6) — `command -v opencode`
 - `cmd` (Command Code) — `command -v cmd`
 
-⚠️ **Secret hygiene**: The FirePass lane is backed by a custom model whose API key is stored in `~/.factory/settings.json`. Reference the model id `custom:FirePass-0` only — never read, print, or copy that settings file.
+⚠️ **Secret hygiene**: The FirePass lane is backed by OpenCode's Fireworks provider configuration. Reference the model id `fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo` only — never read, print, or copy provider API keys.
 
 ## Phase 1 (Diff mode): Gather Context
 
@@ -91,7 +91,7 @@ WR_TIMEOUT=${WR_TIMEOUT:-720}
 
 ## Phase 2: Pre-flight
 
-Detect available lanes with `command -v` (`grok`, `qodercli`, `droid`, `cmd`) and build the active lane list. Note any skipped lanes for the final report. No per-lane configuration is required — each lane sets its model on the command line.
+Detect available lanes with `command -v` (`grok`, `qodercli`, `opencode`, `cmd`) and build the active lane list. Note any skipped lanes for the final report. No per-lane configuration is required — each lane sets its model on the command line.
 
 ## Phase 3: Launch Parallel Reviews
 
@@ -140,9 +140,9 @@ timeout "$WR_TIMEOUT" grok -p "$WR_PROMPT" -m grok-composer-2.5-fast --always-ap
   > "$WR_DIR/laneA.txt" 2>&1 & A=$!
 timeout "$WR_TIMEOUT" qodercli -p --model "Qwen3.7-Max" --reasoning-effort max --dangerously-skip-permissions --cwd "${ROOT:-.}" "$WR_PROMPT" \
   > "$WR_DIR/laneB.txt" 2>&1 & B=$!
-timeout "$WR_TIMEOUT" droid exec -m custom:FirePass-0 --skip-permissions-unsafe --cwd "${ROOT:-.}" "$WR_PROMPT" \
+timeout "$WR_TIMEOUT" opencode run "$WR_PROMPT" -m fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo --dir "${ROOT:-.}" --dangerously-skip-permissions -f "${BUNDLE:-$MANIFEST}" \
   > "$WR_DIR/laneC.txt" 2>&1 & C=$!
-timeout "$WR_TIMEOUT" bash -c "cd '${ROOT:-.}' 2>/dev/null; cmd -p \"\$0\" --model xiaomi/mimo-v2.5-pro --skip-onboarding -t" "$WR_PROMPT" \
+timeout "$WR_TIMEOUT" bash -c "cd '${ROOT:-.}' 2>/dev/null; cmd -p \"\$0\" --model xiaomi/mimo-v2.5-pro --skip-onboarding --max-turns 120 -t" "$WR_PROMPT" \
   > "$WR_DIR/laneD.txt" 2>&1 & D=$!
 wait
 ```
