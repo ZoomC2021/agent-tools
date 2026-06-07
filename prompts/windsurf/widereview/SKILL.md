@@ -143,10 +143,13 @@ timeout "$WR_TIMEOUT" opencode run "$WR_PROMPT" --pure -m fireworks-ai/accounts/
   > "$WR_DIR/laneC.txt" 2>&1 & C=$!
 timeout "$WR_TIMEOUT" bash -c "cd '${ROOT:-.}' 2>/dev/null; cmd -p \"\$0\" --model xiaomi/mimo-v2.5-pro --skip-onboarding --max-turns 120 --add-dir '$WR_DIR' --yolo -t" "$WR_PROMPT" \
   > "$WR_DIR/laneD.txt" 2>&1 & D=$!
-wait
+wait "$A"; A_STATUS=$?
+wait "$B"; B_STATUS=$?
+wait "$C"; C_STATUS=$?
+wait "$D"; D_STATUS=$?
 ```
 
-(Only start lanes whose CLI was detected in Phase 2. `ROOT` is unset in diff mode — `${ROOT:-.}` keeps lanes in the current repo. Record each lane's exit code: `0` = ok, `124` = timeout, other = failed.)
+(Only start lanes whose CLI was detected in Phase 2. `ROOT` is unset in diff mode — `${ROOT:-.}` keeps lanes in the current repo. Wait only for the PIDs of lanes you started; do not use bare `wait`, because it can block on unrelated background jobs in the orchestrator shell. Record each lane's exit code: `0` = ok, `124` = timeout, other = failed.)
 
 ## Phase 4: Collect and Parse
 
