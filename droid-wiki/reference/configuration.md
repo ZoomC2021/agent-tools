@@ -27,7 +27,7 @@ OpenCode configuration structure and options.
 | `$schema` | string | JSON Schema URI for validation |
 | `plugin` | string[] | Auth plugins (e.g., `opencode-antigravity-auth@1.6.0`) |
 | `provider` | object | Provider configurations (openai, google, fireworks-ai) |
-| `model` | string | Default model ID (e.g., `fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo`) |
+| `model` | string | Default model ID (e.g., `fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo`) |
 | `default_agent` | string | Default agent to use (e.g., `codex53-kimi-turbo`) |
 | `mode` | object | Mode-specific model overrides (plan, build) |
 | `agent` | object | Agent definitions and permissions |
@@ -69,7 +69,7 @@ OpenCode configuration structure and options.
     "apiKey": "YOUR_FIREWORKS_API_KEY_HERE"
   },
   "models": {
-    "accounts/fireworks/routers/kimi-k2p5-turbo": {
+    "accounts/fireworks/routers/kimi-k2p6-turbo": {
       "name": "Kimi 2.5 Turbo (Fireworks)",
       "limit": {
         "context": 256000,
@@ -122,7 +122,7 @@ Override models for specific modes:
     "model": "openai/gpt-5.3-codex"
   },
   "build": {
-    "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+    "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo"
   }
 }
 ```

@@ -1,7 +1,7 @@
 ---
 description: Read-only remote GitHub code research on default-branch snapshots and lightweight history
 mode: subagent
-model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo
 permission:
   task:
     '*': deny

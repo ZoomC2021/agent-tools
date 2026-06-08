@@ -31,10 +31,10 @@
     {
       "name": "kimi25turbo-primary",
       "description": "Fireworks Kimi K2.5 Turbo used as the orchestrator/primary model with subagent routing unchanged.",
-      "cliModel": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "cliModel": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
       "includeProjectPlugins": true,
       "configOverrides": {
-        "agent.codex53-kimi.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+        "agent.codex53-kimi.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
         "agent.codex53-kimi.prompt": "{file:./agent/codex53-kimi-turbo.md}",
         "agent.codex53-kimi.permission.read": "deny",
         "agent.codex53-kimi.permission.grep": "deny",
@@ -43,14 +43,14 @@
         "agent.codex53-kimi.permission.google_search": "deny",
         "agent.codex53-kimi.permission.websearch": "deny",
         "agent.codex53-kimi.permission.webfetch": "deny",
-        "mode.plan.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+        "mode.plan.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo"
       },
       "configDeletes": [
         "agent.codex53-kimi.routing_policy"
       ],
       "promptFrontmatterOverrides": {
         "agent/codex53-kimi-turbo.md": {
-          "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+          "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo"
         }
       }
     },
@@ -60,13 +60,13 @@
       "configOverrides": {
         "agent.kimi-explore.mode": "primary",
         "agent.kimi-explore.hidden": false,
-        "agent.kimi-explore.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+        "agent.kimi-explore.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
         "agent.kimi-explore.permission.bash": "allow"
       },
       "promptFrontmatterOverrides": {
         "agent/kimi-explore.md": {
           "mode": "primary",
-          "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+          "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo"
         }
       }
     },
@@ -92,12 +92,12 @@
       "configOverrides": {
         "agent.kimi-general.mode": "primary",
         "agent.kimi-general.hidden": false,
-        "agent.kimi-general.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+        "agent.kimi-general.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo"
       },
       "promptFrontmatterOverrides": {
         "agent/kimi-general.md": {
           "mode": "primary",
-          "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+          "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo"
         }
       }
     },
@@ -122,12 +122,12 @@
       "configOverrides": {
         "agent.mission-scrutiny.mode": "primary",
         "agent.mission-scrutiny.hidden": false,
-        "agent.mission-scrutiny.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+        "agent.mission-scrutiny.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo"
       },
       "promptFrontmatterOverrides": {
         "commands/mission-scrutiny.md": {
           "mode": "primary",
-          "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+          "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo"
         }
       }
     },
@@ -152,13 +152,13 @@
       "configOverrides": {
         "agent.milestone-validator.mode": "primary",
         "agent.milestone-validator.hidden": false,
-        "agent.milestone-validator.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+        "agent.milestone-validator.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
         "agent.milestone-validator.permission.bash": "allow"
       },
       "promptFrontmatterOverrides": {
         "commands/milestone-validator.md": {
           "mode": "primary",
-          "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+          "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo"
         }
       }
     },
@@ -168,12 +168,12 @@
       "configOverrides": {
         "agent.plan-review.mode": "primary",
         "agent.plan-review.hidden": false,
-        "agent.plan-review.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+        "agent.plan-review.model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo"
       },
       "promptFrontmatterOverrides": {
         "commands/plan-review.md": {
           "mode": "primary",
-          "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
+          "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo"
         }
       }
     },

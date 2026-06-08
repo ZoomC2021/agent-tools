@@ -12,7 +12,7 @@ Most agents use YAML frontmatter:
 ---
 description: Short description of what this prompt does
 mode: subagent
-model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo
 permission:
   task:
     '*': deny
@@ -34,7 +34,7 @@ Windsurf, Amp, and Gemini CLI use SKILL.md files:
 ## Metadata
 
 - **Name**: skill-name
-- **Model**: kimi-k2p5-turbo
+- **Model**: kimi-k2p6-turbo
 
 ## Description
 

@@ -1,7 +1,7 @@
 ---
 description: Run parallel code reviews using Kimi 2.5 Turbo (OpenCode) AND Gemini 3 Flash Preview (Gemini CLI), then consolidate results
 mode: subagent
-model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo
 ---
 
 # UltraReview Lite: Parallel Kimi + Gemini Flash Code Review
@@ -59,7 +59,7 @@ description: Kimi 2.5 Turbo read-only code review
 subagent_type: review
 prompt: |
   TASK: Perform READ-ONLY code review using Kimi 2.5 Turbo
-  MODEL OVERRIDE: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
+  MODEL OVERRIDE: fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo
   TOOLS ALLOWED: Read, Bash (for git commands only), Grep, Glob
   TOOLS FORBIDDEN: Edit, Write
 

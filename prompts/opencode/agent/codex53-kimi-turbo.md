@@ -3,7 +3,7 @@ description: >-
   Kimi 2.5 Turbo optimized orchestrator (codex53-kimi variant) that delegates
   implementation and research work to subagents.
 mode: primary
-model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo
 permission:
   task:
     '*': deny

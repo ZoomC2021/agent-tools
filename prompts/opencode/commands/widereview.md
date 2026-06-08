@@ -1,7 +1,7 @@
 ---
 description: Wide fan-out code review across four cheap-model CLIs (Grok Composer 2.5, Qwen3.7-Max, FirePass, MiMo v2.5 Pro) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (--full)
 mode: subagent
-model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo
 ---
 
 # WideReview: Wide Fan-Out Cheap-Model Code Review

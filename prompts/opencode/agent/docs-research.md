@@ -1,7 +1,7 @@
 ---
 description: Research official documentation and external API behavior using web sources
 mode: subagent
-model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo
 permission:
   task:
     '*': deny

@@ -1,7 +1,7 @@
 ---
 description: Execute Claude CLI commands and code reviews from OpenCode
 mode: subagent
-model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo
 ---
 
 # CC: Claude CLI Command Execution
