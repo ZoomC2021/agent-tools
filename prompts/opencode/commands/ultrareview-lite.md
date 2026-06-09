@@ -1,14 +1,14 @@
 ---
-description: Run parallel code reviews using Kimi 2.5 Turbo (OpenCode) AND Gemini 3 Flash Preview (Gemini CLI), then consolidate results
+description: Run parallel code reviews using MiMo v2.5 Pro (OpenCode) AND Gemini 3 Flash Preview (Gemini CLI), then consolidate results
 mode: subagent
-model: fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo
+model: xiaomi/mimo-v2.5-pro
 ---
 
-# UltraReview Lite: Parallel Kimi + Gemini Flash Code Review
+# UltraReview Lite: Parallel MiMo + Gemini Flash Code Review
 
-Run simultaneous code reviews using **Kimi 2.5 Turbo** (via OpenCode native) AND **Gemini 3 Flash Preview** (via Gemini CLI), then consolidate findings into a unified report.
+Run simultaneous code reviews using **MiMo v2.5 Pro** (via OpenCode native) AND **Gemini 3 Flash Preview** (via Gemini CLI), then consolidate findings into a unified report.
 
-Compared with `/ultrareview`, this variant reduces cost by replacing the GPT 5.4 lane with Kimi 2.5 Turbo.
+Compared with `/ultrareview`, this variant reduces cost by replacing the GPT 5.4 lane with MiMo v2.5 Pro.
 
 ## Phase 1: Gather Context
 
@@ -27,8 +27,8 @@ Capture the complete set of changed files and their contents for both models.
 Both models should review from the **same** input to keep consensus detection meaningful. The bundle is an extended-context diff (`git diff -U40 HEAD`) carrying each hunk with +/-40 lines of context.
 
 Rules:
-- The extended-context diff is the **primary** input for both Kimi and Gemini Flash.
-- Kimi may still read a modified file in full when a hunk needs extra context.
+- The extended-context diff is the **primary** input for both MiMo and Gemini Flash.
+- MiMo may still read a modified file in full when a hunk needs extra context.
 - Gemini receives only the bundle (via file reference, not stdin).
 - Never replace the bundle with hand-edited excerpts.
 
@@ -48,18 +48,18 @@ Rules:
 
 ## Phase 2: Launch Reviews
 
-### Task 1: Kimi 2.5 Turbo Review (Primary - Always Run)
+### Task 1: MiMo v2.5 Pro Review (Primary - Always Run)
 
 This is the **primary** review. Gemini CLI is attempted in parallel but may timeout.
 
 Launch this task using the `task` tool:
 
 ```
-description: Kimi 2.5 Turbo read-only code review
+description: MiMo v2.5 Pro read-only code review
 subagent_type: review
 prompt: |
-  TASK: Perform READ-ONLY code review using Kimi 2.5 Turbo
-  MODEL OVERRIDE: fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo
+  TASK: Perform READ-ONLY code review using MiMo v2.5 Pro
+  MODEL OVERRIDE: xiaomi/mimo-v2.5-pro
   TOOLS ALLOWED: Read, Bash (for git commands only), Grep, Glob
   TOOLS FORBIDDEN: Edit, Write
 
@@ -96,7 +96,7 @@ Launch this task using the `task` tool:
 
 ```
 description: Gemini 3 Flash CLI review via helper (opportunistic)
-subagent_type: kimi-general
+subagent_type: mimo-general
 prompt: |
   TASK: Execute Gemini 3 Flash Preview review via CLI helper
   
@@ -157,11 +157,11 @@ prompt: |
 
 ### Expected Outcomes
 
-| Scenario | Kimi Result | Gemini Result | Action |
+| Scenario | MiMo Result | Gemini Result | Action |
 |----------|-------------|---------------|--------|
 | Ideal | Success | Success | Full dual-model consolidation |
-| Typical | Success | Timeout | Kimi-only report with note about Gemini timeout |
-| Degraded | Success | Fail | Kimi-only report with Gemini failure reason |
+| Typical | Success | Timeout | MiMo-only report with note about Gemini timeout |
+| Degraded | Success | Fail | MiMo-only report with Gemini failure reason |
 
 ### Processing Gemini Results
 
@@ -197,14 +197,14 @@ fi
 
 ```
 ## UltraReview Lite Summary
-- Kimi 2.5 Turbo: <status>
+- MiMo v2.5 Pro: <status>
 - Gemini 3 Flash: <status> (<failure_reason if not success>)
 - Consensus Critical: <count>
-- Kimi Exclusive: <count>
+- MiMo Exclusive: <count>
 - Gemini Exclusive: <count>
 - Total Models Used: <1 or 2>
-- Execution: Kimi 2.5 Turbo (OpenCode) + Gemini 3 Flash Preview (CLI)
-- Cost Level: Medium (Kimi + optional Gemini Flash)
+- Execution: MiMo v2.5 Pro (OpenCode) + Gemini 3 Flash Preview (CLI)
+- Cost Level: Medium (MiMo + optional Gemini Flash)
 ```
 
 ### Gemini Failure Banner (when Gemini fails/times out)
@@ -213,12 +213,12 @@ fi
 ⚠️ Gemini 3 Flash CLI timeout or failure
 - Status: <status>
 - Reason: <failure_reason>
-- Review based on Kimi 2.5 Turbo results
+- Review based on MiMo v2.5 Pro results
 ```
 
 ### Report Structure
 
-1. **Kimi 2.5 Turbo Findings** (always present)
+1. **MiMo v2.5 Pro Findings** (always present)
 2. **Gemini 3 Flash Findings** (if available and successful)
 3. **Consensus Issues** (if both models succeeded)
 4. **Divergent Assessments** (if any)
@@ -239,14 +239,14 @@ fi
 
 ### Fallback Strategy
 
-1. **Always complete Kimi review first** - this is the reliable path
+1. **Always complete MiMo review first** - this is the reliable path
 2. **Attempt Gemini in parallel** with generous timeouts (120s)
 3. **Expect occasional timeouts** - file-based review is thorough but slower
-4. **Consolidate with Kimi as primary** - don't fail if Gemini times out
+4. **Consolidate with MiMo as primary** - don't fail if Gemini times out
 
 ### Both Models Unavailable
 
-If even Kimi fails:
+If even MiMo fails:
 1. Report: `UltraReview Lite failed: Unable to complete code review`
 2. Suggest: `Use /review for standard single-model review`
 3. Check: Git repository status, network connectivity, model availability
@@ -256,4 +256,4 @@ If even Kimi fails:
 **Never auto-resolve model conflicts.** When both models report and disagree:
 1. Show both assessments
 2. Mark as `⚠️ Divergent` 
-3. Note: "Human review recommended - models disagree"
+3. Note: "HumaMiMo review recommended - models disagree"

@@ -29,7 +29,7 @@ Only Phase 1 (context gathering) and the lane prompt differ between modes; the p
 3. Launch parallel lanes (each with the mode's timeout, own output file):
    - Lane A: Grok Composer 2.5 (grok -p -m grok-composer-2.5-fast --always-approve --cwd <root>)
    - Lane B: Qwen3.7-Max       (qodercli -p --model "Qwen3.7-Max" --reasoning-effort max --dangerously-skip-permissions --cwd <root>)
-   - Lane C: FirePass / K2.6   (droid exec -m custom:FirePass-0 --skip-permissions-unsafe --cwd <root>)
+   - Lane C: OpenCode / K2.6   (droid exec -m custom:OpenCode-0 --skip-permissions-unsafe --cwd <root>)
    - Lane D: MiMo v2.5 Pro     (cmd -p --model xiaomi/mimo-v2.5-pro --skip-onboarding -t; subshell cd <root>)
 4. Collect exit codes (0=ok, 124=timeout, other=failed); parse pipe-delimited findings, discard narration
 5. Consolidate by vote count:
@@ -48,7 +48,7 @@ Only Phase 1 (context gathering) and the lane prompt differ between modes; the p
 |------|-----|-------|------------------|------------------|
 | A | `grok` (Grok) | `grok-composer-2.5-fast` | model default | n/a |
 | B | `qodercli` (Qoder) | `Qwen3.7-Max` | max | `--reasoning-effort` flag |
-| C | `droid exec` (Factory) | `custom:FirePass-0` (Kimi K2.6 router) | n/a | router model |
+| C | `droid exec` (Factory) | `custom:OpenCode-0` (MiMo v2.5 Pro) | n/a | router model |
 | D | `cmd` (Command Code) | `xiaomi/mimo-v2.5-pro` | model default | n/a |
 
 ## Strict finding format
@@ -97,7 +97,7 @@ Original per-lane severities are always preserved; agreement is additional metad
 
 ## Secret hygiene
 
-The FirePass lane is backed by a custom model whose Fireworks API key is stored in plaintext in `~/.factory/settings.json`. The workflow references the model id `custom:FirePass-0` only and must never read, print, or copy that settings file.
+The OpenCode lane is backed by a custom model whose xiaomi API key is stored in plaintext in `~/.factory/settings.json`. The workflow references the model id `custom:OpenCode-0` only and must never read, print, or copy that settings file.
 
 ## When to use
 

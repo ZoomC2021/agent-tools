@@ -1,7 +1,7 @@
 ---
 description: Execute Claude CLI commands and code reviews from OpenCode
 mode: subagent
-model: fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo
+model: xiaomi/mimo-v2.5-pro
 ---
 
 # CC: Claude CLI Command Execution
@@ -88,7 +88,7 @@ git diff -U40 HEAD > "$REVIEW_TMP_ROOT/bundle.diff"
 
 ```
 description: Claude CLI review via helper
-subagent_type: kimi-general
+subagent_type: mimo-general
 prompt: |
   TASK: Execute Claude CLI review via helper
   
@@ -231,9 +231,9 @@ The helper returns:
 
 | Workflow | Primary Model | Use Case |
 |----------|---------------|----------|
-| `/review` | Kimi 2.5 Turbo | Standard single-model review |
+| `/review` | MiMo v2.5 Pro | Standard single-model review |
 | `/ultrareview` | GPT 5.4 + Gemini 3.1 Pro | Dual high-tier model review |
-| `/ultrareview-lite` | Kimi 2.5 Turbo + Gemini 3 Flash | Cost-effective dual review |
+| `/ultrareview-lite` | MiMo v2.5 Pro + Gemini 3 Flash | Cost-effective dual review |
 | `/cc` | Claude Sonnet/Opus | Claude-specific analysis or multi-step tasks |
 
 Claude Code excels at:

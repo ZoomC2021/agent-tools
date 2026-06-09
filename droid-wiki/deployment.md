@@ -165,7 +165,7 @@ The `prompts/opencode/opencode.json.example` is the **source of truth**. Users c
 - macOS: `~/.config/opencode/opencode.json`
 - Linux: `~/.config/opencode/opencode.json`
 
-**Important**: Users must edit and replace `YOUR_FIREWORKS_API_KEY_HERE` with their actual API key.
+**Important**: Users must edit and replace `YOUR_XIAOMI_API_KEY_HERE` with their actual API key.
 
 ### Config Validation
 

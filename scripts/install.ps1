@@ -203,7 +203,7 @@ function Install-OpenCode {
         Write-Warn "Agent source directory not found: $AgentSource"
     }
 
-    # Install .opencode/plugins (local plugins like kimi-routing-guard)
+    # Install .opencode/plugins (local plugins like mimo-routing-guard)
     $PluginsSource = Join-Path $SourceDir ".opencode\plugins"
     $PluginsDest = Join-Path $env:USERPROFILE ".config\opencode\plugins"
 
@@ -268,7 +268,7 @@ function Install-OpenCode {
         Write-Warn "Example config not found: $ExampleFile"
     }
 
-    Write-Warn "  ⚠️  IMPORTANT: Edit $ConfigFile and replace YOUR_FIREWORKS_API_KEY_HERE with your actual API key (DO NOT commit)"
+    Write-Warn "  ⚠️  IMPORTANT: Edit $ConfigFile and replace YOUR_XIAOMI_API_KEY_HERE with your actual API key (DO NOT commit)"
 
     # Self-check: verify installed files
     Test-OpenCodeInstallation -AgentDest $AgentDest -CommandsDest $CommandsDest -BinDest $BinDest -ConfigFile $ConfigFile
@@ -287,10 +287,10 @@ function Test-OpenCodeInstallation {
 
     # Check required agent files
     $requiredAgentFiles = @(
-        "codex53-kimi.md",
-        "codex53-kimi-turbo.md",
-        "kimi-general.md",
-        "kimi-explore.md",
+        "codex53-mimo.md",
+        "codex53-mimo-turbo.md",
+        "mimo-general.md",
+        "mimo-explore.md",
         "github-librarian.md",
         "docs-research.md",
         "walkthrough.md",
@@ -781,7 +781,7 @@ Write-Host "Installed workflows:"
 Write-Host "  - Refactor         : Analyze codebase for refactoring opportunities"
 Write-Host "  - Review           : Review uncommitted changes"
 Write-Host "  - UltraReview      : Parallel dual-model review (GPT 5.4 + Gemini 3.1 Pro)"
-Write-Host "  - UltraReview-Lite : Parallel dual-model review (Kimi 2.5 Turbo + Gemini 3 Flash Preview)"
+Write-Host "  - UltraReview-Lite : Parallel dual-model review (MiMo v2.5 Pro + Gemini 3 Flash Preview)"
 Write-Host "  - CC               : Execute Claude CLI commands and code reviews"
 Write-Host "  - PR-Reviewer      : Address PR review feedback"
 Write-Host "  - PR-Reviewer-Only : Generate implementation prompt for PR feedback"

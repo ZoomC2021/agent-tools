@@ -1,5 +1,5 @@
 name: WideReview
-description: Wide fan-out code review across four cheap-model CLIs (Grok Composer 2.5, Qwen3.7-Max, FirePass, MiMo v2.5 Pro) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode.
+description: Wide fan-out code review across four cheap-model CLIs (Grok Composer 2.5, Qwen3.7-Max, OpenCode, MiMo v2.5 Pro) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode.
 tags:
   - ai
   - review
@@ -14,7 +14,7 @@ command: |
   Lanes (each optional; skip any whose CLI is missing or unauthenticated, continue with the rest, require at least one):
   - A: `grok -p "<prompt>" -m grok-composer-2.5-fast --always-approve --cwd <root>`
   - B: `qodercli -p --model "Qwen3.7-Max" --reasoning-effort max --dangerously-skip-permissions --cwd <root>`
-  - C: `opencode run "<prompt>" --pure -m fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo --dir <root> --dangerously-skip-permissions -f <bundle-or-manifest>`  (reference the model id only; never read or print provider API keys)
+  - C: `opencode run "<prompt>" --pure -m xiaomi/mimo-v2.5-pro --dir <root> --dangerously-skip-permissions -f <bundle-or-manifest>`  (reference the model id only; never read or print provider API keys)
   - D: `cmd -p "<prompt>" --model xiaomi/mimo-v2.5-pro --skip-onboarding --max-turns 120 --add-dir <wr-dir> --yolo -t`  (cmd has no --cwd; run it via a subshell `cd <root>`)
 
   Workflow:

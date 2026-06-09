@@ -1,6 +1,6 @@
 # WideReview: Wide Fan-Out Cheap-Model Code Review
 
-Run code reviews across **four independent cheap-model CLIs in parallel** — `Grok Composer 2.5`, `Qwen3.7-Max`, `FirePass` (Kimi K2.6), and `MiMo v2.5 Pro` — then consolidate the findings into a single vote-weighted report.
+Run code reviews across **four independent cheap-model CLIs in parallel** — `Grok Composer 2.5`, `Qwen3.7-Max`, `OpenCode` (MiMo v2.5 Pro), and `MiMo v2.5 Pro` — then consolidate the findings into a single vote-weighted report.
 
 💡 **Cost note**: All four are low-cost models. Unlike `ultrareview` (2 premium models, depth), WideReview favors **breadth** — several independent reviewers at near-zero cost. Use it for broad coverage and cheap second opinions.
 
@@ -21,7 +21,7 @@ Pick the mode from the user's request, then follow Phase 1 for that mode. Phases
 |------|-----|-------|------------------|
 | A | `grok` | `grok-composer-2.5-fast` | model default |
 | B | `qodercli` | `Qwen3.7-Max` | max (flag) |
-| C | `opencode run` | `fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo` (FirePass/Kimi K2.6 router) | model default |
+| C | `opencode run` | `xiaomi/mimo-v2.5-pro` (MiMo v2.5 Pro) | model default |
 | D | `cmd` | `xiaomi/mimo-v2.5-pro` | model default |
 
 Consolidating four independent reviewers catches issues any single model misses and surfaces conflicting interpretations.
@@ -32,10 +32,10 @@ Each lane is optional. Missing or unauthenticated CLIs are **skipped**, and the 
 
 - `grok` (Grok) — `command -v grok`
 - `qodercli` (Qoder) — `command -v qodercli`
-- `opencode` (FirePass/Kimi K2.6) — `command -v opencode`
+- `opencode` (MiMo v2.5 Pro) — `command -v opencode`
 - `cmd` (Command Code) — `command -v cmd`
 
-⚠️ **Secret hygiene**: The FirePass lane is backed by OpenCode's Fireworks provider configuration. Reference the model id `fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo` only — never read, print, or copy provider API keys.
+⚠️ **Secret hygiene**: The OpenCode lane is backed by OpenCode's xiaomi provider configuration. Reference the model id `xiaomi/mimo-v2.5-pro` only — never read, print, or copy provider API keys.
 
 ## Phase 1 (Diff mode): Gather Context
 
@@ -134,7 +134,7 @@ timeout "$WR_TIMEOUT" grok -p "$WR_PROMPT" -m grok-composer-2.5-fast --always-ap
   > "$WR_DIR/laneA.txt" 2>&1 & A=$!
 timeout "$WR_TIMEOUT" qodercli -p --model "Qwen3.7-Max" --reasoning-effort max --dangerously-skip-permissions --cwd "${ROOT:-.}" "$WR_PROMPT" \
   > "$WR_DIR/laneB.txt" 2>&1 & B=$!
-timeout "$WR_TIMEOUT" opencode run "$WR_PROMPT" --pure -m fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo --dir "${ROOT:-.}" --dangerously-skip-permissions -f "${BUNDLE:-$MANIFEST}" \
+timeout "$WR_TIMEOUT" opencode run "$WR_PROMPT" --pure -m xiaomi/mimo-v2.5-pro --dir "${ROOT:-.}" --dangerously-skip-permissions -f "${BUNDLE:-$MANIFEST}" \
   > "$WR_DIR/laneC.txt" 2>&1 & C=$!
 timeout "$WR_TIMEOUT" bash -c "cd '${ROOT:-.}' 2>/dev/null; cmd -p \"\$0\" --model xiaomi/mimo-v2.5-pro --skip-onboarding --max-turns 120 --add-dir '$WR_DIR' --yolo -t" "$WR_PROMPT" \
   > "$WR_DIR/laneD.txt" 2>&1 & D=$!
@@ -185,7 +185,7 @@ Build a normalized signature for each finding: `file:line:category` (fuzzy-match
 |------|--------------------|---------------|----------|
 | A    | Grok Composer 2.5  | ok/timeout/.. | <n>      |
 | B    | Qwen3.7-Max        | ...           | <n>      |
-| C    | FirePass           | ...           | <n>      |
+| C    | OpenCode           | ...           | <n>      |
 | D    | MiMo v2.5 Pro      | ...           | <n>      |
 
 - Lanes used: <k>/4

@@ -23,7 +23,7 @@ Beyond standard workflows, OpenCode provides:
 
 - **Deterministic routing** — Keyword-based agent selection with safety gates
 - **Mission-aware workflows** — Long-running task decomposition with milestone validation
-- **Multi-model orchestration** — GPT-5.x for planning, Kimi for execution
+- **Multi-model orchestration** — GPT-5.x for planning, MiMo for execution
 - **Research agents** — GitHub librarian, docs research, architecture walkthroughs
 - **Execution contracts** — Structured specs before implementation work
 

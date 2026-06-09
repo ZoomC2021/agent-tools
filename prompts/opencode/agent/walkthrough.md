@@ -1,7 +1,7 @@
 ---
 description: Explain local architecture and code flow with evidence-backed walkthroughs and Mermaid diagrams
 mode: subagent
-model: fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo
+model: xiaomi/mimo-v2.5-pro
 permission:
   task:
     '*': deny

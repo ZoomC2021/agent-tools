@@ -1,7 +1,7 @@
 ---
 description: Run parallel code reviews using GPT 5.4 (OpenCode) AND Gemini 3.1 Pro Preview (Gemini CLI) simultaneously, then consolidate results
 mode: subagent
-model: fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo
+model: xiaomi/mimo-v2.5-pro
 ---
 
 # UltraReview: Parallel Dual-Model Code Review
@@ -104,7 +104,7 @@ Launch this task using the `task` tool:
 
 ```
 description: Gemini 3.1 Pro CLI review via helper
-subagent_type: kimi-general
+subagent_type: mimo-general
 prompt: |
   TASK: Execute Gemini 3.1 Pro Preview review via CLI helper
   TOOLS ALLOWED: Bash, Read

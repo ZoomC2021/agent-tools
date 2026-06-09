@@ -769,7 +769,7 @@ function runOpencodeCase({ variant, variantDir, scenario, workspace, caseDir }) 
     "--format",
     "json",
     "--agent",
-    scenario.agent || "codex53-kimi",
+    scenario.agent || "codex53-mimo",
     "--dir",
     workspace.workdir,
   ]

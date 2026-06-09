@@ -495,41 +495,34 @@
         }
       }
     },
-    "fireworks-ai": {
+    "xiaomi": {
       "options": {
-        "apiKey": "YOUR_FIREWORKS_API_KEY_HERE"
+        "apiKey": "YOUR_XIAOMI_API_KEY_HERE",
+        "baseURL": "https://token-plan-ams.xiaomimimo.com/v1"
       },
       "models": {
-        "accounts/fireworks/routers/kimi-k2p6-turbo": {
-          "name": "Kimi 2.5 Turbo (Fireworks)",
+        "mimo-v2.5-pro": {
+          "name": "MiMo v2.5 Pro (Xiaomi)",
           "limit": {
-            "context": 256000,
+            "context": 1000000,
             "output": 256000
           },
           "modalities": {
             "input": ["text"],
             "output": ["text"]
-          },
-          "cost": {
-            "input": 0.99,
-            "output": 4.94,
-            "cache": {
-              "read": 0.16,
-              "write": 0.99
-            }
           }
         }
       }
     }
   },
-  "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
-  "default_agent": "codex53-kimi-turbo",
+  "model": "xiaomi/mimo-v2.5-pro",
+  "default_agent": "codex53-mimo-turbo",
   "mode": {
     "plan": {
       "model": "openai/gpt-5.3-codex"
     },
     "build": {
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo"
+      "model": "xiaomi/mimo-v2.5-pro"
     }
   },
   "agent": {
@@ -538,27 +531,27 @@
       "reasoningEffort": "high"
     },
     "title": {
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo"
+      "model": "xiaomi/mimo-v2.5-pro"
     },
     "summary": {
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo"
+      "model": "xiaomi/mimo-v2.5-pro"
     },
     "compaction": {
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo"
+      "model": "xiaomi/mimo-v2.5-pro"
     },
     "code-review": {
       "model": "openai/gpt-5.3-codex",
       "variant": "high",
       "reasoningEffort": "high"
     },
-    "codex53-kimi": {
+    "codex53-mimo": {
       "model": "openai/gpt-5.3-codex",
-      "prompt": "{file:./agent/codex53-kimi.md}",
+      "prompt": "{file:./agent/codex53-mimo.md}",
       "permission": {
         "task": {
           "*": "deny",
-          "kimi-general": "allow",
-          "kimi-explore": "allow",
+          "mimo-general": "allow",
+          "mimo-explore": "allow",
           "github-librarian": "allow",
           "docs-research": "allow",
           "walkthrough": "allow",
@@ -579,14 +572,14 @@
       },
       "description": "Primary orchestrator agent (GPT 5.3 Codex) - delegates to subagents for specialized tasks"
     },
-    "codex53-kimi-turbo": {
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
-      "prompt": "{file:./agent/codex53-kimi-turbo.md}",
+    "codex53-mimo-turbo": {
+      "model": "xiaomi/mimo-v2.5-pro",
+      "prompt": "{file:./agent/codex53-mimo-turbo.md}",
       "permission": {
         "task": {
           "*": "deny",
-          "kimi-general": "allow",
-          "kimi-explore": "allow",
+          "mimo-general": "allow",
+          "mimo-explore": "allow",
           "github-librarian": "allow",
           "docs-research": "allow",
           "walkthrough": "allow",
@@ -605,12 +598,12 @@
           "plan-review": "allow"
         }
       },
-      "description": "Primary orchestrator agent (Kimi 2.5 Turbo) - delegates to subagents for specialized tasks"
+      "description": "Primary orchestrator agent (MiMo v2.5 Pro) - delegates to subagents for specialized tasks"
     },
     "github-librarian": {
       "description": "Read-only remote GitHub code research on default branches with lightweight history.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./agent/github-librarian.md}",
       "permission": {
@@ -624,7 +617,7 @@
     "docs-research": {
       "description": "Research official documentation, API behavior, and release notes.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./agent/docs-research.md}",
       "permission": {
@@ -639,7 +632,7 @@
     "walkthrough": {
       "description": "Explain local architecture and generate Mermaid walkthroughs.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./agent/walkthrough.md}",
       "permission": {
@@ -680,112 +673,113 @@
     "ultrareview": {
       "description": "Parallel dual-model review using GPT 5.4 (OpenCode) AND Gemini 3.1 Pro Preview (Gemini CLI with helper-managed bundling/chunking/retries).",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/ultrareview.md}"
     },
     "ultrareview-lite": {
-      "description": "Parallel dual-model review using Kimi 2.5 Turbo (OpenCode) AND Gemini 3 Flash Preview (Gemini CLI with helper-managed bundling/chunking/retries).",
+      "description": "Parallel dual-model review using MiMo v2.5 Pro (OpenCode) AND Gemini 3 Flash Preview (Gemini CLI with helper-managed bundling/chunking/retries).",
+
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/ultrareview-lite.md}"
     },
     "widereview": {
-      "description": "Wide fan-out review across four cheap-model CLIs (Grok Composer 2.5 via grok, Qwen3.7-Max via qodercli, FirePass/Kimi K2.6 via opencode, MiMo v2.5 Pro via cmd) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (--full).",
+      "description": "Wide fan-out review across four cheap-model CLIs (Grok Composer 2.5 via grok, Qwen3.7-Max via qodercli, MiMo v2.5 Pro via opencode, MiMo v2.5 Pro via cmd) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (--full).",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/widereview.md}"
     },
     "cc": {
       "description": "Execute Claude CLI commands and code reviews from OpenCode via the Agent SDK CLI.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/cc.md}"
     },
     "refactor": {
       "description": "Analyze and prioritize refactoring opportunities.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/refactor.md}"
     },
     "deslop": {
       "description": "Detect and prioritize code quality violations.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/deslop.md}"
     },
     "diagnose": {
       "description": "Debug bugs and performance regressions with a disciplined reproduce/minimize/hypothesize/instrument/fix/regression-test loop.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/diagnose.md}"
     },
     "tdd": {
       "description": "Build features or fixes using a test-driven red-green-refactor workflow.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/tdd.md}"
     },
     "grill-me": {
       "description": "Stress-test a plan or design through structured questioning before implementation.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/grill-me.md}"
     },
     "to-prd": {
       "description": "Convert current context into a product requirements document.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/to-prd.md}"
     },
     "to-issues": {
       "description": "Break a plan or PRD into independently shippable vertical-slice issues.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/to-issues.md}"
     },
     "triage": {
       "description": "Triage issues through a state machine of readiness roles.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/triage.md}"
     },
     "create-cli": {
       "description": "Design CLI UX/specs covering args, flags, help, output, errors, config, dry-run, and exit codes.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/create-cli.md}"
     },
     "frontend-design": {
       "description": "Build distinctive production frontend UI for pages, apps, and components without generic AI-slop design.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/frontend-design.md}"
     },
     "markdown-converter": {
       "description": "Convert PDFs, Office docs, HTML, data files, media, ZIPs, and YouTube URLs to Markdown using markitdown.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/markdown-converter.md}"
     },
     "agent-browser": {
       "description": "Use the agent-browser CLI for browser automation, screenshots, web app QA, Electron/Slack automation, and cloud browser sessions.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/agent-browser.md}",
       "permission": {
@@ -815,37 +809,37 @@
     "pr-reviewer": {
       "description": "Fetch PR feedback and apply fixes on the PR branch.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/pr-reviewer.md}"
     },
     "pr-reviewer-only": {
       "description": "Fetch PR feedback and produce an implementation prompt.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/pr-reviewer-only.md}"
     },
     "create-pr": {
       "description": "Create a pull request from current git changes.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/create-pr.md}"
     },
     "spec-compiler": {
       "description": "Compile Execution Contract before implementation work.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/spec-compiler.md}"
     },
-    "kimi-general": {
+    "mimo-general": {
       "description": "Concrete implementation, debugging, refactoring, and execution tasks.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
-      "prompt": "{file:./agent/kimi-general.md}",
+      "prompt": "{file:./agent/mimo-general.md}",
       "permission": {
         "task": {
           "*": "deny"
@@ -857,12 +851,12 @@
         "grep": "allow"
       }
     },
-    "kimi-explore": {
+    "mimo-explore": {
       "description": "Read-only local codebase discovery and search.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
-      "prompt": "{file:./agent/kimi-explore.md}",
+      "prompt": "{file:./agent/mimo-explore.md}",
       "permission": {
         "task": {
           "*": "deny"
@@ -875,7 +869,7 @@
     "quick-validator": {
       "description": "Run quick validation checks on implementation output.",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/quick-validator.md}"
     },
@@ -904,7 +898,7 @@
     "plan-review": {
       "description": "Binary validation of Execution Contracts (Momus-style: approve 80% clear plans, reject only true blockers).",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/plan-review.md}",
       "permission": {
@@ -920,7 +914,7 @@
     "handoff": {
       "description": "Generate handoff context for continuing work in a new session",
       "mode": "subagent",
-      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo",
+      "model": "xiaomi/mimo-v2.5-pro",
       "hidden": true,
       "prompt": "{file:./commands/handoff.md}",
       "permission": {

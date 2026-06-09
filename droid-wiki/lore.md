@@ -6,7 +6,7 @@ The history and evolution of the agent-tools repository.
 
 ### Foundation (Mar–Apr 2025)
 
-The repository emerged to solve a specific problem: inconsistent workflows across AI coding agents. Early commits established the core OpenCode architecture with the Codex53-Kimi orchestrator pattern.
+The repository emerged to solve a specific problem: inconsistent workflows across AI coding agents. Early commits established the core OpenCode architecture with the Codex53-MiMo orchestrator pattern.
 
 Key events:
 - Initial OpenCode agent definitions and routing logic
@@ -72,7 +72,7 @@ The repository grew from a single OpenCode-focused project to a comprehensive mu
 
 ## Notable patterns
 
-**Model selection philosophy**: Use highest-reasoning models (GPT-5.x) for planning and orchestration, fast capable models (Kimi K2.5 Turbo) for execution and research.
+**Model selection philosophy**: Use highest-reasoning models (GPT-5.x) for planning and orchestration, fast capable models (MiMo v2.5 Pro) for execution and research.
 
 **Safety-first design**: Every workflow includes multiple safety gates before destructive actions. The orchestrator verbalizes intent, checks context completion, and escalates after consecutive failures.
 

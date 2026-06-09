@@ -26,9 +26,9 @@ OpenCode configuration structure and options.
 |-------|------|-------------|
 | `$schema` | string | JSON Schema URI for validation |
 | `plugin` | string[] | Auth plugins (e.g., `opencode-antigravity-auth@1.6.0`) |
-| `provider` | object | Provider configurations (openai, google, fireworks-ai) |
-| `model` | string | Default model ID (e.g., `fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo`) |
-| `default_agent` | string | Default agent to use (e.g., `codex53-kimi-turbo`) |
+| `provider` | object | Provider configurations (openai, google, xiaomi) |
+| `model` | string | Default model ID (e.g., `xiaomi/mimo-v2.5-pro`) |
+| `default_agent` | string | Default agent to use (e.g., `codex53-mimo-turbo`) |
 | `mode` | object | Mode-specific model overrides (plan, build) |
 | `agent` | object | Agent definitions and permissions |
 
@@ -61,18 +61,19 @@ OpenCode configuration structure and options.
 }
 ```
 
-### Fireworks AI provider
+### Xiaomi provider
 
 ```json
-"fireworks-ai": {
+"xiaomi": {
   "options": {
-    "apiKey": "YOUR_FIREWORKS_API_KEY_HERE"
+    "apiKey": "YOUR_XIAOMI_API_KEY_HERE",
+    "baseURL": "https://token-plan-ams.xiaomimimo.com/v1"
   },
   "models": {
-    "accounts/fireworks/routers/kimi-k2p6-turbo": {
-      "name": "Kimi 2.5 Turbo (Fireworks)",
+    "mimo-v2.5-pro": {
+      "name": "MiMo v2.5 Pro (Xiaomi)",
       "limit": {
-        "context": 256000,
+        "context": 1000000,
         "output": 256000
       },
       "modalities": {
@@ -122,7 +123,7 @@ Override models for specific modes:
     "model": "openai/gpt-5.3-codex"
   },
   "build": {
-    "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo"
+    "model": "xiaomi/mimo-v2.5-pro"
   }
 }
 ```
@@ -130,7 +131,7 @@ Override models for specific modes:
 | Mode | Purpose | Default model |
 |------|---------|---------------|
 | `plan` | Architecture and planning | GPT 5.3 Codex |
-| `build` | Implementation and execution | Kimi 2.5 Turbo |
+| `build` | Implementation and execution | MiMo v2.5 Pro |
 
 ## Agent configuration
 
@@ -169,7 +170,7 @@ Each agent has the following structure:
 Prompts use `{file:./relative/path}` syntax to reference Markdown files:
 
 ```json
-"prompt": "{file:./agent/codex53-kimi.md}"
+"prompt": "{file:./agent/codex53-mimo.md}"
 ```
 
 The path is relative to `prompts/opencode/`.

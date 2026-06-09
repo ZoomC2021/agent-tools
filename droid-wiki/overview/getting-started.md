@@ -4,7 +4,7 @@
 
 - **Git** — for version control operations
 - **GitHub CLI (`gh`)** — for PR operations and `github-librarian` agent
-- **OpenCode** — for the primary Codex53-Kimi architecture
+- **OpenCode** — for the primary Codex53-MiMo architecture
 - **Bash** — for the installer script (macOS/Linux)
 
 Optional:
@@ -55,7 +55,7 @@ chmod +x ~/.config/opencode/bin/*
 cp prompts/opencode/opencode.json.example ~/.config/opencode/opencode.json
 ```
 
-**Security note:** Edit `~/.config/opencode/opencode.json` and replace `YOUR_FIREWORKS_API_KEY_HERE` with your actual API key. Never commit this file.
+**Security note:** Edit `~/.config/opencode/opencode.json` and replace `YOUR_XIAOMI_API_KEY_HERE` with your actual API key. Never commit this file.
 
 ## Verification
 

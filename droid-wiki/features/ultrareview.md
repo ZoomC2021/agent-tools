@@ -46,7 +46,7 @@ The `opencode-gemini-review` helper script manages the Gemini lane:
 Full dual-model with GPT 5.4 + Gemini 3.1 Pro Preview.
 
 ### Ultrareview-lite
-Lower-cost variant with Kimi 2.5 Turbo + Gemini 3 Flash Preview.
+Lower-cost variant with MiMo v2.5 Pro + Gemini 3 Flash Preview.
 
 ## Usage
 

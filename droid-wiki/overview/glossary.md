@@ -4,8 +4,8 @@ Terms and concepts used throughout the agent-tools repository.
 
 ## Core concepts
 
-**Codex53-Kimi**
-The primary orchestrator architecture using GPT-5.3-Codex for planning and routing, with Fireworks Kimi K2.5 Turbo subagents for execution. Defined in `prompts/opencode/agent/codex53-kimi.md`.
+**Codex53-MiMo**
+The primary orchestrator architecture using GPT-5.3-Codex for planning and routing, with Xiaomi MiMo v2.5 Pro subagents for execution. Defined in `prompts/opencode/agent/codex53-mimo.md`.
 
 **Execution Contract**
 A structured specification produced by `spec-compiler` before implementation work begins. Defines scope, risks, success criteria, and validation steps.
@@ -19,7 +19,7 @@ Parallel dual-model code review using GPT 5.4 (OpenCode) AND Gemini 3.1 Pro Prev
 ## Agent types
 
 **Orchestrator**
-Primary agent that plans, sequences, and verifies work. Delegates implementation to subagents. In OpenCode: `codex53-kimi` or `codex53-kimi-turbo`.
+Primary agent that plans, sequences, and verifies work. Delegates implementation to subagents. In OpenCode: `codex53-mimo` or `codex53-mimo-turbo`.
 
 **Subagent**
 Specialized agent for specific tasks (research, implementation, review). Has restricted permissions and is marked `hidden: true` in config.

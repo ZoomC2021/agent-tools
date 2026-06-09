@@ -27,7 +27,7 @@ Supporting 14 different AI agents means the repository speaks multiple "dialects
 
 - **Deslop**: Named after the open-source deslop utility for code quality audits
 - **Ultrareview**: The "ultra" signifies the dual-model parallel execution
-- **Codex53-Kimi**: Codex 5.3 (the orchestrator model) + Kimi (the subagent model)
+- **Codex53-MiMo**: Codex 5.3 (the orchestrator model) + MiMo (the subagent model)
 - **Oracle**: The name for the deep-reasoning GPT-5.4 agent you consult for wisdom
 
 ## Skill location trivia

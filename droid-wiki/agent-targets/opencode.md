@@ -4,17 +4,17 @@ Active contributors: zmang
 
 ## Purpose
 
-OpenCode is the primary agent target for agent-tools, featuring the sophisticated Codex53-Kimi orchestration architecture. It uses GPT-5.3-Codex for planning and routing, with Fireworks Kimi K2.5 Turbo subagents for execution.
+OpenCode is the primary agent target for agent-tools, featuring the sophisticated Codex53-MiMo orchestration architecture. It uses GPT-5.3-Codex for planning and routing, with Xiaomi MiMo v2.5 Pro subagents for execution.
 
 ## Directory layout
 
 ```
 prompts/opencode/
 ├── agent/                    # Agent definitions
-│   ├── codex53-kimi.md      # Primary orchestrator (GPT-5.3-Codex)
-│   ├── codex53-kimi-turbo.md # Alternative orchestrator (Kimi)
-│   ├── kimi-general.md      # Implementation execution
-│   ├── kimi-explore.md      # Read-only local discovery
+│   ├── codex53-mimo.md      # Primary orchestrator (GPT-5.3-Codex)
+│   ├── codex53-mimo-turbo.md # Alternative orchestrator (MiMo)
+│   ├── mimo-general.md      # Implementation execution
+│   ├── mimo-explore.md      # Read-only local discovery
 │   ├── github-librarian.md  # Remote GitHub research
 │   ├── docs-research.md     # Official documentation research
 │   ├── walkthrough.md       # Architecture walkthroughs
@@ -51,13 +51,13 @@ prompts/opencode/
 
 | File | Purpose |
 |------|---------|
-| `agent/codex53-kimi.md` | Orchestrator with deterministic routing and safety gates |
+| `agent/codex53-mimo.md` | Orchestrator with deterministic routing and safety gates |
 | `opencode.json.example` | Complete agent and model configuration |
 | `bin/opencode-gemini-review` | Helper for dual-model reviews |
 
 ## Orchestrator routing
 
-The codex53-kimi agent implements deterministic routing:
+The codex53-mimo agent implements deterministic routing:
 
 ```
 "create PR" / "pull request" → create-pr
@@ -67,8 +67,8 @@ The codex53-kimi agent implements deterministic routing:
 GitHub URL / "owner/repo" → github-librarian
 "official docs" → docs-research
 "walk me through" → walkthrough
-"find" / "search" → kimi-explore
-"implement" / "fix" → spec-compiler → kimi-general
+"find" / "search" → mimo-explore
+"implement" / "fix" → spec-compiler → mimo-general
 ```
 
 ## Safety gates
@@ -81,7 +81,7 @@ GitHub URL / "owner/repo" → github-librarian
 ## Configuration
 
 The `opencode.json.example` defines:
-- Models (GPT-5.x series, Kimi K2.5 Turbo, Gemini)
+- Models (GPT-5.x series, MiMo v2.5 Pro, Gemini)
 - Agents with permissions and prompts
 - Mode-based routing (plan vs build)
 

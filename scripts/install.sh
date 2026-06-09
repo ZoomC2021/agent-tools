@@ -136,7 +136,7 @@ install_opencode() {
         log_warn "Agent source directory not found: $agent_source"
     fi
 
-    # Install .opencode/plugins (local plugins like kimi-routing-guard)
+    # Install .opencode/plugins (local plugins like mimo-routing-guard)
     local plugins_source="$source_dir/.opencode/plugins"
     local plugins_dest="$HOME/.config/opencode/plugins"
 
@@ -215,7 +215,7 @@ install_opencode() {
         log_warn "Example config not found: $example_file"
     fi
 
-    log_warn "  ⚠️  IMPORTANT: Edit $config_file and replace YOUR_FIREWORKS_API_KEY_HERE with your actual API key (DO NOT commit)"
+    log_warn "  ⚠️  IMPORTANT: Edit $config_file and replace YOUR_XIAOMI_API_KEY_HERE with your actual API key (DO NOT commit)"
 
     # Self-check: verify installed files
     _self_check_opencode "$agent_dest" "$commands_dest" "$bin_dest" "$config_file"
@@ -233,10 +233,10 @@ _self_check_opencode() {
 
     # Check required agent files
     local required_agent_files=(
-        "codex53-kimi.md"
-        "codex53-kimi-turbo.md"
-        "kimi-general.md"
-        "kimi-explore.md"
+        "codex53-mimo.md"
+        "codex53-mimo-turbo.md"
+        "mimo-general.md"
+        "mimo-explore.md"
         "github-librarian.md"
         "docs-research.md"
         "walkthrough.md"
@@ -906,8 +906,8 @@ main() {
     echo "  - refactor         : Analyze codebase for refactoring opportunities"
     echo "  - review           : Review uncommitted changes"
     echo "  - ultrareview      : Parallel dual-model review (GPT 5.4 + Gemini 3.1 Pro)"
-    echo "  - ultrareview-lite : Parallel dual-model review (Kimi 2.5 Turbo + Gemini 3 Flash Preview)"
-    echo "  - widereview       : Wide fan-out review across 4 cheap-model CLIs (Grok Composer 2.5 + Qwen3.7-Max + FirePass/Kimi K2.6 via OpenCode + MiMo v2.5 Pro); diff or full-codebase (--full)"
+    echo "  - ultrareview-lite : Parallel dual-model review (MiMo v2.5 Pro + Gemini 3 Flash Preview)"
+    echo "  - widereview       : Wide fan-out review across 4 cheap-model CLIs (Grok Composer 2.5 + Qwen3.7-Max + MiMo v2.5 Pro via OpenCode + MiMo v2.5 Pro); diff or full-codebase (--full)"
     echo "  - cc               : Execute Claude CLI commands and code reviews"
     echo "  - pr-reviewer      : Address PR review feedback"
     echo "  - pr-reviewer-only : Generate implementation prompt for PR feedback"

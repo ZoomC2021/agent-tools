@@ -12,7 +12,7 @@ Most agents use YAML frontmatter:
 ---
 description: Short description of what this prompt does
 mode: subagent
-model: fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo
+model: xiaomi/mimo-v2.5-pro
 permission:
   task:
     '*': deny
@@ -34,7 +34,7 @@ Windsurf, Amp, and Gemini CLI use SKILL.md files:
 ## Metadata
 
 - **Name**: skill-name
-- **Model**: kimi-k2p6-turbo
+- **Model**: mimo-v2.5-pro
 
 ## Description
 
@@ -139,11 +139,11 @@ The `opencode.json.example` uses `{file:./path/to/file.md}` references:
 
 ```json
 {
-  "prompt": "{file:./agent/codex53-kimi.md}",
+  "prompt": "{file:./agent/codex53-mimo.md}",
   "permission": {
     "task": {
       "*": "deny",
-      "kimi-general": "allow"
+      "mimo-general": "allow"
     }
   }
 }

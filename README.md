@@ -9,8 +9,8 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 | **refactor** | Analyze codebase for refactoring opportunities, prioritize by severity/effort |
 | **review** | Review uncommitted changes for bugs, regressions, and improvements |
 | **ultrareview** | Parallel dual-model review using GPT 5.4 + Gemini 3.1 Pro Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
-| **ultrareview-lite** | Parallel dual-model review using Kimi 2.5 Turbo + Gemini 3 Flash Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
-| **widereview** | Wide fan-out review across four cheap-model CLIs (Grok Composer 2.5, Qwen3.7-Max, FirePass/Kimi K2.6 via OpenCode, MiMo v2.5 Pro) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (`--full`) *(Not available: Gemini, Antigravity, Amp)* |
+| **ultrareview-lite** | Parallel dual-model review using MiMo v2.5 Pro + Gemini 3 Flash Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
+| **widereview** | Wide fan-out review across four cheap-model CLIs (Grok Composer 2.5, Qwen3.7-Max, MiMo v2.5 Pro via OpenCode, MiMo v2.5 Pro) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (`--full`) *(Not available: Gemini, Antigravity, Amp)* |
 | **pr-reviewer** | Fetch PR comments, summarize issues, address them, update PR |
 | **pr-reviewer-only** | Fetch PR comments, summarize issues, generate implementation prompt for another agent |
 | **create-pr** | Create PR with auto-generated title and description |
@@ -21,15 +21,15 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 | **docs-research** | Research official documentation and external API behavior using web sources |
 | **walkthrough** | Explain local architecture and code flow with evidence-backed walkthroughs |
 
-## Opencode Codex53-Kimi Setup (Primary Agent Architecture)
+## Opencode Codex53-MiMo Setup (Primary Agent Architecture)
 
-This repository includes a sophisticated agent architecture for OpenCode using GPT-5.3-Codex as the orchestrator and Fireworks Kimi K2.5 Turbo as specialized subagents.
+This repository includes a sophisticated agent architecture for OpenCode using GPT-5.3-Codex as the orchestrator and Xiaomi MiMo v2.5 Pro as specialized subagents.
 
 ### Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Codex53-Kimi Orchestrator (GPT-5.3-Codex)                 │
+│  Codex53-MiMo Orchestrator (GPT-5.3-Codex)                 │
 │  • Plans and sequences work                                  │
 │  • Makes routing decisions                                    │
 │  • Delegates to specialized subagents                       │
@@ -38,7 +38,7 @@ This repository includes a sophisticated agent architecture for OpenCode using G
    ┌───────────┬──────────────┬──────────────────┬──────────────┐
    │           │              │                  │              │
 ┌──▼────────┐ ┌▼───────────┐ ┌▼────────────────┐ ┌▼────────────┐
-│ kimi-     │ │ kimi-      │ │ github-         │ │ docs-       │
+│ mimo-     │ │ mimo-      │ │ github-         │ │ docs-       │
 │ general   │ │ explore    │ │ librarian       │ │ research    │
 │ execution │ │ local find │ │ remote GitHub   │ │ official    │
 └───────────┘ └────────────┘ └─────────────────┘ └─────────────┘
@@ -68,8 +68,8 @@ The orchestrator uses keyword-based deterministic routing:
 | Remote repo research | GitHub URL, `owner/repo`, "reference implementation" | **github-librarian** |
 | Official docs research | "official docs", "migration guide", "API docs" | **docs-research** |
 | Local walkthrough | "walk me through", "diagram", "architecture" | **walkthrough** |
-| Local discovery | "find", "search", "explore" | **kimi-explore** |
-| Implementation | "implement", "fix", "refactor" | **kimi-general** |
+| Local discovery | "find", "search", "explore" | **mimo-explore** |
+| Implementation | "implement", "fix", "refactor" | **mimo-general** |
 
 ### Orchestrator Safety Gates
 
@@ -89,14 +89,14 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 1. **Standard flow** for small/medium single-milestone work:
    1. **PHASE 0 (optional): docs-research / github-librarian** → Gather official docs or upstream reference code first
    2. **PHASE 1: spec-compiler** → Compile Execution Contract (scope, risks, success criteria)
-   3. **PHASE 2: kimi-general** → Execute implementation based on contract
+   3. **PHASE 2: mimo-general** → Execute implementation based on contract
    4. **PHASE 3: quick-validator** → Run validation tests/checks
    5. **PHASE 4 (optional): change-auditor** → Deep audit for high-risk areas
 
 2. **Mission flow** for long-running, multi-step work:
    1. **PHASE 0 (optional): docs-research / github-librarian** → Gather external references first when needed
    2. **PHASE 1: mission-scrutiny** → Front-load scrutiny, decompose into milestones, set validation cadence
-   3. **PHASE 2 (loop per milestone): spec-compiler → kimi-general → milestone-validator**
+   3. **PHASE 2 (loop per milestone): spec-compiler → mimo-general → milestone-validator**
    4. **PHASE 3: quick-validator** → Final end-to-end validation across all milestones
    5. **PHASE 4 (optional): change-auditor** → Deep audit for high-risk milestone or final changes
 
@@ -107,9 +107,9 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 ├── opencode.json              # Main configuration (see example)
 ├── bin/                       # Helper scripts (e.g. opencode-gh-librarian)
 ├── agent/                     # Primary agent definitions
-│   ├── codex53-kimi.md       # Orchestrator (routing logic)
-│   ├── kimi-general.md       # Execution worker
-│   ├── kimi-explore.md       # Local read-only discovery
+│   ├── codex53-mimo.md       # Orchestrator (routing logic)
+│   ├── mimo-general.md       # Execution worker
+│   ├── mimo-explore.md       # Local read-only discovery
 │   ├── github-librarian.md   # Remote GitHub research
 │   ├── docs-research.md      # Official docs + API research
 │   ├── walkthrough.md        # Architecture walkthroughs + diagrams
@@ -135,44 +135,44 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 
 | Subagent | Purpose | Model | Reasoning Effort |
 |----------|---------|-------|------------------|
-| **codex53-kimi** | Primary orchestrator (plans, routes, delegates) | GPT-5.3-Codex | High |
-| **codex53-kimi-turbo** | Alternative orchestrator using Kimi | Kimi K2.5 Turbo | — |
-| **kimi-general** | Implementation, debugging, refactoring execution | Kimi K2.5 Turbo | — |
-| **kimi-explore** | Local read-only codebase discovery and search | Kimi K2.5 Turbo | — |
-| **github-librarian** | Remote GitHub research (default branches, history) | Kimi K2.5 Turbo | — |
-| **docs-research** | Official docs, API behavior, release notes | Kimi K2.5 Turbo | — |
-| **walkthrough** | Architecture walkthroughs with Mermaid diagrams | Kimi K2.5 Turbo | — |
+| **codex53-mimo** | Primary orchestrator (plans, routes, delegates) | GPT-5.3-Codex | High |
+| **codex53-mimo-turbo** | Alternative orchestrator using MiMo | MiMo v2.5 Pro | — |
+| **mimo-general** | Implementation, debugging, refactoring execution | MiMo v2.5 Pro | — |
+| **mimo-explore** | Local read-only codebase discovery and search | MiMo v2.5 Pro | — |
+| **github-librarian** | Remote GitHub research (default branches, history) | MiMo v2.5 Pro | — |
+| **docs-research** | Official docs, API behavior, release notes | MiMo v2.5 Pro | — |
+| **walkthrough** | Architecture walkthroughs with Mermaid diagrams | MiMo v2.5 Pro | — |
 | **oracle** | Deep reasoning for complex problems | GPT-5.4 | **High** |
-| **spec-compiler** | Compile Execution Contracts before implementation | Kimi K2.5 Turbo | — |
-| **plan-review** | Binary validation of Execution Contracts | Kimi K2.5 Turbo | — |
-| **quick-validator** | Fast validation of implementation output | Kimi K2.5 Turbo | — |
+| **spec-compiler** | Compile Execution Contracts before implementation | MiMo v2.5 Pro | — |
+| **plan-review** | Binary validation of Execution Contracts | MiMo v2.5 Pro | — |
+| **quick-validator** | Fast validation of implementation output | MiMo v2.5 Pro | — |
 | **mission-scrutiny** | Front-load scrutiny, milestone planning | GPT-5.3-Codex | — |
 | **milestone-validator** | Validate each milestone before advancing | GPT-5.3-Codex | — |
 | **change-auditor** | Deep audit for security, breaking changes | GPT-5.3-Codex | **High** |
 | **review** | Review uncommitted changes | GPT-5.3-Codex | **High** |
-| **ultrareview** | Parallel dual-model review (GPT 5.4 + Gemini 3.1 Pro Preview) | Kimi K2.5 Turbo | — |
-| **ultrareview-lite** | Parallel dual-model review (Kimi 2.5 Turbo + Gemini 3 Flash Preview) | Kimi K2.5 Turbo | — |
-| **widereview** | Wide fan-out review across 4 cheap-model CLIs (Grok Composer 2.5 + Qwen3.7-Max + FirePass/Kimi K2.6 via OpenCode + MiMo v2.5 Pro); diff or full-codebase (`--full`) | Kimi K2.5 Turbo | — |
-| **deslop** | Code quality audit against principles | Kimi K2.5 Turbo | — |
+| **ultrareview** | Parallel dual-model review (GPT 5.4 + Gemini 3.1 Pro Preview) | MiMo v2.5 Pro | — |
+| **ultrareview-lite** | Parallel dual-model review (MiMo v2.5 Pro + Gemini 3 Flash Preview) | MiMo v2.5 Pro | — |
+| **widereview** | Wide fan-out review across 4 cheap-model CLIs (Grok Composer 2.5 + Qwen3.7-Max + MiMo v2.5 Pro via OpenCode + MiMo v2.5 Pro); diff or full-codebase (`--full`) | MiMo v2.5 Pro | — |
+| **deslop** | Code quality audit against principles | MiMo v2.5 Pro | — |
 | **imagegen-grok** | Generate/edit images with xAI Grok Imagine | xAI Grok Imagine Image Quality | — |
 | **imagegen-google** | Generate/edit images with Google Nano Banana Pro | Gemini 3 Pro Image Preview | — |
-| **pr-reviewer** | Fetch PR comments and apply fixes | Kimi K2.5 Turbo | — |
-| **pr-reviewer-only** | Fetch PR comments, produce implementation prompt | Kimi K2.5 Turbo | — |
-| **create-pr** | Create PR with auto-generated title/description | Kimi K2.5 Turbo | — |
-| **refactor** | Analyze and prioritize refactoring opportunities | Kimi K2.5 Turbo | — |
+| **pr-reviewer** | Fetch PR comments and apply fixes | MiMo v2.5 Pro | — |
+| **pr-reviewer-only** | Fetch PR comments, produce implementation prompt | MiMo v2.5 Pro | — |
+| **create-pr** | Create PR with auto-generated title/description | MiMo v2.5 Pro | — |
+| **refactor** | Analyze and prioritize refactoring opportunities | MiMo v2.5 Pro | — |
 
 ### ⚠️ Security Warning
 
 **NEVER commit your `opencode.json` with real API keys to version control.**
 
-- Use environment variables: `OPENCODE_FIREWORKS_API_KEY`
+- Use environment variables: `OPENCODE_XIAOMI_API_KEY`
 - Or keep the config file in a secure location with `apiKey: "YOUR_KEY_HERE"`
 - The example file includes placeholder warnings to help prevent accidental commits
 
 ### Reference Example
 
 A local reference setup uses:
-- Fireworks Kimi K2.5 Turbo for build mode and subagents
+- Xiaomi MiMo v2.5 Pro for build mode and subagents
 - GPT-5.3-Codex for the orchestrator (plan mode)
 - Specialized subagents for local discovery, remote GitHub research, docs research, architecture walkthroughs, and execution
 
@@ -242,7 +242,7 @@ cp prompts/codex/*.md ~/.codex/skills/
 </details>
 
 <details>
-<summary>OpenCode (Codex53-Kimi Architecture)</summary>
+<summary>OpenCode (Codex53-MiMo Architecture)</summary>
 
 ```bash
 # Create directories
@@ -263,8 +263,8 @@ for f in prompts/opencode/commands/review.md prompts/opencode/commands/deslop.md
 done
 
 # Copy agent definitions to agent/
-for f in prompts/opencode/agent/codex53-kimi.md prompts/opencode/agent/codex53-kimi-turbo.md \
-         prompts/opencode/agent/kimi-general.md prompts/opencode/agent/kimi-explore.md \
+for f in prompts/opencode/agent/codex53-mimo.md prompts/opencode/agent/codex53-mimo-turbo.md \
+         prompts/opencode/agent/mimo-general.md prompts/opencode/agent/mimo-explore.md \
          prompts/opencode/agent/github-librarian.md prompts/opencode/agent/docs-research.md \
          prompts/opencode/agent/walkthrough.md prompts/opencode/agent/oracle.md; do
   [ -f "$f" ] && cp "$f" ~/.config/opencode/agent/
@@ -278,11 +278,11 @@ chmod +x ~/.config/opencode/bin/*
 cp prompts/opencode/opencode.json.example ~/.config/opencode/opencode.json
 ```
 
-**⚠️ Security Warning**: Edit `~/.config/opencode/opencode.json` and replace `YOUR_FIREWORKS_API_KEY_HERE` with your actual API key. **Do not commit this file.**
+**⚠️ Security Warning**: Edit `~/.config/opencode/opencode.json` and replace `YOUR_XIAOMI_API_KEY_HERE` with your actual API key. **Do not commit this file.**
 
 **Note**: `github-librarian` requires `gh` to be installed and authenticated. `docs-research` works best when `websearch` is available, which OpenCode enables when using the OpenCode provider or when `OPENCODE_ENABLE_EXA=1` is set.
 
-See [Opencode Codex53-Kimi Setup](#opencode-codex53-kimi-setup-primary-agent-architecture) for architecture details.
+See [Opencode Codex53-MiMo Setup](#opencode-codex53-mimo-setup-primary-agent-architecture) for architecture details.
 </details>
 
 <details>
@@ -472,7 +472,7 @@ cp prompts/codex/*.md ~/.codex/skills/
 </details>
 
 <details>
-<summary>OpenCode (Codex53-Kimi Architecture)</summary>
+<summary>OpenCode (Codex53-MiMo Architecture)</summary>
 
 ```bash
 # Create directories
@@ -493,8 +493,8 @@ for f in prompts/opencode/commands/review.md prompts/opencode/commands/deslop.md
 done
 
 # Copy agent definitions to agent/
-for f in prompts/opencode/agent/codex53-kimi.md prompts/opencode/agent/codex53-kimi-turbo.md \
-         prompts/opencode/agent/kimi-general.md prompts/opencode/agent/kimi-explore.md \
+for f in prompts/opencode/agent/codex53-mimo.md prompts/opencode/agent/codex53-mimo-turbo.md \
+         prompts/opencode/agent/mimo-general.md prompts/opencode/agent/mimo-explore.md \
          prompts/opencode/agent/github-librarian.md prompts/opencode/agent/docs-research.md \
          prompts/opencode/agent/walkthrough.md prompts/opencode/agent/oracle.md; do
   [ -f "$f" ] && cp "$f" ~/.config/opencode/agent/
@@ -508,11 +508,11 @@ chmod +x ~/.config/opencode/bin/*
 cp prompts/opencode/opencode.json.example ~/.config/opencode/opencode.json
 ```
 
-**⚠️ Security Warning**: Edit `~/.config/opencode/opencode.json` and replace `YOUR_FIREWORKS_API_KEY_HERE` with your actual API key. **Do not commit this file.**
+**⚠️ Security Warning**: Edit `~/.config/opencode/opencode.json` and replace `YOUR_XIAOMI_API_KEY_HERE` with your actual API key. **Do not commit this file.**
 
 **Note**: `github-librarian` requires `gh` to be installed and authenticated. `docs-research` works best when `websearch` is available, which OpenCode enables when using the OpenCode provider or when `OPENCODE_ENABLE_EXA=1` is set.
 
-See [Opencode Codex53-Kimi Setup](#opencode-codex53-kimi-setup-primary-agent-architecture) for architecture details.
+See [Opencode Codex53-MiMo Setup](#opencode-codex53-mimo-setup-primary-agent-architecture) for architecture details.
 </details>
 
 <details>
@@ -724,13 +724,13 @@ Runs parallel code reviews using **GPT 5.4** (via OpenCode) AND **Gemini 3.1 Pro
 
 Lower-cost dual-model variant of `ultrareview`.
 
-Runs parallel code reviews using **Kimi 2.5 Turbo** (via OpenCode) AND **Gemini 3 Flash Preview** (via Gemini CLI), then consolidates using the same consensus/exclusive/divergent reporting structure.
+Runs parallel code reviews using **MiMo v2.5 Pro** (via OpenCode) AND **Gemini 3 Flash Preview** (via Gemini CLI), then consolidates using the same consensus/exclusive/divergent reporting structure.
 
 1. **Launch parallel reviews**: Both models review the same `git diff -U40 HEAD` bundle
 2. **Consolidate findings** with identical severity-preserving rules from `ultrareview`
 3. **Use helper-managed Gemini execution**: deterministic bundle generation, chunking, retries, and `summary.json` status/failure metadata
 4. **Graceful fallback and partial reporting**: if Gemini lane is partial or unavailable, report `failure_reason` and proceed with available results
-5. **Lower operating cost** than `ultrareview` by replacing GPT 5.4 with Kimi in the OpenCode lane
+5. **Lower operating cost** than `ultrareview` by replacing GPT 5.4 with MiMo in the OpenCode lane
 
 ### cc (Claude CLI)
 
@@ -753,7 +753,7 @@ Generates and edits images using **xAI Grok Imagine** (OpenCode only):
 3. **Local output**: Requests `b64_json` output and writes image files immediately because xAI URLs are temporary
 4. **Format choices**: Guides aspect ratio, resolution, and variation count based on the requested asset
 
-Grok Imagine is reachable two ways from OpenCode: a raw `XAI_API_KEY` (required for the curl workflow in the skill), or a SuperGrok subscription signed in through OpenCode (resolves the `xai/grok-imagine-image-quality` model without an API key, but the curl path doesn't use it). Also requires `curl`, `jq`, and `python3` for the direct-API path.
+Grok Imagine is reachable two ways from OpenCode: a raw `XAI_API_KEY` (required for the curl workflow in the skill), or a SuperGrok subscription signed in through OpenCode (resolves the `xai/grok-imagine-image-quality` model without axiaomi API key, but the curl path doesn't use it). Also requires `curl`, `jq`, and `python3` for the direct-API path.
 
 ### imagegen-google
 

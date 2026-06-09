@@ -1,7 +1,7 @@
 ---
 description: Compile Execution Contract before implementation work
 mode: subagent
-model: fireworks-ai/accounts/fireworks/routers/kimi-k2p6-turbo
+model: xiaomi/mimo-v2.5-pro
 permission:
   task:
     '*': deny

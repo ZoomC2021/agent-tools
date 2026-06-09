@@ -4,8 +4,8 @@ This harness runs repeatable A/B evaluations for your Opencode workflow definiti
 
 It is designed for model-swap experiments like:
 
-- current `codex53-kimi` orchestrator on `openai/gpt-5.3-codex`
-- candidate `codex53-kimi` orchestrator on `openai/gpt-5.4`
+- current `codex53-mimo` orchestrator on `openai/gpt-5.3-codex`
+- candidate `codex53-mimo` orchestrator on `openai/gpt-5.4`
 
 It also supports direct subagent evaluation by defining scenarios that target a hidden subagent with `"agent": "<subagent-name>"`.
 
@@ -50,10 +50,10 @@ Run the default starter suite:
 bin/opencode-eval run
 ```
 
-Run the end-to-end primary workflow result suite across the current Codex 5.3 orchestrator and the Kimi Turbo orchestrator:
+Run the end-to-end primary workflow result suite across the current Codex 5.3 orchestrator and the MiMo Turbo orchestrator:
 
 ```bash
-bin/opencode-eval run --variants baseline-codex53-primary,kimi25turbo-primary --tags workflow-results
+bin/opencode-eval run --variants baseline-codex53-primary,mimo25pro-primary --tags workflow-results
 ```
 
 Run only the GPT 5.4 primary variant against the sandbox implementation scenario:
@@ -62,10 +62,10 @@ Run only the GPT 5.4 primary variant against the sandbox implementation scenario
 bin/opencode-eval run --variants gpt54-primary --scenarios implementation-sandbox
 ```
 
-Run mission-scrutiny subagent evals on Kimi K2.5 Turbo only:
+Run mission-scrutiny subagent evals on MiMo v2.5 Pro only:
 
 ```bash
-bin/opencode-eval run --variants mission-scrutiny-kimi25turbo --tags mission-scrutiny
+bin/opencode-eval run --variants mission-scrutiny-mimo25pro --tags mission-scrutiny
 ```
 
 Run mission-scrutiny subagent evals on GPT-5.3 Codex (current default) only:
@@ -74,16 +74,16 @@ Run mission-scrutiny subagent evals on GPT-5.3 Codex (current default) only:
 bin/opencode-eval run --variants mission-scrutiny-codex53 --tags mission-scrutiny
 ```
 
-Run plan-review subagent A/B evals comparing Kimi K2.5 Turbo (current default) against GPT-5.3 Codex:
+Run plan-review subagent A/B evals comparing MiMo v2.5 Pro (current default) against GPT-5.3 Codex:
 
 ```bash
-bin/opencode-eval run --variants plan-review-kimi25turbo,plan-review-codex53 --tags plan-review
+bin/opencode-eval run --variants plan-review-mimo25pro,plan-review-codex53 --tags plan-review
 ```
 
 Run only the adversarial plan-review subset (anti-perfectionism, hidden blockers, format discipline, STOP IF triggers):
 
 ```bash
-bin/opencode-eval run --variants plan-review-kimi25turbo,plan-review-codex53 --tags plan-review-adversarial
+bin/opencode-eval run --variants plan-review-mimo25pro,plan-review-codex53 --tags plan-review-adversarial
 ```
 
 Rebuild the summary for an existing run directory:
@@ -94,7 +94,7 @@ bin/opencode-eval report evals/out/<run-id>
 
 By default, `run` executes scenarios tagged `starter`. Use `--tags extended` or `--scenarios <id>` for additional cases.
 
-The `workflow-results` tag focuses on end-to-end task outcomes through the primary `spec-compiler` -> `kimi-general` -> `quick-validator` path rather than routing-only checks. It intentionally evaluates final receipts, resulting file state, and executable behavior, not brittle internal assertions about exact subagent hop order or delegated prompt wording.
+The `workflow-results` tag focuses on end-to-end task outcomes through the primary `spec-compiler` -> `mimo-general` -> `quick-validator` path rather than routing-only checks. It intentionally evaluates final receipts, resulting file state, and executable behavior, not brittle internal assertions about exact subagent hop order or delegated prompt wording.
 
 ## Variant Format
 
