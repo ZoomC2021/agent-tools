@@ -1,10 +1,10 @@
 # Widereview workflow
 
-Wide fan-out code review across four independent cheap-model CLIs run in parallel.
+Wide fan-out code review across three independent cheap-model CLIs run in parallel.
 
 ## Purpose
 
-Widereview runs four low-cost models on the same code changes simultaneously, then consolidates findings into a vote-weighted report. Where [ultrareview](ultrareview.md) favors depth (two premium models), widereview favors **breadth** — several independent reviewers at near-zero cost. The host agent acts as orchestrator only; it does not review the code itself.
+Widereview runs three low-cost models on the same code changes simultaneously, then consolidates findings into a vote-weighted report. Where [ultrareview](ultrareview.md) favors depth (two premium models), widereview favors **breadth** — several independent reviewers at near-zero cost. The host agent acts as orchestrator only; it does not review the code itself.
 
 ## Modes
 
@@ -48,8 +48,7 @@ Only Phase 1 (context gathering) and the lane prompt differ between modes; the p
 |------|-----|-------|------------------|------------------|
 | A | `grok` (Grok) | `grok-composer-2.5-fast` | model default | n/a |
 | B | `qodercli` (Qoder) | `Qwen3.7-Max` | max | `--reasoning-effort` flag |
-| C | `droid exec` (Factory) | `custom:OpenCode-0` (MiMo v2.5 Pro) | n/a | router model |
-| D | `cmd` (Command Code) | `xiaomi/mimo-v2.5-pro` | model default | n/a |
+| C | `opencode run` (OpenCode) | `xiaomi/mimo-v2.5-pro` (MiMo v2.5 Pro) | model default | n/a |
 
 ## Strict finding format
 
@@ -92,12 +91,12 @@ Original per-lane severities are always preserved; agreement is additional metad
 ```
 
 ### Requirements
-- One or more of: `grok`, `qodercli`, `droid`, `cmd` installed and authenticated
+- One or more of: `grok`, `qodercli`, `opencode` installed and authenticated
 - Git repository (diff mode needs changes to review; full mode uses `git ls-files`, falling back to `find`)
 
 ## Secret hygiene
 
-The OpenCode lane is backed by a custom model whose xiaomi API key is stored in plaintext in `~/.factory/settings.json`. The workflow references the model id `custom:OpenCode-0` only and must never read, print, or copy that settings file.
+The OpenCode lane is backed by OpenCode's xiaomi provider configuration. Reference the model id `xiaomi/mimo-v2.5-pro` only — never read, print, or copy provider API keys.
 
 ## When to use
 

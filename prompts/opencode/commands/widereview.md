@@ -1,14 +1,14 @@
 ---
-description: Wide fan-out code review across four cheap-model CLIs (Grok Composer 2.5, Qwen3.7-Max, OpenCode, MiMo v2.5 Pro) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (--full)
+description: Wide fan-out code review across three cheap-model CLIs (Grok Composer 2.5, Qwen3.7-Max, OpenCode) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (--full)
 mode: subagent
 model: xiaomi/mimo-v2.5-pro
 ---
 
 # WideReview: Wide Fan-Out Cheap-Model Code Review
 
-Run code reviews across **four independent cheap-model CLIs in parallel** — `Grok Composer 2.5`, `Qwen3.7-Max`, `OpenCode` (MiMo v2.5 Pro), and `MiMo v2.5 Pro` — then consolidate the findings into a single vote-weighted report.
+Run code reviews across **three independent cheap-model CLIs in parallel** — `Grok Composer 2.5`, `Qwen3.7-Max`, and `OpenCode` (MiMo v2.5 Pro) — then consolidate the findings into a single vote-weighted report.
 
-💡 **Cost note**: All four are low-cost models. Unlike `ultrareview` (2 premium models, depth), WideReview favors **breadth** — several independent reviewers at near-zero cost. Use it for broad coverage and cheap second opinions.
+💡 **Cost note**: All three are low-cost models. Unlike `ultrareview` (2 premium models, depth), WideReview favors **breadth** — several independent reviewers at near-zero cost. Use it for broad coverage and cheap second opinions.
 
 ## Modes
 
@@ -28,9 +28,8 @@ Pick the mode from the user's request, then follow Phase 1 for that mode. Phases
 | A | `grok` | `grok-composer-2.5-fast` | model default |
 | B | `qodercli` | `Qwen3.7-Max` | max (flag) |
 | C | `opencode run` | `xiaomi/mimo-v2.5-pro` (MiMo v2.5 Pro) | model default |
-| D | `cmd` | `xiaomi/mimo-v2.5-pro` | model default |
 
-Consolidating four independent reviewers catches issues any single model misses and surfaces conflicting interpretations.
+Consolidating three independent reviewers catches issues any single model misses and surfaces conflicting interpretations.
 
 ## Prerequisites
 
@@ -39,7 +38,6 @@ Each lane is optional. Missing or unauthenticated CLIs are **skipped**, and the 
 - `grok` (Grok) — `command -v grok`
 - `qodercli` (Qoder) — `command -v qodercli`
 - `opencode` (MiMo v2.5 Pro) — `command -v opencode`
-- `cmd` (Command Code) — `command -v cmd`
 
 ⚠️ **Secret hygiene**: The OpenCode lane is backed by OpenCode's xiaomi provider configuration. Reference the model id `xiaomi/mimo-v2.5-pro` only — never read, print, or copy provider API keys.
 
@@ -91,7 +89,7 @@ WR_TIMEOUT=${WR_TIMEOUT:-720}
 
 ## Phase 2: Pre-flight
 
-Detect available lanes with `command -v` (`grok`, `qodercli`, `opencode`, `cmd`) and build the active lane list. Note any skipped lanes for the final report. No per-lane configuration is required — each lane sets its model on the command line.
+Detect available lanes with `command -v` (`grok`, `qodercli`, `opencode`) and build the active lane list. Note any skipped lanes for the final report. No per-lane configuration is required — each lane sets its model on the command line.
 
 ## Phase 3: Launch Parallel Reviews
 
@@ -133,7 +131,7 @@ Do not include headings, summaries, prose, code fences, or markdown — only the
 EOF
 ```
 
-Launch each available lane in the background, each with the mode's timeout, writing to its own output file. Lanes with a native working-directory flag use it; `cmd` has none, so it runs in a subshell `cd` (the bundle/manifest paths are absolute, so reads work regardless):
+Launch each available lane in the background, each with the mode's timeout, writing to its own output file. Lanes with a native working-directory flag use it:
 
 ```bash
 timeout "$WR_TIMEOUT" grok -p "$WR_PROMPT" -m grok-composer-2.5-fast --always-approve --cwd "${ROOT:-.}" \
@@ -142,12 +140,9 @@ timeout "$WR_TIMEOUT" qodercli -p --model "Qwen3.7-Max" --reasoning-effort max -
   > "$WR_DIR/laneB.txt" 2>&1 & B=$!
 timeout "$WR_TIMEOUT" opencode run "$WR_PROMPT" --pure -m xiaomi/mimo-v2.5-pro --dir "${ROOT:-.}" --dangerously-skip-permissions -f "${BUNDLE:-$MANIFEST}" \
   > "$WR_DIR/laneC.txt" 2>&1 & C=$!
-timeout "$WR_TIMEOUT" bash -c "cd '${ROOT:-.}' 2>/dev/null; cmd -p \"\$0\" --model xiaomi/mimo-v2.5-pro --skip-onboarding --max-turns 120 --add-dir '$WR_DIR' --yolo -t" "$WR_PROMPT" \
-  > "$WR_DIR/laneD.txt" 2>&1 & D=$!
 wait "$A"; A_STATUS=$?
 wait "$B"; B_STATUS=$?
 wait "$C"; C_STATUS=$?
-wait "$D"; D_STATUS=$?
 ```
 
 (Only start lanes whose CLI was detected in Phase 2. `ROOT` is unset in diff mode — `${ROOT:-.}` keeps lanes in the current repo. Wait only for the PIDs of lanes you started; do not use bare `wait`, because it can block on unrelated background jobs in the orchestrator shell. Record each lane's exit code: `0` = ok, `124` = timeout, other = failed.)
@@ -180,11 +175,11 @@ Build a normalized signature for each finding: `file:line:category` (fuzzy-match
 
 ```
 ## WideReview Summary  (<mode>: diff | full)
-- Strong Consensus (3-4 lanes): <count>
-- Consensus (2 lanes):          <count>
-- Exclusive (high conf):        <count>
-- Lower Confidence:             <count>
-- Divergent:                    <count>
+- Strong Consensus (3 lanes):  <count>
+- Consensus (2 lanes):         <count>
+- Exclusive (high conf):       <count>
+- Lower Confidence:            <count>
+- Divergent:                   <count>
 
 ### Lane status
 | Lane | Model              | Status        | Findings |
@@ -192,10 +187,9 @@ Build a normalized signature for each finding: `file:line:category` (fuzzy-match
 | A    | Grok Composer 2.5  | ok/timeout/.. | <n>      |
 | B    | Qwen3.7-Max        | ...           | <n>      |
 | C    | OpenCode           | ...           | <n>      |
-| D    | MiMo v2.5 Pro      | ...           | <n>      |
 
-- Lanes used: <k>/4
-- Cost Level: Low (4 cheap models)
+- Lanes used: <k>/3
+- Cost Level: Low (3 cheap models)
 
 Recommendation: <prioritized next steps — consensus issues first>
 ```
@@ -203,7 +197,7 @@ Recommendation: <prioritized next steps — consensus issues first>
 Then list findings grouped by the buckets in Phase 5, each as:
 
 ```
-<icon> [<Severity>] [Category] file:line   (agreement: <k>/4 lanes)
+<icon> [<Severity>] [Category] file:line   (agreement: <k>/3 lanes)
    Sources: <lanes that reported it>
    Problem: <description>
    Fix: <recommendation>
