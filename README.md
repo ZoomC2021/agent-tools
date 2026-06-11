@@ -10,7 +10,7 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 | **review** | Review uncommitted changes for bugs, regressions, and improvements |
 | **ultrareview** | Parallel dual-model review using GPT 5.5 + Gemini 3.1 Pro Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
 | **ultrareview-lite** | Parallel dual-model review using MiMo v2.5 Pro + Gemini 3 Flash Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
-| **widereview** | Wide fan-out review across four cheap-model CLIs (Grok Composer 2.5, Qwen3.7-Max, MiMo v2.5 Pro via OpenCode, MiMo v2.5 Pro) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (`--full`) *(Not available: Gemini, Antigravity, Amp)* |
+| **widereview** | Wide fan-out review across four cheap-model CLIs (Grok Composer 2.5, Qwen3.7-Max, MiMo v2.5 Pro via OpenCode, MiniMax-M3 via pi) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (`--full`) *(Not available: Gemini, Antigravity, Amp)* |
 | **pr-reviewer** | Fetch PR comments, summarize issues, address them, update PR |
 | **pr-reviewer-only** | Fetch PR comments, summarize issues, generate implementation prompt for another agent |
 | **create-pr** | Create PR with auto-generated title and description |
@@ -152,7 +152,7 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 | **review** | Review uncommitted changes | GPT-5.5 | **High** |
 | **ultrareview** | Parallel dual-model review (GPT 5.5 + Gemini 3.1 Pro Preview) | MiMo v2.5 Pro | — |
 | **ultrareview-lite** | Parallel dual-model review (MiMo v2.5 Pro + Gemini 3 Flash Preview) | MiMo v2.5 Pro | — |
-| **widereview** | Wide fan-out review across 4 cheap-model CLIs (Grok Composer 2.5 + Qwen3.7-Max + MiMo v2.5 Pro via OpenCode + MiMo v2.5 Pro); diff or full-codebase (`--full`) | MiMo v2.5 Pro | — |
+| **widereview** | Wide fan-out review across 4 cheap-model CLIs (Grok Composer 2.5 + Qwen3.7-Max + MiMo v2.5 Pro via OpenCode + MiniMax-M3 via pi); diff or full-codebase (`--full`) | MiMo v2.5 Pro | — |
 | **deslop** | Code quality audit against principles | MiMo v2.5 Pro | — |
 | **imagegen-grok** | Generate/edit images with xAI Grok Imagine | xAI Grok Imagine Image Quality | — |
 | **imagegen-google** | Generate/edit images with Google Nano Banana Pro | Gemini 3 Pro Image Preview | — |
