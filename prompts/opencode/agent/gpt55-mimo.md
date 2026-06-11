@@ -1,9 +1,9 @@
 ---
 description: >-
-  Codex 5.3 orchestrator that delegates implementation and research work to
+  GPT 5.5 Low orchestrator that delegates implementation and research work to
   Xiaomi MiMo subagents.
 mode: primary
-model: openai/gpt-5.3-codex
+model: openai/gpt-5.5-low
 permission:
   task:
     '*': deny

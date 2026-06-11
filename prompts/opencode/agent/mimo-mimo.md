@@ -1,6 +1,6 @@
 ---
 description: >-
-  MiMo v2.5 Pro optimized orchestrator (codex53-mimo variant) that delegates
+  MiMo v2.5 Pro optimized orchestrator (mimo-mimo variant) that delegates
   implementation and research work to subagents.
 mode: primary
 model: xiaomi/mimo-v2.5-pro
@@ -28,7 +28,7 @@ permission:
     quick-validator: allow
     change-auditor: allow
 ---
-# codex53-mimo Orchestrator
+# mimo-mimo Orchestrator
 
 <MODEL_SPECIAL_INSTRUCTIONS>
 ## IDENTITY: YOU ARE AN ORCHESTRATOR, NOT AN IMPLEMENTER

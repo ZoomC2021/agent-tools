@@ -287,8 +287,8 @@ function Test-OpenCodeInstallation {
 
     # Check required agent files
     $requiredAgentFiles = @(
-        "codex53-mimo.md",
-        "codex53-mimo-turbo.md",
+        "gpt55-mimo.md",
+        "mimo-mimo.md",
         "mimo-general.md",
         "mimo-explore.md",
         "github-librarian.md",

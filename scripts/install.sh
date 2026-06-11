@@ -233,8 +233,8 @@ _self_check_opencode() {
 
     # Check required agent files
     local required_agent_files=(
-        "codex53-mimo.md"
-        "codex53-mimo-turbo.md"
+        "gpt55-mimo.md"
+        "mimo-mimo.md"
         "mimo-general.md"
         "mimo-explore.md"
         "github-librarian.md"
