@@ -4,21 +4,21 @@ Active contributors: zmang
 
 ## Purpose
 
-OpenCode is the primary agent target for agent-tools, featuring the sophisticated Codex53-MiMo orchestration architecture. It uses GPT-5.3-Codex for planning and routing, with Xiaomi MiMo v2.5 Pro subagents for execution.
+OpenCode is the primary agent target for agent-tools, featuring the sophisticated Codex53-MiMo orchestration architecture. It uses GPT-5.5 for planning and routing, with Xiaomi MiMo v2.5 Pro subagents for execution.
 
 ## Directory layout
 
 ```
 prompts/opencode/
 ├── agent/                    # Agent definitions
-│   ├── codex53-mimo.md      # Primary orchestrator (GPT-5.3-Codex)
-│   ├── codex53-mimo-turbo.md # Alternative orchestrator (MiMo)
+│   ├── gpt55-mimo.md      # Primary orchestrator (GPT-5.5)
+│   ├── gpt55-mimo-turbo.md # Alternative orchestrator (MiMo)
 │   ├── mimo-general.md      # Implementation execution
 │   ├── mimo-explore.md      # Read-only local discovery
 │   ├── github-librarian.md  # Remote GitHub research
 │   ├── docs-research.md     # Official documentation research
 │   ├── walkthrough.md       # Architecture walkthroughs
-│   └── oracle.md            # Deep reasoning (GPT-5.4)
+│   └── oracle.md            # Deep reasoning (GPT-5.5)
 ├── commands/                 # Workflow prompts
 │   ├── review.md
 │   ├── refactor.md
@@ -51,13 +51,13 @@ prompts/opencode/
 
 | File | Purpose |
 |------|---------|
-| `agent/codex53-mimo.md` | Orchestrator with deterministic routing and safety gates |
+| `agent/gpt55-mimo.md` | Orchestrator with deterministic routing and safety gates |
 | `opencode.json.example` | Complete agent and model configuration |
 | `bin/opencode-gemini-review` | Helper for dual-model reviews |
 
 ## Orchestrator routing
 
-The codex53-mimo agent implements deterministic routing:
+The gpt55-mimo agent implements deterministic routing:
 
 ```
 "create PR" / "pull request" → create-pr

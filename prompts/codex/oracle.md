@@ -1,6 +1,6 @@
 # Oracle
 
-Invoke GPT-5.4 for deep reasoning when stuck on complex problems. Bundles your prompt and relevant files so the oracle can provide informed guidance.
+Invoke GPT-5.5 for deep reasoning when stuck on complex problems. Bundles your prompt and relevant files so the oracle can provide informed guidance.
 
 ## When to Use
 
@@ -38,7 +38,7 @@ Or use npx: `npx -y @steipete/oracle ...`
    # API mode (requires OPENAI_API_KEY)
    npx -y @steipete/oracle \
      --engine api \
-     --model gpt-5.4 \
+     --model gpt-5.5 \
      -p "Your detailed question here" \
      --file "src/relevant/file.ts" \
      --file "docs/architecture.md"
@@ -82,8 +82,8 @@ Or use npx: `npx -y @steipete/oracle ...`
 
 ## Model Configuration
 
-This subagent uses GPT-5.4 via OpenAI API:
-- Model: `gpt-5.4`
+This subagent uses GPT-5.5 via OpenAI API:
+- Model: `gpt-5.5`
 - Engine: API (requires `OPENAI_API_KEY` environment variable)
 
 ## Example Usage
@@ -92,7 +92,7 @@ This subagent uses GPT-5.4 via OpenAI API:
 ```bash
 npx -y @steipete/oracle \
   --engine api \
-  --model gpt-5.4 \
+  --model gpt-5.5 \
   -p "Analyze this code for race conditions in the payment processing flow. I've observed intermittent test failures in test_payment_flow.py::test_refund. Review the transaction handling and async patterns." \
   --file "src/payments/processor.py" \
   --file "src/payments/transactions.py" \
@@ -103,7 +103,7 @@ npx -y @steipete/oracle \
 ```bash
 npx -y @steipete/oracle \
   --engine api \
-  --model gpt-5.4 \
+  --model gpt-5.5 \
   -p "We're considering migrating from REST to GraphQL for our API. Review the current API structure and evaluate: 1) Migration complexity, 2) Performance implications, 3) Breaking changes for clients. Recommend approach with tradeoffs." \
   --file "src/api/router.py" \
   --file "src/api/resolvers.py" \
@@ -114,7 +114,7 @@ npx -y @steipete/oracle \
 ```bash
 npx -y @steipete/oracle \
   --engine api \
-  --model gpt-5.4 \
+  --model gpt-5.5 \
   -p "Review this authentication refactor for security issues and edge cases. Pay special attention to session handling and token validation." \
   --file "src/auth/session.py" \
   --file "src/auth/tokens.py" \

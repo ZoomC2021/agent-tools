@@ -1,7 +1,7 @@
 ---
 description: Validate each milestone before advancing to the next one
 mode: subagent
-model: openai/gpt-5.3-codex
+model: openai/gpt-5.5
 permission:
   task:
     '*': deny

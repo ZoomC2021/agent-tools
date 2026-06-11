@@ -8,7 +8,7 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 |----------|-------------|
 | **refactor** | Analyze codebase for refactoring opportunities, prioritize by severity/effort |
 | **review** | Review uncommitted changes for bugs, regressions, and improvements |
-| **ultrareview** | Parallel dual-model review using GPT 5.4 + Gemini 3.1 Pro Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
+| **ultrareview** | Parallel dual-model review using GPT 5.5 + Gemini 3.1 Pro Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
 | **ultrareview-lite** | Parallel dual-model review using MiMo v2.5 Pro + Gemini 3 Flash Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
 | **widereview** | Wide fan-out review across four cheap-model CLIs (Grok Composer 2.5, Qwen3.7-Max, MiMo v2.5 Pro via OpenCode, MiMo v2.5 Pro) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (`--full`) *(Not available: Gemini, Antigravity, Amp)* |
 | **pr-reviewer** | Fetch PR comments, summarize issues, address them, update PR |
@@ -23,13 +23,13 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 
 ## Opencode Codex53-MiMo Setup (Primary Agent Architecture)
 
-This repository includes a sophisticated agent architecture for OpenCode using GPT-5.3-Codex as the orchestrator and Xiaomi MiMo v2.5 Pro as specialized subagents.
+This repository includes a sophisticated agent architecture for OpenCode using GPT-5.5 as the orchestrator and Xiaomi MiMo v2.5 Pro as specialized subagents.
 
 ### Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Codex53-MiMo Orchestrator (GPT-5.3-Codex)                 │
+│  Codex53-MiMo Orchestrator (GPT-5.5)                 │
 │  • Plans and sequences work                                  │
 │  • Makes routing decisions                                    │
 │  • Delegates to specialized subagents                       │
@@ -107,13 +107,13 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 ├── opencode.json              # Main configuration (see example)
 ├── bin/                       # Helper scripts (e.g. opencode-gh-librarian)
 ├── agent/                     # Primary agent definitions
-│   ├── codex53-mimo.md       # Orchestrator (routing logic)
+│   ├── gpt55-mimo.md       # Orchestrator (routing logic)
 │   ├── mimo-general.md       # Execution worker
 │   ├── mimo-explore.md       # Local read-only discovery
 │   ├── github-librarian.md   # Remote GitHub research
 │   ├── docs-research.md      # Official docs + API research
 │   ├── walkthrough.md        # Architecture walkthroughs + diagrams
-│   └── oracle.md             # Deep reasoning (GPT-5.4)
+│   └── oracle.md             # Deep reasoning (GPT-5.5)
 └── commands/                  # Workflow prompts
     ├── review.md
     ├── ultrareview.md
@@ -135,22 +135,22 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 
 | Subagent | Purpose | Model | Reasoning Effort |
 |----------|---------|-------|------------------|
-| **codex53-mimo** | Primary orchestrator (plans, routes, delegates) | GPT-5.3-Codex | High |
-| **codex53-mimo-turbo** | Alternative orchestrator using MiMo | MiMo v2.5 Pro | — |
+| **gpt55-mimo** | Primary orchestrator (plans, routes, delegates) | GPT-5.5 | High |
+| **gpt55-mimo-turbo** | Alternative orchestrator using MiMo | MiMo v2.5 Pro | — |
 | **mimo-general** | Implementation, debugging, refactoring execution | MiMo v2.5 Pro | — |
 | **mimo-explore** | Local read-only codebase discovery and search | MiMo v2.5 Pro | — |
 | **github-librarian** | Remote GitHub research (default branches, history) | MiMo v2.5 Pro | — |
 | **docs-research** | Official docs, API behavior, release notes | MiMo v2.5 Pro | — |
 | **walkthrough** | Architecture walkthroughs with Mermaid diagrams | MiMo v2.5 Pro | — |
-| **oracle** | Deep reasoning for complex problems | GPT-5.4 | **High** |
+| **oracle** | Deep reasoning for complex problems | GPT-5.5 | **High** |
 | **spec-compiler** | Compile Execution Contracts before implementation | MiMo v2.5 Pro | — |
 | **plan-review** | Binary validation of Execution Contracts | MiMo v2.5 Pro | — |
 | **quick-validator** | Fast validation of implementation output | MiMo v2.5 Pro | — |
-| **mission-scrutiny** | Front-load scrutiny, milestone planning | GPT-5.3-Codex | — |
-| **milestone-validator** | Validate each milestone before advancing | GPT-5.3-Codex | — |
-| **change-auditor** | Deep audit for security, breaking changes | GPT-5.3-Codex | **High** |
-| **review** | Review uncommitted changes | GPT-5.3-Codex | **High** |
-| **ultrareview** | Parallel dual-model review (GPT 5.4 + Gemini 3.1 Pro Preview) | MiMo v2.5 Pro | — |
+| **mission-scrutiny** | Front-load scrutiny, milestone planning | GPT-5.5 | — |
+| **milestone-validator** | Validate each milestone before advancing | GPT-5.5 | — |
+| **change-auditor** | Deep audit for security, breaking changes | GPT-5.5 | **High** |
+| **review** | Review uncommitted changes | GPT-5.5 | **High** |
+| **ultrareview** | Parallel dual-model review (GPT 5.5 + Gemini 3.1 Pro Preview) | MiMo v2.5 Pro | — |
 | **ultrareview-lite** | Parallel dual-model review (MiMo v2.5 Pro + Gemini 3 Flash Preview) | MiMo v2.5 Pro | — |
 | **widereview** | Wide fan-out review across 4 cheap-model CLIs (Grok Composer 2.5 + Qwen3.7-Max + MiMo v2.5 Pro via OpenCode + MiMo v2.5 Pro); diff or full-codebase (`--full`) | MiMo v2.5 Pro | — |
 | **deslop** | Code quality audit against principles | MiMo v2.5 Pro | — |
@@ -173,7 +173,7 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 
 A local reference setup uses:
 - Xiaomi MiMo v2.5 Pro for build mode and subagents
-- GPT-5.3-Codex for the orchestrator (plan mode)
+- GPT-5.5 for the orchestrator (plan mode)
 - Specialized subagents for local discovery, remote GitHub research, docs research, architecture walkthroughs, and execution
 
 See `prompts/opencode/opencode.json.example` for the full configuration structure.
@@ -263,7 +263,7 @@ for f in prompts/opencode/commands/review.md prompts/opencode/commands/deslop.md
 done
 
 # Copy agent definitions to agent/
-for f in prompts/opencode/agent/codex53-mimo.md prompts/opencode/agent/codex53-mimo-turbo.md \
+for f in prompts/opencode/agent/gpt55-mimo.md prompts/opencode/agent/gpt55-mimo-turbo.md \
          prompts/opencode/agent/mimo-general.md prompts/opencode/agent/mimo-explore.md \
          prompts/opencode/agent/github-librarian.md prompts/opencode/agent/docs-research.md \
          prompts/opencode/agent/walkthrough.md prompts/opencode/agent/oracle.md; do
@@ -282,7 +282,7 @@ cp prompts/opencode/opencode.json.example ~/.config/opencode/opencode.json
 
 **Note**: `github-librarian` requires `gh` to be installed and authenticated. `docs-research` works best when `websearch` is available, which OpenCode enables when using the OpenCode provider or when `OPENCODE_ENABLE_EXA=1` is set.
 
-See [Opencode Codex53-MiMo Setup](#opencode-codex53-mimo-setup-primary-agent-architecture) for architecture details.
+See [Opencode Codex53-MiMo Setup](#opencode-gpt55-mimo-setup-primary-agent-architecture) for architecture details.
 </details>
 
 <details>
@@ -397,7 +397,7 @@ chmod +x ~/.config/opencode/bin/opencode-gh-librarian
 
 **Skills:** `oracle`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`, `widereview`
 
-The shipped `oracle` droid inherits your parent Droid model with `reasoningEffort: high`, so it works with your available Factory plan, credits, or BYOK configuration. To force Factory's built-in GPT-5.4, change `~/.factory/droids/oracle.md` to `model: gpt-5.4`; for BYOK use `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
+The shipped `oracle` droid inherits your parent Droid model with `reasoningEffort: low`, so it works with your available Factory plan, credits, or BYOK configuration. To force Factory's built-in GPT-5.5, change `~/.factory/droids/oracle.md` to `model: gpt-5.5`; for BYOK use `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
 </details>
 
 <details>
@@ -493,7 +493,7 @@ for f in prompts/opencode/commands/review.md prompts/opencode/commands/deslop.md
 done
 
 # Copy agent definitions to agent/
-for f in prompts/opencode/agent/codex53-mimo.md prompts/opencode/agent/codex53-mimo-turbo.md \
+for f in prompts/opencode/agent/gpt55-mimo.md prompts/opencode/agent/gpt55-mimo-turbo.md \
          prompts/opencode/agent/mimo-general.md prompts/opencode/agent/mimo-explore.md \
          prompts/opencode/agent/github-librarian.md prompts/opencode/agent/docs-research.md \
          prompts/opencode/agent/walkthrough.md prompts/opencode/agent/oracle.md; do
@@ -512,7 +512,7 @@ cp prompts/opencode/opencode.json.example ~/.config/opencode/opencode.json
 
 **Note**: `github-librarian` requires `gh` to be installed and authenticated. `docs-research` works best when `websearch` is available, which OpenCode enables when using the OpenCode provider or when `OPENCODE_ENABLE_EXA=1` is set.
 
-See [Opencode Codex53-MiMo Setup](#opencode-codex53-mimo-setup-primary-agent-architecture) for architecture details.
+See [Opencode Codex53-MiMo Setup](#opencode-gpt55-mimo-setup-primary-agent-architecture) for architecture details.
 </details>
 
 <details>
@@ -626,7 +626,7 @@ chmod +x ~/.config/opencode/bin/opencode-gh-librarian
 
 **Skills:** `oracle`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`, `widereview`
 
-The shipped `oracle` droid inherits your parent Droid model with `reasoningEffort: high`, so it works with your available Factory plan, credits, or BYOK configuration. To force Factory's built-in GPT-5.4, change `~/.factory/droids/oracle.md` to `model: gpt-5.4`; for BYOK use `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
+The shipped `oracle` droid inherits your parent Droid model with `reasoningEffort: low`, so it works with your available Factory plan, credits, or BYOK configuration. To force Factory's built-in GPT-5.5, change `~/.factory/droids/oracle.md` to `model: gpt-5.5`; for BYOK use `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
 </details>
 
 <details>
@@ -706,7 +706,7 @@ Reviews uncommitted changes:
 
 ⚠️ **Uses 2 high-tier models simultaneously** — use for critical reviews only.
 
-Runs parallel code reviews using **GPT 5.4** (via OpenCode) AND **Gemini 3.1 Pro Preview** (via Gemini CLI) simultaneously, then consolidates:
+Runs parallel code reviews using **GPT 5.5** (via OpenCode) AND **Gemini 3.1 Pro Preview** (via Gemini CLI) simultaneously, then consolidates:
 
 1. **Launch parallel reviews**: Both models review the same changes concurrently
 2. **Consolidate findings**:
@@ -730,7 +730,7 @@ Runs parallel code reviews using **MiMo v2.5 Pro** (via OpenCode) AND **Gemini 3
 2. **Consolidate findings** with identical severity-preserving rules from `ultrareview`
 3. **Use helper-managed Gemini execution**: deterministic bundle generation, chunking, retries, and `summary.json` status/failure metadata
 4. **Graceful fallback and partial reporting**: if Gemini lane is partial or unavailable, report `failure_reason` and proceed with available results
-5. **Lower operating cost** than `ultrareview` by replacing GPT 5.4 with MiMo in the OpenCode lane
+5. **Lower operating cost** than `ultrareview` by replacing GPT 5.5 with MiMo in the OpenCode lane
 
 ### cc (Claude CLI)
 

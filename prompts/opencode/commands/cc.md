@@ -232,7 +232,7 @@ The helper returns:
 | Workflow | Primary Model | Use Case |
 |----------|---------------|----------|
 | `/review` | MiMo v2.5 Pro | Standard single-model review |
-| `/ultrareview` | GPT 5.4 + Gemini 3.1 Pro | Dual high-tier model review |
+| `/ultrareview` | GPT 5.5 + Gemini 3.1 Pro | Dual high-tier model review |
 | `/ultrareview-lite` | MiMo v2.5 Pro + Gemini 3 Flash | Cost-effective dual review |
 | `/cc` | Claude Sonnet/Opus | Claude-specific analysis or multi-step tasks |
 

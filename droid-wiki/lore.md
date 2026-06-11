@@ -28,7 +28,7 @@ Key events:
 Introduction of sophisticated multi-agent and multi-model workflows.
 
 Key events:
-- **Apr 16**: Ultrareview — parallel dual-model review with GPT 5.4 + Gemini 3.1 Pro Preview
+- **Apr 16**: Ultrareview — parallel dual-model review with GPT 5.5 + Gemini 3.1 Pro Preview
 - **Apr 16**: Mission-scrutiny workflow for long-running tasks with milestone validation
 - **Apr 25**: Handoff command for session continuity
 - **Apr 25**: Ultrareview-lite — lower-cost dual-model variant

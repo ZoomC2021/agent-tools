@@ -8,7 +8,7 @@ model: xiaomi/mimo-v2.5-pro
 
 Run simultaneous code reviews using **MiMo v2.5 Pro** (via OpenCode native) AND **Gemini 3 Flash Preview** (via Gemini CLI), then consolidate findings into a unified report.
 
-Compared with `/ultrareview`, this variant reduces cost by replacing the GPT 5.4 lane with MiMo v2.5 Pro.
+Compared with `/ultrareview`, this variant reduces cost by replacing the GPT 5.5 lane with MiMo v2.5 Pro.
 
 ## Phase 1: Gather Context
 

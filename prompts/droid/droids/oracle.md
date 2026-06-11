@@ -2,7 +2,7 @@
 name: oracle
 description: Deep reasoning subagent for complex bugs, architecture tradeoffs, risky reviews, and performance investigations.
 model: inherit
-reasoningEffort: high
+reasoningEffort: low
 tools: read-only
 ---
 
@@ -33,7 +33,7 @@ If the bundle is too broad or too thin, ask for the narrowest missing artifact t
 
 ## Model Note
 
-This droid inherits the parent Droid's configured model and uses `reasoningEffort: high` so it works with the user's available Factory plan, credits, or BYOK configuration. If you specifically want Factory's built-in GPT-5.4 and your workspace can access it, change the frontmatter to `model: gpt-5.4`; for BYOK use a configured model like `model: custom:<your-config-model-name>`. A ChatGPT Plus/Pro browser subscription is not the same thing as a CLI/API credential.
+This droid inherits the parent Droid's configured model and uses `reasoningEffort: low` so it works with the user's available Factory plan, credits, or BYOK configuration. If you specifically want Factory's built-in GPT-5.5 and your workspace can access it, change the frontmatter to `model: gpt-5.5`; for BYOK use a configured model like `model: custom:<your-config-model-name>`. A ChatGPT Plus/Pro browser subscription is not the same thing as a CLI/API credential.
 
 ## Response Format
 

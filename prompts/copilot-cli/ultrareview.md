@@ -1,13 +1,13 @@
 # UltraReview: Parallel Dual-Model Code Review
 
-Run simultaneous code reviews using **GPT 5.4** AND **Gemini 3.1 Pro Preview** (via Gemini CLI), then consolidate findings into a unified report.
+Run simultaneous code reviews using **GPT 5.5** AND **Gemini 3.1 Pro Preview** (via Gemini CLI), then consolidate findings into a unified report.
 
 ⚠️ **Cost Warning**: This uses 2 high-tier models simultaneously. Use for critical reviews only.
 
 ## Overview
 
 This workflow performs parallel code reviews using two different AI models:
-1. **GPT 5.4** - Primary model for reasoning-heavy analysis (Copilot CLI uses GPT-4)
+1. **GPT 5.5** - Primary model for reasoning-heavy analysis (Copilot CLI uses GPT-4)
 2. **Gemini 3.1 Pro Preview** - Secondary model for pattern recognition (via Gemini CLI)
 
 The results are consolidated to catch issues each model might miss and surface conflicting interpretations.

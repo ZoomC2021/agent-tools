@@ -1,6 +1,6 @@
 # Ultrareview workflow
 
-Parallel dual-model code review using GPT 5.4 AND Gemini 3.1 Pro Preview simultaneously.
+Parallel dual-model code review using GPT 5.5 AND Gemini 3.1 Pro Preview simultaneously.
 
 ## Purpose
 
@@ -11,7 +11,7 @@ Ultrareview runs two high-tier models in parallel on the same code changes, then
 ```
 1. Build shared git diff bundle (git diff -U40 HEAD)
 2. Launch parallel reviews:
-   - Lane A: GPT 5.4 (via OpenCode)
+   - Lane A: GPT 5.5 (via OpenCode)
    - Lane B: Gemini 3.1 Pro Preview (via Gemini CLI)
 3. Wait for both results (with timeout and retry logic)
 4. Consolidate findings:
@@ -43,7 +43,7 @@ The `opencode-gemini-review` helper script manages the Gemini lane:
 ## Variants
 
 ### Ultrareview
-Full dual-model with GPT 5.4 + Gemini 3.1 Pro Preview.
+Full dual-model with GPT 5.5 + Gemini 3.1 Pro Preview.
 
 ### Ultrareview-lite
 Lower-cost variant with MiMo v2.5 Pro + Gemini 3 Flash Preview.

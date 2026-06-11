@@ -1,8 +1,8 @@
 ---
 description: Review uncommitted changes and report/fix issues
 mode: subagent
-model: openai/gpt-5.3-codex
-reasoningEffort: high
+model: openai/gpt-5.5
+reasoningEffort: low
 ---
 
 # Code Review

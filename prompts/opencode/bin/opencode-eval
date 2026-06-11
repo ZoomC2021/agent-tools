@@ -32,7 +32,7 @@ Defaults:
 Examples:
   opencode-eval list
   opencode-eval run
-  opencode-eval run --variants gpt54-primary --scenarios implementation-sandbox
+  opencode-eval run --variants gpt55-primary --scenarios implementation-sandbox
   opencode-eval run --tags extended
   opencode-eval report evals/out/20260422T120000Z
 `)
@@ -769,7 +769,7 @@ function runOpencodeCase({ variant, variantDir, scenario, workspace, caseDir }) 
     "--format",
     "json",
     "--agent",
-    scenario.agent || "codex53-mimo",
+    scenario.agent || "gpt55-mimo",
     "--dir",
     workspace.workdir,
   ]

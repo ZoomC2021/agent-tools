@@ -1,30 +1,30 @@
 {
   "variants": [
     {
-      "name": "baseline-codex53-primary",
-      "description": "Current workflow: codex53-mimo and plan mode both use openai/gpt-5.3-codex.",
-      "cliModel": "openai/gpt-5.3-codex",
+      "name": "baseline-gpt55-primary",
+      "description": "Current workflow: gpt55-mimo and plan mode both use openai/gpt-5.5.",
+      "cliModel": "openai/gpt-5.5",
       "configOverrides": {
-        "agent.codex53-mimo.model": "openai/gpt-5.3-codex",
-        "mode.plan.model": "openai/gpt-5.3-codex"
+        "agent.gpt55-mimo.model": "openai/gpt-5.5",
+        "mode.plan.model": "openai/gpt-5.5"
       },
       "promptFrontmatterOverrides": {
-        "agent/codex53-mimo.md": {
-          "model": "openai/gpt-5.3-codex"
+        "agent/gpt55-mimo.md": {
+          "model": "openai/gpt-5.5"
         }
       }
     },
     {
-      "name": "gpt54-primary",
-      "description": "Candidate workflow: codex53-mimo and plan mode both use openai/gpt-5.4 while subagent routing stays the same.",
-      "cliModel": "openai/gpt-5.4",
+      "name": "gpt55-primary",
+      "description": "Candidate workflow: gpt55-mimo and plan mode both use openai/gpt-5.5 while subagent routing stays the same.",
+      "cliModel": "openai/gpt-5.5",
       "configOverrides": {
-        "agent.codex53-mimo.model": "openai/gpt-5.4",
-        "mode.plan.model": "openai/gpt-5.4"
+        "agent.gpt55-mimo.model": "openai/gpt-5.5",
+        "mode.plan.model": "openai/gpt-5.5"
       },
       "promptFrontmatterOverrides": {
-        "agent/codex53-mimo.md": {
-          "model": "openai/gpt-5.4"
+        "agent/gpt55-mimo.md": {
+          "model": "openai/gpt-5.5"
         }
       }
     },
@@ -34,22 +34,22 @@
       "cliModel": "xiaomi/mimo-v2.5-pro",
       "includeProjectPlugins": true,
       "configOverrides": {
-        "agent.codex53-mimo.model": "xiaomi/mimo-v2.5-pro",
-        "agent.codex53-mimo.prompt": "{file:./agent/codex53-mimo-turbo.md}",
-        "agent.codex53-mimo.permission.read": "deny",
-        "agent.codex53-mimo.permission.grep": "deny",
-        "agent.codex53-mimo.permission.glob": "deny",
-        "agent.codex53-mimo.permission.bash": "deny",
-        "agent.codex53-mimo.permission.google_search": "deny",
-        "agent.codex53-mimo.permission.websearch": "deny",
-        "agent.codex53-mimo.permission.webfetch": "deny",
+        "agent.gpt55-mimo.model": "xiaomi/mimo-v2.5-pro",
+        "agent.gpt55-mimo.prompt": "{file:./agent/gpt55-mimo.md}",
+        "agent.gpt55-mimo.permission.read": "deny",
+        "agent.gpt55-mimo.permission.grep": "deny",
+        "agent.gpt55-mimo.permission.glob": "deny",
+        "agent.gpt55-mimo.permission.bash": "deny",
+        "agent.gpt55-mimo.permission.google_search": "deny",
+        "agent.gpt55-mimo.permission.websearch": "deny",
+        "agent.gpt55-mimo.permission.webfetch": "deny",
         "mode.plan.model": "xiaomi/mimo-v2.5-pro"
       },
       "configDeletes": [
-        "agent.codex53-mimo.routing_policy"
+        "agent.gpt55-mimo.routing_policy"
       ],
       "promptFrontmatterOverrides": {
-        "agent/codex53-mimo-turbo.md": {
+        "agent/gpt55-mimo.md": {
           "model": "xiaomi/mimo-v2.5-pro"
         }
       }
@@ -71,18 +71,18 @@
       }
     },
     {
-      "name": "mimo-explore-gpt54mini-fast",
-      "description": "Direct mimo-explore subagent eval using OpenAI GPT-5.4 mini Fast.",
+      "name": "mimo-explore-gpt55mini-fast",
+      "description": "Direct mimo-explore subagent eval using OpenAI GPT-5.5 mini Fast.",
       "configOverrides": {
         "agent.mimo-explore.mode": "primary",
         "agent.mimo-explore.hidden": false,
-        "agent.mimo-explore.model": "openai/gpt-5.4-mini-fast",
+        "agent.mimo-explore.model": "openai/gpt-5.5-mini-fast",
         "agent.mimo-explore.permission.bash": "allow"
       },
       "promptFrontmatterOverrides": {
         "agent/mimo-explore.md": {
           "mode": "primary",
-          "model": "openai/gpt-5.4-mini-fast"
+          "model": "openai/gpt-5.5-mini-fast"
         }
       }
     },
@@ -102,17 +102,17 @@
       }
     },
     {
-      "name": "mimo-general-gpt53-codex",
-      "description": "Direct mimo-general subagent eval using OpenAI GPT-5.3 Codex.",
+      "name": "mimo-general-gpt55",
+      "description": "Direct mimo-general subagent eval using OpenAI GPT-5.5.",
       "configOverrides": {
         "agent.mimo-general.mode": "primary",
         "agent.mimo-general.hidden": false,
-        "agent.mimo-general.model": "openai/gpt-5.3-codex"
+        "agent.mimo-general.model": "openai/gpt-5.5"
       },
       "promptFrontmatterOverrides": {
         "agent/mimo-general.md": {
           "mode": "primary",
-          "model": "openai/gpt-5.3-codex"
+          "model": "openai/gpt-5.5"
         }
       }
     },
@@ -132,17 +132,17 @@
       }
     },
     {
-      "name": "mission-scrutiny-codex53",
-      "description": "Direct mission-scrutiny subagent eval using OpenAI GPT-5.3 Codex (current default).",
+      "name": "mission-scrutiny-gpt55",
+      "description": "Direct mission-scrutiny subagent eval using OpenAI GPT-5.5 (current default).",
       "configOverrides": {
         "agent.mission-scrutiny.mode": "primary",
         "agent.mission-scrutiny.hidden": false,
-        "agent.mission-scrutiny.model": "openai/gpt-5.3-codex"
+        "agent.mission-scrutiny.model": "openai/gpt-5.5"
       },
       "promptFrontmatterOverrides": {
         "commands/mission-scrutiny.md": {
           "mode": "primary",
-          "model": "openai/gpt-5.3-codex"
+          "model": "openai/gpt-5.5"
         }
       }
     },
@@ -178,17 +178,17 @@
       }
     },
     {
-      "name": "plan-review-codex53",
-      "description": "Direct plan-review subagent eval using OpenAI GPT-5.3 Codex for A/B comparison against MiMo Turbo.",
+      "name": "plan-review-gpt55",
+      "description": "Direct plan-review subagent eval using OpenAI GPT-5.5 for A/B comparison against MiMo Turbo.",
       "configOverrides": {
         "agent.plan-review.mode": "primary",
         "agent.plan-review.hidden": false,
-        "agent.plan-review.model": "openai/gpt-5.3-codex"
+        "agent.plan-review.model": "openai/gpt-5.5"
       },
       "promptFrontmatterOverrides": {
         "commands/plan-review.md": {
           "mode": "primary",
-          "model": "openai/gpt-5.3-codex"
+          "model": "openai/gpt-5.5"
         }
       }
     }

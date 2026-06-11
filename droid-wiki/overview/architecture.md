@@ -6,7 +6,7 @@ The agent-tools repository implements a hierarchical orchestration pattern for A
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Codex53-MiMo Orchestrator (GPT-5.3-Codex)                 │
+│  Codex53-MiMo Orchestrator (GPT-5.5)                 │
 │  • Plans and sequences work                                  │
 │  • Makes routing decisions                                    │
 │  • Delegates to specialized subagents                       │
@@ -34,7 +34,7 @@ The agent-tools repository implements a hierarchical orchestration pattern for A
 
 ## Orchestrator routing logic
 
-The `codex53-mimo` agent in `prompts/opencode/agent/codex53-mimo.md` uses deterministic keyword-based routing:
+The `gpt55-mimo` agent in `prompts/opencode/agent/gpt55-mimo.md` uses deterministic keyword-based routing:
 
 | Trigger | Keywords | Agent Selected |
 |---------|----------|----------------|

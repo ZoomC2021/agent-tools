@@ -2,7 +2,7 @@
 
 Agent-tools provides custom prompts, skills, and workflows for AI coding agents. It enables consistent developer workflows across 14+ coding assistants including OpenCode, Claude Code, Codex, Cursor, Pi, Warp, and others.
 
-The repository centers around the **OpenCode Codex53-MiMo architecture** — a sophisticated orchestrator pattern using GPT-5.3-Codex for planning and routing, with Xiaomi MiMo v2.5 Pro subagents for execution and research tasks.
+The repository centers around the **OpenCode Codex53-MiMo architecture** — a sophisticated orchestrator pattern using GPT-5.5 for planning and routing, with Xiaomi MiMo v2.5 Pro subagents for execution and research tasks.
 
 ## What it provides
 

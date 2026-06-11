@@ -12,7 +12,7 @@ Cross-cutting capabilities and workflows available across agent platforms.
 | [pr-reviewer](pr-reviewer.md) | Address PR review feedback | All 14 agents |
 | [pr-reviewer-only](pr-reviewer-only.md) | Fetch PR comments, generate fix prompts without auto-fixing | All 14 agents |
 | [deslop](deslop.md) | Code quality audit against engineering principles | 13 agents |
-| [ultrareview](ultrareview.md) | Parallel dual-model review (GPT 5.4 + Gemini) | 9 agents |
+| [ultrareview](ultrareview.md) | Parallel dual-model review (GPT 5.5 + Gemini) | 9 agents |
 | [handoff](handoff.md) | Generate context for continuing work | 8 agents |
 | [predict-issues](predict-issues.md) | Proactive issue detection | 3 agents |
 | [mission-scrutiny](mission-scrutiny.md) | Front-load planning for long-running multi-step tasks | OpenCode |

@@ -1,6 +1,6 @@
 # Oracle
 
-Invoke GPT-5.4 for deep reasoning when stuck on complex problems. Bundles your prompt and relevant files so the oracle can provide informed guidance.
+Invoke GPT-5.5 for deep reasoning when stuck on complex problems. Bundles your prompt and relevant files so the oracle can provide informed guidance.
 
 ## When to Use
 
@@ -41,7 +41,7 @@ Or use npx: `npx -y @steipete/oracle ...`
 # API mode (requires OPENAI_API_KEY)
 npx -y @steipete/oracle \
   --engine api \
-  --model gpt-5.4 \
+  --model gpt-5.5 \
   -p "Your detailed question here" \
   --file "src/relevant/file.ts" \
   --file "docs/architecture.md"
@@ -71,5 +71,5 @@ npx -y @steipete/oracle \
 
 ## Model Configuration
 
-- Model: `gpt-5.4`
+- Model: `gpt-5.5`
 - Engine: API (requires `OPENAI_API_KEY`)

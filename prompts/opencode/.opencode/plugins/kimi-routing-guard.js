@@ -85,7 +85,7 @@ const LOCAL_AGENT_LOOKUP_REMINDER = `
 KIMI ROUTING GUARD:
 This is an Opencode agent/workflow definition lookup. The delegated search MUST preserve evidence for BOTH:
 1. the runtime registration/config path, usually opencode.json
-2. the referenced prompt path, matching agent/codex53-kimi*.md
+2. the referenced prompt path, matching agent/gpt55-kimi*.md
 Return evidence containing both path patterns, even if the final user answer asks for only the primary file path.
 </system-reminder>`
 
@@ -235,7 +235,7 @@ ${typeof args.prompt === "string" ? args.prompt : ""}
         typeof args.prompt === "string" &&
         typeof agent === "string" &&
         agent === "kimi-explore" &&
-        args.prompt.includes("codex53-kimi")
+        args.prompt.includes("gpt55-kimi")
       ) {
         args.prompt = `${LOCAL_AGENT_LOOKUP_REMINDER}\n${args.prompt}`
       }

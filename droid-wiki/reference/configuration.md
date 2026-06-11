@@ -28,7 +28,7 @@ OpenCode configuration structure and options.
 | `plugin` | string[] | Auth plugins (e.g., `opencode-antigravity-auth@1.6.0`) |
 | `provider` | object | Provider configurations (openai, google, xiaomi) |
 | `model` | string | Default model ID (e.g., `xiaomi/mimo-v2.5-pro`) |
-| `default_agent` | string | Default agent to use (e.g., `codex53-mimo-turbo`) |
+| `default_agent` | string | Default agent to use (e.g., `gpt55-mimo-turbo`) |
 | `mode` | object | Mode-specific model overrides (plan, build) |
 | `agent` | object | Agent definitions and permissions |
 
@@ -120,7 +120,7 @@ Override models for specific modes:
 ```json
 "mode": {
   "plan": {
-    "model": "openai/gpt-5.3-codex"
+    "model": "openai/gpt-5.5"
   },
   "build": {
     "model": "xiaomi/mimo-v2.5-pro"
@@ -130,7 +130,7 @@ Override models for specific modes:
 
 | Mode | Purpose | Default model |
 |------|---------|---------------|
-| `plan` | Architecture and planning | GPT 5.3 Codex |
+| `plan` | Architecture and planning | GPT 5.5 Low |
 | `build` | Implementation and execution | MiMo v2.5 Pro |
 
 ## Agent configuration
@@ -170,7 +170,7 @@ Each agent has the following structure:
 Prompts use `{file:./relative/path}` syntax to reference Markdown files:
 
 ```json
-"prompt": "{file:./agent/codex53-mimo.md}"
+"prompt": "{file:./agent/gpt55-mimo.md}"
 ```
 
 The path is relative to `prompts/opencode/`.

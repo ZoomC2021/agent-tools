@@ -274,7 +274,7 @@ RESPONSE REQUIREMENT:
   5) Optional: **Change Audit Report** (if change-auditor was invoked for high-risk milestones)
 
 Additional agents:
-- Use `oracle` for deep reasoning on complex problems when stuck—invokes GPT-5.4 with a pre-synthesized context bundle for expert guidance.
+- Use `oracle` for deep reasoning on complex problems when stuck—invokes GPT-5.5 with a pre-synthesized context bundle for expert guidance.
 - Use `github-librarian` for remote GitHub code research, reference implementations, and lightweight history on default branches.
 - Use `docs-research` when correctness depends on official documentation or release notes.
 - Use `walkthrough` when the user wants a local architecture explanation or Mermaid diagram.

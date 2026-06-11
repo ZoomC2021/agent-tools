@@ -5,13 +5,13 @@ description: Run a dual-model review with Droid-native oracle and Gemini 3.1 Pro
 
 # ultrareview
 
-Run a dual-model review with Droid-native subagents: the high-reasoning oracle droid and Gemini 3.1 Pro.
+Run a dual-model review with Droid-native subagents: the low-reasoning oracle droid and Gemini 3.1 Pro.
 
 This mirrors the OpenCode UltraReview workflow but **must not** use Gemini CLI helpers or external CLI review processes.
 
 ## Models Used
 
-1. `oracle` droid (`model: inherit`, `reasoningEffort: high`)
+1. `oracle` droid (`model: inherit`, `reasoningEffort: low`)
 2. `gemini-3-1-pro-reviewer` droid (`gemini-3.1-pro-preview`)
 
 ## Workflow
@@ -33,7 +33,7 @@ Use `git diff -U40 HEAD` as the primary bundle for both models so consensus matc
 
 Use two `Task` tool calls in the same response:
 
-- `subagent_type: oracle` for high-reasoning review
+- `subagent_type: oracle` for low-reasoning review
 - `subagent_type: gemini-3-1-pro-reviewer` for Gemini 3.1 Pro review
 
 Each prompt should require read-only analysis and this output shape per finding:

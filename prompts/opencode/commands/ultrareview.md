@@ -1,12 +1,12 @@
 ---
-description: Run parallel code reviews using GPT 5.4 (OpenCode) AND Gemini 3.1 Pro Preview (Gemini CLI) simultaneously, then consolidate results
+description: Run parallel code reviews using GPT 5.5 (OpenCode) AND Gemini 3.1 Pro Preview (Gemini CLI) simultaneously, then consolidate results
 mode: subagent
 model: xiaomi/mimo-v2.5-pro
 ---
 
 # UltraReview: Parallel Dual-Model Code Review
 
-Run simultaneous code reviews using **GPT 5.4** (via OpenCode native) AND **Gemini 3.1 Pro Preview** (via Gemini CLI), then consolidate findings into a unified report.
+Run simultaneous code reviews using **GPT 5.5** (via OpenCode native) AND **Gemini 3.1 Pro Preview** (via Gemini CLI), then consolidate findings into a unified report.
 
 ⚠️ **Cost Warning**: This uses 2 high-tier models simultaneously. Use for critical reviews only.
 
@@ -27,8 +27,8 @@ Capture the complete set of changed files and their contents for both models.
 Both models should review from the **same** input to make consensus detection in Phase 4 meaningful. The bundle is an extended-context diff (`git diff -U40 HEAD`) that carries each hunk together with ±40 lines of surrounding context, so reviewers see enough code around every change without reading whole files off disk for unchanged modules.
 
 Rules:
-- The extended-context diff is the **primary** input for both GPT 5.4 and Gemini 3.1 Pro.
-- GPT 5.4 may still read a modified file in full when a specific hunk requires it (e.g. cross-reference with a helper far from the change). Gemini receives only the bundle (chunked per Phase 2c when large).
+- The extended-context diff is the **primary** input for both GPT 5.5 and Gemini 3.1 Pro.
+- GPT 5.5 may still read a modified file in full when a specific hunk requires it (e.g. cross-reference with a helper far from the change). Gemini receives only the bundle (chunked per Phase 2c when large).
 - Never replace the bundle with hand-edited excerpts; it must be deterministically generated from git so both models see identical content.
 - Subsequent phases (size preflight, chunking, retry) operate on this bundle, not on raw `-U3` diffs.
 
@@ -52,16 +52,16 @@ You can call multiple tools in a single response. When multiple independent piec
 
 **CRITICAL**: Launch BOTH review tasks in the SAME response for true parallel execution. Do NOT wait for one to complete before starting the other.
 
-### Task 1: GPT 5.4 Review (Read-Only)
+### Task 1: GPT 5.5 Review (Read-Only)
 
 Launch this task using the `task` tool:
 
 ```
-description: GPT 5.4 read-only code review
+description: GPT 5.5 read-only code review
 subagent_type: review
 prompt: |
-  TASK: Perform READ-ONLY code review using GPT 5.4
-  MODEL OVERRIDE: openai/gpt-5.4
+  TASK: Perform READ-ONLY code review using GPT 5.5
+  MODEL OVERRIDE: openai/gpt-5.5
   TOOLS ALLOWED: Read, Bash (for git commands only), Grep, Glob
   TOOLS FORBIDDEN: Edit, Write (must NOT modify any files)
 
@@ -180,7 +180,7 @@ Windows note:
 ## Phase 3: Wait for Both Results
 
 Wait for completion from both review processes:
-- GPT 5.4 review (from OpenCode review agent)
+- GPT 5.5 review (from OpenCode review agent)
 - Gemini 3.1 Pro review (from gemini CLI bash command)
 
 ### Partial Success Tracking
@@ -191,7 +191,7 @@ Track which chunks succeeded or failed:
 |--------|--------|
 | All chunks success | Proceed with full consolidation |
 | Partial success | Use successful chunks, report failures |
-| All chunks failed | Treat as Gemini failure, fallback to GPT 5.4 |
+| All chunks failed | Treat as Gemini failure, fallback to GPT 5.5 |
 
 **Chunk Result Aggregation:**
 The helper already aggregates every successful chunk/retry into `combined_output.txt` and records per-unit status in `summary.json`.
@@ -215,8 +215,8 @@ PY
 
 Handle failures gracefully:
 
-- If GPT 5.4 fails → Return Gemini CLI results alone with warning
-- If Gemini CLI fails (not installed, auth error, or model error) → Return GPT 5.4 results alone with warning
+- If GPT 5.5 fails → Return Gemini CLI results alone with warning
+- If Gemini CLI fails (not installed, auth error, or model error) → Return GPT 5.5 results alone with warning
 - If Gemini CLI has **partial success** (some chunks succeeded) → Use successful chunks with the standardized partial warning banner
 - If both fail → Report failure, suggest using `/review` instead
 
@@ -261,19 +261,19 @@ Issues found by BOTH models. Original severity preserved - sorted by severity.
 Format for each:
 ```
 🔴 [<Original_Severity>] [Category] filename:line
-   Consensus: GPT 5.4 + Gemini 3.1 Pro
+   Consensus: GPT 5.5 + Gemini 3.1 Pro
    Original Severity: <Critical/Warning/Suggestion>
    Problem: <description>
    Fix: <recommendation>
 ```
 
-#### Section 2: 🟠 GPT 5.4 Exclusive Findings
-Issues found ONLY by GPT 5.4. Original severity preserved.
+#### Section 2: 🟠 GPT 5.5 Exclusive Findings
+Issues found ONLY by GPT 5.5. Original severity preserved.
 
 Format for each:
 ```
 🟠 [<Severity>] [Category] filename:line
-   Source: GPT 5.4
+   Source: GPT 5.5
    Confidence: <High/Medium/Low>
    Original Severity: <Critical/Warning/Suggestion>
    Problem: <description>
@@ -311,7 +311,7 @@ Same code location, but models disagree on severity or existence of issue.
 Format for each:
 ```
 ⚠️ filename:line
-   GPT 5.4: <assessment>
+   GPT 5.5: <assessment>
    Gemini 3.1 Pro: <assessment>
    Human Review Recommended: The models disagree significantly.
 ```
@@ -321,12 +321,12 @@ Format for each:
 ```
 ## UltraReview Summary
 - Consensus Critical: <count>
-- GPT 5.4 Exclusive: <count>
+- GPT 5.5 Exclusive: <count>
 - Gemini 3.1 Pro Exclusive: <count>
 - Lower Confidence: <count>
 - Divergent Assessments: <count>
 - Total Models Used: <2 or note if fallback>
-- Execution: GPT 5.4 (OpenCode native) + Gemini 3.1 Pro (CLI)
+- Execution: GPT 5.5 (OpenCode native) + Gemini 3.1 Pro (CLI)
 - Cost Level: High (2 premium models)
 
 Recommendation: <prioritized next steps>
@@ -369,7 +369,7 @@ When Gemini CLI uses chunked processing, some chunks may succeed while others fa
 - Failure reason: <summary.failure_reason or partial_results>
 - Successfully reviewed files: <count>
 - Failed Gemini files: <file list or "none">
-- Consolidation uses available Gemini results plus full GPT 5.4 results
+- Consolidation uses available Gemini results plus full GPT 5.5 results
 ```
 
 **Implementation:**
@@ -392,7 +392,7 @@ if summary.get("status") == "partial" and units.get("successful", 0) > 0:
             print(f"  - {file_path}")
     else:
         print('- Failed Gemini files: none')
-    print("- Consolidation uses available Gemini results plus full GPT 5.4 results")
+    print("- Consolidation uses available Gemini results plus full GPT 5.5 results")
 PY
 ```
 
@@ -404,8 +404,8 @@ PY
 
 ### Both Models Failure
 If both review processes fail:
-1. Report: "UltraReview failed: Both GPT 5.4 (OpenCode) and Gemini 3.1 Pro (CLI) unavailable"
-2. Suggest: "Use `/review` for single-model review with GPT 5.3-Codex"
+1. Report: "UltraReview failed: Both GPT 5.5 (OpenCode) and Gemini 3.1 Pro (CLI) unavailable"
+2. Suggest: "Use `/review` for single-model review with GPT 5.5"
 3. Provide any partial results that were captured (including successful chunk outputs)
 4. Include specific error for Gemini CLI if applicable
 

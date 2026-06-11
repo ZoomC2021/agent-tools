@@ -5,7 +5,7 @@ Terms and concepts used throughout the agent-tools repository.
 ## Core concepts
 
 **Codex53-MiMo**
-The primary orchestrator architecture using GPT-5.3-Codex for planning and routing, with Xiaomi MiMo v2.5 Pro subagents for execution. Defined in `prompts/opencode/agent/codex53-mimo.md`.
+The primary orchestrator architecture using GPT-5.5 for planning and routing, with Xiaomi MiMo v2.5 Pro subagents for execution. Defined in `prompts/opencode/agent/gpt55-mimo.md`.
 
 **Execution Contract**
 A structured specification produced by `spec-compiler` before implementation work begins. Defines scope, risks, success criteria, and validation steps.
@@ -14,12 +14,12 @@ A structured specification produced by `spec-compiler` before implementation wor
 A workflow for long-running, multi-step tasks that front-loads scrutiny, decomposes work into milestones, and sets validation cadence.
 
 **Ultrareview**
-Parallel dual-model code review using GPT 5.4 (OpenCode) AND Gemini 3.1 Pro Preview (Gemini CLI) simultaneously, with consolidated findings.
+Parallel dual-model code review using GPT 5.5 (OpenCode) AND Gemini 3.1 Pro Preview (Gemini CLI) simultaneously, with consolidated findings.
 
 ## Agent types
 
 **Orchestrator**
-Primary agent that plans, sequences, and verifies work. Delegates implementation to subagents. In OpenCode: `codex53-mimo` or `codex53-mimo-turbo`.
+Primary agent that plans, sequences, and verifies work. Delegates implementation to subagents. In OpenCode: `gpt55-mimo` or `gpt55-mimo-turbo`.
 
 **Subagent**
 Specialized agent for specific tasks (research, implementation, review). Has restricted permissions and is marked `hidden: true` in config.
@@ -36,7 +36,7 @@ Code quality audit workflow. Named after the open-source deslop utility. Analyze
 Workflow that generates context for continuing work in a new session. Captures current state and pending tasks.
 
 **Oracle**
-Deep reasoning subagent using GPT-5.4 with high reasoning effort. Consulted for complex problems after consecutive failures.
+Deep reasoning subagent using GPT-5.5 with low reasoning effort. Consulted for complex problems after consecutive failures.
 
 ## Technical terms
 

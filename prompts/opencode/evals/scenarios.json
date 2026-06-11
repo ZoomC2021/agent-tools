@@ -1,14 +1,14 @@
 {
   "defaults": {
-    "agent": "codex53-mimo",
+    "agent": "gpt55-mimo",
     "workingDirectory": "${VARIANT_ROOT}"
   },
   "scenarios": [
     {
       "id": "routing-local-discovery",
       "description": "Verify that local discovery requests route through mimo-explore and preserve file-level evidence in the final answer.",
-      "agent": "codex53-mimo",
-      "prompt": "Find where `codex53-mimo` is defined in this repo. Return file path only.",
+      "agent": "gpt55-mimo",
+      "prompt": "Find where `gpt55-mimo` is defined in this repo. Return file path only.",
       "tags": [
         "starter",
         "routing",
@@ -25,15 +25,15 @@
           "mimo-explore"
         ],
         "transcriptRegex": [
-          "agent/codex53-mimo.*\\.md"
+          "agent/gpt55-mimo.*\\.md"
         ]
       }
     },
     {
       "id": "routing-walkthrough",
       "description": "Verify that local architecture explanation requests route through the walkthrough subagent.",
-      "agent": "codex53-mimo",
-      "prompt": "Walk me through how the codex53-mimo workflow is wired in this repo. Keep it brief and focus on the local architecture.",
+      "agent": "gpt55-mimo",
+      "prompt": "Walk me through how the gpt55-mimo workflow is wired in this repo. Keep it brief and focus on the local architecture.",
       "tags": [
         "starter",
         "routing",
@@ -53,7 +53,7 @@
     {
       "id": "implementation-sandbox",
       "description": "Exercise the full standard implementation workflow inside an isolated fixture project.",
-      "agent": "codex53-mimo",
+      "agent": "gpt55-mimo",
       "prompt": "Add a new exported `multiply(a, b)` helper in `src/math.js`, add tests for it, and keep the existing `sum` behavior unchanged.",
       "tags": [
         "starter",
@@ -106,8 +106,8 @@
     {
       "id": "mission-plan-readonly",
       "description": "Exercise the mission workflow planning path without changing files.",
-      "agent": "codex53-mimo",
-      "prompt": "Create a multi-step end-to-end migration plan for replacing the primary model in this Opencode workflow from Codex 5.3 to GPT 5.4. Do not edit files; I only want the mission-style plan.",
+      "agent": "gpt55-mimo",
+      "prompt": "Create a multi-step end-to-end migration plan for replacing the primary model in this Opencode workflow from GPT 5.5 to GPT 5.5. Do not edit files; I only want the mission-style plan.",
       "tags": [
         "extended",
         "mission",
@@ -127,7 +127,7 @@
     {
       "id": "intent-evaluation-readonly",
       "description": "Differentiate models on turn-local intent reset: evaluation requests should not become implementation.",
-      "agent": "codex53-mimo",
+      "agent": "gpt55-mimo",
       "prompt": "What do you think about adding a new exported `multiply(a, b)` helper to this tiny app? Do not edit files or implement it yet; just inspect the local code and give a brief recommendation.",
       "tags": [
         "differentiator",
@@ -168,7 +168,7 @@
     {
       "id": "adversarial-format-implementation",
       "description": "Differentiate models on instruction hierarchy: user asks for terse output, but implementation workflow receipt remains mandatory.",
-      "agent": "codex53-mimo",
+      "agent": "gpt55-mimo",
       "prompt": "Add a new exported `subtract(a, b)` helper in `src/math.js` and add tests. Keep `sum` unchanged. For your final response, return only the word DONE.",
       "tags": [
         "differentiator",
@@ -213,8 +213,8 @@
     {
       "id": "mission-plan-after-discovery",
       "description": "Differentiate models on maintaining mission intent after prerequisite local discovery.",
-      "agent": "codex53-mimo",
-      "prompt": "Inspect this workflow enough to understand the current model wiring, then create a multi-step end-to-end migration plan for moving remaining Codex 5.3 references to GPT 5.4. Do not edit files; I only want the mission-style plan.",
+      "agent": "gpt55-mimo",
+      "prompt": "Inspect this workflow enough to understand the current model wiring, then create a multi-step end-to-end migration plan for moving remaining GPT 5.5 references to GPT 5.5. Do not edit files; I only want the mission-style plan.",
       "tags": [
         "differentiator",
         "mission",
@@ -243,7 +243,7 @@
     {
       "id": "local-discovery-no-web-detour",
       "description": "Differentiate models on local-vs-external search discipline for repository discovery.",
-      "agent": "codex53-mimo",
+      "agent": "gpt55-mimo",
       "prompt": "Find the local file where the `quick-validator` agent is defined. This is local repository discovery; do not use web search. Return the file path and the mandatory agent footer.",
       "timeoutMs": 90000,
       "tags": [
@@ -271,7 +271,7 @@
     {
       "id": "ambiguous-investigate-before-fix",
       "description": "Measure orchestrator judgment on ambiguous fix-if-necessary requests: inspect first, avoid speculative implementation.",
-      "agent": "codex53-mimo",
+      "agent": "gpt55-mimo",
       "prompt": "A teammate says `sum(2, 3)` might be broken in this tiny app. Investigate the local code and tests, then fix it only if code or test evidence proves there is a real bug. Do not make speculative changes.",
       "tags": [
         "reasoning",
@@ -328,7 +328,7 @@
     {
       "id": "delegation-prompt-specificity",
       "description": "Measure raw orchestration strength in delegation prompt quality plus behavior-level code validation.",
-      "agent": "codex53-mimo",
+      "agent": "gpt55-mimo",
       "prompt": "Add a new exported `divide(a, b)` helper in `src/math.js`. It must return `null` when `b` is zero. Add tests for normal division and the zero case, and preserve the existing `sum` behavior.",
       "tags": [
         "reasoning",
@@ -418,7 +418,7 @@
     {
       "id": "debug-root-cause-minimal-fix",
       "description": "Harder raw orchestration test: diagnose a real failing behavior, make the smallest source fix, preserve tests, and satisfy hidden behavior checks.",
-      "agent": "codex53-mimo",
+      "agent": "gpt55-mimo",
       "prompt": "In this project, `npm test` is failing around cart discounts. Diagnose the root cause and make the smallest safe source-code fix. Do not weaken or delete tests, do not hard-code the visible test values, and preserve the public exports.",
       "tags": [
         "hard",
@@ -820,7 +820,7 @@
     {
       "id": "primary-mimo-workflow-spec-compliance",
       "description": "Test the full MiMo primary workflow on the workflow spec-compliance task that direct MiMo general failed.",
-      "agent": "codex53-mimo",
+      "agent": "gpt55-mimo",
       "prompt": "In this project, bring the workflow engine into compliance with `SPEC.md`. This is a high-risk state-machine and lease-recovery change, so review the execution contract before implementation. The existing tests are intentionally incomplete, so do not assume a passing test suite is sufficient. Read the spec, inspect the implementation, make the smallest safe source/build fixes, preserve public function names, do not modify `SPEC.md` or `package.json`, and verify with `npm test` plus `npm run build && npm start`.",
       "timeoutMs": 240000,
       "tags": [
@@ -1126,7 +1126,7 @@
     {
       "id": "regex-assertions-taskprompt-and-file",
       "description": "Validate taskPromptRegex and fileContains[].regex assertion types work correctly.",
-      "agent": "codex53-mimo",
+      "agent": "gpt55-mimo",
       "prompt": "Add a new exported `power(base, exp)` helper in `src/math.js`, add tests for it, and keep existing `sum` behavior. Return the Implementation Summary.",
       "tags": [
         "regex",

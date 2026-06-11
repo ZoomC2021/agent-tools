@@ -4,8 +4,8 @@ This harness runs repeatable A/B evaluations for your Opencode workflow definiti
 
 It is designed for model-swap experiments like:
 
-- current `codex53-mimo` orchestrator on `openai/gpt-5.3-codex`
-- candidate `codex53-mimo` orchestrator on `openai/gpt-5.4`
+- current `gpt55-mimo` orchestrator on `openai/gpt-5.5`
+- candidate `gpt55-mimo` orchestrator on `openai/gpt-5.5`
 
 It also supports direct subagent evaluation by defining scenarios that target a hidden subagent with `"agent": "<subagent-name>"`.
 
@@ -50,16 +50,16 @@ Run the default starter suite:
 bin/opencode-eval run
 ```
 
-Run the end-to-end primary workflow result suite across the current Codex 5.3 orchestrator and the MiMo Turbo orchestrator:
+Run the end-to-end primary workflow result suite across the current GPT 5.5 orchestrator and the MiMo Turbo orchestrator:
 
 ```bash
-bin/opencode-eval run --variants baseline-codex53-primary,mimo25pro-primary --tags workflow-results
+bin/opencode-eval run --variants baseline-gpt55-primary,mimo25pro-primary --tags workflow-results
 ```
 
-Run only the GPT 5.4 primary variant against the sandbox implementation scenario:
+Run only the GPT 5.5 primary variant against the sandbox implementation scenario:
 
 ```bash
-bin/opencode-eval run --variants gpt54-primary --scenarios implementation-sandbox
+bin/opencode-eval run --variants gpt55-primary --scenarios implementation-sandbox
 ```
 
 Run mission-scrutiny subagent evals on MiMo v2.5 Pro only:
@@ -68,22 +68,22 @@ Run mission-scrutiny subagent evals on MiMo v2.5 Pro only:
 bin/opencode-eval run --variants mission-scrutiny-mimo25pro --tags mission-scrutiny
 ```
 
-Run mission-scrutiny subagent evals on GPT-5.3 Codex (current default) only:
+Run mission-scrutiny subagent evals on GPT-5.5 (current default) only:
 
 ```bash
-bin/opencode-eval run --variants mission-scrutiny-codex53 --tags mission-scrutiny
+bin/opencode-eval run --variants mission-scrutiny-gpt55 --tags mission-scrutiny
 ```
 
-Run plan-review subagent A/B evals comparing MiMo v2.5 Pro (current default) against GPT-5.3 Codex:
+Run plan-review subagent A/B evals comparing MiMo v2.5 Pro (current default) against GPT-5.5:
 
 ```bash
-bin/opencode-eval run --variants plan-review-mimo25pro,plan-review-codex53 --tags plan-review
+bin/opencode-eval run --variants plan-review-mimo25pro,plan-review-gpt55 --tags plan-review
 ```
 
 Run only the adversarial plan-review subset (anti-perfectionism, hidden blockers, format discipline, STOP IF triggers):
 
 ```bash
-bin/opencode-eval run --variants plan-review-mimo25pro,plan-review-codex53 --tags plan-review-adversarial
+bin/opencode-eval run --variants plan-review-mimo25pro,plan-review-gpt55 --tags plan-review-adversarial
 ```
 
 Rebuild the summary for an existing run directory:
@@ -139,8 +139,8 @@ Supported expectations include:
 
 The built-in variants already cover the exact comparison you asked for:
 
-- `baseline-codex53-primary`
-- `gpt54-primary`
+- `baseline-gpt55-primary`
+- `gpt55-primary`
 
 Run the starter suite first to compare:
 

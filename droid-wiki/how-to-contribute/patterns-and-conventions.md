@@ -139,7 +139,7 @@ The `opencode.json.example` uses `{file:./path/to/file.md}` references:
 
 ```json
 {
-  "prompt": "{file:./agent/codex53-mimo.md}",
+  "prompt": "{file:./agent/gpt55-mimo.md}",
   "permission": {
     "task": {
       "*": "deny",

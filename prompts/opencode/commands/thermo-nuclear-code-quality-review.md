@@ -1,8 +1,8 @@
 ---
 description: Run an extremely strict maintainability review for abstraction quality, giant files, and spaghetti-condition growth
 mode: subagent
-model: openai/gpt-5.3-codex
-reasoningEffort: high
+model: openai/gpt-5.5
+reasoningEffort: low
 ---
 
 # Thermo-Nuclear Code Quality Review
