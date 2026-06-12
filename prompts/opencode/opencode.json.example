@@ -533,6 +533,25 @@
         }
       }
     },
+    "zenmux": {
+      "options": {
+        "apiKey": "{env:ZENMUX_API_KEY}",
+        "baseURL": "https://zenmux.ai/api/v1"
+      },
+      "models": {
+        "moonshotai/kimi-k2.7-code-free": {
+          "name": "Kimi K2.7 Code Free (ZenMux)",
+          "limit": {
+            "context": 262144,
+            "output": 262144
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        }
+      }
+    },
     "tokenrouter": {
       "options": {
         "apiKey": "YOUR_TOKENROUTER_API_KEY_HERE",
