@@ -513,6 +513,124 @@
           }
         }
       }
+    },
+    "tokenrouter": {
+      "options": {
+        "apiKey": "YOUR_TOKENROUTER_API_KEY_HERE",
+        "baseURL": "https://api.tokenrouter.com/v1"
+      },
+      "models": {
+        "MiniMax-M3": {
+          "name": "MiniMax-M3 (TokenRouter)",
+          "limit": {
+            "context": 128000,
+            "output": 16384
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        },
+        "anthropic/claude-opus-4.7": {
+          "name": "Claude Opus 4.7 (TokenRouter)",
+          "limit": {
+            "context": 200000,
+            "output": 32000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        },
+        "openai/gpt-5.4": {
+          "name": "GPT-5.4 (TokenRouter)",
+          "limit": {
+            "context": 128000,
+            "output": 16384
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        },
+        "deepseek/deepseek-v4-pro": {
+          "name": "DeepSeek V4 Pro (TokenRouter)",
+          "limit": {
+            "context": 128000,
+            "output": 16384
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        },
+        "xiaomi/mimo-v2.5-pro": {
+          "name": "MiMo V2.5 Pro (TokenRouter)",
+          "limit": {
+            "context": 128000,
+            "output": 16384
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        },
+        "x-ai/grok-4.3": {
+          "name": "Grok 4.3 (TokenRouter)",
+          "limit": {
+            "context": 128000,
+            "output": 16384
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        },
+        "qwen/qwen3.7-max": {
+          "name": "Qwen 3.7 Max (TokenRouter)",
+          "limit": {
+            "context": 128000,
+            "output": 16384
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        },
+        "google/gemini-3.5-flash": {
+          "name": "Gemini 3.5 Flash (TokenRouter)",
+          "limit": {
+            "context": 1000000,
+            "output": 65536
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        },
+        "moonshotai/kimi-k2.6": {
+          "name": "Kimi K2.6 (TokenRouter)",
+          "limit": {
+            "context": 128000,
+            "output": 16384
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        },
+        "mistralai/mistral-medium-3-5": {
+          "name": "Mistral Medium 3.5 (TokenRouter)",
+          "limit": {
+            "context": 128000,
+            "output": 16384
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        }
+      }
     }
   },
   "model": "xiaomi/mimo-v2.5-pro",
