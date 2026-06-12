@@ -132,19 +132,32 @@ Do not include headings, summaries, prose, code fences, or markdown — only the
 EOF
 ```
 
-Launch each available lane in the background, each with the mode's timeout, writing to its own output file. Lanes with a native working-directory flag use it:
+Launch each available lane in the background, each with the mode's timeout, writing to its own output file. `timeout(1)` is GNU coreutils and does not exist on stock macOS, so resolve a portable wrapper first. The wrapper must be able to **SIGKILL** — some lane CLIs ignore softer signals like SIGALRM/SIGTERM:
 
 ```bash
-timeout "$WR_TIMEOUT" grok -p "$WR_PROMPT" -m grok-composer-2.5-fast --always-approve --cwd "${ROOT:-.}" \
+wr_timeout() {
+  if command -v timeout >/dev/null 2>&1; then timeout -k 10 "$WR_TIMEOUT" "$@"
+  elif command -v gtimeout >/dev/null 2>&1; then gtimeout -k 10 "$WR_TIMEOUT" "$@"   # Homebrew coreutils on macOS
+  else  # stock macOS: pure-shell watchdog; kill -9 because some CLIs ignore softer signals
+    "$@" & local p=$!
+    ( sleep "$WR_TIMEOUT"; kill -9 "$p" 2>/dev/null ) & local w=$!
+    wait "$p"; local s=$?; kill "$w" 2>/dev/null; return "$s"
+  fi
+}
+```
+
+Every lane gets `< /dev/null`: under an orchestrator, stdin is an open pipe that never closes, and some CLIs block forever reading it. Lanes with a native working-directory flag use it; `pi` has no `--cwd`, so lane D runs in a subshell `cd`:
+
+```bash
+wr_timeout grok -p "$WR_PROMPT" -m grok-composer-2.5-fast --always-approve --cwd "${ROOT:-.}" < /dev/null \
   > "$WR_DIR/laneA.txt" 2>&1 & A=$!
-timeout "$WR_TIMEOUT" qodercli -p --model "Qwen3.7-Max" --reasoning-effort max --dangerously-skip-permissions --cwd "${ROOT:-.}" "$WR_PROMPT" \
+wr_timeout qodercli -p --model "Qwen3.7-Max" --reasoning-effort max --dangerously-skip-permissions --cwd "${ROOT:-.}" "$WR_PROMPT" < /dev/null \
   > "$WR_DIR/laneB.txt" 2>&1 & B=$!
-timeout "$WR_TIMEOUT" opencode run "$WR_PROMPT" --pure -m xiaomi/mimo-v2.5-pro --dir "${ROOT:-.}" --dangerously-skip-permissions -f "${BUNDLE:-$MANIFEST}" \
+wr_timeout opencode run "$WR_PROMPT" --pure -m xiaomi/mimo-v2.5-pro --dir "${ROOT:-.}" --dangerously-skip-permissions -f "${BUNDLE:-$MANIFEST}" < /dev/null \
   > "$WR_DIR/laneC.txt" 2>&1 & C=$!
 # Lane D: pi has no --cwd, so wrap in a subshell cd. The bundle/manifest is inlined
 # via @ so diff mode needs no tool use; in full mode pi reads files itself.
-( cd "${ROOT:-.}" && timeout "$WR_TIMEOUT" \
-    pi -p --provider tokenrouter --model MiniMax-M3 @"${BUNDLE:-$MANIFEST}" "$WR_PROMPT" \
+( cd "${ROOT:-.}" && wr_timeout pi -p --provider tokenrouter --model MiniMax-M3 @"${BUNDLE:-$MANIFEST}" "$WR_PROMPT" < /dev/null \
   ) > "$WR_DIR/laneD.txt" 2>&1 & D=$!
 wait "$A"; A_STATUS=$?
 wait "$B"; B_STATUS=$?
@@ -152,7 +165,7 @@ wait "$C"; C_STATUS=$?
 wait "$D"; D_STATUS=$?
 ```
 
-(Only start lanes whose CLI was detected in Phase 2. `ROOT` is unset in diff mode — `${ROOT:-.}` keeps lanes in the current repo. Wait only for the PIDs of lanes you started; do not use bare `wait`, because it can block on unrelated background jobs in the orchestrator shell. Record each lane's exit code: `0` = ok, `124` = timeout, other = failed.)
+(Only start lanes whose CLI was detected in Phase 2. `ROOT` is unset in diff mode — `${ROOT:-.}` keeps lanes in the current repo; bundle/manifest paths are absolute so lane D's subshell `cd` still resolves them. Wait only for the PIDs of lanes you started; do not use bare `wait`, because it can block on unrelated background jobs in the orchestrator shell. Record each lane's exit code: `0` = ok, `124` (or `137` if SIGKILL was needed) = timeout, other = failed.)
 
 ## Phase 4: Collect and Parse
 
@@ -216,7 +229,7 @@ Finally, clean up: `rm -rf "$WR_DIR"`.
 ## Error Handling
 
 - **A CLI is missing/unauthenticated** → skip that lane, note it in the report, continue.
-- **A lane times out (`124`) or errors** → mark it failed, continue with the rest. (Raise `WR_TIMEOUT` if a lane keeps timing out on large full-mode reviews.)
+- **A lane times out (`124`, or `137` if SIGKILL was needed) or errors** → mark it failed, continue with the rest. (Raise `WR_TIMEOUT` if a lane keeps timing out on large full-mode reviews.)
 - **A lane returns only narration / no conforming lines** → mark it empty, continue.
 - **All lanes fail/empty** → report failure and suggest the standard `/review` instead.
 - **Divergence** → never auto-resolve; always surface both/all assessments for human review.

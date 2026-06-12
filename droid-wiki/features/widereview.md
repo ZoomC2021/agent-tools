@@ -26,12 +26,12 @@ Only Phase 1 (context gathering) and the lane prompt differ between modes; the p
             optional path arg; scale guard at ~150 files; timeout 720/lane
 2. Pre-flight:
    - Detect available lanes with `command -v` (no per-lane config required)
-3. Launch parallel lanes (each with the mode's timeout, own output file):
+3. Launch parallel lanes (each with the mode's timeout via `wr_timeout`, own output file, stdin from `/dev/null`):
    - Lane A: Grok Composer 2.5 (grok -p -m grok-composer-2.5-fast --always-approve --cwd <root>)
    - Lane B: Qwen3.7-Max       (qodercli -p --model "Qwen3.7-Max" --reasoning-effort max --dangerously-skip-permissions --cwd <root>)
-   - Lane C: OpenCode / K2.6   (droid exec -m custom:OpenCode-0 --skip-permissions-unsafe --cwd <root>)
+   - Lane C: MiMo v2.5 Pro     (opencode run --pure -m xiaomi/mimo-v2.5-pro --dir <root> --dangerously-skip-permissions -f <bundle-or-manifest>)
    - Lane D: MiniMax-M3        (pi -p --provider tokenrouter --model MiniMax-M3 @<bundle-or-manifest> <prompt>; subshell cd <root>)
-4. Collect exit codes (0=ok, 124=timeout, other=failed); parse pipe-delimited findings, discard narration
+4. Collect exit codes (0=ok, 124/137=timeout, other=failed); parse pipe-delimited findings, discard narration
 5. Consolidate by vote count:
    - 🔴🔴 Strong Consensus: 3-4 lanes agree
    - 🔴 Consensus: 2 lanes agree
@@ -95,6 +95,8 @@ Original per-lane severities are always preserved; agreement is additional metad
 - One or more of: `grok`, `qodercli`, `opencode`, `pi` installed and authenticated
 - For the `pi` lane: the `tokenrouter` provider must be defined in `~/.pi/agent/models.json` and `$TOKENROUTER_API_KEY` exported
 - Git repository (diff mode needs changes to review; full mode uses `git ls-files`, falling back to `find`)
+- GNU `timeout` is **not** required: lanes are wrapped in a `wr_timeout` helper that falls back to `gtimeout` (Homebrew coreutils) and then to a perl/shell watchdog with `kill -9`, since stock macOS ships no timeout(1). The watchdog reports timeouts as exit 137 (SIGKILL) rather than 124 when no GNU timeout is available.
+- Every lane is launched with `< /dev/null` so orchestrator stdin pipes do not hang headless CLIs.
 
 ## Secret hygiene
 
