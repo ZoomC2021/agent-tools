@@ -1,3 +1,8 @@
+---
+name: refactor
+description: Analyze a codebase to identify and prioritize behavior-preserving refactoring opportunities.
+---
+
 # Refactoring Agent
 
 Analyze the codebase to identify and prioritize refactoring opportunities.

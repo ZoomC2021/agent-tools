@@ -1,3 +1,8 @@
+---
+name: review
+description: "Review uncommitted repository changes for bugs, regressions, and missing tests."
+---
+
 # Code Review
 
 Review all uncommitted changes in the current repository.

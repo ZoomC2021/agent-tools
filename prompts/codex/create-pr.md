@@ -1,3 +1,8 @@
+---
+name: create-pr
+description: "Prepare and create pull requests from local changes."
+---
+
 # Create PR
 
 Create a pull request from current git changes with an auto-generated title and description.

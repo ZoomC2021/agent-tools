@@ -1,3 +1,8 @@
+---
+name: markdown-converter
+description: "Convert files to Markdown using markitdown."
+---
+
 # Markdown Converter
 
 Convert files to Markdown using `uvx markitdown` — no installation required.

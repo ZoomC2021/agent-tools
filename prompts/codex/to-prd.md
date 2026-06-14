@@ -1,3 +1,8 @@
+---
+name: to-prd
+description: "Turn product ideas into a structured product requirements document."
+---
+
 # To PRD
 
 This skill takes the current conversation context and codebase understanding and produces a PRD. Do NOT interview the user — just synthesize what you already know.

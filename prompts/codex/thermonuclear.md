@@ -1,3 +1,8 @@
+---
+name: thermonuclear
+description: "Perform an intensive code quality review."
+---
+
 # Thermo-Nuclear Code Quality Review
 
 Use this skill for an unusually strict review focused on implementation quality, maintainability, abstraction quality, and codebase health.

@@ -1,3 +1,8 @@
+---
+name: create-cli
+description: "Design human-first, script-friendly command-line interfaces."
+---
+
 # Create CLI
 
 Design CLI surface area (syntax + behavior), human-first, script-friendly.

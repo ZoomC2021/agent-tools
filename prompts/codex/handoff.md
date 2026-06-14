@@ -1,3 +1,8 @@
+---
+name: handoff
+description: "Generate structured handoff context for continuing work in a new session."
+---
+
 # Handoff Command
 
 Generate a structured handoff context for continuing work in a new session.

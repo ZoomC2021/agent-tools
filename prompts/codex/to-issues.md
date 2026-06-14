@@ -1,3 +1,8 @@
+---
+name: to-issues
+description: "Break a plan into independently actionable issue tracker tasks."
+---
+
 # To Issues
 
 Break a plan into independently-grabbable issues using vertical slices (tracer bullets).

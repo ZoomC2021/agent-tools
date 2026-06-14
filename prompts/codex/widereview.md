@@ -1,3 +1,8 @@
+---
+name: widereview
+description: "Run a wide fan-out code review workflow with cheaper models."
+---
+
 # WideReview: Wide Fan-Out Cheap-Model Code Review
 
 Run code reviews across **four independent cheap-model CLIs in parallel** — `Grok Composer 2.5`, `Qwen3.7-Max`, `OpenCode` (MiMo v2.5 Pro), and `pi` (MiniMax-M3) — then consolidate the findings into a single vote-weighted report.

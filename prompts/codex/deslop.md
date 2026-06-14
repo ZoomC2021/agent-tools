@@ -1,3 +1,8 @@
+---
+name: deslop
+description: "Analyze code quality issues and suggest targeted improvements."
+---
+
 # Deslop: Code Quality Analysis Command
 <sub><sup>Note: This file is ≈27k tokens as of 2026-01-19</sup></sub>
 

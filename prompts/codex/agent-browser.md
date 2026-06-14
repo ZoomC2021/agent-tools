@@ -1,3 +1,8 @@
+---
+name: agent-browser
+description: "Use agent-browser for browser automation, inspection, extraction, screenshots, and web app testing."
+---
+
 # Agent Browser
 
 Use `agent-browser` for browser automation tasks: navigating websites, inspecting pages, clicking or filling controls, extracting data, taking screenshots/PDFs, testing web apps, automating Electron/Slack, and using cloud browser providers.

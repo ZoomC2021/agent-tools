@@ -1,3 +1,8 @@
+---
+name: oracle
+description: "Invoke an external reasoning model for difficult debugging, architecture, review, or optimization questions."
+---
+
 # Oracle
 
 Invoke GPT-5.5 for deep reasoning when stuck on complex problems. Bundles your prompt and relevant files so the oracle can provide informed guidance.

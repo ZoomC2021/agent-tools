@@ -1,3 +1,8 @@
+---
+name: ultrareview
+description: "Run a parallel dual-model code review workflow."
+---
+
 # UltraReview: Parallel Dual-Model Code Review
 
 Run simultaneous code reviews using **GPT 5.5** AND **Gemini 3.1 Pro Preview** (via Gemini CLI), then consolidate findings into a unified report.

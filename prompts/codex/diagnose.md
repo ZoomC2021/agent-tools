@@ -1,3 +1,8 @@
+---
+name: diagnose
+description: "Diagnose hard bugs with a disciplined, evidence-driven workflow."
+---
+
 # Diagnose
 
 A discipline for hard bugs. Skip phases only when explicitly justified.

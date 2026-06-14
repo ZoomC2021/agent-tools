@@ -1,3 +1,8 @@
+---
+name: imagegen-google
+description: "Generate or edit images with Google Gemini image generation."
+---
+
 # Imagegen (Google)
 
 Generate or edit images using **Google Nano Banana Pro** (`gemini-3-pro-image-preview`) via the Vertex AI Express mode of the `google-genai` Python SDK.

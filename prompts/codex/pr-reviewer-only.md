@@ -1,3 +1,8 @@
+---
+name: pr-reviewer-only
+description: "Summarize pull request review feedback and produce an implementation prompt."
+---
+
 # PR Reviewer (Review Only)
 
 Fetch all comments from a GitHub PR, summarize issues, and generate a detailed implementation prompt for a faster coding agent to resolve them.

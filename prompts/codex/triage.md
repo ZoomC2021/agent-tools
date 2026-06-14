@@ -1,3 +1,8 @@
+---
+name: triage
+description: "Triage issues through a small role-based state machine."
+---
+
 # Triage
 
 Move issues on the project issue tracker through a small state machine of triage roles.

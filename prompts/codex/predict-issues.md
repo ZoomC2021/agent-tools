@@ -1,3 +1,8 @@
+---
+name: predict-issues
+description: "Analyze code changes to predict likely defects and review risks."
+---
+
 # Predictive Code Analysis
 
 I'll analyze your codebase to predict potential problems before they impact your project.
