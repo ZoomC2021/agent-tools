@@ -25,6 +25,22 @@ Guidance for coding agents working in this repository.
 - Never commit real secrets or API keys (for example in `opencode.json`-style config files).
 - `prompts/opencode/opencode.json.example` is the authoritative shipped OpenCode config. Any change to agents, commands, plugins, providers, models, permissions, or `{file:...}` references under `prompts/opencode/` must be reflected in the example in the same commit — the installer uses it as the source of truth to sync existing user configs.
 
+## Changing a Skill or Subagent's Model
+
+Do not hand-edit model fields. The model for any OpenCode skill/subagent lives in three places that must stay in sync: the canonical `.agent[NAME].model` in `opencode.json.example`, the `model:` frontmatter in the matching `prompts/opencode/{agent,commands}/NAME.md`, and the "Model" column in the README "Subagent Reference" table. Use `scripts/set-model.sh`, which updates all three and validates the result:
+
+```bash
+scripts/set-model.sh                                  # list every agent and its model
+scripts/set-model.sh plan-review                      # show one agent's current model
+scripts/set-model.sh plan-review xiaomi/mimo-v2.5-pro # set one skill
+scripts/set-model.sh review change-auditor openai/gpt-5.5  # set several at once
+scripts/set-model.sh all xiaomi/mimo-v2.5-pro         # set every agent
+```
+
+- The model is the last argument containing a `/`; everything before it is a target name (or `all`).
+- `scripts/set-worker-model.sh` is a backwards-compatible shim that forwards to `set-model.sh` for `worker-general` and `worker-explore`.
+- When introducing a new `provider/model`, also add its definition to the `provider` block in `opencode.json.example`, and add a display-name mapping in `set-model.sh` (`display_name()`) so the README column renders the human-facing name. Then run `scripts/install.sh` to sync installed agent frontmatter.
+
 ## Validation
 
 Run the smallest relevant validation set after changes:
