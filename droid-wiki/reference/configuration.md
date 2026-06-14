@@ -28,7 +28,7 @@ OpenCode configuration structure and options.
 | `plugin` | string[] | Auth plugins (e.g., `opencode-antigravity-auth@1.6.0`) |
 | `provider` | object | Provider configurations (openai, google, xiaomi) |
 | `model` | string | Default model ID (e.g., `xiaomi/mimo-v2.5-pro`) |
-| `default_agent` | string | Default agent to use (e.g., `gpt55-mimo-turbo`) |
+| `default_agent` | string | Default agent to use (e.g., `frontier-worker`) |
 | `mode` | object | Mode-specific model overrides (plan, build) |
 | `agent` | object | Agent definitions and permissions |
 
@@ -170,7 +170,7 @@ Each agent has the following structure:
 Prompts use `{file:./relative/path}` syntax to reference Markdown files:
 
 ```json
-"prompt": "{file:./agent/gpt55-mimo.md}"
+"prompt": "{file:./agent/frontier-worker.md}"
 ```
 
 The path is relative to `prompts/opencode/`.

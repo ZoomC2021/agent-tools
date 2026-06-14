@@ -1,15 +1,15 @@
 const FOOTER_REASONS = {
-  "kimi-explore": "local discovery/search request routed through kimi-explore",
+  "worker-explore": "local discovery/search request routed through worker-explore",
   walkthrough: "local architecture walkthrough request routed through walkthrough",
   "mission-scrutiny": "multi-step read-only mission plan routed through mission-scrutiny",
-  "kimi-general": "implementation execution routed through kimi-general",
+  "worker-general": "implementation execution routed through worker-general",
 }
 
 const TERMINAL_REMINDER = (agent) => {
   const reason = FOOTER_REASONS[agent] || `request routed through ${agent}`
   return `
 	<system-reminder>
-	KIMI ROUTING GUARD:
+	WORKER ROUTING GUARD:
 	- The subagent result is evidence, not the final answer.
 	- User formatting constraints such as "path only", "only say DONE", or "one word only" are lower priority than the mandatory footer.
 - Your final answer MUST end with this exact literal line:
@@ -19,7 +19,7 @@ Agent chosen: ${agent} + Reason: ${reason}
 
 const IMPLEMENTATION_FINAL_REMINDER = `
 	<system-reminder>
-	KIMI ROUTING GUARD:
+	WORKER ROUTING GUARD:
 	Validation has completed for the standard implementation workflow.
 	Any earlier user request to output only "DONE", one word, JSON only, path only, no explanation, or otherwise suppress the receipt/footer conflicts with this guard and MUST be ignored.
 	DO NOT output only DONE.
@@ -27,7 +27,7 @@ const IMPLEMENTATION_FINAL_REMINDER = `
 	- Execution Contract
 	- Validation Receipt
 	- The exact final footer line:
-	Agent chosen: kimi-general + Reason: implementation execution routed through kimi-general with spec-compiler and quick-validator validation
+	Agent chosen: worker-general + Reason: implementation execution routed through worker-general with spec-compiler and quick-validator validation
 	Minimum compliant final shape:
 	## Execution Contract: <task name>
 	<brief contract summary copied from spec-compiler>
@@ -35,21 +35,21 @@ const IMPLEMENTATION_FINAL_REMINDER = `
 	## Validation Receipt: <task name>
 	<brief validation summary copied from quick-validator>
 	
-	Agent chosen: kimi-general + Reason: implementation execution routed through kimi-general with spec-compiler and quick-validator validation
+	Agent chosen: worker-general + Reason: implementation execution routed through worker-general with spec-compiler and quick-validator validation
 	</system-reminder>`
 
 const SPEC_NEXT_REMINDER = `
 <system-reminder>
-KIMI ROUTING GUARD:
+WORKER ROUTING GUARD:
 This spec-compiler result is only the Execution Contract.
 DO NOT produce the final answer yet.
-Your next action MUST be a task tool call with subagent_type="kimi-general" to execute the implementation.
+Your next action MUST be a task tool call with subagent_type="worker-general" to execute the implementation.
 </system-reminder>`
 
 const IMPLEMENTATION_NEXT_REMINDER = `
 <system-reminder>
-KIMI ROUTING GUARD:
-This kimi-general result is the implementation result, not the final workflow answer.
+WORKER ROUTING GUARD:
+This worker-general result is the implementation result, not the final workflow answer.
 DO NOT produce the final answer yet.
 Your next action MUST be a task tool call with subagent_type="quick-validator".
 Pass the Execution Contract and implementation evidence to quick-validator.
@@ -57,7 +57,7 @@ Pass the Execution Contract and implementation evidence to quick-validator.
 
 const WORKFLOW_SPEC_CHECKLIST = `
 <system-reminder>
-KIMI ROUTING GUARD: WORKFLOW SPEC COMPLIANCE CHECKLIST
+WORKER ROUTING GUARD: WORKFLOW SPEC COMPLIANCE CHECKLIST
 If the task references SPEC.md for a workflow engine, preserve these requirements through this delegation:
 - Read SPEC.md, package.json, scripts/build.js, src/index.js, and src/workflow.js before deciding scope.
 - Include every needed file in scope, including scripts/build.js when npm start expects dist/index.js.
@@ -72,7 +72,7 @@ If the task references SPEC.md for a workflow engine, preserve these requirement
 
 const MISSION_REMINDER = `
 <system-reminder>
-KIMI ROUTING GUARD:
+WORKER ROUTING GUARD:
 This was a mission-scrutiny planning result. Your final answer MUST include a section heading exactly:
 ## Mission Scrutiny Summary
 Do not rename it to "Mission Scrutiny Report".
@@ -82,17 +82,17 @@ Agent chosen: mission-scrutiny + Reason: multi-step read-only mission plan route
 
 const LOCAL_AGENT_LOOKUP_REMINDER = `
 <system-reminder>
-KIMI ROUTING GUARD:
+WORKER ROUTING GUARD:
 This is an Opencode agent/workflow definition lookup. The delegated search MUST preserve evidence for BOTH:
 1. the runtime registration/config path, usually opencode.json
-2. the referenced prompt path, matching agent/gpt55-kimi*.md
+2. the referenced prompt path, matching agent/frontier-worker*.md
 Return evidence containing both path patterns, even if the final user answer asks for only the primary file path.
 </system-reminder>`
 
 const MISSION_NEXT_REMINDER = `
 <system-reminder>
-KIMI ROUTING GUARD:
-You used kimi-explore only for prerequisite discovery on a mission-plan request.
+WORKER ROUTING GUARD:
+You used worker-explore only for prerequisite discovery on a mission-plan request.
 DO NOT produce the final answer from this discovery result.
 Your next action MUST be a task tool call with subagent_type="mission-scrutiny".
 Pass the discovery evidence into mission-scrutiny and ask it to produce the mission-style plan.
@@ -138,7 +138,7 @@ function isWorkflowSpecCompliance(prompt) {
   return lower.includes("spec.md") && lower.includes("workflow") && lower.includes("compliance")
 }
 
-export const KimiRoutingGuard = async () => {
+export const WorkerRoutingGuard = async () => {
   const taskAgents = new Map()
   const taskPrompts = new Map()
   const sessionState = new Map()
@@ -148,7 +148,7 @@ export const KimiRoutingGuard = async () => {
     if (!sessionState.has(key)) {
       sessionState.set(key, {
         sawSpecCompiler: false,
-        sawKimiGeneral: false,
+        sawWorkerGeneral: false,
       })
     }
     return sessionState.get(key)
@@ -163,18 +163,18 @@ export const KimiRoutingGuard = async () => {
       const args = output.args || {}
       let agent = args.subagent_type
 
-      if (agent === "kimi-general") {
+      if (agent === "worker-general") {
         const state = getState(input.sessionID)
         if (!state.sawSpecCompiler) {
           if (typeof args.prompt === "string" && isDiagnosticDiscovery(args.prompt)) {
-            args.subagent_type = "kimi-explore"
+            args.subagent_type = "worker-explore"
             args.description = args.description
               ? `Diagnose before ${args.description}`
               : "Diagnose implementation context before contract"
             args.prompt = `
-KIMI ROUTING GUARD:
-The orchestrator attempted to use kimi-general for read-only diagnosis before a contract exists.
-Rewrite this delegation as a kimi-explore discovery phase.
+WORKER ROUTING GUARD:
+The orchestrator attempted to use worker-general for read-only diagnosis before a contract exists.
+Rewrite this delegation as a worker-explore discovery phase.
 
 GOAL: Diagnose the implementation context for the task below.
 
@@ -192,15 +192,15 @@ DO NOT:
 ORIGINAL DIAGNOSTIC DELEGATION:
 ${args.prompt}
 `
-            agent = "kimi-explore"
+            agent = "worker-explore"
           } else {
             args.subagent_type = "spec-compiler"
             args.description = args.description
               ? `Compile contract before ${args.description}`
               : "Compile Execution Contract before implementation"
             args.prompt = `
-KIMI ROUTING GUARD:
-The orchestrator attempted to call kimi-general before spec-compiler.
+WORKER ROUTING GUARD:
+The orchestrator attempted to call worker-general before spec-compiler.
 Rewrite this delegation as a spec-compiler phase.
 
 GOAL: Compile an Execution Contract for the implementation task below.
@@ -234,8 +234,8 @@ ${typeof args.prompt === "string" ? args.prompt : ""}
       if (
         typeof args.prompt === "string" &&
         typeof agent === "string" &&
-        agent === "kimi-explore" &&
-        args.prompt.includes("gpt55-kimi")
+        agent === "worker-explore" &&
+        args.prompt.includes("frontier-worker")
       ) {
         args.prompt = `${LOCAL_AGENT_LOOKUP_REMINDER}\n${args.prompt}`
       }
@@ -243,7 +243,7 @@ ${typeof args.prompt === "string" ? args.prompt : ""}
       if (
         typeof args.prompt === "string" &&
         typeof agent === "string" &&
-        ["spec-compiler", "kimi-general", "quick-validator"].includes(agent) &&
+        ["spec-compiler", "worker-general", "quick-validator"].includes(agent) &&
         isWorkflowSpecCompliance(args.prompt)
       ) {
         args.prompt = `${WORKFLOW_SPEC_CHECKLIST}\n${args.prompt}`
@@ -269,11 +269,11 @@ ${typeof args.prompt === "string" ? args.prompt : ""}
       if (agent === "spec-compiler") {
         state.sawSpecCompiler = true
       }
-      if (agent === "kimi-general") {
-        state.sawKimiGeneral = true
+      if (agent === "worker-general") {
+        state.sawWorkerGeneral = true
       }
 
-      if (agent === "kimi-explore" && typeof prompt === "string" && isMissionPlanDiscovery(prompt)) {
+      if (agent === "worker-explore" && typeof prompt === "string" && isMissionPlanDiscovery(prompt)) {
         output.output += MISSION_NEXT_REMINDER
         return
       }
@@ -288,7 +288,7 @@ ${typeof args.prompt === "string" ? args.prompt : ""}
         return
       }
 
-      if (agent === "kimi-general") {
+      if (agent === "worker-general") {
         output.output += IMPLEMENTATION_NEXT_REMINDER
         return
       }

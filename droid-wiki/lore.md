@@ -6,7 +6,7 @@ The history and evolution of the agent-tools repository.
 
 ### Foundation (Mar–Apr 2025)
 
-The repository emerged to solve a specific problem: inconsistent workflows across AI coding agents. Early commits established the core OpenCode architecture with the Codex53-MiMo orchestrator pattern.
+The repository emerged to solve a specific problem: inconsistent workflows across AI coding agents. Early commits established the core OpenCode architecture with a GPT-5.5 worker orchestration pattern.
 
 Key events:
 - Initial OpenCode agent definitions and routing logic

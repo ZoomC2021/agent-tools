@@ -104,7 +104,7 @@ Launch this task using the `task` tool:
 
 ```
 description: Gemini 3.1 Pro CLI review via helper
-subagent_type: mimo-general
+subagent_type: worker-general
 prompt: |
   TASK: Execute Gemini 3.1 Pro Preview review via CLI helper
   TOOLS ALLOWED: Bash, Read

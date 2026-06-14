@@ -769,7 +769,7 @@ function runOpencodeCase({ variant, variantDir, scenario, workspace, caseDir }) 
     "--format",
     "json",
     "--agent",
-    scenario.agent || "gpt55-mimo",
+    scenario.agent || "frontier-worker",
     "--dir",
     workspace.workdir,
   ]

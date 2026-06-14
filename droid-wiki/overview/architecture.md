@@ -6,7 +6,7 @@ The agent-tools repository implements a hierarchical orchestration pattern for A
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Codex53-MiMo Orchestrator (GPT-5.5)                 │
+│  GPT-5.5 Worker Orchestrator                         │
 │  • Plans and sequences work                                  │
 │  • Makes routing decisions                                    │
 │  • Delegates to specialized subagents                       │
@@ -34,7 +34,7 @@ The agent-tools repository implements a hierarchical orchestration pattern for A
 
 ## Orchestrator routing logic
 
-The `gpt55-mimo` agent in `prompts/opencode/agent/gpt55-mimo.md` uses deterministic keyword-based routing:
+The `frontier-worker` agent in `prompts/opencode/agent/frontier-worker.md` uses deterministic keyword-based routing:
 
 | Trigger | Keywords | Agent Selected |
 |---------|----------|----------------|
@@ -45,8 +45,8 @@ The `gpt55-mimo` agent in `prompts/opencode/agent/gpt55-mimo.md` uses determinis
 | Remote repo research | GitHub URL, `owner/repo` | **github-librarian** |
 | Official docs research | "official docs", "migration guide" | **docs-research** |
 | Local walkthrough | "walk me through", "diagram" | **walkthrough** |
-| Local discovery | "find", "search", "explore" | **mimo-explore** |
-| Implementation | "implement", "fix", "refactor" | **mimo-general** |
+| Local discovery | "find", "search", "explore" | **worker-explore** |
+| Implementation | "implement", "fix", "refactor" | **worker-general** |
 
 ## Safety gates
 
@@ -64,7 +64,7 @@ For multi-step tasks, the orchestrator uses a phased approach:
 ```
 PHASE 0 (optional): docs-research / github-librarian → Gather external references
 PHASE 1: mission-scrutiny → Front-load scrutiny, decompose into milestones
-PHASE 2 (loop): spec-compiler → mimo-general → milestone-validator
+PHASE 2 (loop): spec-compiler → worker-general → milestone-validator
 PHASE 3: quick-validator → Final end-to-end validation
 PHASE 4 (optional): change-auditor → Deep audit for high-risk areas
 ```

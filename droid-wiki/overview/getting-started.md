@@ -4,7 +4,7 @@
 
 - **Git** — for version control operations
 - **GitHub CLI (`gh`)** — for PR operations and `github-librarian` agent
-- **OpenCode** — for the primary Codex53-MiMo architecture
+- **OpenCode** — for the primary GPT-5.5 worker architecture
 - **Bash** — for the installer script (macOS/Linux)
 
 Optional:

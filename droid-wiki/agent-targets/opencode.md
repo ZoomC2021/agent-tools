@@ -4,17 +4,16 @@ Active contributors: zmang
 
 ## Purpose
 
-OpenCode is the primary agent target for agent-tools, featuring the sophisticated Codex53-MiMo orchestration architecture. It uses GPT-5.5 for planning and routing, with Xiaomi MiMo v2.5 Pro subagents for execution.
+OpenCode is the primary agent target for agent-tools, featuring the sophisticated GPT-5.5 worker orchestration architecture. It uses GPT-5.5 for planning and routing, with model-swappable worker subagents for execution and discovery.
 
 ## Directory layout
 
 ```
 prompts/opencode/
 ├── agent/                    # Agent definitions
-│   ├── gpt55-mimo.md      # Primary orchestrator (GPT-5.5)
-│   ├── gpt55-mimo-turbo.md # Alternative orchestrator (MiMo)
-│   ├── mimo-general.md      # Implementation execution
-│   ├── mimo-explore.md      # Read-only local discovery
+│   ├── frontier-worker.md      # Primary orchestrator (GPT-5.5)
+│   ├── worker-general.md      # Implementation execution
+│   ├── worker-explore.md      # Read-only local discovery
 │   ├── github-librarian.md  # Remote GitHub research
 │   ├── docs-research.md     # Official documentation research
 │   ├── walkthrough.md       # Architecture walkthroughs
@@ -51,13 +50,13 @@ prompts/opencode/
 
 | File | Purpose |
 |------|---------|
-| `agent/gpt55-mimo.md` | Orchestrator with deterministic routing and safety gates |
+| `agent/frontier-worker.md` | Orchestrator with deterministic routing and safety gates |
 | `opencode.json.example` | Complete agent and model configuration |
 | `bin/opencode-gemini-review` | Helper for dual-model reviews |
 
 ## Orchestrator routing
 
-The gpt55-mimo agent implements deterministic routing:
+The frontier-worker agent implements deterministic routing:
 
 ```
 "create PR" / "pull request" → create-pr
@@ -67,8 +66,8 @@ The gpt55-mimo agent implements deterministic routing:
 GitHub URL / "owner/repo" → github-librarian
 "official docs" → docs-research
 "walk me through" → walkthrough
-"find" / "search" → mimo-explore
-"implement" / "fix" → spec-compiler → mimo-general
+"find" / "search" → worker-explore
+"implement" / "fix" → spec-compiler → worker-general
 ```
 
 ## Safety gates

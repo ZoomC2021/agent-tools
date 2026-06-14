@@ -21,15 +21,15 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 | **docs-research** | Research official documentation and external API behavior using web sources |
 | **walkthrough** | Explain local architecture and code flow with evidence-backed walkthroughs |
 
-## Opencode Codex53-MiMo Setup (Primary Agent Architecture)
+## Opencode GPT-5.5 Worker Setup (Primary Agent Architecture)
 
-This repository includes a sophisticated agent architecture for OpenCode using GPT-5.5 as the orchestrator and Xiaomi MiMo v2.5 Pro as specialized subagents.
+This repository includes a sophisticated agent architecture for OpenCode using GPT-5.5 as the orchestrator and model-swappable worker subagents for execution and discovery.
 
 ### Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Codex53-MiMo Orchestrator (GPT-5.5)                 │
+│  GPT-5.5 Worker Orchestrator                         │
 │  • Plans and sequences work                                  │
 │  • Makes routing decisions                                    │
 │  • Delegates to specialized subagents                       │
@@ -68,8 +68,8 @@ The orchestrator uses keyword-based deterministic routing:
 | Remote repo research | GitHub URL, `owner/repo`, "reference implementation" | **github-librarian** |
 | Official docs research | "official docs", "migration guide", "API docs" | **docs-research** |
 | Local walkthrough | "walk me through", "diagram", "architecture" | **walkthrough** |
-| Local discovery | "find", "search", "explore" | **mimo-explore** |
-| Implementation | "implement", "fix", "refactor" | **mimo-general** |
+| Local discovery | "find", "search", "explore" | **worker-explore** |
+| Implementation | "implement", "fix", "refactor" | **worker-general** |
 
 ### Orchestrator Safety Gates
 
@@ -89,14 +89,14 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 1. **Standard flow** for small/medium single-milestone work:
    1. **PHASE 0 (optional): docs-research / github-librarian** → Gather official docs or upstream reference code first
    2. **PHASE 1: spec-compiler** → Compile Execution Contract (scope, risks, success criteria)
-   3. **PHASE 2: mimo-general** → Execute implementation based on contract
+   3. **PHASE 2: worker-general** → Execute implementation based on contract
    4. **PHASE 3: quick-validator** → Run validation tests/checks
    5. **PHASE 4 (optional): change-auditor** → Deep audit for high-risk areas
 
 2. **Mission flow** for long-running, multi-step work:
    1. **PHASE 0 (optional): docs-research / github-librarian** → Gather external references first when needed
    2. **PHASE 1: mission-scrutiny** → Front-load scrutiny, decompose into milestones, set validation cadence
-   3. **PHASE 2 (loop per milestone): spec-compiler → mimo-general → milestone-validator**
+   3. **PHASE 2 (loop per milestone): spec-compiler → worker-general → milestone-validator**
    4. **PHASE 3: quick-validator** → Final end-to-end validation across all milestones
    5. **PHASE 4 (optional): change-auditor** → Deep audit for high-risk milestone or final changes
 
@@ -107,9 +107,9 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 ├── opencode.json              # Main configuration (see example)
 ├── bin/                       # Helper scripts (e.g. opencode-gh-librarian)
 ├── agent/                     # Primary agent definitions
-│   ├── gpt55-mimo.md       # Orchestrator (routing logic)
-│   ├── mimo-general.md       # Execution worker
-│   ├── mimo-explore.md       # Local read-only discovery
+│   ├── frontier-worker.md       # Orchestrator (routing logic)
+│   ├── worker-general.md       # Execution worker
+│   ├── worker-explore.md       # Local read-only discovery
 │   ├── github-librarian.md   # Remote GitHub research
 │   ├── docs-research.md      # Official docs + API research
 │   ├── walkthrough.md        # Architecture walkthroughs + diagrams
@@ -135,10 +135,9 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 
 | Subagent | Purpose | Model | Reasoning Effort |
 |----------|---------|-------|------------------|
-| **gpt55-mimo** | Primary orchestrator (plans, routes, delegates) | GPT-5.5 | High |
-| **gpt55-mimo-turbo** | Alternative orchestrator using MiMo | MiMo v2.5 Pro | — |
-| **mimo-general** | Implementation, debugging, refactoring execution | MiMo v2.5 Pro | — |
-| **mimo-explore** | Local read-only codebase discovery and search | MiMo v2.5 Pro | — |
+| **frontier-worker** | Primary orchestrator (plans, routes, delegates) | GPT-5.5 | High |
+| **worker-general** | Implementation, debugging, refactoring execution | MiniMax-M3 | — |
+| **worker-explore** | Local read-only codebase discovery and search | MiniMax-M3 | — |
 | **github-librarian** | Remote GitHub research (default branches, history) | MiMo v2.5 Pro | — |
 | **docs-research** | Official docs, API behavior, release notes | MiMo v2.5 Pro | — |
 | **walkthrough** | Architecture walkthroughs with Mermaid diagrams | MiMo v2.5 Pro | — |
@@ -236,13 +235,16 @@ cp prompts/claude/*.md ~/.claude/commands/
 <summary>Codex</summary>
 
 ```bash
-mkdir -p ~/.codex/skills
-cp prompts/codex/*.md ~/.codex/skills/
+for file in prompts/codex/*.md; do
+  skill_name="$(basename "$file" .md)"
+  mkdir -p "$HOME/.codex/skills/$skill_name"
+  cp "$file" "$HOME/.codex/skills/$skill_name/SKILL.md"
+done
 ```
 </details>
 
 <details>
-<summary>OpenCode (Codex53-MiMo Architecture)</summary>
+<summary>OpenCode (GPT-5.5 Worker Architecture)</summary>
 
 ```bash
 # Create directories
@@ -263,8 +265,8 @@ for f in prompts/opencode/commands/review.md prompts/opencode/commands/deslop.md
 done
 
 # Copy agent definitions to agent/
-for f in prompts/opencode/agent/gpt55-mimo.md prompts/opencode/agent/gpt55-mimo-turbo.md \
-         prompts/opencode/agent/mimo-general.md prompts/opencode/agent/mimo-explore.md \
+for f in prompts/opencode/agent/frontier-worker.md \
+         prompts/opencode/agent/worker-general.md prompts/opencode/agent/worker-explore.md \
          prompts/opencode/agent/github-librarian.md prompts/opencode/agent/docs-research.md \
          prompts/opencode/agent/walkthrough.md prompts/opencode/agent/oracle.md; do
   [ -f "$f" ] && cp "$f" ~/.config/opencode/agent/
@@ -282,7 +284,7 @@ cp prompts/opencode/opencode.json.example ~/.config/opencode/opencode.json
 
 **Note**: `github-librarian` requires `gh` to be installed and authenticated. `docs-research` works best when `websearch` is available, which OpenCode enables when using the OpenCode provider or when `OPENCODE_ENABLE_EXA=1` is set.
 
-See [Opencode Codex53-MiMo Setup](#opencode-gpt55-mimo-setup-primary-agent-architecture) for architecture details.
+See [Opencode GPT-5.5 Worker Setup](#opencode-gpt-55-worker-setup-primary-agent-architecture) for architecture details.
 </details>
 
 <details>
@@ -466,13 +468,16 @@ cp prompts/claude/*.md ~/.claude/commands/
 <summary>Codex</summary>
 
 ```bash
-mkdir -p ~/.codex/skills
-cp prompts/codex/*.md ~/.codex/skills/
+for file in prompts/codex/*.md; do
+  skill_name="$(basename "$file" .md)"
+  mkdir -p "$HOME/.codex/skills/$skill_name"
+  cp "$file" "$HOME/.codex/skills/$skill_name/SKILL.md"
+done
 ```
 </details>
 
 <details>
-<summary>OpenCode (Codex53-MiMo Architecture)</summary>
+<summary>OpenCode (GPT-5.5 Worker Architecture)</summary>
 
 ```bash
 # Create directories
@@ -493,8 +498,8 @@ for f in prompts/opencode/commands/review.md prompts/opencode/commands/deslop.md
 done
 
 # Copy agent definitions to agent/
-for f in prompts/opencode/agent/gpt55-mimo.md prompts/opencode/agent/gpt55-mimo-turbo.md \
-         prompts/opencode/agent/mimo-general.md prompts/opencode/agent/mimo-explore.md \
+for f in prompts/opencode/agent/frontier-worker.md \
+         prompts/opencode/agent/worker-general.md prompts/opencode/agent/worker-explore.md \
          prompts/opencode/agent/github-librarian.md prompts/opencode/agent/docs-research.md \
          prompts/opencode/agent/walkthrough.md prompts/opencode/agent/oracle.md; do
   [ -f "$f" ] && cp "$f" ~/.config/opencode/agent/
@@ -512,7 +517,7 @@ cp prompts/opencode/opencode.json.example ~/.config/opencode/opencode.json
 
 **Note**: `github-librarian` requires `gh` to be installed and authenticated. `docs-research` works best when `websearch` is available, which OpenCode enables when using the OpenCode provider or when `OPENCODE_ENABLE_EXA=1` is set.
 
-See [Opencode Codex53-MiMo Setup](#opencode-gpt55-mimo-setup-primary-agent-architecture) for architecture details.
+See [Opencode GPT-5.5 Worker Setup](#opencode-gpt-55-worker-setup-primary-agent-architecture) for architecture details.
 </details>
 
 <details>

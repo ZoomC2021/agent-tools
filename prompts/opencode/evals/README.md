@@ -4,8 +4,8 @@ This harness runs repeatable A/B evaluations for your Opencode workflow definiti
 
 It is designed for model-swap experiments like:
 
-- current `gpt55-mimo` orchestrator on `openai/gpt-5.5`
-- candidate `gpt55-mimo` orchestrator on `openai/gpt-5.5`
+- current `frontier-worker` orchestrator on `openai/gpt-5.5`
+- candidate `frontier-worker` orchestrator on `openai/gpt-5.5`
 
 It also supports direct subagent evaluation by defining scenarios that target a hidden subagent with `"agent": "<subagent-name>"`.
 
@@ -94,7 +94,7 @@ bin/opencode-eval report evals/out/<run-id>
 
 By default, `run` executes scenarios tagged `starter`. Use `--tags extended` or `--scenarios <id>` for additional cases.
 
-The `workflow-results` tag focuses on end-to-end task outcomes through the primary `spec-compiler` -> `mimo-general` -> `quick-validator` path rather than routing-only checks. It intentionally evaluates final receipts, resulting file state, and executable behavior, not brittle internal assertions about exact subagent hop order or delegated prompt wording.
+The `workflow-results` tag focuses on end-to-end task outcomes through the primary `spec-compiler` -> `worker-general` -> `quick-validator` path rather than routing-only checks. It intentionally evaluates final receipts, resulting file state, and executable behavior, not brittle internal assertions about exact subagent hop order or delegated prompt wording.
 
 ## Variant Format
 

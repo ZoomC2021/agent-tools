@@ -96,7 +96,7 @@ Launch this task using the `task` tool:
 
 ```
 description: Gemini 3 Flash CLI review via helper (opportunistic)
-subagent_type: mimo-general
+subagent_type: worker-general
 prompt: |
   TASK: Execute Gemini 3 Flash Preview review via CLI helper
   

@@ -287,10 +287,10 @@ function Test-OpenCodeInstallation {
 
     # Check required agent files
     $requiredAgentFiles = @(
-        "gpt55-mimo.md",
-        "mimo-mimo.md",
-        "mimo-general.md",
-        "mimo-explore.md",
+        "frontier-worker.md",
+        "worker-worker.md",
+        "worker-general.md",
+        "worker-explore.md",
         "github-librarian.md",
         "docs-research.md",
         "walkthrough.md",

@@ -88,7 +88,7 @@ git diff -U40 HEAD > "$REVIEW_TMP_ROOT/bundle.diff"
 
 ```
 description: Claude CLI review via helper
-subagent_type: mimo-general
+subagent_type: worker-general
 prompt: |
   TASK: Execute Claude CLI review via helper
   

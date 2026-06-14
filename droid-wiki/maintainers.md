@@ -33,6 +33,7 @@ Based on git history analysis (no CODEOWNERS file exists).
 - **Most active area** — 40+ commits
 - **Focus**: Agent definitions, command prompts, subagent workflows
 - **Key files**: `opencode.json.example`, commands/*.md, agent/*.md
+- **Changing the worker model**: run `scripts/set-worker-model.sh <provider/model>` instead of hand-editing. It updates `opencode.json.example`, the `worker-*.md` frontmatter, and the README table from one input. Orchestrator and widereview-lane models are separate slots — edit those directly.
 
 ### prompts/claude/
 

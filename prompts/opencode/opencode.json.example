@@ -533,25 +533,6 @@
         }
       }
     },
-    "zenmux": {
-      "options": {
-        "apiKey": "{env:ZENMUX_API_KEY}",
-        "baseURL": "https://zenmux.ai/api/v1"
-      },
-      "models": {
-        "moonshotai/kimi-k2.7-code-free": {
-          "name": "Kimi K2.7 Code Free (ZenMux)",
-          "limit": {
-            "context": 262144,
-            "output": 262144
-          },
-          "modalities": {
-            "input": ["text"],
-            "output": ["text"]
-          }
-        }
-      }
-    },
     "tokenrouter": {
       "options": {
         "apiKey": "YOUR_TOKENROUTER_API_KEY_HERE",
@@ -646,17 +627,6 @@
             "output": ["text"]
           }
         },
-        "moonshotai/kimi-k2.6": {
-          "name": "Kimi K2.6 (TokenRouter)",
-          "limit": {
-            "context": 128000,
-            "output": 16384
-          },
-          "modalities": {
-            "input": ["text"],
-            "output": ["text"]
-          }
-        },
         "mistralai/mistral-medium-3-5": {
           "name": "Mistral Medium 3.5 (TokenRouter)",
           "limit": {
@@ -700,15 +670,15 @@
       "variant": "high",
       "reasoningEffort": "low"
     },
-    "gpt55-mimo": {
+    "frontier-worker": {
       "model": "openai/gpt-5.5",
       "reasoningEffort": "low",
-      "prompt": "{file:./agent/gpt55-mimo.md}",
+      "prompt": "{file:./agent/frontier-worker.md}",
       "permission": {
         "task": {
           "*": "deny",
-          "mimo-general": "allow",
-          "mimo-explore": "allow",
+          "worker-general": "allow",
+          "worker-explore": "allow",
           "github-librarian": "allow",
           "docs-research": "allow",
           "walkthrough": "allow",
@@ -727,16 +697,16 @@
           "plan-review": "allow"
         }
       },
-      "description": "Primary orchestrator agent (GPT 5.5) - delegates to subagents for specialized tasks"
+      "description": "Primary orchestrator agent (frontier-worker variant) - delegates to subagents for specialized tasks"
     },
-    "mimo-mimo": {
-      "model": "xiaomi/mimo-v2.5-pro",
-      "prompt": "{file:./agent/mimo-mimo.md}",
+    "worker-worker": {
+      "model": "tokenrouter/MiniMax-M3",
+      "prompt": "{file:./agent/worker-worker.md}",
       "permission": {
         "task": {
           "*": "deny",
-          "mimo-general": "allow",
-          "mimo-explore": "allow",
+          "worker-general": "allow",
+          "worker-explore": "allow",
           "github-librarian": "allow",
           "docs-research": "allow",
           "walkthrough": "allow",
@@ -755,7 +725,7 @@
           "plan-review": "allow"
         }
       },
-      "description": "Primary orchestrator agent (MiMo v2.5 Pro) - delegates to subagents for specialized tasks"
+      "description": "Primary orchestrator agent (worker-worker variant) - delegates to subagents for specialized tasks"
     },
 
     "github-librarian": {
@@ -992,12 +962,12 @@
       "hidden": true,
       "prompt": "{file:./commands/spec-compiler.md}"
     },
-    "mimo-general": {
+    "worker-general": {
       "description": "Concrete implementation, debugging, refactoring, and execution tasks.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "tokenrouter/MiniMax-M3",
       "hidden": true,
-      "prompt": "{file:./agent/mimo-general.md}",
+      "prompt": "{file:./agent/worker-general.md}",
       "permission": {
         "task": {
           "*": "deny"
@@ -1009,12 +979,12 @@
         "grep": "allow"
       }
     },
-    "mimo-explore": {
+    "worker-explore": {
       "description": "Read-only local codebase discovery and search.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "tokenrouter/MiniMax-M3",
       "hidden": true,
-      "prompt": "{file:./agent/mimo-explore.md}",
+      "prompt": "{file:./agent/worker-explore.md}",
       "permission": {
         "task": {
           "*": "deny"

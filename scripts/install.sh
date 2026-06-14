@@ -74,7 +74,35 @@ install_claude() {
 
 # Install Codex skills
 install_codex() {
-    install_agent "Codex" "$PROMPTS_DIR/codex" "$HOME/.codex/skills"
+    log_info "Installing Codex skills..."
+    local source_dir="$PROMPTS_DIR/codex"
+    local dest="$HOME/.codex/skills"
+
+    if [[ ! -d "$source_dir" ]]; then
+        log_warn "Source directory not found: $source_dir"
+        return 0
+    fi
+
+    mkdir -p "$dest"
+
+    shopt -s nullglob
+    local files=("$source_dir"/*.md)
+    shopt -u nullglob
+
+    if [[ ${#files[@]} -eq 0 ]]; then
+        log_warn "No .md files found in $source_dir"
+        return 0
+    fi
+
+    local skill_file skill_name skill_dest
+    for skill_file in "${files[@]}"; do
+        skill_name="$(basename "$skill_file" .md)"
+        skill_dest="$dest/$skill_name"
+        mkdir -p "$skill_dest"
+        cp "$skill_file" "$skill_dest/SKILL.md"
+    done
+
+    log_success "Codex skills: $dest"
 }
 
 # Install OpenCode commands and agent files
@@ -233,10 +261,10 @@ _self_check_opencode() {
 
     # Check required agent files
     local required_agent_files=(
-        "gpt55-mimo.md"
-        "mimo-mimo.md"
-        "mimo-general.md"
-        "mimo-explore.md"
+        "frontier-worker.md"
+        "worker-worker.md"
+        "worker-general.md"
+        "worker-explore.md"
         "github-librarian.md"
         "docs-research.md"
         "walkthrough.md"
