@@ -639,6 +639,36 @@
           }
         }
       }
+    },
+    "nousresearch": {
+      "options": {
+        "apiKey": "{env:NOUS_API_KEY}",
+        "baseURL": "https://inference-api.nousresearch.com/v1"
+      },
+      "models": {
+        "nvidia/nemotron-3-ultra:free": {
+          "name": "Nemotron 3 Ultra Free (Nous Research)",
+          "limit": {
+            "context": 1000000,
+            "output": 16384
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        },
+        "stepfun/step-3.7-flash:free": {
+          "name": "StepFun Step 3.7 Flash Free (Nous Research)",
+          "limit": {
+            "context": 256000,
+            "output": 256000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        }
+      }
     }
   },
   "model": "xiaomi/mimo-v2.5-pro",
