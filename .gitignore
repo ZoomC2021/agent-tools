@@ -157,6 +157,7 @@ cython_debug/
 
 # Opencode eval harness
 prompts/opencode/evals/out/
+prompts/opencode/evals/cmd-out/
 prompts/opencode/opencode.json
 prompts/opencode/antigravity-accounts.json
 prompts/opencode/antigravity-accounts.json.*.tmp

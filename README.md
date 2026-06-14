@@ -178,35 +178,43 @@ A local reference setup uses:
 
 See `prompts/opencode/opencode.json.example` for the full configuration structure.
 
-### Rate-Limited Providers (ZenMux Throttle Proxy)
+### Rate-Limited Providers (Throttle Proxy)
 
-Some providers enforce a hard requests-per-minute cap and **stop serving** when you exceed it instead of returning a retryable `429` — for example ZenMux's free `moonshotai/kimi-k2.7-code-free` (10 RPM). OpenCode has no native RPM control, so bursts (agentic tool loops, parallel fan-out skills like `widereview`) will silently fail.
+Some providers enforce a hard requests-per-minute cap. ZenMux's free `moonshotai/kimi-k2.7-code-free` (10 RPM) can stop serving when you exceed it, while Nvidia NIM returns retryable `429 Too Many Requests` around its 40 RPM cap. OpenCode has no native RPM control, so bursts (agentic tool loops, parallel fan-out skills like `widereview`) can fail a whole scenario.
 
-`prompts/opencode/bin/zenmux-throttle-proxy` is a dependency-free Node streaming reverse proxy that enforces the cap at a single chokepoint. It **serializes** requests through a leaky bucket (capacity 1) with a minimum spacing between request starts, so callers that arrive too fast **wait** in the proxy instead of failing. SSE streaming and the `Authorization` header pass through unchanged (your key stays in `{env:ZENMUX_API_KEY}`).
+`prompts/opencode/bin/zenmux-throttle-proxy` is a dependency-free Node streaming reverse proxy that enforces provider caps at one local chokepoint. One process serves independent per-provider queues: `/zenmux/...` defaults to 9 RPM, `/nvidia/...` defaults to 40 RPM, and old unprefixed ZenMux routes still work. Callers that arrive too fast **wait** in the proxy instead of failing. SSE streaming and the `Authorization` header pass through unchanged (your API keys stay in OpenCode config).
 
-Run it (target a value **below** the real cap for margin):
+Run it (targets should stay **below** real caps for margin):
 
 ```bash
-# 9 RPM => one request every ~6.7s; default upstream is https://zenmux.ai/api/v1
-ZENMUX_RPM=9 prompts/opencode/bin/zenmux-throttle-proxy
+# Defaults:
+#   /zenmux -> https://zenmux.ai/api/v1 at 9 RPM
+#   /nvidia -> https://integrate.api.nvidia.com/v1 at 40 RPM
+prompts/opencode/bin/zenmux-throttle-proxy
 ```
 
-Then point the provider `baseURL` at the proxy (no trailing `/api/v1` — the proxy prepends the upstream base path):
+Then point provider `baseURL`s at the provider-specific routes (no trailing `/api/v1` — the proxy prepends each upstream base path):
 
 ```json
 "zenmux": {
   "options": {
     "apiKey": "{env:ZENMUX_API_KEY}",
-    "baseURL": "http://127.0.0.1:8787"
+    "baseURL": "http://127.0.0.1:8787/zenmux"
+  }
+},
+"nvidia": {
+  "options": {
+    "apiKey": "{env:NVIDIA_API_KEY}",
+    "baseURL": "http://127.0.0.1:8787/nvidia"
   }
 }
 ```
 
-Config is via env vars: `ZENMUX_PROXY_PORT` (8787), `ZENMUX_PROXY_HOST` (127.0.0.1), `ZENMUX_UPSTREAM` (`https://zenmux.ai/api/v1`), `ZENMUX_RPM` (9), `ZENMUX_CONCURRENCY` (1), `ZENMUX_QUEUE_MAX` (0 = unbounded), `ZENMUX_UPSTREAM_TIMEOUT_MS` (600000). `GET /healthz` reports live state without consuming a slot.
+Config is via env vars: `ZENMUX_PROXY_PORT` (8787), `ZENMUX_PROXY_HOST` (127.0.0.1), `ZENMUX_UPSTREAM` (`https://zenmux.ai/api/v1`), `NVIDIA_UPSTREAM` (`https://integrate.api.nvidia.com/v1`), `ZENMUX_RPM` (9), `NVIDIA_RPM` (40), `ZENMUX_CONCURRENCY` / `NVIDIA_CONCURRENCY` (1), `ZENMUX_QUEUE_MAX` / `NVIDIA_QUEUE_MAX` (0 = unbounded), and per-provider `*_UPSTREAM_TIMEOUT_MS` (600000). `GET /healthz` reports live per-provider state without consuming a slot. If Nvidia still returns `429`, the proxy forwards that response and pauses only the Nvidia lane according to `Retry-After` before releasing queued Nvidia requests.
 
 Notes:
-- The shipped `opencode.json.example` points `zenmux.baseURL` at ZenMux directly — switch it to the proxy **only on machines where you run the proxy**, otherwise that model will fail.
-- Throttling at one process can only bound RPM if **all** traffic funnels through it. Keep rate-limited models on sequential single-agent skills rather than parallel fan-out reviewers.
+- The shipped `opencode.json.example` points providers at upstreams directly — switch a provider to the proxy **only on machines where you run the proxy**, otherwise that model will fail.
+- Throttling at one process can only bound RPM if **all** traffic for that provider funnels through it. Multiple providers can share this one proxy process because each provider has its own queue and timer.
 - Tested by `tests/zenmux-throttle-proxy.test.js` (`node tests/zenmux-throttle-proxy.test.js`).
 
 ## Supported Agents
@@ -843,7 +851,7 @@ Analyzes code for quality issues using established software engineering principl
 - **Gemini CLI (`gemini`)** plus `gemini login` for `ultrareview` and `ultrareview-lite` secondary review lanes
 - **`XAI_API_KEY`** *(or a SuperGrok subscription signed into OpenCode — note the curl workflow still needs the raw API key)*, `curl`, `jq`, and `python3` for OpenCode `imagegen-grok`
 - **`GOOGLE_API_KEY`** (Vertex AI Express), `python3`, and `google-genai` for OpenCode `imagegen-google`
-- **`ZENMUX_API_KEY`** and **Node.js** to run `bin/zenmux-throttle-proxy` when using rate-limited ZenMux models (e.g. `moonshotai/kimi-k2.7-code-free`)
+- **`ZENMUX_API_KEY`**, **`NVIDIA_API_KEY`**, and **Node.js** to run `bin/zenmux-throttle-proxy` when using rate-limited ZenMux or Nvidia models through the local throttle proxy
 - The respective coding agent installed and configured
 
 ## Example OpenCode Prompts

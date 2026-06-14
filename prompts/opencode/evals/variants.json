@@ -55,6 +55,208 @@
       }
     },
     {
+      "name": "orchestrated-m3-plugins",
+      "description": "Live delegation path: gpt-5.5 frontier-worker orchestrator (direct tools denied so it MUST delegate) with worker-routing-guard plugin active and workers on tokenrouter/MiniMax-M3. Exercises the <think>-stripping hook end-to-end.",
+      "cliModel": "openai/gpt-5.5",
+      "includeProjectPlugins": true,
+      "configOverrides": {
+        "agent.frontier-worker.model": "openai/gpt-5.5",
+        "agent.frontier-worker.permission.read": "deny",
+        "agent.frontier-worker.permission.grep": "deny",
+        "agent.frontier-worker.permission.glob": "deny",
+        "agent.frontier-worker.permission.bash": "deny",
+        "agent.frontier-worker.permission.edit": "deny",
+        "agent.frontier-worker.permission.webfetch": "deny",
+        "agent.frontier-worker.permission.websearch": "deny"
+      }
+    },
+    {
+      "name": "worker-explore-kimi-k27-zenmux-proxy",
+      "description": "Direct worker-explore eval using ZenMux moonshotai/kimi-k2.7-code-free through the local 9-RPM throttle proxy (zenmux/moonshotai/kimi-k2.7-code-free, baseURL 127.0.0.1:8787).",
+      "configOverrides": {
+        "agent.worker-explore.mode": "primary",
+        "agent.worker-explore.hidden": false,
+        "agent.worker-explore.model": "zenmux/moonshotai/kimi-k2.7-code-free",
+        "agent.worker-explore.permission.bash": "allow"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-explore.md": {
+          "mode": "primary",
+          "model": "zenmux/moonshotai/kimi-k2.7-code-free"
+        }
+      }
+    },
+    {
+      "name": "worker-general-kimi-k27-zenmux-proxy",
+      "description": "Direct worker-general eval using ZenMux moonshotai/kimi-k2.7-code-free through the local 9-RPM throttle proxy. Note: at 9 RPM multi-turn scenarios are slow and may hit the per-scenario timeout.",
+      "configOverrides": {
+        "agent.worker-general.mode": "primary",
+        "agent.worker-general.hidden": false,
+        "agent.worker-general.model": "zenmux/moonshotai/kimi-k2.7-code-free"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-general.md": {
+          "mode": "primary",
+          "model": "zenmux/moonshotai/kimi-k2.7-code-free"
+        }
+      }
+    },
+    {
+      "name": "worker-explore-kimi-k27-code",
+      "description": "Direct worker-explore subagent eval using tokenrouter/moonshotai/kimi-k2.7-code.",
+      "configOverrides": {
+        "agent.worker-explore.mode": "primary",
+        "agent.worker-explore.hidden": false,
+        "agent.worker-explore.model": "tokenrouter/moonshotai/kimi-k2.7-code",
+        "agent.worker-explore.permission.bash": "allow"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-explore.md": {
+          "mode": "primary",
+          "model": "tokenrouter/moonshotai/kimi-k2.7-code"
+        }
+      }
+    },
+    {
+      "name": "worker-general-kimi-k27-code",
+      "description": "Direct worker-general subagent eval using tokenrouter/moonshotai/kimi-k2.7-code.",
+      "configOverrides": {
+        "agent.worker-general.mode": "primary",
+        "agent.worker-general.hidden": false,
+        "agent.worker-general.model": "tokenrouter/moonshotai/kimi-k2.7-code"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-general.md": {
+          "mode": "primary",
+          "model": "tokenrouter/moonshotai/kimi-k2.7-code"
+        }
+      }
+    },
+    {
+      "name": "worker-explore-deepseek-v4-flash",
+      "description": "Direct worker-explore subagent eval using tokenrouter/deepseek/deepseek-v4-flash.",
+      "configOverrides": {
+        "agent.worker-explore.mode": "primary",
+        "agent.worker-explore.hidden": false,
+        "agent.worker-explore.model": "tokenrouter/deepseek/deepseek-v4-flash",
+        "agent.worker-explore.permission.bash": "allow"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-explore.md": {
+          "mode": "primary",
+          "model": "tokenrouter/deepseek/deepseek-v4-flash"
+        }
+      }
+    },
+    {
+      "name": "worker-general-deepseek-v4-flash",
+      "description": "Direct worker-general subagent eval using tokenrouter/deepseek/deepseek-v4-flash.",
+      "configOverrides": {
+        "agent.worker-general.mode": "primary",
+        "agent.worker-general.hidden": false,
+        "agent.worker-general.model": "tokenrouter/deepseek/deepseek-v4-flash"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-general.md": {
+          "mode": "primary",
+          "model": "tokenrouter/deepseek/deepseek-v4-flash"
+        }
+      }
+    },
+    {
+      "name": "worker-explore-deepseek-v4-pro",
+      "description": "Direct worker-explore subagent eval using tokenrouter/deepseek/deepseek-v4-pro.",
+      "configOverrides": {
+        "agent.worker-explore.mode": "primary",
+        "agent.worker-explore.hidden": false,
+        "agent.worker-explore.model": "tokenrouter/deepseek/deepseek-v4-pro",
+        "agent.worker-explore.permission.bash": "allow"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-explore.md": {
+          "mode": "primary",
+          "model": "tokenrouter/deepseek/deepseek-v4-pro"
+        }
+      }
+    },
+    {
+      "name": "worker-general-deepseek-v4-pro",
+      "description": "Direct worker-general subagent eval using tokenrouter/deepseek/deepseek-v4-pro.",
+      "configOverrides": {
+        "agent.worker-general.mode": "primary",
+        "agent.worker-general.hidden": false,
+        "agent.worker-general.model": "tokenrouter/deepseek/deepseek-v4-pro"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-general.md": {
+          "mode": "primary",
+          "model": "tokenrouter/deepseek/deepseek-v4-pro"
+        }
+      }
+    },
+    {
+      "name": "worker-explore-minimax-m3",
+      "description": "Direct worker-explore subagent eval using the current default tokenrouter/MiniMax-M3 worker model.",
+      "configOverrides": {
+        "agent.worker-explore.mode": "primary",
+        "agent.worker-explore.hidden": false,
+        "agent.worker-explore.model": "tokenrouter/MiniMax-M3",
+        "agent.worker-explore.permission.bash": "allow"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-explore.md": {
+          "mode": "primary",
+          "model": "tokenrouter/MiniMax-M3"
+        }
+      }
+    },
+    {
+      "name": "worker-general-minimax-m3",
+      "description": "Direct worker-general subagent eval using the current default tokenrouter/MiniMax-M3 worker model.",
+      "configOverrides": {
+        "agent.worker-general.mode": "primary",
+        "agent.worker-general.hidden": false,
+        "agent.worker-general.model": "tokenrouter/MiniMax-M3"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-general.md": {
+          "mode": "primary",
+          "model": "tokenrouter/MiniMax-M3"
+        }
+      }
+    },
+    {
+      "name": "worker-explore-mimo25",
+      "description": "Direct worker-explore subagent eval using Xiaomi MiMo v2.5 (non-pro).",
+      "configOverrides": {
+        "agent.worker-explore.mode": "primary",
+        "agent.worker-explore.hidden": false,
+        "agent.worker-explore.model": "xiaomi/mimo-v2.5",
+        "agent.worker-explore.permission.bash": "allow"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-explore.md": {
+          "mode": "primary",
+          "model": "xiaomi/mimo-v2.5"
+        }
+      }
+    },
+    {
+      "name": "worker-general-mimo25",
+      "description": "Direct worker-general subagent eval using Xiaomi MiMo v2.5 (non-pro).",
+      "configOverrides": {
+        "agent.worker-general.mode": "primary",
+        "agent.worker-general.hidden": false,
+        "agent.worker-general.model": "xiaomi/mimo-v2.5"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-general.md": {
+          "mode": "primary",
+          "model": "xiaomi/mimo-v2.5"
+        }
+      }
+    },
+    {
       "name": "worker-explore-mimo25pro",
       "description": "Direct worker-explore subagent eval using the existing Xiaomi MiMo v2.5 Pro model.",
       "configOverrides": {
@@ -189,6 +391,236 @@
         "commands/plan-review.md": {
           "mode": "primary",
           "model": "openai/gpt-5.5"
+        }
+      }
+    },
+    {
+      "name": "matrix-minimax-m3",
+      "description": "Reference-matrix variant: both worker-explore and worker-general -> tokenrouter/MiniMax-M3.",
+      "configOverrides": {
+        "agent.worker-explore.mode": "primary",
+        "agent.worker-explore.hidden": false,
+        "agent.worker-explore.model": "tokenrouter/MiniMax-M3",
+        "agent.worker-explore.permission.bash": "allow",
+        "agent.worker-general.mode": "primary",
+        "agent.worker-general.hidden": false,
+        "agent.worker-general.model": "tokenrouter/MiniMax-M3"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-explore.md": {
+          "mode": "primary",
+          "model": "tokenrouter/MiniMax-M3"
+        },
+        "agent/worker-general.md": {
+          "mode": "primary",
+          "model": "tokenrouter/MiniMax-M3"
+        }
+      }
+    },
+    {
+      "name": "matrix-mimo-v2.5",
+      "description": "Reference-matrix variant: both worker-explore and worker-general -> xiaomi/mimo-v2.5.",
+      "configOverrides": {
+        "agent.worker-explore.mode": "primary",
+        "agent.worker-explore.hidden": false,
+        "agent.worker-explore.model": "xiaomi/mimo-v2.5",
+        "agent.worker-explore.permission.bash": "allow",
+        "agent.worker-general.mode": "primary",
+        "agent.worker-general.hidden": false,
+        "agent.worker-general.model": "xiaomi/mimo-v2.5"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-explore.md": {
+          "mode": "primary",
+          "model": "xiaomi/mimo-v2.5"
+        },
+        "agent/worker-general.md": {
+          "mode": "primary",
+          "model": "xiaomi/mimo-v2.5"
+        }
+      }
+    },
+    {
+      "name": "matrix-mimo-v2.5-pro",
+      "description": "Reference-matrix variant: both worker-explore and worker-general -> xiaomi/mimo-v2.5-pro.",
+      "configOverrides": {
+        "agent.worker-explore.mode": "primary",
+        "agent.worker-explore.hidden": false,
+        "agent.worker-explore.model": "xiaomi/mimo-v2.5-pro",
+        "agent.worker-explore.permission.bash": "allow",
+        "agent.worker-general.mode": "primary",
+        "agent.worker-general.hidden": false,
+        "agent.worker-general.model": "xiaomi/mimo-v2.5-pro"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-explore.md": {
+          "mode": "primary",
+          "model": "xiaomi/mimo-v2.5-pro"
+        },
+        "agent/worker-general.md": {
+          "mode": "primary",
+          "model": "xiaomi/mimo-v2.5-pro"
+        }
+      }
+    },
+    {
+      "name": "matrix-kimi-k2.7-code",
+      "description": "Reference-matrix variant: both worker-explore and worker-general -> tokenrouter/moonshotai/kimi-k2.7-code.",
+      "configOverrides": {
+        "agent.worker-explore.mode": "primary",
+        "agent.worker-explore.hidden": false,
+        "agent.worker-explore.model": "tokenrouter/moonshotai/kimi-k2.7-code",
+        "agent.worker-explore.permission.bash": "allow",
+        "agent.worker-general.mode": "primary",
+        "agent.worker-general.hidden": false,
+        "agent.worker-general.model": "tokenrouter/moonshotai/kimi-k2.7-code"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-explore.md": {
+          "mode": "primary",
+          "model": "tokenrouter/moonshotai/kimi-k2.7-code"
+        },
+        "agent/worker-general.md": {
+          "mode": "primary",
+          "model": "tokenrouter/moonshotai/kimi-k2.7-code"
+        }
+      }
+    },
+    {
+      "name": "matrix-deepseek-v4-flash",
+      "description": "Reference-matrix variant: both worker-explore and worker-general -> tokenrouter/deepseek/deepseek-v4-flash.",
+      "configOverrides": {
+        "agent.worker-explore.mode": "primary",
+        "agent.worker-explore.hidden": false,
+        "agent.worker-explore.model": "tokenrouter/deepseek/deepseek-v4-flash",
+        "agent.worker-explore.permission.bash": "allow",
+        "agent.worker-general.mode": "primary",
+        "agent.worker-general.hidden": false,
+        "agent.worker-general.model": "tokenrouter/deepseek/deepseek-v4-flash"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-explore.md": {
+          "mode": "primary",
+          "model": "tokenrouter/deepseek/deepseek-v4-flash"
+        },
+        "agent/worker-general.md": {
+          "mode": "primary",
+          "model": "tokenrouter/deepseek/deepseek-v4-flash"
+        }
+      }
+    },
+    {
+      "name": "matrix-deepseek-v4-pro",
+      "description": "Reference-matrix variant: both worker-explore and worker-general -> tokenrouter/deepseek/deepseek-v4-pro.",
+      "configOverrides": {
+        "agent.worker-explore.mode": "primary",
+        "agent.worker-explore.hidden": false,
+        "agent.worker-explore.model": "tokenrouter/deepseek/deepseek-v4-pro",
+        "agent.worker-explore.permission.bash": "allow",
+        "agent.worker-general.mode": "primary",
+        "agent.worker-general.hidden": false,
+        "agent.worker-general.model": "tokenrouter/deepseek/deepseek-v4-pro"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-explore.md": {
+          "mode": "primary",
+          "model": "tokenrouter/deepseek/deepseek-v4-pro"
+        },
+        "agent/worker-general.md": {
+          "mode": "primary",
+          "model": "tokenrouter/deepseek/deepseek-v4-pro"
+        }
+      }
+    },
+    {
+      "name": "matrix-glm-5.1",
+      "description": "Reference-matrix variant: both worker-explore and worker-general -> tokenrouter/z-ai/glm-5.1.",
+      "configOverrides": {
+        "agent.worker-explore.mode": "primary",
+        "agent.worker-explore.hidden": false,
+        "agent.worker-explore.model": "tokenrouter/z-ai/glm-5.1",
+        "agent.worker-explore.permission.bash": "allow",
+        "agent.worker-general.mode": "primary",
+        "agent.worker-general.hidden": false,
+        "agent.worker-general.model": "tokenrouter/z-ai/glm-5.1"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-explore.md": {
+          "mode": "primary",
+          "model": "tokenrouter/z-ai/glm-5.1"
+        },
+        "agent/worker-general.md": {
+          "mode": "primary",
+          "model": "tokenrouter/z-ai/glm-5.1"
+        }
+      }
+    },
+    {
+      "name": "matrix-kimi-k2.7-zenmux-9rpm",
+      "description": "Reference-matrix variant: both worker-explore and worker-general -> zenmux/moonshotai/kimi-k2.7-code-free.",
+      "configOverrides": {
+        "agent.worker-explore.mode": "primary",
+        "agent.worker-explore.hidden": false,
+        "agent.worker-explore.model": "zenmux/moonshotai/kimi-k2.7-code-free",
+        "agent.worker-explore.permission.bash": "allow",
+        "agent.worker-general.mode": "primary",
+        "agent.worker-general.hidden": false,
+        "agent.worker-general.model": "zenmux/moonshotai/kimi-k2.7-code-free"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-explore.md": {
+          "mode": "primary",
+          "model": "zenmux/moonshotai/kimi-k2.7-code-free"
+        },
+        "agent/worker-general.md": {
+          "mode": "primary",
+          "model": "zenmux/moonshotai/kimi-k2.7-code-free"
+        }
+      }
+    },
+    {
+      "name": "matrix-nemotron-3-ultra",
+      "description": "Reference-matrix variant: both worker-explore and worker-general -> nousresearch/nvidia/nemotron-3-ultra:free.",
+      "configOverrides": {
+        "agent.worker-explore.mode": "primary",
+        "agent.worker-explore.hidden": false,
+        "agent.worker-explore.model": "nousresearch/nvidia/nemotron-3-ultra:free",
+        "agent.worker-explore.permission.bash": "allow",
+        "agent.worker-general.mode": "primary",
+        "agent.worker-general.hidden": false,
+        "agent.worker-general.model": "nousresearch/nvidia/nemotron-3-ultra:free"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-explore.md": {
+          "mode": "primary",
+          "model": "nousresearch/nvidia/nemotron-3-ultra:free"
+        },
+        "agent/worker-general.md": {
+          "mode": "primary",
+          "model": "nousresearch/nvidia/nemotron-3-ultra:free"
+        }
+      }
+    },
+    {
+      "name": "matrix-step-3.7-flash",
+      "description": "Reference-matrix variant: both worker-explore and worker-general -> nousresearch/stepfun/step-3.7-flash:free.",
+      "configOverrides": {
+        "agent.worker-explore.mode": "primary",
+        "agent.worker-explore.hidden": false,
+        "agent.worker-explore.model": "nousresearch/stepfun/step-3.7-flash:free",
+        "agent.worker-explore.permission.bash": "allow",
+        "agent.worker-general.mode": "primary",
+        "agent.worker-general.hidden": false,
+        "agent.worker-general.model": "nousresearch/stepfun/step-3.7-flash:free"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-explore.md": {
+          "mode": "primary",
+          "model": "nousresearch/stepfun/step-3.7-flash:free"
+        },
+        "agent/worker-general.md": {
+          "mode": "primary",
+          "model": "nousresearch/stepfun/step-3.7-flash:free"
         }
       }
     }

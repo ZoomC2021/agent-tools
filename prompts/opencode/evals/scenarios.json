@@ -93,7 +93,8 @@
             "command": "npm test",
             "exitCode": 0,
             "outputRegex": [
-              "pass 2"
+              "(#|ℹ) fail 0\\b",
+              "(#|ℹ) pass [1-9][0-9]*\\b"
             ]
           },
           {
@@ -650,7 +651,7 @@
       "description": "Directly test worker-general on state-machine correctness that passing visible tests do not cover.",
       "agent": "worker-general",
       "prompt": "GOAL: Fix the workflow engine so it satisfies the state-machine contract below, not just the visible tests.\n\nCONTEXT:\n- This is a small in-memory workflow engine.\n- `npm test` currently covers only easy cases and may pass before the real contract is correct.\n- Treat this prompt as the source of truth for the missing edge cases.\n\nEXECUTION CONTRACT:\n- Files to modify: `src/workflow.js` and `scripts/build.js` only.\n- DO: Run `npm test` before and after the fix.\n- DO: Run `npm run build && npm start` before reporting complete.\n- DO NOT: Modify tests, package metadata, or create dependencies.\n\nSTATE-MACHINE REQUIREMENTS:\n1. `claim({ queue, workerId, now, limit, leaseMs })` must choose globally across all active runs on the queue, ordered by priority descending, then availableAt ascending, then createdAt ascending. Do not order inside each run and then concatenate runs.\n2. `complete` and `fail` must reject an expired lease using an error whose message contains `LEASE_EXPIRED`. An expired lease must not be allowed to mark a step `succeeded` or user-failed.\n3. `recoverExpiredLeases` must be robust when several running steps expire in the same pass. If one expired step exhausts attempts and fails the run, every other non-terminal step in that run must stay `blocked`, even if it also appeared in the recovery snapshot.\n4. `streamRunEvents(runId, { afterEventId })` must replay stored events after the cursor and then keep delivering live events emitted after the stream starts. `close()` must unregister the live listener.\n5. The clean build path must work: `npm run build` must produce the file that `npm start` runs.\n\nOUTPUT FORMAT: Implementation Summary with Test Results.",
-      "timeoutMs": 150000,
+      "timeoutMs": 300000,
       "tags": [
         "subagent",
         "worker-general",
@@ -729,7 +730,7 @@
       "description": "Directly test worker-general on reading a workflow spec and finding incomplete state-machine behavior beyond passing tests.",
       "agent": "worker-general",
       "prompt": "GOAL: Bring this workflow engine into compliance with `SPEC.md`.\n\nCONTEXT:\n- The existing tests are intentionally incomplete.\n- Do not assume a passing test suite means the implementation satisfies the spec.\n- Read `SPEC.md`, inspect the implementation, and fix the smallest set of source/build issues needed for compliance.\n\nEXECUTION CONTRACT:\n- Files you may modify: `src/workflow.js`, `scripts/build.js`, and `test/workflow.test.js` only.\n- DO: Run `npm test` before and after the fix.\n- DO: Run `npm run build && npm start` before reporting complete.\n- DO NOT: Modify `SPEC.md`, `package.json`, or add dependencies.\n- DO NOT: Remove public exports or change public function names.\n\nOUTPUT FORMAT: Implementation Summary with Test Results.",
-      "timeoutMs": 180000,
+      "timeoutMs": 300000,
       "tags": [
         "subagent",
         "worker-general",
@@ -798,7 +799,8 @@
             "command": "npm test",
             "exitCode": 0,
             "outputRegex": [
-              "# fail 0"
+              "(#|ℹ) fail 0\\b",
+              "(#|ℹ) pass [1-9][0-9]*\\b"
             ]
           },
           {
@@ -895,7 +897,8 @@
             "command": "npm test",
             "exitCode": 0,
             "outputRegex": [
-              "# fail 0"
+              "(#|ℹ) fail 0\\b",
+              "(#|ℹ) pass [1-9][0-9]*\\b"
             ]
           },
           {

@@ -138,6 +138,24 @@ function isWorkflowSpecCompliance(prompt) {
   return lower.includes("spec.md") && lower.includes("workflow") && lower.includes("compliance")
 }
 
+// Some worker models (notably tokenrouter/MiniMax-M3) emit raw <think>...</think>
+// reasoning inline in the final assistant message instead of on a separate
+// reasoning channel. That noise leaks up to the orchestrator. Strip it before
+// the result is consumed. Safe no-op for models that don't emit think tags.
+function stripThinkBlocks(text) {
+  if (typeof text !== "string" || !text.includes("<think>")) {
+    return text
+  }
+  return text
+    // closed blocks (multiline)
+    .replace(/<think>[\s\S]*?<\/think>/g, "")
+    // a dangling, unclosed <think> (e.g. output truncated by a timeout)
+    .replace(/<think>[\s\S]*$/g, "")
+    // collapse the blank lines left behind
+    .replace(/\n{3,}/g, "\n\n")
+    .trim()
+}
+
 export const WorkerRoutingGuard = async () => {
   const taskAgents = new Map()
   const taskPrompts = new Map()
@@ -264,6 +282,10 @@ ${typeof args.prompt === "string" ? args.prompt : ""}
       if (!agent || typeof output.output !== "string") {
         return
       }
+
+      // Drop any inline <think> reasoning the worker model leaked into its
+      // result before the orchestrator (or the appended reminders) see it.
+      output.output = stripThinkBlocks(output.output)
 
       const state = getState(input.sessionID)
       if (agent === "spec-compiler") {

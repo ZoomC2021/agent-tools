@@ -1,0 +1,735 @@
+#!/usr/bin/env node
+
+const fs = require("fs")
+const path = require("path")
+const { spawn, spawnSync } = require("child_process")
+
+const repoRoot = path.resolve(__dirname, "..")
+const defaultVariantsPath = path.join(repoRoot, "evals", "variants.json")
+const defaultScenariosPath = path.join(repoRoot, "evals", "scenarios.json")
+const defaultOutputRoot = path.join(repoRoot, "evals", "cmd-out")
+const supportEntries = [
+  "agent",
+  "bin",
+  "command",
+  "commands",
+  "prompts",
+  "opencode.json",
+  "antigravity-accounts.json",
+]
+
+// Map opencode provider-prefixed model IDs to cmd model IDs
+const MODEL_MAP = {
+  "tokenrouter/moonshotai/kimi-k2.7-code": "moonshotai/Kimi-K2.7-Code",
+  "tokenrouter/deepseek/deepseek-v4-pro": "deepseek/deepseek-v4-pro",
+  "tokenrouter/deepseek/deepseek-v4-flash": "deepseek/deepseek-v4-flash",
+  "tokenrouter/MiniMax-M3": "MiniMaxAI/MiniMax-M3",
+  "xiaomi/mimo-v2.5": "xiaomi/mimo-v2.5",
+  "xiaomi/mimo-v2.5-pro": "xiaomi/mimo-v2.5-pro",
+  "tokenrouter/z-ai/glm-5.1": "zai-org/GLM-5.1",
+  "nvidia/z-ai/glm-5.1": "zai-org/GLM-5.1",
+  "nousresearch/nvidia/nemotron-3-ultra:free": "nvidia/nemotron-3-ultra-550b-a55b",
+  "nousresearch/stepfun/step-3.7-flash:free": "stepfun/Step-3.7-Flash",
+  "zenmux/moonshotai/kimi-k2.7-code-free": "moonshotai/Kimi-K2.7-Code",
+}
+
+function mapModelId(opencodeModelId) {
+  if (!opencodeModelId) return null
+  if (MODEL_MAP[opencodeModelId]) return MODEL_MAP[opencodeModelId]
+  // Fallback: use last two path segments
+  const parts = opencodeModelId.split("/")
+  return parts.slice(-2).join("/")
+}
+
+function usage() {
+  console.log(`Usage:
+  cmd-eval list [variants|scenarios]
+  cmd-eval run [--variants pattern[,pattern]] [--scenarios pattern[,pattern]] [--tags tag[,tag]] [--out dir] [--dry-run]
+  cmd-eval report <run-dir>
+
+Defaults:
+  variants file:  ${relativeToRoot(defaultVariantsPath)}
+  scenarios file: ${relativeToRoot(defaultScenariosPath)}
+  output root:    ${relativeToRoot(defaultOutputRoot)}
+
+Examples:
+  cmd-eval list
+  cmd-eval run
+  cmd-eval run --variants matrix-mimo-v2.5 --scenarios subagent-worker-general-add-helper
+  cmd-eval run --variants matrix-mimo-v2.5 --scenarios "subagent-worker-*"
+  cmd-eval report evals/cmd-out/20260422T120000Z
+`)
+}
+
+function die(message) {
+  console.error(`error: ${message}`)
+  process.exit(1)
+}
+
+function relativeToRoot(targetPath) {
+  return path.relative(repoRoot, targetPath) || "."
+}
+
+function ensureDir(dirPath) {
+  fs.mkdirSync(dirPath, { recursive: true })
+}
+
+function readJson(filePath) {
+  return JSON.parse(fs.readFileSync(filePath, "utf8"))
+}
+
+function writeJson(filePath, value) {
+  fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`)
+}
+
+function writeText(filePath, value) {
+  fs.writeFileSync(filePath, value)
+}
+
+function fileExists(targetPath) {
+  return fs.existsSync(targetPath)
+}
+
+function timestampSlug(date = new Date()) {
+  const iso = date.toISOString()
+  return iso.replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z")
+}
+
+function parseArgs(argv) {
+  const positionals = []
+  const options = {}
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const part = argv[index]
+    if (!part.startsWith("--")) {
+      positionals.push(part)
+      continue
+    }
+
+    const key = part.slice(2)
+    if (["dry-run"].includes(key)) {
+      options[key] = true
+      continue
+    }
+
+    const next = argv[index + 1]
+    if (!next || next.startsWith("--")) {
+      die(`missing value for --${key}`)
+    }
+
+    options[key] = next
+    index += 1
+  }
+
+  return { positionals, options }
+}
+
+function splitCsv(value) {
+  if (!value) return []
+  return value.split(",").map((item) => item.trim()).filter(Boolean)
+}
+
+function wildcardToRegExp(pattern) {
+  const escaped = pattern.replace(/[|\\{}()[\]^$+?.]/g, "\\$&")
+  return new RegExp(`^${escaped.replace(/\*/g, ".*")}$`)
+}
+
+function matchesAnyPattern(value, patterns) {
+  if (!patterns.length) return true
+  return patterns.some((pattern) => wildcardToRegExp(pattern).test(value))
+}
+
+function copyEntry(sourcePath, destinationPath) {
+  fs.cpSync(sourcePath, destinationPath, {
+    recursive: true,
+    force: true,
+    preserveTimestamps: true,
+  })
+}
+
+function setNestedValue(object, dottedPath, value) {
+  const parts = dottedPath.split(".")
+  let current = object
+  for (let index = 0; index < parts.length - 1; index += 1) {
+    const part = parts[index]
+    if (!(part in current) || typeof current[part] !== "object" || current[part] === null) {
+      current[part] = {}
+    }
+    current = current[part]
+  }
+  current[parts[parts.length - 1]] = value
+}
+
+function deleteNestedValue(object, dottedPath) {
+  const parts = dottedPath.split(".")
+  let current = object
+  for (let index = 0; index < parts.length - 1; index += 1) {
+    const part = parts[index]
+    if (!(part in current) || typeof current[part] !== "object" || current[part] === null) return
+    current = current[part]
+  }
+  delete current[parts[parts.length - 1]]
+}
+
+function updateFrontmatterValue(filePath, key, value) {
+  const original = fs.readFileSync(filePath, "utf8")
+  const match = original.match(/^---\n([\s\S]*?)\n---\n/)
+  if (!match) throw new Error(`frontmatter block not found in ${relativeToRoot(filePath)}`)
+
+  const frontmatterLines = match[1].split("\n")
+  const replacement = `${key}: ${value}`
+  let replaced = false
+
+  const updatedLines = frontmatterLines.map((line) => {
+    if (line.startsWith(`${key}:`)) {
+      replaced = true
+      return replacement
+    }
+    return line
+  })
+
+  if (!replaced) updatedLines.push(replacement)
+
+  const updated = `---\n${updatedLines.join("\n")}\n---\n${original.slice(match[0].length)}`
+  fs.writeFileSync(filePath, updated)
+}
+
+function expandTemplate(value, variables) {
+  if (typeof value !== "string") return value
+  return value.replace(/\$\{([A-Z0-9_]+)\}/g, (_, name) => {
+    if (!(name in variables)) throw new Error(`missing template variable ${name}`)
+    return variables[name]
+  })
+}
+
+function loadVariants(variantsPath) {
+  const payload = readJson(variantsPath)
+  if (!Array.isArray(payload.variants)) die(`${relativeToRoot(variantsPath)} must contain a variants array`)
+  return payload
+}
+
+function loadScenarios(scenariosPath) {
+  const payload = readJson(scenariosPath)
+  if (!Array.isArray(payload.scenarios)) die(`${relativeToRoot(scenariosPath)} must contain a scenarios array`)
+
+  const defaults = payload.defaults || {}
+  payload.scenarios = payload.scenarios.map((scenario) => ({ ...defaults, ...scenario }))
+  return payload
+}
+
+function filterVariants(variants, patterns) {
+  return variants.filter((variant) => matchesAnyPattern(variant.name, patterns))
+}
+
+function filterScenarios(scenarios, scenarioPatterns, tagPatterns) {
+  return scenarios.filter((scenario) => {
+    const matchesScenario = matchesAnyPattern(scenario.id, scenarioPatterns)
+    const tags = Array.isArray(scenario.tags) ? scenario.tags : []
+    const matchesTags = !tagPatterns.length || tags.some((tag) => tagPatterns.includes(tag))
+    return matchesScenario && matchesTags
+  })
+}
+
+function prepareVariantWorkspace(variant, variantDir) {
+  fs.rmSync(variantDir, { recursive: true, force: true })
+  ensureDir(variantDir)
+
+  for (const entry of supportEntries) {
+    const sourcePath = path.join(repoRoot, entry)
+    if (!fileExists(sourcePath)) continue
+    copyEntry(sourcePath, path.join(variantDir, entry))
+  }
+
+  if (variant.includeProjectPlugins) {
+    const pluginsPath = path.join(repoRoot, ".opencode")
+    if (fileExists(pluginsPath)) copyEntry(pluginsPath, path.join(variantDir, ".opencode"))
+  }
+
+  const configPath = path.join(variantDir, "opencode.json")
+  if (!fileExists(configPath)) {
+    throw new Error(`missing opencode.json in ${relativeToRoot(variantDir)}.`)
+  }
+  const config = readJson(configPath)
+  const configOverrides = variant.configOverrides || {}
+  for (const [dottedPath, value] of Object.entries(configOverrides)) {
+    setNestedValue(config, dottedPath, value)
+  }
+  for (const dottedPath of variant.configDeletes || []) {
+    deleteNestedValue(config, dottedPath)
+  }
+  writeJson(configPath, config)
+
+  const promptOverrides = variant.promptFrontmatterOverrides || {}
+  for (const [relativeFile, frontmatterValues] of Object.entries(promptOverrides)) {
+    const filePath = path.join(variantDir, relativeFile)
+    for (const [key, value] of Object.entries(frontmatterValues)) {
+      updateFrontmatterValue(filePath, key, value)
+    }
+  }
+
+  writeJson(path.join(variantDir, "variant.json"), variant)
+}
+
+function runShellCommand(command, cwd, logFile) {
+  const result = spawnSync(command, [], { cwd, shell: true, encoding: "utf8" })
+  const contents = [`$ ${command}`, "", result.stdout || "", result.stderr || ""].join("\n")
+  writeText(logFile, contents)
+  if (result.status !== 0) throw new Error(`setup command failed (${command})`)
+}
+
+function prepareScenarioWorkspace(scenario, caseDir, variantDir) {
+  const os = require("os")
+  const isolatedDir = fs.mkdtempSync(path.join(os.tmpdir(), "cmd-eval-"))
+  const workspaceRoot = path.join(isolatedDir, "workspace")
+  fs.mkdirSync(workspaceRoot, { recursive: true })
+  copyEntry(variantDir, workspaceRoot)
+
+  const variables = {
+    REPO_ROOT: repoRoot,
+    VARIANT_ROOT: workspaceRoot,
+    CASE_DIR: caseDir,
+    RUN_DIR: path.dirname(caseDir),
+    ISOLATED_DIR: isolatedDir,
+  }
+
+  let scenarioWorkdir = workspaceRoot
+
+  if (scenario.sandbox && scenario.sandbox.copyFrom) {
+    const sandboxSource = expandTemplate(scenario.sandbox.copyFrom, variables)
+    copyEntry(sandboxSource, workspaceRoot)
+    variables.SCENARIO_WORKDIR = workspaceRoot
+  }
+
+  scenarioWorkdir = expandTemplate(
+    scenario.workingDirectory || scenario.workdir || (variables.SCENARIO_WORKDIR || workspaceRoot),
+    variables,
+  )
+
+  variables.SCENARIO_WORKDIR = variables.SCENARIO_WORKDIR || scenarioWorkdir
+
+  const setupCommands = Array.isArray(scenario.setupCommands) ? scenario.setupCommands : []
+  if (setupCommands.length) {
+    const setupDir = path.join(caseDir, "setup")
+    ensureDir(setupDir)
+    setupCommands.forEach((command, index) => {
+      const expanded = expandTemplate(command, variables)
+      runShellCommand(expanded, scenarioWorkdir, path.join(setupDir, `${index + 1}.log`))
+    })
+  }
+
+  return { workdir: scenarioWorkdir, variables }
+}
+
+function resolveCmdModel(variant, scenario) {
+  const overrides = variant.configOverrides || {}
+  const isExplore = scenario.id && scenario.id.includes("explore")
+  const modelKey = isExplore ? "agent.worker-explore.model" : "agent.worker-general.model"
+  const opencodeModel = overrides[modelKey] || overrides["agent.worker-general.model"] || overrides["agent.worker-explore.model"]
+  return mapModelId(opencodeModel)
+}
+
+function runCmdCase({ variant, scenario, workspace, caseDir }) {
+  const cmdModel = resolveCmdModel(variant, scenario)
+  const args = ["-p", scenario.prompt, "--yolo", "--max-turns", "30"]
+  if (cmdModel) args.push("--model", cmdModel)
+
+  const timeoutMs = Number(scenario.timeoutMs || 180000)
+
+  return new Promise((resolve) => {
+    const child = spawn("cmd", args, {
+      cwd: workspace.workdir,
+      env: { ...process.env },
+      stdio: ["ignore", "pipe", "pipe"],
+      detached: true,
+    })
+
+    let stdout = ""
+    let stderr = ""
+    let timedOut = false
+    let sigkillTimer = null
+
+    const killProcessGroup = (signal) => {
+      if (!child.pid) return
+      try {
+        process.kill(-child.pid, signal)
+      } catch {
+        try { child.kill(signal) } catch {}
+      }
+    }
+
+    const timeoutTimer = setTimeout(() => {
+      timedOut = true
+      stderr += `\n[cmd-eval] Timed out after ${timeoutMs}ms\n`
+      killProcessGroup("SIGTERM")
+      sigkillTimer = setTimeout(() => killProcessGroup("SIGKILL"), 2000)
+    }, timeoutMs)
+
+    child.stdout.on("data", (chunk) => { stdout += chunk.toString() })
+    child.stderr.on("data", (chunk) => { stderr += chunk.toString() })
+    child.on("error", (error) => { stderr += `${error.stack || String(error)}\n` })
+    child.on("close", (code) => {
+      clearTimeout(timeoutTimer)
+      if (sigkillTimer) clearTimeout(sigkillTimer)
+      writeText(path.join(caseDir, "cmd-stdout.txt"), stdout)
+      writeText(path.join(caseDir, "cmd-stderr.txt"), stderr)
+      resolve({ exitCode: timedOut ? 124 : code ?? 0, stdout, stderr, timedOut, timeoutMs })
+    })
+  })
+}
+
+function evaluateExpectations(expectations, summary) {
+  const checks = []
+  const pushCheck = (name, pass, expected, actual) => {
+    checks.push({ name, pass, expected, actual })
+  }
+
+  if (Object.prototype.hasOwnProperty.call(expectations, "exitCode")) {
+    pushCheck("exitCode", summary.exitCode === expectations.exitCode, expectations.exitCode, summary.exitCode)
+  }
+
+  for (const needle of expectations.finalIncludes || []) {
+    pushCheck(`finalIncludes:${needle}`, summary.finalText.includes(needle), needle, summary.finalText.slice(0, 500))
+  }
+
+  for (const needle of expectations.finalIncludesInsensitive || []) {
+    pushCheck(
+      `finalIncludesInsensitive:${needle}`,
+      summary.finalText.toLowerCase().includes(String(needle).toLowerCase()),
+      needle,
+      summary.finalText.slice(0, 500),
+    )
+  }
+
+  for (const needle of expectations.finalExcludes || []) {
+    pushCheck(`finalExcludes:${needle}`, !summary.finalText.includes(needle), `not ${needle}`, summary.finalText.slice(0, 500))
+  }
+
+  for (const pattern of expectations.finalRegex || []) {
+    let regex
+    try { regex = new RegExp(pattern, "m") } catch (e) {
+      pushCheck(`finalRegex:${pattern}`, false, `valid regex: ${pattern}`, `invalid regex: ${e.message}`)
+      continue
+    }
+    pushCheck(`finalRegex:${pattern}`, regex.test(summary.finalText), pattern, summary.finalText.slice(0, 500))
+  }
+
+  for (const pattern of expectations.textRegex || []) {
+    let regex
+    try { regex = new RegExp(pattern, "m") } catch (e) {
+      pushCheck(`textRegex:${pattern}`, false, `valid regex: ${pattern}`, `invalid regex: ${e.message}`)
+      continue
+    }
+    pushCheck(`textRegex:${pattern}`, regex.test(summary.finalText), pattern, summary.finalText.slice(0, 500))
+  }
+
+  // Skip tool/subagent checks — cmd doesn't expose these
+  for (const tool of expectations.forbiddenTools || []) {
+    checks.push({ name: `forbiddenTool:${tool}`, pass: null, note: "not evaluable via cmd (no tool call tracking)" })
+  }
+  for (const tool of expectations.requiredTools || []) {
+    checks.push({ name: `requiredTool:${tool}`, pass: null, note: "not evaluable via cmd (no tool call tracking)" })
+  }
+  for (const subagent of expectations.requiredSubagents || []) {
+    checks.push({ name: `requiredSubagent:${subagent}`, pass: null, note: "not evaluable via cmd (no subagent routing)" })
+  }
+  for (const subagent of expectations.forbiddenSubagents || []) {
+    checks.push({ name: `forbiddenSubagent:${subagent}`, pass: null, note: "not evaluable via cmd (no subagent routing)" })
+  }
+
+  // File-based checks
+  for (const fileCheck of expectations.fileContains || []) {
+    const targetPath = path.join(summary.workdir, fileCheck.path)
+    const exists = fileExists(targetPath)
+    const contents = exists ? fs.readFileSync(targetPath, "utf8") : ""
+
+    pushCheck(`fileExists:${fileCheck.path}`, exists, true, exists)
+
+    for (const needle of fileCheck.includes || []) {
+      pushCheck(`fileContains:${fileCheck.path}:${needle}`, contents.includes(needle), needle, exists ? contents.slice(0, 200) : "<missing file>")
+    }
+    for (const needle of fileCheck.excludes || []) {
+      pushCheck(`fileExcludes:${fileCheck.path}:${needle}`, !contents.includes(needle), `not ${needle}`, exists ? contents.slice(0, 200) : "<missing file>")
+    }
+    for (const pattern of fileCheck.regex || []) {
+      let regex
+      try { regex = new RegExp(pattern, "m") } catch (e) {
+        pushCheck(`fileRegex:${fileCheck.path}:${pattern}`, false, `valid regex: ${pattern}`, `invalid regex: ${e.message}`)
+        continue
+      }
+      pushCheck(`fileRegex:${fileCheck.path}:${pattern}`, regex.test(contents), pattern, exists ? contents.slice(0, 200) : "<missing file>")
+    }
+    for (const pattern of fileCheck.excludesRegex || []) {
+      let regex
+      try { regex = new RegExp(pattern, "m") } catch (e) {
+        pushCheck(`fileExcludesRegex:${fileCheck.path}:${pattern}`, false, `valid regex: ${pattern}`, `invalid regex: ${e.message}`)
+        continue
+      }
+      pushCheck(`fileExcludesRegex:${fileCheck.path}:${pattern}`, !regex.test(contents), `not matching: ${pattern}`, exists ? contents.slice(0, 200) : "<missing file>")
+    }
+  }
+
+  // Workspace commands
+  for (const commandCheck of expectations.workspaceCommands || []) {
+    const result = spawnSync(commandCheck.command, {
+      cwd: summary.workdir,
+      shell: true,
+      encoding: "utf8",
+      timeout: commandCheck.timeoutMs || 30000,
+      maxBuffer: 10 * 1024 * 1024,
+    })
+    const output = `${result.stdout || ""}${result.stderr || ""}`
+    const actualExitCode = result.status ?? (result.signal ? 124 : 1)
+    pushCheck(
+      `workspaceCommand:${commandCheck.command}:exitCode`,
+      actualExitCode === (commandCheck.exitCode ?? 0),
+      commandCheck.exitCode ?? 0,
+      { exitCode: actualExitCode, output: output.slice(0, 500) },
+    )
+    for (const needle of commandCheck.outputIncludes || []) {
+      pushCheck(`workspaceCommand:${commandCheck.command}:outputIncludes:${needle}`, output.includes(needle), needle, output.slice(0, 500))
+    }
+    for (const pattern of commandCheck.outputRegex || []) {
+      let regex
+      try { regex = new RegExp(pattern, "m") } catch (e) {
+        pushCheck(`workspaceCommand:${commandCheck.command}:outputRegex:${pattern}`, false, `valid regex: ${pattern}`, `invalid regex: ${e.message}`)
+        continue
+      }
+      pushCheck(`workspaceCommand:${commandCheck.command}:outputRegex:${pattern}`, regex.test(output), pattern, output.slice(0, 500))
+    }
+  }
+
+  // Overall pass: true if all evaluable checks pass, null if any are unevaluable
+  const evaluableChecks = checks.filter((c) => c.pass !== null)
+  const hasUnevaluable = checks.some((c) => c.pass === null)
+  const allEvaluablePass = evaluableChecks.every((c) => c.pass)
+
+  return {
+    pass: hasUnevaluable ? (allEvaluablePass ? null : false) : allEvaluablePass,
+    checks,
+    note: hasUnevaluable ? "Some checks could not be evaluated via cmd; review finalText manually" : undefined,
+  }
+}
+
+function summarizeCase({ variant, scenario, runResult, workspace }) {
+  return {
+    runner: "cmd",
+    variant: variant.name,
+    scenario: scenario.id,
+    description: scenario.description,
+    exitCode: runResult.exitCode,
+    timedOut: Boolean(runResult.timedOut),
+    timeoutMs: runResult.timeoutMs || null,
+    finalText: runResult.stdout,
+    durationMs: null,
+    workdir: workspace.workdir,
+    cmdModel: resolveCmdModel(variant, scenario),
+  }
+}
+
+function renderSummaryMarkdown(summary) {
+  const lines = [
+    `# Cmd Eval Summary`,
+    "",
+    `- Run directory: \`${summary.runDirectory}\``,
+    `- Runner: cmd (Command Code)`,
+    `- Variants: ${summary.variants.join(", ")}`,
+    `- Scenarios: ${summary.scenarios.join(", ")}`,
+    `- Total cases: ${summary.results.length}`,
+    "",
+    "| Variant | Scenario | Eval | Pass | Notes |",
+    "|---------|----------|------|------|-------|",
+  ]
+
+  for (const result of summary.results) {
+    const passStr = result.evaluation.pass === true ? "PASS" : result.evaluation.pass === false ? "FAIL" : "REVIEW"
+    const evaluableCount = result.evaluation.checks.filter((c) => c.pass !== null).length
+    const passCount = result.evaluation.checks.filter((c) => c.pass === true).length
+    const note = result.evaluation.note || ""
+    lines.push(`| ${result.variant} | ${result.scenario} | ${passCount}/${evaluableCount} | ${passStr} | ${note.slice(0, 60)} |`)
+  }
+
+  lines.push("", "## Variant Totals", "")
+  lines.push("| Variant | Passed | Review | Failed | Total |", "|---------|--------|--------|--------|-------|")
+  for (const item of summary.variantTotals) {
+    lines.push(`| ${item.variant} | ${item.passed} | ${item.review} | ${item.failed} | ${item.total} |`)
+  }
+
+  return `${lines.join("\n")}\n`
+}
+
+function buildSummary(runDirectory, resultEntries) {
+  const byVariant = new Map()
+
+  for (const entry of resultEntries) {
+    if (!byVariant.has(entry.variant)) {
+      byVariant.set(entry.variant, { variant: entry.variant, passed: 0, review: 0, failed: 0, total: 0 })
+    }
+    const item = byVariant.get(entry.variant)
+    item.total += 1
+    if (entry.evaluation.pass === true) item.passed += 1
+    else if (entry.evaluation.pass === null) item.review += 1
+    else item.failed += 1
+  }
+
+  return {
+    runDirectory,
+    runner: "cmd",
+    variants: [...new Set(resultEntries.map((entry) => entry.variant))],
+    scenarios: [...new Set(resultEntries.map((entry) => entry.scenario))],
+    results: resultEntries,
+    variantTotals: [...byVariant.values()],
+  }
+}
+
+function printList(variantsPayload, scenariosPayload, target) {
+  if (!target || target === "variants") {
+    console.log("Variants")
+    for (const variant of variantsPayload.variants) {
+      console.log(`- ${variant.name}: ${variant.description || ""}`)
+    }
+    console.log("")
+  }
+
+  if (!target || target === "scenarios") {
+    console.log("Scenarios")
+    for (const scenario of scenariosPayload.scenarios) {
+      const tags = Array.isArray(scenario.tags) && scenario.tags.length ? ` [tags: ${scenario.tags.join(", ")}]` : ""
+      console.log(`- ${scenario.id}${tags}: ${scenario.description || ""}`)
+    }
+  }
+}
+
+async function runCommand(options) {
+  const variantsPayload = loadVariants(defaultVariantsPath)
+  const scenariosPayload = loadScenarios(defaultScenariosPath)
+
+  const variantPatterns = splitCsv(options.variants)
+  const scenarioPatterns = splitCsv(options.scenarios)
+  const tagPatterns = splitCsv(options.tags)
+  const effectiveTagPatterns = !scenarioPatterns.length && !tagPatterns.length ? ["starter"] : tagPatterns
+
+  const variants = filterVariants(variantsPayload.variants, variantPatterns)
+  const scenarios = filterScenarios(scenariosPayload.scenarios, scenarioPatterns, effectiveTagPatterns)
+
+  if (!variants.length) die("no variants matched the requested filters")
+  if (!scenarios.length) die("no scenarios matched the requested filters")
+
+  const runDirectory = options.out
+    ? path.resolve(repoRoot, options.out)
+    : path.join(defaultOutputRoot, timestampSlug())
+
+  const manifest = {
+    createdAt: new Date().toISOString(),
+    runDirectory,
+    runner: "cmd",
+    variants: variants.map((variant) => variant.name),
+    scenarios: scenarios.map((scenario) => scenario.id),
+  }
+
+  if (options["dry-run"]) {
+    console.log(JSON.stringify(manifest, null, 2))
+    return
+  }
+
+  ensureDir(runDirectory)
+  ensureDir(path.join(runDirectory, "variants"))
+  ensureDir(path.join(runDirectory, "cases"))
+  writeJson(path.join(runDirectory, "manifest.json"), manifest)
+
+  const variantDirs = new Map()
+  for (const variant of variants) {
+    const variantDir = path.join(runDirectory, "variants", variant.name)
+    prepareVariantWorkspace(variant, variantDir)
+    variantDirs.set(variant.name, variantDir)
+  }
+
+  const results = []
+  for (const variant of variants) {
+    const variantDir = variantDirs.get(variant.name)
+
+    for (const scenario of scenarios) {
+      const caseId = `${variant.name}__${scenario.id}`
+      const caseDir = path.join(runDirectory, "cases", caseId)
+      ensureDir(caseDir)
+
+      const workspace = prepareScenarioWorkspace(scenario, caseDir, variantDir)
+      const runResult = await runCmdCase({ variant, scenario, workspace, caseDir })
+
+      const finalWorkspacePath = path.join(caseDir, "workspace")
+      copyEntry(workspace.variables.ISOLATED_DIR + "/workspace", finalWorkspacePath)
+      workspace.workdir = workspace.workdir.replace(workspace.variables.ISOLATED_DIR + "/workspace", finalWorkspacePath)
+      fs.rmSync(workspace.variables.ISOLATED_DIR, { recursive: true, force: true })
+
+      const summary = summarizeCase({ variant, scenario, runResult, workspace })
+      const evaluation = evaluateExpectations(scenario.expectations || {}, summary)
+      const resultEntry = {
+        variant: variant.name,
+        scenario: scenario.id,
+        evaluation,
+        summary,
+      }
+
+      writeJson(path.join(caseDir, "result.json"), resultEntry)
+      results.push(resultEntry)
+
+      const passStr = evaluation.pass === true ? "PASS" : evaluation.pass === false ? "FAIL" : "REVIEW"
+      console.log(`${passStr} ${variant.name} :: ${scenario.id}`)
+    }
+  }
+
+  const summary = buildSummary(runDirectory, results)
+  writeJson(path.join(runDirectory, "summary.json"), summary)
+  writeText(path.join(runDirectory, "summary.md"), renderSummaryMarkdown(summary))
+  console.log(`Summary written to ${relativeToRoot(path.join(runDirectory, "summary.md"))}`)
+}
+
+function reportCommand(runDirectoryArg) {
+  if (!runDirectoryArg) die("report requires a run directory")
+
+  const runDirectory = path.resolve(repoRoot, runDirectoryArg)
+  const casesDir = path.join(runDirectory, "cases")
+  if (!fileExists(casesDir)) die(`cases directory not found in ${runDirectoryArg}`)
+
+  const resultEntries = fs
+    .readdirSync(casesDir)
+    .map((entry) => path.join(casesDir, entry, "result.json"))
+    .filter((filePath) => fileExists(filePath))
+    .map((filePath) => readJson(filePath))
+
+  const summary = buildSummary(runDirectory, resultEntries)
+  writeJson(path.join(runDirectory, "summary.json"), summary)
+  writeText(path.join(runDirectory, "summary.md"), renderSummaryMarkdown(summary))
+  console.log(renderSummaryMarkdown(summary))
+}
+
+async function main() {
+  const { positionals, options } = parseArgs(process.argv.slice(2))
+  const command = positionals[0]
+
+  if (!command || command === "--help" || command === "help") {
+    usage()
+    return
+  }
+
+  if (command === "list") {
+    printList(loadVariants(defaultVariantsPath), loadScenarios(defaultScenariosPath), positionals[1])
+    return
+  }
+
+  if (command === "run") {
+    await runCommand(options)
+    return
+  }
+
+  if (command === "report") {
+    reportCommand(positionals[1])
+    return
+  }
+
+  die(`unknown command: ${command}`)
+}
+
+main().catch((error) => {
+  console.error(error.stack || String(error))
+  process.exit(1)
+})
