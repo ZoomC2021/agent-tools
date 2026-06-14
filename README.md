@@ -105,7 +105,8 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 ```
 ~/.config/opencode/
 ├── opencode.json              # Main configuration (see example)
-├── bin/                       # Helper scripts (e.g. opencode-gh-librarian)
+├── bin/                       # Helper scripts (e.g. opencode-gh-librarian,
+│                              #   zenmux-throttle-proxy)
 ├── agent/                     # Primary agent definitions
 │   ├── frontier-worker.md       # Orchestrator (routing logic)
 │   ├── worker-general.md       # Execution worker
@@ -176,6 +177,37 @@ A local reference setup uses:
 - Specialized subagents for local discovery, remote GitHub research, docs research, architecture walkthroughs, and execution
 
 See `prompts/opencode/opencode.json.example` for the full configuration structure.
+
+### Rate-Limited Providers (ZenMux Throttle Proxy)
+
+Some providers enforce a hard requests-per-minute cap and **stop serving** when you exceed it instead of returning a retryable `429` — for example ZenMux's free `moonshotai/kimi-k2.7-code-free` (10 RPM). OpenCode has no native RPM control, so bursts (agentic tool loops, parallel fan-out skills like `widereview`) will silently fail.
+
+`prompts/opencode/bin/zenmux-throttle-proxy` is a dependency-free Node streaming reverse proxy that enforces the cap at a single chokepoint. It **serializes** requests through a leaky bucket (capacity 1) with a minimum spacing between request starts, so callers that arrive too fast **wait** in the proxy instead of failing. SSE streaming and the `Authorization` header pass through unchanged (your key stays in `{env:ZENMUX_API_KEY}`).
+
+Run it (target a value **below** the real cap for margin):
+
+```bash
+# 9 RPM => one request every ~6.7s; default upstream is https://zenmux.ai/api/v1
+ZENMUX_RPM=9 prompts/opencode/bin/zenmux-throttle-proxy
+```
+
+Then point the provider `baseURL` at the proxy (no trailing `/api/v1` — the proxy prepends the upstream base path):
+
+```json
+"zenmux": {
+  "options": {
+    "apiKey": "{env:ZENMUX_API_KEY}",
+    "baseURL": "http://127.0.0.1:8787"
+  }
+}
+```
+
+Config is via env vars: `ZENMUX_PROXY_PORT` (8787), `ZENMUX_PROXY_HOST` (127.0.0.1), `ZENMUX_UPSTREAM` (`https://zenmux.ai/api/v1`), `ZENMUX_RPM` (9), `ZENMUX_CONCURRENCY` (1), `ZENMUX_QUEUE_MAX` (0 = unbounded), `ZENMUX_UPSTREAM_TIMEOUT_MS` (600000). `GET /healthz` reports live state without consuming a slot.
+
+Notes:
+- The shipped `opencode.json.example` points `zenmux.baseURL` at ZenMux directly — switch it to the proxy **only on machines where you run the proxy**, otherwise that model will fail.
+- Throttling at one process can only bound RPM if **all** traffic funnels through it. Keep rate-limited models on sequential single-agent skills rather than parallel fan-out reviewers.
+- Tested by `tests/zenmux-throttle-proxy.test.js` (`node tests/zenmux-throttle-proxy.test.js`).
 
 ## Supported Agents
 
@@ -811,6 +843,7 @@ Analyzes code for quality issues using established software engineering principl
 - **Gemini CLI (`gemini`)** plus `gemini login` for `ultrareview` and `ultrareview-lite` secondary review lanes
 - **`XAI_API_KEY`** *(or a SuperGrok subscription signed into OpenCode — note the curl workflow still needs the raw API key)*, `curl`, `jq`, and `python3` for OpenCode `imagegen-grok`
 - **`GOOGLE_API_KEY`** (Vertex AI Express), `python3`, and `google-genai` for OpenCode `imagegen-google`
+- **`ZENMUX_API_KEY`** and **Node.js** to run `bin/zenmux-throttle-proxy` when using rate-limited ZenMux models (e.g. `moonshotai/kimi-k2.7-code-free`)
 - The respective coding agent installed and configured
 
 ## Example OpenCode Prompts

@@ -1,0 +1,230 @@
+#!/usr/bin/env node
+
+// zenmux-throttle-proxy — a streaming reverse proxy that enforces a hard
+// requests-per-minute cap in front of an OpenAI-compatible API (default:
+// ZenMux). OpenCode has no native RPM control, and ZenMux's free tier "just
+// stops" when you exceed its limit (no retryable 429), so the only safe
+// strategy is to PREVENT bursts at a single chokepoint that all traffic funnels
+// through.
+//
+// It does this by SERIALIZING requests through a queue with a minimum spacing
+// between request starts (a leaky bucket with capacity 1). Callers that arrive
+// too fast WAIT in the proxy instead of failing — so OpenCode just sees slower,
+// always-successful responses. Response bodies (including SSE streams) are piped
+// through unbuffered.
+//
+// Usage:
+//   prompts/opencode/bin/zenmux-throttle-proxy
+//   ZENMUX_PROXY_PORT=8787 ZENMUX_RPM=9 prompts/opencode/bin/zenmux-throttle-proxy
+//
+// Then point the provider baseURL at it (no trailing /api/v1 — the proxy
+// prepends the upstream base path itself):
+//   "zenmux": { "options": { "baseURL": "http://127.0.0.1:8787", ... } }
+//
+// Config (env vars):
+//   ZENMUX_PROXY_PORT   listen port                         (default 8787)
+//   ZENMUX_PROXY_HOST   listen host                         (default 127.0.0.1)
+//   ZENMUX_UPSTREAM     upstream base URL (incl. /api/v1)   (default https://zenmux.ai/api/v1)
+//   ZENMUX_RPM         target requests/min (set BELOW the
+//                       real cap for margin)                (default 9)
+//   ZENMUX_CONCURRENCY  max in-flight upstream requests      (default 1)
+//   ZENMUX_QUEUE_MAX    max queued requests; 0 = unbounded   (default 0)
+//   ZENMUX_UPSTREAM_TIMEOUT_MS  per-request upstream timeout (default 600000)
+//
+// Auth: the proxy forwards the incoming Authorization header unchanged, so the
+// API key stays in OpenCode's config ({env:ZENMUX_API_KEY}); the proxy never
+// needs to see it directly.
+
+const http = require("http")
+const https = require("https")
+const { URL } = require("url")
+
+const PORT = parseInt(process.env.ZENMUX_PROXY_PORT || "8787", 10)
+const HOST = process.env.ZENMUX_PROXY_HOST || "127.0.0.1"
+const UPSTREAM = (process.env.ZENMUX_UPSTREAM || "https://zenmux.ai/api/v1").replace(/\/+$/, "")
+const RPM = Math.max(1, parseFloat(process.env.ZENMUX_RPM || "9"))
+const CONCURRENCY = Math.max(1, parseInt(process.env.ZENMUX_CONCURRENCY || "1", 10))
+const QUEUE_MAX = Math.max(0, parseInt(process.env.ZENMUX_QUEUE_MAX || "0", 10))
+const UPSTREAM_TIMEOUT_MS = Math.max(0, parseInt(process.env.ZENMUX_UPSTREAM_TIMEOUT_MS || "600000", 10))
+
+// Minimum gap between successive request STARTS, derived from the RPM target.
+const MIN_INTERVAL_MS = Math.ceil(60000 / RPM)
+
+const upstreamUrl = new URL(UPSTREAM)
+const upstreamClient = upstreamUrl.protocol === "http:" ? http : https
+
+function log(...args) {
+  process.stderr.write(`[zenmux-throttle ${new Date().toISOString()}] ${args.join(" ")}\n`)
+}
+
+// ---- Scheduler: leaky bucket (capacity 1) + concurrency cap ----------------
+const queue = []
+let inFlight = 0
+let lastStart = 0
+let timer = null
+
+function pump() {
+  if (queue.length === 0) return
+  if (inFlight >= CONCURRENCY) return
+
+  const now = Date.now()
+  const wait = lastStart + MIN_INTERVAL_MS - now
+  if (wait > 0) {
+    if (timer === null) {
+      timer = setTimeout(() => {
+        timer = null
+        pump()
+      }, wait)
+    }
+    return
+  }
+
+  const job = queue.shift()
+  lastStart = Date.now()
+  inFlight++
+  job.run(() => {
+    inFlight--
+    pump()
+  })
+
+  // More may be runnable (concurrency > 1, or spacing already satisfied).
+  pump()
+}
+
+function schedule(job) {
+  if (QUEUE_MAX > 0 && queue.length >= QUEUE_MAX) {
+    return false
+  }
+  queue.push(job)
+  pump()
+  return true
+}
+
+// ---- HTTP server -----------------------------------------------------------
+const server = http.createServer((req, res) => {
+  // Lightweight health endpoint that does NOT consume a rate-limit slot.
+  if (req.method === "GET" && (req.url === "/healthz" || req.url === "/")) {
+    res.writeHead(200, { "content-type": "application/json" })
+    res.end(
+      JSON.stringify({
+        ok: true,
+        upstream: UPSTREAM,
+        rpm: RPM,
+        minIntervalMs: MIN_INTERVAL_MS,
+        concurrency: CONCURRENCY,
+        queued: queue.length,
+        inFlight,
+      })
+    )
+    return
+  }
+
+  // Buffer the request body so we can replay it to the upstream when the
+  // scheduler releases this job (the original stream would be drained by then).
+  const chunks = []
+  let aborted = false
+  req.on("data", (c) => chunks.push(c))
+  req.on("aborted", () => {
+    aborted = true
+  })
+  req.on("end", () => {
+    if (aborted) return
+    const body = Buffer.concat(chunks)
+
+    const accepted = schedule({
+      run(done) {
+        if (aborted) {
+          done()
+          return
+        }
+        forward(req, res, body, done)
+      },
+    })
+
+    if (!accepted) {
+      res.writeHead(503, { "content-type": "application/json", "retry-after": "5" })
+      res.end(JSON.stringify({ error: { message: "throttle queue full", type: "proxy_overloaded" } }))
+    }
+  })
+})
+
+function forward(req, res, body, done) {
+  let finished = false
+  const finish = () => {
+    if (finished) return
+    finished = true
+    done()
+  }
+
+  const headers = Object.assign({}, req.headers)
+  delete headers.host
+  delete headers["content-length"] // re-derived below
+  if (body.length > 0) headers["content-length"] = String(body.length)
+
+  const targetPath = (upstreamUrl.pathname.replace(/\/+$/, "")) + req.url
+
+  const options = {
+    protocol: upstreamUrl.protocol,
+    hostname: upstreamUrl.hostname,
+    port: upstreamUrl.port || (upstreamUrl.protocol === "http:" ? 80 : 443),
+    method: req.method,
+    path: targetPath,
+    headers: Object.assign({}, headers, { host: upstreamUrl.host }),
+  }
+
+  const upstreamReq = upstreamClient.request(options, (upstreamRes) => {
+    res.writeHead(upstreamRes.statusCode || 502, upstreamRes.headers)
+    upstreamRes.pipe(res) // stream through, unbuffered (SSE-safe)
+    upstreamRes.on("end", finish)
+    upstreamRes.on("error", () => {
+      res.destroy()
+      finish()
+    })
+  })
+
+  if (UPSTREAM_TIMEOUT_MS > 0) {
+    upstreamReq.setTimeout(UPSTREAM_TIMEOUT_MS, () => {
+      upstreamReq.destroy(new Error("upstream timeout"))
+    })
+  }
+
+  upstreamReq.on("error", (err) => {
+    if (!res.headersSent) {
+      res.writeHead(502, { "content-type": "application/json" })
+      res.end(JSON.stringify({ error: { message: `upstream error: ${err.message}`, type: "proxy_upstream_error" } }))
+    } else {
+      res.destroy()
+    }
+    log("upstream error:", err.message)
+    finish()
+  })
+
+  // If the client hangs up, abort the upstream call too.
+  res.on("close", () => {
+    if (!finished) upstreamReq.destroy()
+  })
+
+  if (body.length > 0) upstreamReq.write(body)
+  upstreamReq.end()
+}
+
+server.listen(PORT, HOST, () => {
+  log(
+    `listening on http://${HOST}:${PORT} -> ${UPSTREAM} | ` +
+      `${RPM} rpm (1 every ${MIN_INTERVAL_MS}ms), concurrency=${CONCURRENCY}` +
+      (QUEUE_MAX > 0 ? `, queueMax=${QUEUE_MAX}` : ", queue=unbounded")
+  )
+})
+
+server.on("error", (err) => {
+  log("server error:", err.message)
+  process.exit(1)
+})
+
+for (const sig of ["SIGINT", "SIGTERM"]) {
+  process.on(sig, () => {
+    log(`received ${sig}, shutting down`)
+    server.close(() => process.exit(0))
+    setTimeout(() => process.exit(0), 2000).unref()
+  })
+}

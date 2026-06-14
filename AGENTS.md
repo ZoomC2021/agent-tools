@@ -13,8 +13,10 @@ Guidance for coding agents working in this repository.
 - `prompts/`: Agent prompts, workflows, and eval fixtures.
 - `prompts/opencode/evals/`: OpenCode eval harness (`scenarios.json`, `variants.json`, fixtures, and run outputs under `out/`).
 - `scripts/install.sh` and `scripts/install.ps1`: Installer logic for all supported agent targets.
+- `prompts/opencode/bin/zenmux-throttle-proxy`: Streaming reverse proxy that enforces a hard requests-per-minute cap in front of a rate-limited OpenAI-compatible provider (e.g. ZenMux). See the "Rate-Limited Providers" section in `README.md`.
 - `README.md`: Source of truth for supported workflows and installation instructions.
 - `tests/test_utils.py`: Regression tests for `utils.py`.
+- `tests/zenmux-throttle-proxy.test.js`: Node test for the throttle proxy (pacing, concurrency cap, queue-not-fail, SSE passthrough); runs fully locally with no network or API key.
 
 ## Editing Rules
 
@@ -51,6 +53,12 @@ python tests/test_utils.py
 
 # Optional, if pytest is available
 pytest tests/test_utils.py
+```
+
+When changing `prompts/opencode/bin/zenmux-throttle-proxy`, run its test (no network/API key required):
+
+```bash
+node tests/zenmux-throttle-proxy.test.js
 ```
 
 For prompt/doc-only changes:
