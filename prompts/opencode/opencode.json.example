@@ -501,6 +501,17 @@
         "baseURL": "https://token-plan-ams.xiaomimimo.com/v1"
       },
       "models": {
+        "mimo-v2.5": {
+          "name": "MiMo v2.5 (Xiaomi)",
+          "limit": {
+            "context": 1000000,
+            "output": 256000
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        },
         "mimo-v2.5-pro": {
           "name": "MiMo v2.5 Pro (Xiaomi)",
           "limit": {
@@ -723,14 +734,14 @@
       }
     }
   },
-  "model": "xiaomi/mimo-v2.5-pro",
+  "model": "xiaomi/mimo-v2.5",
   "default_agent": "build",
   "mode": {
     "plan": {
       "model": "openai/gpt-5.5"
     },
     "build": {
-      "model": "xiaomi/mimo-v2.5-pro"
+      "model": "xiaomi/mimo-v2.5"
     }
   },
   "agent": {
@@ -739,13 +750,13 @@
       "reasoningEffort": "low"
     },
     "title": {
-      "model": "xiaomi/mimo-v2.5-pro"
+      "model": "xiaomi/mimo-v2.5"
     },
     "summary": {
-      "model": "xiaomi/mimo-v2.5-pro"
+      "model": "xiaomi/mimo-v2.5"
     },
     "compaction": {
-      "model": "xiaomi/mimo-v2.5-pro"
+      "model": "xiaomi/mimo-v2.5"
     },
     "code-review": {
       "model": "openai/gpt-5.5",
@@ -813,7 +824,7 @@
     "github-librarian": {
       "description": "Read-only remote GitHub code research on default branches with lightweight history.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./agent/github-librarian.md}",
       "permission": {
@@ -827,7 +838,7 @@
     "docs-research": {
       "description": "Research official documentation, API behavior, and release notes.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./agent/docs-research.md}",
       "permission": {
@@ -842,7 +853,7 @@
     "walkthrough": {
       "description": "Explain local architecture and generate Mermaid walkthroughs.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./agent/walkthrough.md}",
       "permission": {
@@ -883,7 +894,7 @@
     "ultrareview": {
       "description": "Parallel dual-model review using GPT 5.5 (OpenCode) AND Gemini 3.1 Pro Preview (Gemini CLI with helper-managed bundling/chunking/retries).",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/ultrareview.md}"
     },
@@ -891,105 +902,105 @@
       "description": "Parallel dual-model review using MiMo v2.5 Pro (OpenCode) AND Gemini 3 Flash Preview (Gemini CLI with helper-managed bundling/chunking/retries).",
 
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/ultrareview-lite.md}"
     },
     "widereview": {
       "description": "Wide fan-out review across four cheap-model CLIs (Grok Composer 2.5 via grok, Qwen3.7-Max via qodercli, MiMo v2.5 Pro via opencode, MiMo v2.5 Pro via cmd) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (--full).",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/widereview.md}"
     },
     "cc": {
       "description": "Execute Claude CLI commands and code reviews from OpenCode via the Agent SDK CLI.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/cc.md}"
     },
     "refactor": {
       "description": "Analyze and prioritize refactoring opportunities.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/refactor.md}"
     },
     "deslop": {
       "description": "Detect and prioritize code quality violations.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/deslop.md}"
     },
     "diagnose": {
       "description": "Debug bugs and performance regressions with a disciplined reproduce/minimize/hypothesize/instrument/fix/regression-test loop.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/diagnose.md}"
     },
     "tdd": {
       "description": "Build features or fixes using a test-driven red-green-refactor workflow.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/tdd.md}"
     },
     "grill-me": {
       "description": "Stress-test a plan or design through structured questioning before implementation.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/grill-me.md}"
     },
     "to-prd": {
       "description": "Convert current context into a product requirements document.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/to-prd.md}"
     },
     "to-issues": {
       "description": "Break a plan or PRD into independently shippable vertical-slice issues.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/to-issues.md}"
     },
     "triage": {
       "description": "Triage issues through a state machine of readiness roles.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/triage.md}"
     },
     "create-cli": {
       "description": "Design CLI UX/specs covering args, flags, help, output, errors, config, dry-run, and exit codes.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/create-cli.md}"
     },
     "frontend-design": {
       "description": "Build distinctive production frontend UI for pages, apps, and components without generic AI-slop design.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/frontend-design.md}"
     },
     "markdown-converter": {
       "description": "Convert PDFs, Office docs, HTML, data files, media, ZIPs, and YouTube URLs to Markdown using markitdown.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/markdown-converter.md}"
     },
     "agent-browser": {
       "description": "Use the agent-browser CLI for browser automation, screenshots, web app QA, Electron/Slack automation, and cloud browser sessions.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/agent-browser.md}",
       "permission": {
@@ -1019,28 +1030,28 @@
     "pr-reviewer": {
       "description": "Fetch PR feedback and apply fixes on the PR branch.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/pr-reviewer.md}"
     },
     "pr-reviewer-only": {
       "description": "Fetch PR feedback and produce an implementation prompt.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/pr-reviewer-only.md}"
     },
     "create-pr": {
       "description": "Create a pull request from current git changes.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/create-pr.md}"
     },
     "spec-compiler": {
       "description": "Compile Execution Contract before implementation work.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/spec-compiler.md}"
     },
@@ -1079,7 +1090,7 @@
     "quick-validator": {
       "description": "Run quick validation checks on implementation output.",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/quick-validator.md}"
     },
@@ -1108,7 +1119,7 @@
     "plan-review": {
       "description": "Binary validation of Execution Contracts (Momus-style: approve 80% clear plans, reject only true blockers).",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/plan-review.md}",
       "permission": {
@@ -1124,7 +1135,7 @@
     "handoff": {
       "description": "Generate handoff context for continuing work in a new session",
       "mode": "subagent",
-      "model": "xiaomi/mimo-v2.5-pro",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/handoff.md}",
       "permission": {
