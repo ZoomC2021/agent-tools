@@ -321,7 +321,8 @@ function Test-OpenCodeInstallation {
         "pr-reviewer.md",
         "change-auditor.md",
         "deslop.md",
-        "create-pr.md"
+        "create-pr.md",
+        "cp.md"
     )
 
     foreach ($file in $requiredCommandFiles) {

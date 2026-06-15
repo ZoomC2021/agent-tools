@@ -781,6 +781,7 @@
           "pr-reviewer": "allow",
           "pr-reviewer-only": "allow",
           "create-pr": "allow",
+          "cp": "allow",
           "oracle": "allow",
           "spec-compiler": "allow",
           "quick-validator": "allow",
@@ -809,6 +810,7 @@
           "pr-reviewer": "allow",
           "pr-reviewer-only": "allow",
           "create-pr": "allow",
+          "cp": "allow",
           "oracle": "allow",
           "spec-compiler": "allow",
           "quick-validator": "allow",
@@ -1047,6 +1049,13 @@
       "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./commands/create-pr.md}"
+    },
+    "cp": {
+      "description": "Commit current work with meaningful boundaries and push to origin.",
+      "mode": "subagent",
+      "model": "xiaomi/mimo-v2.5",
+      "hidden": true,
+      "prompt": "{file:./commands/cp.md}"
     },
     "spec-compiler": {
       "description": "Compile Execution Contract before implementation work.",
