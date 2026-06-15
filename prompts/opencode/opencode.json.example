@@ -732,6 +732,25 @@
           }
         }
       }
+    },
+    "zerog": {
+      "options": {
+        "apiKey": "{env:ZEROG_API_KEY}",
+        "baseURL": "https://router-api.0g.ai/v1"
+      },
+      "models": {
+        "minimax-m3": {
+          "name": "MiniMax-M3 (0G Router)",
+          "limit": {
+            "context": 1000000,
+            "output": 256000
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        }
+      }
     }
   },
   "model": "xiaomi/mimo-v2.5",
