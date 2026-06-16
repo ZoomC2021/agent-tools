@@ -36,6 +36,15 @@ FW_DIR="$(mktemp -d)"                                              # scratch for
 - `cmd` (Command Code) — required. `command -v cmd`. If missing, stop and tell the user the worker is unavailable.
 - `agy` (Antigravity CLI) — optional. `command -v agy`. If missing, **skip Reviewer B** and run with your review only; note it in the final report.
 
+## Concurrent Work Safety
+
+Assume the user and other agents may be editing the same worktree at the same time. Your job is to preserve their work while completing only the requested task.
+
+- Before every Worker call, include this constraint in the brief: **do not revert, reset, overwrite, delete, reformat, or "clean up" changes you did not make; work around unrelated modified files and mention blockers instead of discarding them.**
+- Tell the Worker to inspect `git status --short` before editing and to keep edits limited to the files and hunks needed for the assigned step.
+- Never run or ask a Worker to run destructive git commands such as `git reset --hard`, `git checkout -- .`, `git restore .`, broad `git clean`, or equivalent commands unless the user explicitly asks for that exact cleanup.
+- When capturing/reviewing the bundle, distinguish the Worker-owned changes from pre-existing unrelated changes. Review and iterate only on Worker-owned changes; do not route fixes that would revert someone else's work.
+
 A portable, **SIGKILL-capable** timeout wrapper (stock macOS has no `timeout`; some CLIs ignore softer signals):
 
 ```bash
@@ -72,7 +81,7 @@ fw_timeout() {
 
 ## Phase 1: Delegate Implementation to the Worker
 
-For each step, write a **self-contained brief** — the worker shares none of your context. Include: the goal, exact files/paths, relevant code excerpts or signatures, constraints, and a crisp definition of done. Then invoke `cmd` in print mode (it operates on the current working directory):
+For each step, write a **self-contained brief** — the worker shares none of your context. Include: the goal, exact files/paths, relevant code excerpts or signatures, concurrent-work safety constraints from above, and a crisp definition of done. Then invoke `cmd` in print mode (it operates on the current working directory):
 
 ```bash
 read -r -d '' WORKER_BRIEF <<'EOF'
