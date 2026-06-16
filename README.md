@@ -6,6 +6,7 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 
 | Workflow | Description |
 |----------|-------------|
+| **frontier-worker** | *(Claude Code & Codex)* Orchestrate a task: delegate **all** exploration and coding to the `cmd` CLI (MiniMax-M3-Free), then dual-review every change with a clean-context host subagent **and** an independent `agy` reviewer (Gemini 3.1 Pro High), looping fixes until clean |
 | **refactor** | Analyze codebase for refactoring opportunities, prioritize by severity/effort |
 | **review** | Review uncommitted changes for bugs, regressions, and improvements |
 | **ultrareview** | Parallel dual-model review using GPT 5.5 + Gemini 3.1 Pro Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
@@ -21,6 +22,41 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 | **github-librarian** | Read-only remote GitHub code research on default-branch snapshots |
 | **docs-research** | Research official documentation and external API behavior using web sources |
 | **walkthrough** | Explain local architecture and code flow with evidence-backed walkthroughs |
+
+## Frontier Worker (Claude Code & Codex)
+
+A flexible, CLI-driven variant of the OpenCode `frontier-worker` orchestrator. Here the **host CLI (Claude Code or Codex) is the orchestrator**: it plans and routes but delegates **all** investigation and coding to the `cmd` CLI, then reviews every change with two independent reviewers in parallel. Because neither `cmd` nor `agy` exposes ACP or an SDK, both are driven one-shot via their `--print` modes.
+
+Invoke with `/frontier-worker <task>` (Claude Code) or the `frontier-worker` skill (Codex).
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Orchestrator = host CLI (Claude Code / Codex)               │
+│  • Plans & sequences  • Writes briefs  • Consolidates review │
+│  • Never reads/edits project files itself                    │
+└───────────┬───────────────────────┬──────────────────────────┘
+            │ explore + code        │ dual review (parallel)
+   ┌────────▼─────────┐    ┌─────────▼──────────┬───────────────┐
+   │ cmd  (MiniMax-   │    │ clean-context      │ agy           │
+   │ M3-Free)         │    │ subagent           │ (Gemini 3.1   │
+   │ • plan mode =    │    │ (Task tool /       │  Pro High)    │
+   │   read-only      │    │  Codex multi-agent)│ independent   │
+   │   exploration    │    │ reviews the diff   │ reviewer      │
+   │ • --yolo = edits │    └────────────────────┴───────────────┘
+   └──────────────────┘
+```
+
+| Role | CLI / mechanism | Model |
+|------|-----------------|-------|
+| Orchestrator | host (Claude Code / Codex) | — |
+| Explorer (read-only) | `cmd -p --permission-mode plan` | `MiniMaxAI/MiniMax-M3-Free` |
+| Worker (coding) | `cmd -p --yolo` | `MiniMaxAI/MiniMax-M3-Free` |
+| Reviewer A (clean context) | Claude `Task` subagent / Codex multi-agent (`codex exec` fallback) | host default |
+| Reviewer B (independent) | `agy -p` | `Gemini 3.1 Pro (High)` |
+
+**Flexible knobs** (env overrides): `FW_WORKER_MODEL`, `FW_REVIEW_MODEL`, `FW_TIMEOUT`, `FW_MAX_TURNS`, `FW_MAX_ITERS`.
+
+**Notes**: `cmd` is required; `agy` is optional (missing → host-subagent review only). `agy` must run inside a directory listed in `trustedWorkspaces` (`~/.gemini/antigravity-cli/settings.json`) or it blocks on a trust prompt. Never print or copy provider API keys — reference model ids only.
 
 ## Opencode GPT-5.5 Worker Setup (Primary Agent Architecture)
 
