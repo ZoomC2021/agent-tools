@@ -253,6 +253,7 @@ Config is via env vars: `ZENMUX_PROXY_PORT` (8787), `ZENMUX_PROXY_HOST` (127.0.0
 
 Notes:
 - The shipped `opencode.json.example` points providers at upstreams directly — switch a provider to the proxy **only on machines where you run the proxy**, otherwise that model will fail.
+- For Pi, use `scripts/pi-zenmux.sh [pi args...]` (or local alias `pi-zenmux`). It starts/reuses the proxy, creates a temporary Pi config with `zenmux.baseUrl` set to `http://127.0.0.1:8787/zenmux`, and launches `pi --provider zenmux --model z-ai/glm-5.2-free` by default without mutating `~/.pi/agent/models.json`.
 - Throttling at one process can only bound RPM if **all** traffic for that provider funnels through it. Multiple providers can share this one proxy process because each provider has its own queue and timer.
 - Tested by `tests/zenmux-throttle-proxy.test.js` (`node tests/zenmux-throttle-proxy.test.js`).
 
