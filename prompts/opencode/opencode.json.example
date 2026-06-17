@@ -541,6 +541,17 @@
             "input": ["text"],
             "output": ["text"]
           }
+        },
+        "z-ai/glm-5.2-free": {
+          "name": "GLM-5.2 Free (ZenMux)",
+          "limit": {
+            "context": 1000000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
         }
       }
     },

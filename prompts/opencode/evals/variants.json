@@ -72,7 +72,7 @@
     },
     {
       "name": "worker-explore-kimi-k27-zenmux-proxy",
-      "description": "Direct worker-explore eval using ZenMux moonshotai/kimi-k2.7-code-free through the local 9-RPM throttle proxy (zenmux/moonshotai/kimi-k2.7-code-free, baseURL 127.0.0.1:8787).",
+      "description": "Direct worker-explore eval using ZenMux moonshotai/kimi-k2.7-code-free through the local 9-RPM throttle proxy (zenmux/moonshotai/kimi-k2.7-code-free, baseURL 127.0.0.1:8787/zenmux).",
       "configOverrides": {
         "agent.worker-explore.mode": "primary",
         "agent.worker-explore.hidden": false,
@@ -575,6 +575,29 @@
         "agent/worker-general.md": {
           "mode": "primary",
           "model": "zenmux/moonshotai/kimi-k2.7-code-free"
+        }
+      }
+    },
+    {
+      "name": "matrix-glm-5.2-free-zenmux-9rpm",
+      "description": "Reference-matrix variant: both worker-explore and worker-general -> zenmux/z-ai/glm-5.2-free (1M ctx reasoning model, served through the local 9-RPM throttle proxy).",
+      "configOverrides": {
+        "agent.worker-explore.mode": "primary",
+        "agent.worker-explore.hidden": false,
+        "agent.worker-explore.model": "zenmux/z-ai/glm-5.2-free",
+        "agent.worker-explore.permission.bash": "allow",
+        "agent.worker-general.mode": "primary",
+        "agent.worker-general.hidden": false,
+        "agent.worker-general.model": "zenmux/z-ai/glm-5.2-free"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-explore.md": {
+          "mode": "primary",
+          "model": "zenmux/z-ai/glm-5.2-free"
+        },
+        "agent/worker-general.md": {
+          "mode": "primary",
+          "model": "zenmux/z-ai/glm-5.2-free"
         }
       }
     },

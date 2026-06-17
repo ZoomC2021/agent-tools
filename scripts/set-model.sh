@@ -71,6 +71,8 @@ display_name() {
         openai/gpt-5.5)                    echo "GPT-5.5" ;;
         xai/grok-imagine-image-quality)    echo "xAI Grok Imagine Image Quality" ;;
         google/gemini-3-pro-image-preview) echo "Gemini 3 Pro Image Preview" ;;
+        zenmux/z-ai/glm-5.2-free)          echo "GLM-5.2 Free (ZenMux)" ;;
+        zenmux/moonshotai/kimi-k2.7-code-free) echo "Kimi K2.7 Code Free (ZenMux)" ;;
         *)                                 echo "" ;;  # signal: unknown
     esac
 }
