@@ -77,13 +77,15 @@ install_codex() {
     log_info "Installing Codex skills..."
     local source_dir="$PROMPTS_DIR/codex"
     local dest="$HOME/.codex/skills"
+    local codex_home="$HOME/.codex"
+    local codex_config="$codex_home/config.toml"
 
     if [[ ! -d "$source_dir" ]]; then
         log_warn "Source directory not found: $source_dir"
         return 0
     fi
 
-    mkdir -p "$dest"
+    mkdir -p "$dest" "$codex_home"
 
     shopt -s nullglob
     local files=("$source_dir"/*.md)
@@ -103,6 +105,37 @@ install_codex() {
     done
 
     log_success "Codex skills: $dest"
+
+    if [[ ! -f "$codex_config" ]]; then
+        touch "$codex_config"
+    fi
+
+    if grep -Eq '^\[model_providers\.ccapi\]' "$codex_config"; then
+        log_warn "Codex ccapi provider already exists in $codex_config; leaving it unchanged"
+    else
+        cat >>"$codex_config" <<'EOF'
+
+# Added by agent-tools: ccapi.us OpenAI-compatible endpoint for Codex.
+# Set CCAPI_API_KEY in your environment before using this provider.
+[model_providers.ccapi]
+name = "ccapi"
+base_url = "https://api-direct.ccapi.us/v1"
+env_key = "CCAPI_API_KEY"
+wire_api = "responses"
+EOF
+        log_success "Codex ccapi provider: $codex_config"
+    fi
+
+    local profile_ccapi="$codex_home/ccapi.config.toml"
+    if [[ -f "$profile_ccapi" ]]; then
+        log_warn "Codex profile already exists: $profile_ccapi"
+    else
+        cat >"$profile_ccapi" <<'EOF'
+model_provider = "ccapi"
+model = "gpt-5.5"
+EOF
+        log_success "Codex ccapi provider profile: $profile_ccapi"
+    fi
 }
 
 # Install OpenCode commands and agent files

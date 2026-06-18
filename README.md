@@ -280,6 +280,27 @@ Notes:
 | [cmd](https://commandcode.ai) | CLI | `~/.commandcode/skills/` |
 | [Windsurf](https://codeium.com/windsurf) | Editor | `~/.codeium/windsurf/skills/` |
 
+### Codex ccapi Provider
+
+The Codex installer also adds a persistent custom provider for the ccapi.us OpenAI-compatible endpoint in `~/.codex/config.toml`:
+
+```toml
+[model_providers.ccapi]
+name = "ccapi"
+base_url = "https://api-direct.ccapi.us/v1"
+env_key = "CCAPI_API_KEY"
+wire_api = "responses"
+```
+
+Codex's model picker changes only the model name, not the provider, so provider-specific entries such as `ccapi/gpt-5.5` are not supported. Launch with the ccapi profile first; then selecting `gpt-5.5` or `gpt-5.4` in the normal picker routes that model through ccapi:
+
+```bash
+export CCAPI_API_KEY=sk-...
+codex --profile ccapi
+```
+
+For one-off full-access sessions without installing the profile, use `scripts/codex-ccapi.sh` with `--model gpt-5.5` or `--model gpt-5.4`.
+
 ## Quick Install
 
 ### All Agents
@@ -320,6 +341,20 @@ for file in prompts/codex/*.md; do
   mkdir -p "$HOME/.codex/skills/$skill_name"
   cp "$file" "$HOME/.codex/skills/$skill_name/SKILL.md"
 done
+
+cat >> ~/.codex/config.toml <<'EOF'
+
+[model_providers.ccapi]
+name = "ccapi"
+base_url = "https://api-direct.ccapi.us/v1"
+env_key = "CCAPI_API_KEY"
+wire_api = "responses"
+EOF
+
+cat > ~/.codex/ccapi.config.toml <<'EOF'
+model_provider = "ccapi"
+model = "gpt-5.5"
+EOF
 ```
 </details>
 
@@ -554,6 +589,20 @@ for file in prompts/codex/*.md; do
   mkdir -p "$HOME/.codex/skills/$skill_name"
   cp "$file" "$HOME/.codex/skills/$skill_name/SKILL.md"
 done
+
+cat >> ~/.codex/config.toml <<'EOF'
+
+[model_providers.ccapi]
+name = "ccapi"
+base_url = "https://api-direct.ccapi.us/v1"
+env_key = "CCAPI_API_KEY"
+wire_api = "responses"
+EOF
+
+cat > ~/.codex/ccapi.config.toml <<'EOF'
+model_provider = "ccapi"
+model = "gpt-5.5"
+EOF
 ```
 </details>
 
