@@ -2,6 +2,7 @@
 description: Validate each milestone before advancing to the next one
 mode: subagent
 model: openai/gpt-5.5
+reasoningEffort: high
 permission:
   task:
     '*': deny

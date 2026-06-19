@@ -1,6 +1,6 @@
 # Agent targets
 
-The 14 AI coding agent platforms supported by agent-tools.
+The 13 AI coding agent platforms supported by agent-tools.
 
 ## Overview
 
@@ -17,7 +17,6 @@ The 14 AI coding agent platforms supported by agent-tools.
 | [Amp](amp.md) | CLI/Editor | `prompts/amp/` | SKILL.md |
 | [Gemini CLI](gemini.md) | CLI | `prompts/gemini/` | SKILL.md |
 | [Kilo Code](kilocode.md) | CLI | `prompts/kilocode/` | Markdown |
-| [VSCode Copilot](vscode-copilot.md) | Editor | `prompts/vscode-copilot/` | .agent.md |
 | [Copilot CLI](copilot-cli.md) | CLI | `prompts/copilot-cli/` | Markdown |
 | [Antigravity](antigravity.md) | Editor | `prompts/antigravity/` | Markdown |
 
@@ -35,7 +34,6 @@ The 14 AI coding agent platforms supported by agent-tools.
 | Warp | `~/.warp/workflows/` |
 | Windsurf | `~/.codeium/windsurf/skills/` |
 | Amp | `~/.config/agents/skills/` |
-| VSCode Copilot | `~/Library/Application Support/Code/User/prompts/` |
 | Antigravity | `~/Library/Application Support/Antigravity/User/prompts/` |
 
 ### Linux
@@ -50,21 +48,20 @@ The 14 AI coding agent platforms supported by agent-tools.
 | Warp | `${XDG_DATA_HOME:-$HOME/.local/share}/warp-terminal/workflows/` |
 | Windsurf | `~/.codeium/windsurf/skills/` |
 | Amp | `~/.config/agents/skills/` |
-| VSCode Copilot | `~/.config/Code/User/prompts/` |
 | Antigravity | `~/.antigravity/prompts/` |
 
 ## Workflow coverage by agent
 
 | Workflow | Count |
 |----------|-------|
-| review | 14/14 |
-| refactor | 14/14 |
-| create-pr | 14/14 |
-| pr-reviewer | 14/14 |
-| deslop | 13/14 |
-| ultrareview | 9/14 |
-| handoff | 8/14 |
-| predict-issues | 3/14 |
+| review | 13/13 |
+| refactor | 13/13 |
+| create-pr | 13/13 |
+| pr-reviewer | 13/13 |
+| deslop | 12/13 |
+| ultrareview | 8/13 |
+| handoff | 7/13 |
+| predict-issues | 2/13 |
 
 ## Related pages
 

@@ -68,7 +68,7 @@ How to verify these changes
 ```
 
 ### Other agents
-Available in all 14 agent targets. See [Agent targets](../agent-targets/index.md).
+Available in all 13 agent targets. See [Agent targets](../agent-targets/index.md).
 
 ## Safety notes
 

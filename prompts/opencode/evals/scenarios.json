@@ -105,6 +105,53 @@
       }
     },
     {
+      "id": "implementation-sandbox-task-outcome",
+      "description": "Exercise the additive implementation task using portable task-outcome checks without OpenCode-specific routing assertions.",
+      "agent": "frontier-worker",
+      "prompt": "Add a new exported `multiply(a, b)` helper in `src/math.js`, add tests for it, and keep the existing `sum` behavior unchanged.",
+      "tags": [
+        "codex",
+        "implementation",
+        "sandbox",
+        "task-outcome"
+      ],
+      "sandbox": {
+        "copyFrom": "${REPO_ROOT}/evals/fixtures/tiny-js-app"
+      },
+      "workingDirectory": "${SCENARIO_WORKDIR}",
+      "expectations": {
+        "exitCode": 0,
+        "fileContains": [
+          {
+            "path": "src/math.js",
+            "includes": [
+              "multiply"
+            ]
+          },
+          {
+            "path": "test/math.test.js",
+            "includes": [
+              "multiply"
+            ]
+          }
+        ],
+        "workspaceCommands": [
+          {
+            "command": "npm test",
+            "exitCode": 0,
+            "outputRegex": [
+              "(#|ℹ) fail 0\\b",
+              "(#|ℹ) pass [1-9][0-9]*\\b"
+            ]
+          },
+          {
+            "command": "node -e \"const { sum, multiply } = require('./src/math'); if (sum(2,3) !== 5) process.exit(1); if (multiply(4,5) !== 20) process.exit(2);\"",
+            "exitCode": 0
+          }
+        ]
+      }
+    },
+    {
       "id": "mission-plan-readonly",
       "description": "Exercise the mission workflow planning path without changing files.",
       "agent": "frontier-worker",

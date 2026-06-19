@@ -36,7 +36,7 @@ Code quality audit workflow. Named after the open-source deslop utility. Analyze
 Workflow that generates context for continuing work in a new session. Captures current state and pending tasks.
 
 **Oracle**
-Deep reasoning subagent using GPT-5.5 with low reasoning effort. Consulted for complex problems after consecutive failures.
+Deep reasoning subagent using GPT-5.5 with high reasoning effort. Consulted for complex problems after consecutive failures.
 
 ## Technical terms
 

@@ -546,52 +546,6 @@ install_antigravity() {
     fi
 }
 
-# Install VSCode Copilot prompts
-install_vscode_copilot() {
-    log_info "Installing VSCode Copilot prompts..."
-    local source_dir="$PROMPTS_DIR/vscode-copilot"
-    
-    if [[ ! -d "$source_dir" ]]; then
-        log_warn "Source directory not found: $source_dir"
-        return 0
-    fi
-    
-    # Enable nullglob to handle case where no files exist
-    shopt -s nullglob
-    local files=("$source_dir"/*.md)
-    shopt -u nullglob
-    
-    if [[ ${#files[@]} -eq 0 ]]; then
-        log_warn "No .md files found in $source_dir"
-        return 0
-    fi
-    
-    # Linux path
-    local linux_dest="$HOME/.config/Code - Insiders/User/prompts"
-    mkdir -p "$linux_dest"
-    cp "$source_dir"/*.md "$linux_dest/"
-    log_success "VSCode Copilot (Linux): $linux_dest"
-    
-    # Also install to regular VSCode
-    local linux_dest_regular="$HOME/.config/Code/User/prompts"
-    mkdir -p "$linux_dest_regular"
-    cp "$source_dir"/*.md "$linux_dest_regular/"
-    log_success "VSCode Copilot Regular (Linux): $linux_dest_regular"
-    
-    # macOS paths
-    if [[ "$OS" == "macos" ]]; then
-        local macos_dest="$HOME/Library/Application Support/Code - Insiders/User/prompts"
-        mkdir -p "$macos_dest"
-        cp "$source_dir"/*.md "$macos_dest/"
-        log_success "VSCode Copilot Insiders (macOS): $macos_dest"
-        
-        local macos_dest_regular="$HOME/Library/Application Support/Code/User/prompts"
-        mkdir -p "$macos_dest_regular"
-        cp "$source_dir"/*.md "$macos_dest_regular/"
-        log_success "VSCode Copilot Regular (macOS): $macos_dest_regular"
-    fi
-}
-
 # Install Copilot CLI agents
 install_copilot_cli() {
     log_info "Installing Copilot CLI agents..."
@@ -945,7 +899,6 @@ main() {
     install_opencode
     install_antigravity
     install_agy
-    install_vscode_copilot
     install_copilot_cli
     install_cmd
     install_grok
@@ -1000,7 +953,6 @@ else
             opencode) install_opencode ;;
             antigravity) install_antigravity ;;
             agy) install_agy ;;
-            vscode|vscode-copilot) install_vscode_copilot ;;
             copilot-cli) install_copilot_cli ;;
             cmd) install_cmd ;;
             grok) install_grok ;;

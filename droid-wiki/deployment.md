@@ -133,7 +133,6 @@ jq -e . prompts/opencode/opencode.json.example
 | Cursor | `~/.cursor/commands/` |
 | Cline | `~/Documents/Cline/Rules/` |
 | Warp | `~/.warp/workflows/` |
-| VSCode Copilot | `~/Library/Application Support/Code/User/prompts/` |
 | Windsurf | `~/.codeium/windsurf/skills/` |
 | Gemini CLI | `~/.gemini/skills/` |
 
@@ -146,7 +145,6 @@ jq -e . prompts/opencode/opencode.json.example
 | Cursor | `~/.cursor/commands/` |
 | Cline | `~/Documents/Cline/Rules/` |
 | Warp | `~/.local/share/warp-terminal/workflows/` |
-| VSCode Copilot | `~/.config/Code/User/prompts/` |
 | Windsurf | `~/.codeium/windsurf/skills/` |
 | Gemini CLI | `~/.gemini/skills/` |
 | Pi | `~/.pi/agent/prompts/` |

@@ -2,7 +2,7 @@
 description: Invoke GPT-5.5 for deep reasoning when stuck on complex problems
 mode: subagent
 model: openai/gpt-5.5
-reasoningEffort: low
+reasoningEffort: high
 permission:
   task:
     '*': deny

@@ -56,7 +56,7 @@ Unlike generic linters, deslop:
 ```
 
 ### Other agents
-Available in 14 agent targets (all except Warp). See [Agent targets](../agent-targets/index.md).
+Available in 12 agent targets (all except Warp). See [Agent targets](../agent-targets/index.md).
 
 ## Origin
 

@@ -268,7 +268,6 @@ Notes:
 | [Warp](https://www.warp.dev) | CLI/Editor | `~/.warp/workflows/` or `${XDG_DATA_HOME:-$HOME/.local/share}/warp-terminal/workflows/` or `%APPDATA%\warp\Warp\data\workflows\` |
 | [Antigravity](https://antigravity.dev) | Editor | `~/.antigravity/prompts/` or `~/Library/.../Antigravity/User/prompts/` |
 | [agy](https://antigravity.dev) | CLI | `~/.gemini/antigravity-cli/skills/` |
-| [VSCode Copilot](https://github.com/features/copilot) | Editor | `~/.config/Code/User/prompts/` or `~/Library/.../Code/User/prompts/` |
 | [Copilot CLI](https://githubnext.com/projects/copilot-cli) | CLI | `~/.copilot/agents/` |
 | [Amp](https://ampcode.com) | CLI/Editor | `~/.config/agents/skills/` |
 | [Gemini CLI](https://github.com/google-gemini/gemini-cli) | CLI | `~/.gemini/skills/` |
@@ -317,7 +316,7 @@ cd agent-tools
 ./scripts/install.sh claude codex amp warp
 ```
 
-Available options: `claude`, `codex`, `opencode`, `pi`, `warp`, `antigravity`, `agy`, `vscode`, `copilot-cli`, `cmd`, `grok`, `amp`, `gemini`, `droid`, `kilocode`, `cursor`, `cline`, `windsurf`
+Available options: `claude`, `codex`, `opencode`, `pi`, `warp`, `antigravity`, `agy`, `copilot-cli`, `cmd`, `grok`, `amp`, `gemini`, `droid`, `kilocode`, `cursor`, `cline`, `windsurf`
 
 ## Manual Installation
 
@@ -445,20 +444,6 @@ done
 </details>
 
 <details>
-<summary>VSCode Copilot</summary>
-
-```bash
-# VSCode Insiders
-mkdir -p ~/Library/Application\ Support/Code\ -\ Insiders/User/prompts
-cp prompts/vscode-copilot/*.md ~/Library/Application\ Support/Code\ -\ Insiders/User/prompts/
-
-# VSCode Regular
-mkdir -p ~/Library/Application\ Support/Code/User/prompts
-cp prompts/vscode-copilot/*.md ~/Library/Application\ Support/Code/User/prompts/
-```
-</details>
-
-<details>
 <summary>Copilot CLI</summary>
 
 ```bash
@@ -515,7 +500,7 @@ chmod +x ~/.config/opencode/bin/opencode-gh-librarian
 
 **Skills:** `oracle`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`, `widereview`
 
-The shipped `oracle` droid inherits your parent Droid model with `reasoningEffort: low`, so it works with your available Factory plan, credits, or BYOK configuration. To force Factory's built-in GPT-5.5, change `~/.factory/droids/oracle.md` to `model: gpt-5.5`; for BYOK use `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
+The shipped `oracle` droid uses Factory's built-in GPT-5.5 with `reasoningEffort: high`. For BYOK, change `~/.factory/droids/oracle.md` to `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
 </details>
 
 <details>
@@ -693,20 +678,6 @@ done
 </details>
 
 <details>
-<summary>VSCode Copilot</summary>
-
-```bash
-# VSCode Insiders
-mkdir -p ~/.config/Code\ -\ Insiders/User/prompts
-cp prompts/vscode-copilot/*.md ~/.config/Code\ -\ Insiders/User/prompts/
-
-# VSCode Regular
-mkdir -p ~/.config/Code/User/prompts
-cp prompts/vscode-copilot/*.md ~/.config/Code/User/prompts/
-```
-</details>
-
-<details>
 <summary>Copilot CLI</summary>
 
 ```bash
@@ -762,7 +733,7 @@ chmod +x ~/.config/opencode/bin/opencode-gh-librarian
 
 **Skills:** `oracle`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`, `widereview`
 
-The shipped `oracle` droid inherits your parent Droid model with `reasoningEffort: low`, so it works with your available Factory plan, credits, or BYOK configuration. To force Factory's built-in GPT-5.5, change `~/.factory/droids/oracle.md` to `model: gpt-5.5`; for BYOK use `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
+The shipped `oracle` droid uses Factory's built-in GPT-5.5 with `reasoningEffort: high`. For BYOK, change `~/.factory/droids/oracle.md` to `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
 </details>
 
 <details>

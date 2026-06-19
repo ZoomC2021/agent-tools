@@ -1,6 +1,6 @@
 # Oracle
 
-Consult an external deep-reasoning oracle — **GPT-5.5 (low reasoning effort)** driven via the `codex` CLI — when stuck on a hard problem. You bundle a compact, self-contained context package and hand it to the oracle for a second opinion; the oracle runs read-only and cannot change your repo.
+Consult an external deep-reasoning oracle — **GPT-5.5 (high reasoning effort)** driven via the `codex` CLI — when stuck on a hard problem. You bundle a compact, self-contained context package and hand it to the oracle for a second opinion; the oracle runs read-only and cannot change your repo.
 
 Question / problem: **$ARGUMENTS**
 
@@ -57,7 +57,7 @@ If `codex` is missing, tell the user to install it (`npm install -g @openai/code
    - Prioritized next steps
    ```
 
-3. **Invoke the oracle.** Write the prompt to a scratch file and run `codex` read-only with GPT-5.5 at low reasoning effort. It runs inside the repo with read-only access, so it can verify referenced files, but treat the bundle as the authoritative working set.
+3. **Invoke the oracle.** Write the prompt to a scratch file and run `codex` read-only with GPT-5.5 at high reasoning effort. It runs inside the repo with read-only access, so it can verify referenced files, but treat the bundle as the authoritative working set.
 
    ```bash
    ORACLE_DIR="$(mktemp -d)"
@@ -69,7 +69,7 @@ If `codex` is missing, tell the user to install it (`npm install -g @openai/code
      -s read-only \
      --skip-git-repo-check \
      --model gpt-5.5 \
-     -c 'model_reasoning_effort="low"' \
+     -c 'model_reasoning_effort="high"' \
      "$(cat "$ORACLE_DIR/prompt.md")" \
      < /dev/null > "$ORACLE_DIR/oracle.txt" 2>&1
    echo "exit: $?"; cat "$ORACLE_DIR/oracle.txt"

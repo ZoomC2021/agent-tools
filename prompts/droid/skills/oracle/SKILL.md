@@ -68,4 +68,4 @@ cp prompts/droid/skills/oracle/SKILL.md ~/.factory/skills/oracle/SKILL.md
 
 ## Model Configuration Note
 
-The shipped oracle droid inherits the parent Droid's configured model and uses `reasoningEffort: low`, so it should work with the user's available Factory plan, credits, or BYOK configuration. If the user specifically wants Factory's built-in `gpt-5.5` and their workspace can access it, they can edit `~/.factory/droids/oracle.md` to use `model: gpt-5.5`; for BYOK use a configured model such as `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not an API credential for Droid.
+The shipped oracle droid uses Factory's built-in `gpt-5.5` with `reasoningEffort: high`. If the user uses BYOK instead of Factory's built-in GPT-5.5, they can edit `~/.factory/droids/oracle.md` to use a configured model such as `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not an API credential for Droid.

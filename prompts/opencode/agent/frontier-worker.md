@@ -4,7 +4,7 @@ description: >-
   worker subagents.
 mode: primary
 model: openai/gpt-5.5
-reasoningEffort: low
+reasoningEffort: high
 permission:
   task:
     '*': deny

@@ -15,11 +15,11 @@ Key events:
 
 ### Multi-Agent Expansion (Apr 2025)
 
-Rapid expansion to support the most popular AI coding agents. Each agent target required adapting prompts to platform-specific formats (SKILL.md for Windsurf/Amp/Gemini, .agent.md for VSCode Copilot, YAML for Warp).
+Rapid expansion to support the most popular AI coding agents. Each agent target required adapting prompts to platform-specific formats (SKILL.md for Windsurf/Amp/Gemini, YAML for Warp).
 
 Key events:
 - Added Claude Code, Codex, Cursor, Cline support
-- Added VSCode Copilot and Copilot CLI
+- Added Copilot CLI
 - Added Windsurf and Amp skill formats
 - Added Gemini CLI skill format
 
@@ -64,7 +64,7 @@ None yet — the codebase is young and actively evolving.
 
 ```
 Mar 2025: ~5 agent targets, 4 workflows
-Apr 2025: 14 agent targets, 8+ workflows
+Apr 2025: 13 supported agent targets, 8+ workflows
 May 2025: Continued refinement, eval infrastructure
 ```
 
@@ -76,4 +76,4 @@ The repository grew from a single OpenCode-focused project to a comprehensive mu
 
 **Safety-first design**: Every workflow includes multiple safety gates before destructive actions. The orchestrator verbalizes intent, checks context completion, and escalates after consecutive failures.
 
-**Format proliferation**: Supporting 14 agents means maintaining prompts in ~5 different formats (Markdown with frontmatter, SKILL.md, .agent.md, YAML, plain Markdown).
+**Format proliferation**: Supporting 13 agents means maintaining prompts in ~4 different formats (Markdown with frontmatter, SKILL.md, YAML, plain Markdown).

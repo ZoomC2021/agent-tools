@@ -128,27 +128,6 @@ description: What this workflow does
 Content...
 ```
 
-## Agent.md format (VSCode Copilot)
-
-Copilot agents use `.agent.md` files with tool specifications:
-
-```markdown
-# Agent name
-
-## Role
-Description of responsibilities.
-
-## Tools
-
-### tool_name
-description: What this tool does
-
-usage: |
-  ```
-  command syntax
-  ```
-```
-
 ## See also
 
 - [Configuration](configuration.md) — OpenCode config structure

@@ -12,43 +12,6 @@ function Write-Success { param($Message) Write-Host "[OK] $Message" -ForegroundC
 function Write-Warn { param($Message) Write-Host "[!] $Message" -ForegroundColor Yellow }
 function Write-Err { param($Message) Write-Host "[X] $Message" -ForegroundColor Red }
 
-function Install-VSCodeCopilot {
-    Write-Info "Installing VSCode Copilot prompts..."
-    
-    $SourceDir = Join-Path $PromptsDir "vscode-copilot"
-    
-    if (-not (Test-Path -PathType Container $SourceDir)) {
-        Write-Warn "Source directory not found: $SourceDir"
-        return
-    }
-    
-    $SourceFiles = Get-ChildItem -Path $SourceDir -Filter "*.md"
-    if ($SourceFiles.Count -eq 0) {
-        Write-Warn "No .md files found in $SourceDir"
-        return
-    }
-    
-    # VSCode Insiders
-    $InsidersDest = Join-Path $env:APPDATA "Code - Insiders\User\prompts"
-    if (Test-Path (Split-Path -Parent $InsidersDest)) {
-        New-Item -ItemType Directory -Path $InsidersDest -Force | Out-Null
-        Copy-Item "$SourceDir\*.md" -Destination $InsidersDest -Force
-        Write-Success "VSCode Insiders: $InsidersDest"
-    } else {
-        Write-Warn "VSCode Insiders not found, skipping"
-    }
-    
-    # VSCode Regular
-    $RegularDest = Join-Path $env:APPDATA "Code\User\prompts"
-    if (Test-Path (Split-Path -Parent $RegularDest)) {
-        New-Item -ItemType Directory -Path $RegularDest -Force | Out-Null
-        Copy-Item "$SourceDir\*.md" -Destination $RegularDest -Force
-        Write-Success "VSCode: $RegularDest"
-    } else {
-        Write-Warn "VSCode not found, skipping"
-    }
-}
-
 function Install-Cursor {
     Write-Info "Installing Cursor commands..."
     
@@ -761,7 +724,6 @@ Write-Host "       Agent Tools Installer (Windows)"
 Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host ""
 
-Install-VSCodeCopilot
 Install-Cursor
 Install-Pi
 Install-Warp

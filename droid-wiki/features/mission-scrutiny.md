@@ -72,7 +72,7 @@ The workflow may report BLOCKED when:
 
 ## Available in
 
-All 14 agent targets. See [Agent targets](../agent-targets/index.md).
+All 13 agent targets. See [Agent targets](../agent-targets/index.md).
 
 ## Related workflows
 

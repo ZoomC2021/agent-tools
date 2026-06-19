@@ -1,7 +1,7 @@
 # OpenCode Worker Eval Results
 
 Living reference for worker model comparisons.
-Last updated: 2026-06-14.
+Last updated: 2026-06-19.
 
 ## Matrix Results (both explore + general agents set to same model)
 
@@ -11,6 +11,7 @@ Last updated: 2026-06-14.
 | opencode | xiaomi | **mimo-v2.5-pro** | **6/6** | ✓ 26s | ✓ 22s | ✓ 25s | ✓ 22s | ✓ 268s | ✓ 211s |
 | opencode | tokenrouter | **kimi-k2.7-code** | **6/6** | ✓ 19s | ✓ 20s | ✓ 17s | ✓ 20s | ✓ 197s | ✓ 149s |
 | opencode | tokenrouter | **deepseek-v4-pro** | **6/6** | ✓ 36s | ✓ 20s | ✓ 34s | ✓ 40s | ✓ 118s | ✓ 137s |
+| codex | openai | **gpt-5.3-codex-spark high** | **2/6 raw; 6/6 behavior** | ✗ format 16s | ✗ format 13s | ✗ format 12s | ✗ format 11s | ✓ 48s | ✓ 27s |
 | opencode | tokenrouter | MiniMax-M3 | 5/6 | ✓ 37s | ✓ 37s | ✓ 38s | ✓ 31s | ✗ 23/28 | ✓ 202s |
 | cmd | tokenrouter | MiniMax-M3 | 6/6 | REVIEW | REVIEW | ✓ pass 3 | ✓ pass 3 | ✓ pass | ✓ pass 2 |
 | opencode | tokenrouter | deepseek-v4-flash | 5/6 | ✓ 38s | ✓ 27s | ✓ 69s | ✗ 18/21 | ✓ 232s | ✓ 186s |
@@ -42,6 +43,22 @@ Last updated: 2026-06-14.
 
 cmd doesn't report per-scenario durations; total wall-clock measured at 517s and 455s respectively.
 
+### Codex Spark Comparison
+
+`gpt-5.3-codex-spark` was run through the Codex CLI backend added to `opencode-eval`:
+
+```bash
+prompts/opencode/bin/opencode-eval run --runner codex --variants codex-spark-high --scenarios subagent-worker-explore-agent-definition,subagent-worker-explore-failing-tests,subagent-worker-general-add-helper,subagent-worker-general-debug-minimal-fix,subagent-worker-general-workflow-spec-compliance,subagent-worker-general-workflow-state-machine
+```
+
+Run directory: `evals/out/20260619T042602Z`.
+
+Raw score is **2/6** because four OpenCode-era checks require exact final-answer headings (`model`, `Discovery Report`, `Test Results`). Behavioral score is **6/6**: every Codex process exited 0, and all file, test, and workspace-command checks passed.
+
+| Harness | Provider | Model | Raw Score | Behavior Score | Total Time | Notes |
+|---------|----------|-------|-----------|----------------|------------|-------|
+| codex | openai | gpt-5.3-codex-spark high | 2/6 | **6/6** | **127s** | Fastest hard-task times; format-only misses on four light/read-only cases |
+
 ### Provider Notes
 
 | Provider | RPM Limit | Notes |
@@ -58,6 +75,7 @@ cmd doesn't report per-scenario durations; total wall-clock measured at 517s and
 |----------|-------|---------------|-------|
 | xiaomi | mimo-v2.5 | 11.5 | Fastest overall, 6/6 |
 | tokenrouter | kimi-k2.7-code | 18.5 | Fast, clean, 6/6 |
+| openai | gpt-5.3-codex-spark high (codex) | 11.5 | Fastest behaviorally; raw harness misses exact `Test Results` headings |
 | xiaomi | mimo-v2.5-pro | 23.5 | Solid, 6/6 |
 | tokenrouter | deepseek-v4-pro | 37.0 | Best spec-compliance time (118s) |
 | tokenrouter | minimax-m3 | 34.5 | Fails spec-compliance on opencode |
@@ -77,6 +95,7 @@ cmd doesn't report per-scenario durations; total wall-clock measured at 517s and
 |----------|-------|--------|------|
 | xiaomi | mimo-v2.5 | ✓ | 31s |
 | xiaomi | mimo-v2.5-pro | ✓ | 26s |
+| openai | gpt-5.3-codex-spark high (codex) | ✗ format | 16s |
 | tokenrouter | kimi-k2.7-code | ✓ | 19s |
 | tokenrouter | deepseek-v4-pro | ✓ | 36s |
 | tokenrouter | deepseek-v4-flash | ✓ | 38s |
@@ -93,6 +112,7 @@ cmd doesn't report per-scenario durations; total wall-clock measured at 517s and
 |----------|-------|--------|------|
 | xiaomi | mimo-v2.5 | ✓ | 14s |
 | xiaomi | mimo-v2.5-pro | ✓ | 22s |
+| openai | gpt-5.3-codex-spark high (codex) | ✗ format | 13s |
 | tokenrouter | kimi-k2.7-code | ✓ | 20s |
 | tokenrouter | deepseek-v4-pro | ✓ | 20s |
 | tokenrouter | deepseek-v4-flash | ✓ | 27s |
@@ -109,6 +129,7 @@ cmd doesn't report per-scenario durations; total wall-clock measured at 517s and
 |----------|-------|--------|------|
 | xiaomi | mimo-v2.5 | ✓ | 10s |
 | xiaomi | mimo-v2.5-pro | ✓ | 25s |
+| openai | gpt-5.3-codex-spark high (codex) | ✗ format | 12s |
 | tokenrouter | kimi-k2.7-code | ✓ | 17s |
 | tokenrouter | deepseek-v4-pro | ✓ | 34s |
 | tokenrouter | deepseek-v4-flash | ✓ | 69s |
@@ -125,6 +146,7 @@ cmd doesn't report per-scenario durations; total wall-clock measured at 517s and
 |----------|-------|--------|------|
 | xiaomi | mimo-v2.5 | ✓ | 13s |
 | xiaomi | mimo-v2.5-pro | ✓ | 22s |
+| openai | gpt-5.3-codex-spark high (codex) | ✗ format | 11s |
 | tokenrouter | kimi-k2.7-code | ✓ | 20s |
 | tokenrouter | deepseek-v4-pro | ✓ | 40s |
 | tokenrouter | deepseek-v4-flash | ✗ 18/21 | 84s |
@@ -143,6 +165,7 @@ cmd doesn't report per-scenario durations; total wall-clock measured at 517s and
 |----------|-------|--------|------|
 | xiaomi | mimo-v2.5 | ✓ 28/28 | 177s |
 | xiaomi | mimo-v2.5-pro | ✓ 28/28 | 268s |
+| openai | gpt-5.3-codex-spark high (codex) | ✓ 28/28 | 48s |
 | tokenrouter | kimi-k2.7-code | ✓ 28/28 | 197s |
 | tokenrouter | deepseek-v4-pro | ✓ 28/28 | 118s |
 | tokenrouter | deepseek-v4-flash | ✓ 28/28 | 232s |
@@ -159,6 +182,7 @@ cmd doesn't report per-scenario durations; total wall-clock measured at 517s and
 |----------|-------|--------|------|
 | xiaomi | mimo-v2.5 | ✓ 20/20 | 76s |
 | xiaomi | mimo-v2.5-pro | ✓ 20/20 | 211s |
+| openai | gpt-5.3-codex-spark high (codex) | ✓ 20/20 | 27s |
 | tokenrouter | kimi-k2.7-code | ✓ 20/20 | 149s |
 | tokenrouter | deepseek-v4-pro | ✓ 20/20 | 137s |
 | tokenrouter | deepseek-v4-flash | ✓ 20/20 | 186s |
@@ -184,23 +208,30 @@ cmd doesn't report per-scenario durations; total wall-clock measured at 517s and
 - **Pass criteria**: `pass: true` when all evaluable checks pass and no unevaluable checks exist. `pass: null` (REVIEW) when unevaluable checks exist but all evaluable ones pass. `pass: false` when any evaluable check fails.
 - **Output**: Results in `evals/cmd-out/` mirroring `evals/out/` structure
 
+### codex harness
+- **Harness**: `prompts/opencode/bin/opencode-eval --runner codex` runs `codex exec --json --ephemeral --cd <workspace> --model <model>` in isolated workspace copies
+- **Variant**: `codex-spark-high` uses `gpt-5.3-codex-spark` with `model_reasoning_effort="high"`
+- **Evaluation**: Reuses `opencode-eval` expectations. File, workspace-command, exit-code, and final-text checks work; OpenCode-specific subagent/session checks are not meaningful under Codex.
+- **Spark scoring note**: The 2026-06-19 six-case run has a raw score of 2/6, but the four failures are final-answer heading mismatches only. Behavioral score is 6/6.
+
 ### Provider notes
 - **ZenMux 9-RPM proxy**: Leak-bucket throttle at 9 RPM (~1 req/6.7s). Viable for few-turn tasks; multi-turn hard scenarios are throttle-bound regardless of timeout. The unthrottled `kimi-k2.7-code` row captures the model's actual capability
 - **glm-5.1 provider switch**: Moved from nvidia (40 RPM) to tokenrouter (60+ RPM) which resolved state-machine timeouts
 
 ## Key Findings
 
-1. **mimo-v2.5 is the clear winner**: 6/6, fastest on hard tasks (76s state-machine), zero issues. Best cost/speed/quality trade-off.
-2. **deepseek-v4-pro is the best runner-up**: 6/6, fastest spec-compliance (118s), but 3-4× slower on light tasks.
-3. **kimi-k2.7-code is excellent**: 6/6, very fast on light tasks (17-20s), solid on hard.
-4. **mimo-v2.5-pro is solid but slow**: 6/6 but 2-3× slower than mimo-v2.5 on everything. Pro tax doesn't help here.
-5. **cmd improves MiniMax-M3 and deepseek-v4-flash**: Both go from 5/6 to 6/6 under cmd. MiniMax-M3 passes spec-compliance; deepseek-v4-flash passes debug-fix and state-machine. The `--yolo --max-turns 30` flags and cmd's agent architecture give models more room to work.
-6. **MiniMax-M3 is not viable on opencode**: Slower than alternatives, fails spec-compliance (23/28), leaks `<think>` blocks.
-7. **deepseek-v4-flash is slow on opencode**: 69s on add-helper (7× slower than mimo-v2.5). Hard tasks pass but at 2× the time.
-8. **glm-5.1 (tokenrouter)**: 4/6, fast on light tasks but fails debug-fix (14/21) and spec-compliance (20/28). State-machine passes after provider switch from nvidia.
-9. **step-3.7-flash (nousresearch)**: 3/6, fast on light tasks but fails explore-failing-tests (21/22) and both hard scenarios. Not production-ready.
-10. **nemotron-3-ultra (nousresearch)**: 2/6, worst performer. Fails add-helper in 4s, spec-compliance in 10s. Only passes agent-def and debug-fix.
-11. **ZenMux free tier is throttle-bound**: 0/4 on light scenarios at 9 RPM. Viable only for very few-turn tasks.
+1. **gpt-5.3-codex-spark high is the fastest behaviorally-correct run**: 6/6 on behavioral checks in 127s total, with especially strong hard-task times (48s spec-compliance, 27s state-machine). Raw harness score is 2/6 because four light/read-only cases missed exact OpenCode-era final-answer headings.
+2. **mimo-v2.5 is the clear OpenCode winner**: 6/6, fastest OpenCode hard-task profile (76s state-machine), zero issues. Best OpenCode cost/speed/quality trade-off.
+3. **deepseek-v4-pro is the best OpenCode runner-up**: 6/6, fastest OpenCode spec-compliance (118s), but 3-4× slower on light tasks.
+4. **kimi-k2.7-code is excellent**: 6/6, very fast on light tasks (17-20s), solid on hard.
+5. **mimo-v2.5-pro is solid but slow**: 6/6 but 2-3× slower than mimo-v2.5 on everything. Pro tax doesn't help here.
+6. **cmd improves MiniMax-M3 and deepseek-v4-flash**: Both go from 5/6 to 6/6 under cmd. MiniMax-M3 passes spec-compliance; deepseek-v4-flash passes debug-fix and state-machine. The `--yolo --max-turns 30` flags and cmd's agent architecture give models more room to work.
+7. **MiniMax-M3 is not viable on opencode**: Slower than alternatives, fails spec-compliance (23/28), leaks `<think>` blocks.
+8. **deepseek-v4-flash is slow on opencode**: 69s on add-helper (7× slower than mimo-v2.5). Hard tasks pass but at 2× the time.
+9. **glm-5.1 (tokenrouter)**: 4/6, fast on light tasks but fails debug-fix (14/21) and spec-compliance (20/28). State-machine passes after provider switch from nvidia.
+10. **step-3.7-flash (nousresearch)**: 3/6, fast on light tasks but fails explore-failing-tests (21/22) and both hard scenarios. Not production-ready.
+11. **nemotron-3-ultra (nousresearch)**: 2/6, worst performer. Fails add-helper in 4s, spec-compliance in 10s. Only passes agent-def and debug-fix.
+12. **ZenMux free tier is throttle-bound**: 0/4 on light scenarios at 9 RPM. Viable only for very few-turn tasks.
 
 ## Adding New Models
 

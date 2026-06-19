@@ -20,7 +20,6 @@ The `prompts/opencode/opencode.json.example` is the largest single file by line 
 Supporting 14 different AI agents means the repository speaks multiple "dialects":
 - Markdown with YAML frontmatter (most agents)
 - SKILL.md format (Windsurf, Amp, Gemini CLI)
-- .agent.md suffix (VSCode Copilot)
 - YAML (Warp workflows)
 
 ## Naming origins
@@ -32,7 +31,7 @@ Supporting 14 different AI agents means the repository speaks multiple "dialects
 
 ## Skill location trivia
 
-The installer supports 14 agents but needs to know 14+ different config directory paths:
+The installer supports 13 agents but needs to know 13+ different config directory paths:
 - macOS: `~/Library/Application Support/...`
 - Linux: `~/.config/...` or `~/.local/share/...`
 - XDG paths, APPDATA on Windows

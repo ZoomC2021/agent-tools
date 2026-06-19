@@ -72,7 +72,6 @@ python tests/test_utils.py
 |-------|------------------------|
 | OpenCode | `opencode` CLI installed |
 | Claude Code | `claude` CLI installed |
-| VSCode Copilot | VSCode with Copilot extension |
 | Cursor | Cursor IDE |
 | Windsurf | Windsurf IDE |
 | Gemini CLI | `gemini` CLI installed |

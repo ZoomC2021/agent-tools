@@ -21,7 +21,7 @@ const supportEntries = [
 function usage() {
   console.log(`Usage:
   opencode-eval list [variants|scenarios]
-  opencode-eval run [--variants pattern[,pattern]] [--scenarios pattern[,pattern]] [--tags tag[,tag]] [--out dir] [--dry-run]
+  opencode-eval run [--runner opencode|codex] [--variants pattern[,pattern]] [--scenarios pattern[,pattern]] [--tags tag[,tag]] [--out dir] [--dry-run]
   opencode-eval report <run-dir>
 
 Defaults:
@@ -33,6 +33,7 @@ Examples:
   opencode-eval list
   opencode-eval run
   opencode-eval run --variants gpt55-primary --scenarios implementation-sandbox
+  opencode-eval run --runner codex --variants codex-spark-high --scenarios implementation-sandbox-task-outcome
   opencode-eval run --tags extended
   opencode-eval report evals/out/20260422T120000Z
 `)
@@ -239,7 +240,23 @@ function filterScenarios(scenarios, scenarioPatterns, tagPatterns) {
   })
 }
 
-function prepareVariantWorkspace(variant, variantDir) {
+function getRunner(variant, options = {}) {
+  return options.runner || variant.runner || "opencode"
+}
+
+function codexModelForVariant(variant) {
+  if (variant.codexModel) {
+    return variant.codexModel
+  }
+
+  if (variant.cliModel && variant.cliModel.startsWith("openai/")) {
+    return variant.cliModel.slice("openai/".length)
+  }
+
+  return variant.cliModel || null
+}
+
+function prepareVariantWorkspace(variant, variantDir, runner = "opencode") {
   fs.rmSync(variantDir, { recursive: true, force: true })
   ensureDir(variantDir)
 
@@ -260,9 +277,13 @@ function prepareVariantWorkspace(variant, variantDir) {
 
   const configPath = path.join(variantDir, "opencode.json")
   if (!fileExists(configPath)) {
-    throw new Error(
-      `missing opencode.json in ${relativeToRoot(variantDir)}. Create prompts/opencode/opencode.json with valid credentials (local untracked copy is recommended).`,
-    )
+    if (runner === "opencode") {
+      throw new Error(
+        `missing opencode.json in ${relativeToRoot(variantDir)}. Create prompts/opencode/opencode.json with valid credentials (local untracked copy is recommended).`,
+      )
+    }
+    writeJson(path.join(variantDir, "variant.json"), variant)
+    return
   }
   const config = readJson(configPath)
   const configOverrides = variant.configOverrides || {}
@@ -370,6 +391,20 @@ function extractEvents(stdout) {
     })
 }
 
+function extractCodexEvents(stdout) {
+  return stdout
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      try {
+        return JSON.parse(line)
+      } catch (error) {
+        return { type: "parse_error", raw: line, error: error.message }
+      }
+    })
+}
+
 function exportSession(sessionId, cwd, xdgConfigHome) {
   const result = spawnSync("opencode", ["export", sessionId], {
     cwd,
@@ -413,6 +448,42 @@ function exportSession(sessionId, cwd, xdgConfigHome) {
 }
 
 function summarizeCase({ variant, scenario, runResult, events, sessionExport, workspace }) {
+  if (runResult.runner === "codex") {
+    const codexEvents = extractCodexEvents(runResult.stdout)
+    const usage = [...codexEvents].reverse().find((event) => event.type === "turn.completed" && event.usage)?.usage
+      || {}
+    const totalTokens = usage.total_tokens
+      ? Number(usage.total_tokens)
+      : Number(usage.input_tokens || 0) + Number(usage.output_tokens || 0)
+    const toolCalls = codexEvents
+      .filter((event) => event.type === "item.started" && event.item?.type)
+      .map((event) => event.item.type)
+
+    return {
+      variant: variant.name,
+      configuredModel: codexModelForVariant(variant),
+      scenario: scenario.id,
+      description: scenario.description,
+      sessionId: null,
+      exitCode: runResult.exitCode,
+      timedOut: Boolean(runResult.timedOut),
+      timeoutMs: runResult.timeoutMs || null,
+      finalText: runResult.finalText || "",
+      durationMs: runResult.durationMs || null,
+      tokens: {
+        total: totalTokens,
+        input: Number(usage.input_tokens || 0),
+        output: Number(usage.output_tokens || 0),
+        reasoning: Number(usage.reasoning_output_tokens || 0),
+      },
+      toolCalls,
+      subagentCalls: [],
+      assistantModel: codexModelForVariant(variant),
+      workdir: workspace.workdir,
+      transcriptText: runResult.stdout,
+    }
+  }
+
   const sessionId = events.find((event) => event.sessionID)?.sessionID || null
   const textParts = events.filter((event) => event.type === "text" && event.part?.text)
   const finalText = textParts.map((event) => event.part.text).join("\n")
@@ -842,6 +913,103 @@ function runOpencodeCase({ variant, variantDir, scenario, workspace, caseDir }) 
   })
 }
 
+function runCodexCase({ variant, scenario, workspace, caseDir }) {
+  const finalMessagePath = path.join(caseDir, "final.txt")
+  const args = [
+    "exec",
+    "--json",
+    "--ephemeral",
+    "--cd",
+    workspace.workdir,
+    "--sandbox",
+    scenario.codexSandbox || variant.codexSandbox || "workspace-write",
+    "--skip-git-repo-check",
+    "--output-last-message",
+    finalMessagePath,
+  ]
+
+  const model = codexModelForVariant(variant)
+  if (model) {
+    args.push("--model", model)
+  }
+
+  const reasoningEffort = scenario.codexReasoningEffort || variant.codexReasoningEffort
+  if (reasoningEffort) {
+    args.push("-c", `model_reasoning_effort="${reasoningEffort}"`)
+  }
+
+  if (scenario.dangerouslySkipPermissions || variant.dangerouslySkipPermissions) {
+    args.push("--dangerously-bypass-approvals-and-sandbox")
+  }
+
+  args.push(scenario.prompt)
+  const timeoutMs = Number(scenario.timeoutMs || variant.timeoutMs || 180000)
+
+  return new Promise((resolve) => {
+    const startedAt = Date.now()
+    const child = spawn("codex", args, {
+      cwd: workspace.workdir,
+      stdio: ["ignore", "pipe", "pipe"],
+      detached: true,
+    })
+
+    let stdout = ""
+    let stderr = ""
+    let timedOut = false
+    let sigkillTimer = null
+
+    const killProcessGroup = (signal) => {
+      if (!child.pid) return
+      try {
+        process.kill(-child.pid, signal)
+      } catch {
+        try {
+          child.kill(signal)
+        } catch {
+          // The process may have exited between timeout and kill.
+        }
+      }
+    }
+
+    const timeoutTimer = setTimeout(() => {
+      timedOut = true
+      stderr += `\n[opencode-eval] Timed out after ${timeoutMs}ms\n`
+      killProcessGroup("SIGTERM")
+      sigkillTimer = setTimeout(() => killProcessGroup("SIGKILL"), 2000)
+    }, timeoutMs)
+
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk.toString()
+    })
+
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk.toString()
+    })
+
+    child.on("error", (error) => {
+      stderr += `${error.stack || String(error)}\n`
+    })
+
+    child.on("close", (code) => {
+      clearTimeout(timeoutTimer)
+      if (sigkillTimer) clearTimeout(sigkillTimer)
+      const finalText = fileExists(finalMessagePath) ? fs.readFileSync(finalMessagePath, "utf8") : ""
+      writeText(path.join(caseDir, "events.jsonl"), stdout)
+      writeText(path.join(caseDir, "stderr.log"), stderr)
+      resolve({
+        runner: "codex",
+        exitCode: timedOut ? 124 : code ?? 0,
+        stdout,
+        stderr,
+        finalText,
+        timedOut,
+        timeoutMs,
+        durationMs: Date.now() - startedAt,
+      })
+    })
+  })
+}
+
 function renderSummaryMarkdown(summary) {
   const lines = [
     `# Opencode Eval Summary`,
@@ -923,6 +1091,11 @@ async function runCommand(options) {
 
   const variants = filterVariants(variantsPayload.variants, variantPatterns)
   const scenarios = filterScenarios(scenariosPayload.scenarios, scenarioPatterns, effectiveTagPatterns)
+  const runnerOverride = options.runner
+
+  if (runnerOverride && !["opencode", "codex"].includes(runnerOverride)) {
+    die("--runner must be either opencode or codex")
+  }
 
   if (!variants.length) {
     die("no variants matched the requested filters")
@@ -939,6 +1112,7 @@ async function runCommand(options) {
   const manifest = {
     createdAt: new Date().toISOString(),
     runDirectory,
+    runner: runnerOverride || null,
     variants: variants.map((variant) => variant.name),
     scenarios: scenarios.map((scenario) => scenario.id),
   }
@@ -956,7 +1130,7 @@ async function runCommand(options) {
   const variantDirs = new Map()
   for (const variant of variants) {
     const variantDir = path.join(runDirectory, "variants", variant.name)
-    prepareVariantWorkspace(variant, variantDir)
+    prepareVariantWorkspace(variant, variantDir, getRunner(variant, options))
     variantDirs.set(variant.name, variantDir)
   }
 
@@ -970,10 +1144,13 @@ async function runCommand(options) {
       ensureDir(caseDir)
 
       const workspace = prepareScenarioWorkspace(scenario, caseDir, variantDir)
-      const runResult = await runOpencodeCase({ variant, variantDir, scenario, workspace, caseDir })
-      const events = extractEvents(runResult.stdout)
+      const runner = getRunner(variant, options)
+      const runResult = runner === "codex"
+        ? await runCodexCase({ variant, variantDir, scenario, workspace, caseDir })
+        : await runOpencodeCase({ variant, variantDir, scenario, workspace, caseDir })
+      const events = runner === "opencode" ? extractEvents(runResult.stdout) : []
       const sessionId = events.find((event) => event.sessionID)?.sessionID || null
-      const sessionExport = sessionId ? exportSession(sessionId, variantDir, workspace.variables.ISOLATED_DIR) : { raw: "", parsed: null, parseError: "no session id" }
+      const sessionExport = sessionId ? exportSession(sessionId, variantDir, workspace.variables.ISOLATED_DIR) : { raw: "", parsed: null, parseError: runner === "codex" ? "codex runner does not export opencode sessions" : "no session id" }
 
       const finalWorkspacePath = path.join(caseDir, "workspace")
       copyEntry(workspace.variables.ISOLATED_DIR + "/workspace", finalWorkspacePath)

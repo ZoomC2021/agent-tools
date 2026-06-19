@@ -51,7 +51,7 @@ The refactor prompt includes explicit constraints:
 
 ## Usage
 
-Available in all 14 agent targets. In OpenCode:
+Available in all 13 agent targets. In OpenCode:
 
 ```
 /refactor

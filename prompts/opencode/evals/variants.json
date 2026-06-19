@@ -1,6 +1,13 @@
 {
   "variants": [
     {
+      "name": "codex-spark-high",
+      "description": "Codex CLI eval using gpt-5.3-codex-spark with high reasoning. Best used with task-outcome scenarios that do not assert OpenCode subagent routing.",
+      "runner": "codex",
+      "codexModel": "gpt-5.3-codex-spark",
+      "codexReasoningEffort": "high"
+    },
+    {
       "name": "baseline-gpt55-primary",
       "description": "Current workflow: frontier-worker and plan mode both use openai/gpt-5.5.",
       "cliModel": "openai/gpt-5.5",
