@@ -15,7 +15,7 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 | **pr-reviewer** | Fetch PR comments, summarize issues, address them, update PR |
 | **pr-reviewer-only** | Fetch PR comments, summarize issues, generate implementation prompt for another agent |
 | **create-pr** | Create PR with auto-generated title and description |
-| **cp** | Commit current work with meaningful boundaries and push to origin |
+| **ship-it** | Commit current work with meaningful boundaries and push to origin |
 | **deslop** | Analyze code for quality issues using established software engineering principles |
 | **predict-issues** | Analyze codebase to predict potential problems before they impact the project |
 | **oracle** | Consult a deep-reasoning oracle subagent for complex bugs, architecture tradeoffs, and risky reviews |
@@ -162,7 +162,7 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
     ├── milestone-validator.md
     ├── pr-reviewer.md
     ├── create-pr.md
-    ├── cp.md
+    ├── ship-it.md
     ├── spec-compiler.md
     ├── quick-validator.md
     ├── change-auditor.md
@@ -197,7 +197,7 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 | **pr-reviewer** | Fetch PR comments and apply fixes | MiMo v2.5 Pro | — |
 | **pr-reviewer-only** | Fetch PR comments, produce implementation prompt | MiMo v2.5 Pro | — |
 | **create-pr** | Create PR with auto-generated title/description | MiMo v2.5 Pro | — |
-| **cp** | Commit current work with meaningful boundaries and push to origin | MiMo v2.5 | — |
+
 | **refactor** | Analyze and prioritize refactoring opportunities | MiMo v2.5 Pro | — |
 
 ### ⚠️ Security Warning
@@ -370,7 +370,7 @@ mkdir -p ~/.config/opencode/bin
 for f in prompts/opencode/commands/review.md prompts/opencode/commands/deslop.md \
          prompts/opencode/commands/mission-scrutiny.md prompts/opencode/commands/milestone-validator.md \
          prompts/opencode/commands/pr-reviewer.md prompts/opencode/commands/create-pr.md \
-         prompts/opencode/commands/cp.md \
+         prompts/opencode/commands/ship-it.md \
          prompts/opencode/commands/spec-compiler.md prompts/opencode/commands/quick-validator.md \
          prompts/opencode/commands/change-auditor.md prompts/opencode/commands/ultrareview.md \
          prompts/opencode/commands/ultrareview-lite.md prompts/opencode/commands/widereview.md \
@@ -604,7 +604,7 @@ mkdir -p ~/.config/opencode/bin
 for f in prompts/opencode/commands/review.md prompts/opencode/commands/deslop.md \
          prompts/opencode/commands/mission-scrutiny.md prompts/opencode/commands/milestone-validator.md \
          prompts/opencode/commands/pr-reviewer.md prompts/opencode/commands/create-pr.md \
-         prompts/opencode/commands/cp.md \
+         prompts/opencode/commands/ship-it.md \
          prompts/opencode/commands/spec-compiler.md prompts/opencode/commands/quick-validator.md \
          prompts/opencode/commands/change-auditor.md prompts/opencode/commands/ultrareview.md \
          prompts/opencode/commands/ultrareview-lite.md prompts/opencode/commands/widereview.md \
@@ -892,7 +892,7 @@ Creates a PR from current changes:
 3. **Creates PR** with auto-generated title and description
 4. **Reports result** with PR URL and summary
 
-### cp
+### ship-it
 
 Commits current work and pushes to origin:
 
@@ -900,6 +900,8 @@ Commits current work and pushes to origin:
 2. **Commits in focused, conventional-commit slices** (splitting unrelated changes)
 3. **Pushes explicitly** — sets upstream on the first push, otherwise runs `git push`
 4. **Reports the commit(s)** and confirms the push completed
+
+Invoke with `/ship-it` or when the user says "ship it" or "commit and push".
 
 ### deslop
 

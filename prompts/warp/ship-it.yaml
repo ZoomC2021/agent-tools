@@ -1,0 +1,23 @@
+name: Ship It
+description: Commit current work with meaningful boundaries and push to origin.
+tags:
+  - ai
+  - git
+  - github
+  - gitlab
+arguments: []
+command: |
+  Commit current work with meaningful commit boundaries and push cleanly.
+
+  Workflow:
+  1. Inspect `git status --short`, `git diff`, and `git diff --cached` before choosing commit boundaries and messages.
+  2. Commit all uncommitted changes in focused slices. Split unrelated changes into separate commits and use Conventional Commits.
+  3. Check upstream with `git rev-parse --abbrev-ref --symbolic-full-name @{upstream}`.
+  4. If upstream is absent, run `git push --set-upstream origin HEAD`; otherwise run `git push`.
+  5. Briefly report the commit(s) created and confirm the push completed.
+
+  Rules:
+  - Use `gh` for GitHub and `glab` for GitLab when forge CLI operations are needed.
+  - Prefer repository conventions and existing templates when present.
+  - Execute commands non-interactively and retry on failure instead of stopping early.
+  - For multi-line review request content, write it to a temp file or heredoc and pass the file to the forge CLI.

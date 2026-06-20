@@ -1,16 +1,14 @@
 ---
+name: ship-it
 description: Commit current work with meaningful boundaries and push to origin
-mode: subagent
-model: xiaomi/mimo-v2.5
-hidden: true
 ---
 
-# Commit & Push
+# Ship It
 
-Goal:
 Commit current work with meaningful commit boundaries and push cleanly.
 
-Rules:
+## Rules
+
 - Use standard git plus the repository forge CLI for review operations: `gh` for GitHub, `glab` for GitLab.
 - Inspect the current repo and review request state before choosing commit messages, titles, bodies, or review replies.
 - Prefer repository conventions and existing templates when present.
@@ -21,14 +19,42 @@ Rules:
 - For multi-line review request content, write it to a temp file or heredoc and pass the file to the forge CLI instead of inline multi-line body text.
 - If a command fails, resolve the issue and retry rather than stopping early.
 
-Steps:
-1. Inspect the current diff before choosing commit boundaries and messages.
-2. Commit all uncommitted changes in meaningful commit(s): split unrelated changes, keep each commit focused, and use concise imperative messages grounded in the diff.
-3. Push explicitly: run `git rev-parse --abbrev-ref --symbolic-full-name @{upstream}`; if it fails, run `git push --set-upstream origin HEAD`; otherwise run `git push`.
+## Workflow
 
-Done:
+### 1. Inspect the Diff
+
+```bash
+git status --short
+git diff
+git diff --cached
+```
+
+Review changes before choosing commit boundaries and messages.
+
+### 2. Commit in Focused Slices
+
+Split unrelated changes into separate commits. Stage and commit each slice with a concise imperative Conventional Commit message grounded in the diff:
+
+```bash
+git add <paths>
+git commit -m "<type>(<scope>): <subject>"
+```
+
+Repeat until all uncommitted changes are committed.
+
+### 3. Push Explicitly
+
+```bash
+git rev-parse --abbrev-ref --symbolic-full-name @{upstream}
+```
+
+If that fails, run `git push --set-upstream origin HEAD`; otherwise run `git push`.
+
+## Done
+
 - The working tree is clean.
 - The branch is pushed to origin (with upstream configured if needed).
 
-Reply:
+## Report
+
 Briefly report the commit(s) you created and confirm the push completed.

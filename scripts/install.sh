@@ -329,7 +329,7 @@ _self_check_opencode() {
         "change-auditor.md"
         "deslop.md"
         "create-pr.md"
-        "cp.md"
+        "ship-it.md"
     )
 
     for f in "${required_command_files[@]}"; do
@@ -927,7 +927,7 @@ main() {
     echo "  - pr-reviewer      : Address PR review feedback"
     echo "  - pr-reviewer-only : Generate implementation prompt for PR feedback"
     echo "  - create-pr        : Create PR from current changes"
-    echo "  - cp               : Commit current work with meaningful boundaries and push to origin"
+    echo "  - ship-it          : Commit current work with meaningful boundaries and push to origin"
     echo "  - deslop           : Analyze code for quality issues using coding principles"
     echo "  - agent-browser    : Browser automation with the agent-browser CLI"
     echo "  - imagegen-google  : Generate/edit images with Google Nano Banana Pro (Vertex AI)"
