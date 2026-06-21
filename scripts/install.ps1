@@ -278,6 +278,7 @@ function Test-OpenCodeInstallation {
         "pr-reviewer-only.md",
         "refactor.md",
         "review.md",
+        "adversarial-review.md",
         "ultrareview.md",
         "ultrareview-lite.md",
         "cc.md",
@@ -743,6 +744,7 @@ Write-Host ""
 Write-Host "Installed workflows:"
 Write-Host "  - Refactor         : Analyze codebase for refactoring opportunities"
 Write-Host "  - Review           : Review uncommitted changes"
+Write-Host "  - AdversarialReview: Spawn subagents to review changes, verify findings, and fix confirmed issues"
 Write-Host "  - UltraReview      : Parallel dual-model review (GPT 5.5 + Gemini 3.1 Pro)"
 Write-Host "  - UltraReview-Lite : Parallel dual-model review (MiMo v2.5 Pro + Gemini 3 Flash Preview)"
 Write-Host "  - CC               : Execute Claude CLI commands and code reviews"

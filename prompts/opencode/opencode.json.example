@@ -806,6 +806,7 @@
           "docs-research": "allow",
           "walkthrough": "allow",
           "review": "allow",
+          "adversarial-review": "allow",
           "thermo-nuclear-code-quality-review": "allow",
           "deslop": "allow",
           "pr-reviewer": "allow",
@@ -834,6 +835,7 @@
           "docs-research": "allow",
           "walkthrough": "allow",
           "review": "allow",
+          "adversarial-review": "allow",
           "thermo-nuclear-code-quality-review": "allow",
           "deslop": "allow",
           "pr-reviewer": "allow",
@@ -911,6 +913,14 @@
       "model": "openai/gpt-5.5",
       "hidden": true,
       "prompt": "{file:./commands/review.md}",
+      "reasoningEffort": "high"
+    },
+    "adversarial-review": {
+      "description": "Spawn fresh subagents to adversarially review changes, verify findings, and fix confirmed issues.",
+      "mode": "subagent",
+      "model": "openai/gpt-5.5",
+      "hidden": true,
+      "prompt": "{file:./commands/adversarial-review.md}",
       "reasoningEffort": "high"
     },
     "thermo-nuclear-code-quality-review": {

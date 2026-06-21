@@ -9,6 +9,7 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 | **frontier-worker** | *(Claude Code & Codex)* Orchestrate a task: delegate **all** exploration and coding to the `cmd` CLI (MiniMax-M3-Free), then dual-review every change with a clean-context host subagent **and** an independent `agy` reviewer (Gemini 3.1 Pro High), looping fixes until clean |
 | **refactor** | Analyze codebase for refactoring opportunities, prioritize by severity/effort |
 | **review** | Review uncommitted changes for bugs, regressions, and improvements |
+| **adversarial-review** | Spawn fresh subagents to adversarially review current changes, verify findings against live repo evidence, and fix confirmed issues |
 | **ultrareview** | Parallel dual-model review using GPT 5.5 + Gemini 3.1 Pro Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
 | **ultrareview-lite** | Parallel dual-model review using MiMo v2.5 Pro + Gemini 3 Flash Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
 | **widereview** | Wide fan-out review across four cheap-model CLIs (Grok Composer 2.5, Qwen3.7-Max, MiMo v2.5 Pro via OpenCode, MiniMax-M3 via pi) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (`--full`) *(Not available: Gemini, Antigravity, Amp)* |
@@ -102,6 +103,7 @@ The orchestrator uses keyword-based deterministic routing:
 | PR feedback | "PR comment", "address PR" | **pr-reviewer** |
 | Code audit | "audit", "code quality" | **deslop** |
 | Local review | "review changes", "uncommitted" | **review** |
+| Adversarial review | "adversarial review", "subagents review", "verify findings and fix" | **adversarial-review** |
 | Remote repo research | GitHub URL, `owner/repo`, "reference implementation" | **github-librarian** |
 | Official docs research | "official docs", "migration guide", "API docs" | **docs-research** |
 | Local walkthrough | "walk me through", "diagram", "architecture" | **walkthrough** |
@@ -154,6 +156,7 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 │   └── oracle.md             # Deep reasoning (GPT-5.5)
 └── commands/                  # Workflow prompts
     ├── review.md
+    ├── adversarial-review.md
     ├── ultrareview.md
     ├── ultrareview-lite.md
     ├── widereview.md
@@ -188,6 +191,7 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 | **milestone-validator** | Validate each milestone before advancing | GPT-5.5 | — |
 | **change-auditor** | Deep audit for security, breaking changes | GPT-5.5 | **High** |
 | **review** | Review uncommitted changes | GPT-5.5 | **High** |
+| **adversarial-review** | Subagent-backed review, finding verification, and fix loop | GPT-5.5 | **High** |
 | **ultrareview** | Parallel dual-model review (GPT 5.5 + Gemini 3.1 Pro Preview) | MiMo v2.5 Pro | — |
 | **ultrareview-lite** | Parallel dual-model review (MiMo v2.5 Pro + Gemini 3 Flash Preview) | MiMo v2.5 Pro | — |
 | **widereview** | Wide fan-out review across 4 cheap-model CLIs (Grok Composer 2.5 + Qwen3.7-Max + MiMo v2.5 Pro via OpenCode + MiniMax-M3 via pi); diff or full-codebase (`--full`) | MiMo v2.5 Pro | — |
@@ -367,7 +371,8 @@ mkdir -p ~/.config/opencode/agent
 mkdir -p ~/.config/opencode/bin
 
 # Copy workflow prompts to commands/
-for f in prompts/opencode/commands/review.md prompts/opencode/commands/deslop.md \
+for f in prompts/opencode/commands/review.md prompts/opencode/commands/adversarial-review.md \
+         prompts/opencode/commands/deslop.md \
          prompts/opencode/commands/mission-scrutiny.md prompts/opencode/commands/milestone-validator.md \
          prompts/opencode/commands/pr-reviewer.md prompts/opencode/commands/create-pr.md \
          prompts/opencode/commands/ship-it.md \
@@ -498,7 +503,7 @@ chmod +x ~/.config/opencode/bin/opencode-gh-librarian
 
 **Droids:** `oracle` (deep reasoning), `gemini-3-1-pro-reviewer` (Gemini 3.1 Pro read-only review), `github-librarian` (remote GitHub research), `docs-research` (official docs/API research), `walkthrough` (architecture walkthroughs with Mermaid diagrams)
 
-**Skills:** `oracle`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`, `widereview`
+**Skills:** `oracle`, `adversarial-review`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`, `widereview`
 
 The shipped `oracle` droid uses Factory's built-in GPT-5.5 with `reasoningEffort: high`. For BYOK, change `~/.factory/droids/oracle.md` to `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
 </details>
@@ -601,7 +606,8 @@ mkdir -p ~/.config/opencode/agent
 mkdir -p ~/.config/opencode/bin
 
 # Copy workflow prompts to commands/
-for f in prompts/opencode/commands/review.md prompts/opencode/commands/deslop.md \
+for f in prompts/opencode/commands/review.md prompts/opencode/commands/adversarial-review.md \
+         prompts/opencode/commands/deslop.md \
          prompts/opencode/commands/mission-scrutiny.md prompts/opencode/commands/milestone-validator.md \
          prompts/opencode/commands/pr-reviewer.md prompts/opencode/commands/create-pr.md \
          prompts/opencode/commands/ship-it.md \
@@ -731,7 +737,7 @@ chmod +x ~/.config/opencode/bin/opencode-gh-librarian
 
 **Droids:** `oracle` (deep reasoning), `gemini-3-1-pro-reviewer` (Gemini 3.1 Pro read-only review), `github-librarian` (remote GitHub research), `docs-research` (official docs/API research), `walkthrough` (architecture walkthroughs with Mermaid diagrams)
 
-**Skills:** `oracle`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`, `widereview`
+**Skills:** `oracle`, `adversarial-review`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`, `widereview`
 
 The shipped `oracle` droid uses Factory's built-in GPT-5.5 with `reasoningEffort: high`. For BYOK, change `~/.factory/droids/oracle.md` to `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
 </details>
@@ -808,6 +814,17 @@ Reviews uncommitted changes:
 3. **Checks for regressions**: Breaking API changes, removed functionality
 4. **Optimizes**: Finds redundant code, duplicate logic, performance issues
 5. **Fixes simple issues** automatically (≤5 straightforward fixes)
+
+### adversarial-review
+
+Uses fresh subagents to challenge the current diff, then verifies and fixes only confirmed issues:
+
+1. **Builds a shared diff bundle**: `git status --short`, staged diff, unstaged diff, and `git diff -U40 HEAD`
+2. **Spawns independent reviewers**: at least two read-only subagents where the harness supports parallel subagent calls
+3. **Normalizes findings**: severity, category, file:line, rationale, confidence, and suggested fix
+4. **Verifies before editing**: each finding is checked against live files and tests before it is accepted
+5. **Fixes confirmed issues**: invalid, speculative, duplicate, pre-existing, or unrelated findings are rejected with evidence
+6. **Re-reviews material fixes**: runs another adversarial pass when fixes changed behavior
 
 ### ultrareview
 
