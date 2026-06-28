@@ -697,7 +697,7 @@
       "id": "subagent-worker-general-workflow-state-machine",
       "description": "Directly test worker-general on state-machine correctness that passing visible tests do not cover.",
       "agent": "worker-general",
-      "prompt": "GOAL: Fix the workflow engine so it satisfies the state-machine contract below, not just the visible tests.\n\nCONTEXT:\n- This is a small in-memory workflow engine.\n- `npm test` currently covers only easy cases and may pass before the real contract is correct.\n- Treat this prompt as the source of truth for the missing edge cases.\n\nEXECUTION CONTRACT:\n- Files to modify: `src/workflow.js` and `scripts/build.js` only.\n- DO: Run `npm test` before and after the fix.\n- DO: Run `npm run build && npm start` before reporting complete.\n- DO NOT: Modify tests, package metadata, or create dependencies.\n\nSTATE-MACHINE REQUIREMENTS:\n1. `claim({ queue, workerId, now, limit, leaseMs })` must choose globally across all active runs on the queue, ordered by priority descending, then availableAt ascending, then createdAt ascending. Do not order inside each run and then concatenate runs.\n2. `complete` and `fail` must reject an expired lease using an error whose message contains `LEASE_EXPIRED`. An expired lease must not be allowed to mark a step `succeeded` or user-failed.\n3. `recoverExpiredLeases` must be robust when several running steps expire in the same pass. If one expired step exhausts attempts and fails the run, every other non-terminal step in that run must stay `blocked`, even if it also appeared in the recovery snapshot.\n4. `streamRunEvents(runId, { afterEventId })` must replay stored events after the cursor and then keep delivering live events emitted after the stream starts. `close()` must unregister the live listener.\n5. The clean build path must work: `npm run build` must produce the file that `npm start` runs.\n\nOUTPUT FORMAT: Implementation Summary with Test Results.",
+      "prompt": "GOAL: Fix the workflow engine so it satisfies the state-machine contract below, not just the visible tests.\n\nCONTEXT:\n- This is a small in-memory workflow engine.\n- `npm test` currently covers only easy cases and may pass before the real contract is correct.\n- Treat this prompt as the source of truth for the missing edge cases.\n\nEXECUTION CONTRACT:\n- Files to modify: `src/workflow.js` and `scripts/build.js` only.\n- DO: Run `npm test` before and after the fix.\n- DO: Run `npm run build`, then run `npm start` only long enough to confirm it prints `workflow engine ready`; stop it if it remains running.\n- DO NOT: Modify tests, package metadata, or create dependencies.\n\nSTATE-MACHINE REQUIREMENTS:\n1. `claim({ queue, workerId, now, limit, leaseMs })` must choose globally across all active runs on the queue, ordered by priority descending, then availableAt ascending, then createdAt ascending. Do not order inside each run and then concatenate runs.\n2. `complete` and `fail` must reject an expired lease using an error whose message contains `LEASE_EXPIRED`. An expired lease must not be allowed to mark a step `succeeded` or user-failed.\n3. `recoverExpiredLeases` must be robust when several running steps expire in the same pass. If one expired step exhausts attempts and fails the run, every other non-terminal step in that run must stay `blocked`, even if it also appeared in the recovery snapshot.\n4. `streamRunEvents(runId, { afterEventId })` must replay stored events after the cursor and then keep delivering live events emitted after the stream starts. `close()` must unregister the live listener.\n5. The clean build path must work: `npm run build` must produce the file that `npm start` runs.\n\nOUTPUT FORMAT: Implementation Summary with Test Results.",
       "timeoutMs": 300000,
       "tags": [
         "subagent",
@@ -762,7 +762,7 @@
             "timeoutMs": 10000
           },
           {
-            "command": "npm run build && npm start",
+            "command": "npm run build && node - <<'NODE'\nconst { spawnSync } = require('node:child_process')\nconst result = spawnSync('npm', ['start'], { encoding: 'utf8', timeout: 5000 })\nconst output = `${result.stdout || ''}${result.stderr || ''}`\nprocess.stdout.write(output)\nif (!output.includes('workflow engine ready')) process.exit(1)\nif (result.error && result.error.code !== 'ETIMEDOUT') {\n  console.error(result.error)\n  process.exit(1)\n}\nif (typeof result.status === 'number' && result.status !== 0) process.exit(result.status)\nNODE",
             "exitCode": 0,
             "outputIncludes": [
               "workflow engine ready"
@@ -776,7 +776,7 @@
       "id": "subagent-worker-general-workflow-spec-compliance",
       "description": "Directly test worker-general on reading a workflow spec and finding incomplete state-machine behavior beyond passing tests.",
       "agent": "worker-general",
-      "prompt": "GOAL: Bring this workflow engine into compliance with `SPEC.md`.\n\nCONTEXT:\n- The existing tests are intentionally incomplete.\n- Do not assume a passing test suite means the implementation satisfies the spec.\n- Read `SPEC.md`, inspect the implementation, and fix the smallest set of source/build issues needed for compliance.\n\nEXECUTION CONTRACT:\n- Files you may modify: `src/workflow.js`, `scripts/build.js`, and `test/workflow.test.js` only.\n- DO: Run `npm test` before and after the fix.\n- DO: Run `npm run build && npm start` before reporting complete.\n- DO NOT: Modify `SPEC.md`, `package.json`, or add dependencies.\n- DO NOT: Remove public exports or change public function names.\n\nOUTPUT FORMAT: Implementation Summary with Test Results.",
+      "prompt": "GOAL: Bring this workflow engine into compliance with `SPEC.md`.\n\nCONTEXT:\n- The existing tests are intentionally incomplete.\n- Do not assume a passing test suite means the implementation satisfies the spec.\n- Read `SPEC.md`, inspect the implementation, and fix the smallest set of source/build issues needed for compliance.\n\nEXECUTION CONTRACT:\n- Files you may modify: `src/workflow.js`, `scripts/build.js`, and `test/workflow.test.js` only.\n- DO: Run `npm test` before and after the fix.\n- DO: Run `npm run build`, then run `npm start` only long enough to confirm it prints `workflow engine ready`; stop it if it remains running.\n- DO NOT: Modify `SPEC.md`, `package.json`, or add dependencies.\n- DO NOT: Remove public exports or change public function names.\n\nOUTPUT FORMAT: Implementation Summary with Test Results.",
       "timeoutMs": 300000,
       "tags": [
         "subagent",
@@ -856,7 +856,7 @@
             "timeoutMs": 10000
           },
           {
-            "command": "npm run build && npm start",
+            "command": "npm run build && node - <<'NODE'\nconst { spawnSync } = require('node:child_process')\nconst result = spawnSync('npm', ['start'], { encoding: 'utf8', timeout: 5000 })\nconst output = `${result.stdout || ''}${result.stderr || ''}`\nprocess.stdout.write(output)\nif (!output.includes('workflow engine ready')) process.exit(1)\nif (result.error && result.error.code !== 'ETIMEDOUT') {\n  console.error(result.error)\n  process.exit(1)\n}\nif (typeof result.status === 'number' && result.status !== 0) process.exit(result.status)\nNODE",
             "exitCode": 0,
             "outputIncludes": [
               "workflow engine ready"
@@ -870,7 +870,7 @@
       "id": "primary-mimo-workflow-spec-compliance",
       "description": "Test the full MiMo primary workflow on the workflow spec-compliance task that direct MiMo general failed.",
       "agent": "frontier-worker",
-      "prompt": "In this project, bring the workflow engine into compliance with `SPEC.md`. This is a high-risk state-machine and lease-recovery change, so review the execution contract before implementation. The existing tests are intentionally incomplete, so do not assume a passing test suite is sufficient. Read the spec, inspect the implementation, make the smallest safe source/build fixes, preserve public function names, do not modify `SPEC.md` or `package.json`, and verify with `npm test` plus `npm run build && npm start`.",
+      "prompt": "In this project, bring the workflow engine into compliance with `SPEC.md`. This is a high-risk state-machine and lease-recovery change, so review the execution contract before implementation. The existing tests are intentionally incomplete, so do not assume a passing test suite is sufficient. Read the spec, inspect the implementation, make the smallest safe source/build fixes, preserve public function names, do not modify `SPEC.md` or `package.json`, and verify with `npm test`, `npm run build`, and `npm start` only long enough to confirm it prints `workflow engine ready`.",
       "timeoutMs": 240000,
       "tags": [
         "primary",
@@ -954,7 +954,7 @@
             "timeoutMs": 10000
           },
           {
-            "command": "npm run build && npm start",
+            "command": "npm run build && node - <<'NODE'\nconst { spawnSync } = require('node:child_process')\nconst result = spawnSync('npm', ['start'], { encoding: 'utf8', timeout: 5000 })\nconst output = `${result.stdout || ''}${result.stderr || ''}`\nprocess.stdout.write(output)\nif (!output.includes('workflow engine ready')) process.exit(1)\nif (result.error && result.error.code !== 'ETIMEDOUT') {\n  console.error(result.error)\n  process.exit(1)\n}\nif (typeof result.status === 'number' && result.status !== 0) process.exit(result.status)\nNODE",
             "exitCode": 0,
             "outputIncludes": [
               "workflow engine ready"

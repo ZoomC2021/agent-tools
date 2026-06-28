@@ -137,6 +137,8 @@ That means you can test:
 
 Use Codex and Devin variants with expectations based on final text, files, exit codes, and workspace commands. OpenCode-specific expectations such as `requiredSubagents`, `forbiddenSubagents`, `taskPromptIncludes`, and `transcriptRegex` depend on OpenCode session export internals. Use `--outcome-only` to score a run on exit status, file assertions, workspace commands, and token limits while ignoring OpenCode telemetry and receipt-format assertions.
 
+In `--outcome-only` mode, a timed-out process can still pass when the scenario has concrete file or workspace-command checks and those checks pass after the workspace is preserved. Prompt-only timeouts still fail because there is no durable outcome to verify.
+
 ## Scenario Format
 
 Each scenario can define:

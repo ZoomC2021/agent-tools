@@ -578,13 +578,26 @@ function evaluateExpectations(expectations, summary, options = {}) {
   const checks = []
   const transcript = summary.transcriptText || ""
   const outcomeOnly = Boolean(options.outcomeOnly)
+  const hasConcreteOutcomeChecks = Boolean(
+    (expectations.fileContains || []).length || (expectations.workspaceCommands || []).length,
+  )
 
   const pushCheck = (name, pass, expected, actual) => {
     checks.push({ name, pass, expected, actual })
   }
 
   if (Object.prototype.hasOwnProperty.call(expectations, "exitCode")) {
-    pushCheck("exitCode", summary.exitCode === expectations.exitCode, expectations.exitCode, summary.exitCode)
+    const expectedExitCode = expectations.exitCode
+    const timeoutWithOutcomeChecks = outcomeOnly
+      && summary.timedOut
+      && expectedExitCode === 0
+      && hasConcreteOutcomeChecks
+    pushCheck(
+      "exitCode",
+      timeoutWithOutcomeChecks || summary.exitCode === expectedExitCode,
+      expectedExitCode,
+      { exitCode: summary.exitCode, timedOut: summary.timedOut },
+    )
   }
 
   if (!outcomeOnly) {
@@ -1140,8 +1153,11 @@ function renderSummaryMarkdown(summary) {
 
   for (const result of summary.results) {
     const subagents = result.summary.subagentCalls.map((call) => call.subagent).join(", ") || "-"
+    const passLabel = result.evaluation.pass
+      ? (result.summary.timedOut ? "PASS (timeout)" : "PASS")
+      : "FAIL"
     lines.push(
-      `| ${result.variant} | ${result.scenario} | ${result.evaluation.pass ? "PASS" : "FAIL"} | ${result.summary.durationMs ?? "-"} | ${result.summary.tokens.total} | ${subagents} | ${result.summary.assistantModel || "-"} |`,
+      `| ${result.variant} | ${result.scenario} | ${passLabel} | ${result.summary.durationMs ?? "-"} | ${result.summary.tokens.total} | ${subagents} | ${result.summary.assistantModel || "-"} |`,
     )
   }
 

@@ -79,5 +79,6 @@ Recovery must be stable when multiple steps in the same run expire in one pass. 
 The clean build-start flow must work from a fresh checkout:
 
 ```sh
-npm run build && npm start
+npm run build
+npm start # only long enough to confirm it prints "workflow engine ready"
 ```

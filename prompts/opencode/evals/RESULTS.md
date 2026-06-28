@@ -1,7 +1,7 @@
 # OpenCode Worker Eval Results
 
 Living reference for worker model comparisons.
-Last updated: 2026-06-19.
+Last updated: 2026-06-29.
 
 ## Matrix Results (both explore + general agents set to same model)
 
@@ -58,6 +58,17 @@ Raw score is **2/6** because four OpenCode-era checks require exact final-answer
 | Harness | Provider | Model | Raw Score | Behavior Score | Total Time | Notes |
 |---------|----------|-------|-----------|----------------|------------|-------|
 | codex | openai | gpt-5.3-codex-spark high | 2/6 | **6/6** | **127s** | Fastest hard-task times; format-only misses on four light/read-only cases |
+
+### Devin CLI Outcome Runs
+
+Devin CLI runs use `opencode-eval --runner devin --outcome-only`, which scores portable outcomes: exit status, file assertions, and workspace commands. OpenCode subagent telemetry and exact receipt headings are intentionally ignored.
+
+For workflow-hard cases, old runs could hit the CLI timeout after producing a workspace that passed every file, test, hidden behavior, and build/start check. Those are recorded as outcome successes. The harness now treats timeout-after-passing-outcome as success only when concrete file/workspace checks exist, and the workflow fixture no longer asks agents to run an unbounded `npm start`.
+
+| Harness | Provider | Model | Raw Score | Outcome Score | Run Directory | Notes |
+|---------|----------|-------|-----------|---------------|---------------|-------|
+| devin | cognition | GLM-5.2 | 36/38 | **37/38** | `evals/out/devin-glm52-full-20260628T1535Z` | `primary-mimo-workflow-spec-compliance` passed all outcome checks after timeout; `subagent-mission-scrutiny-underspecified-blocked` timed out with no concrete outcome checks |
+| devin | cognition | Kimi K2.7 | 36/38 | **38/38** | `evals/out/devin-kimi27-full-20260628T1602Z` | Both workflow spec-compliance timeouts passed all saved workspace outcome checks |
 
 ### Provider Notes
 
