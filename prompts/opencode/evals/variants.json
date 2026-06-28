@@ -36,6 +36,76 @@
       }
     },
     {
+      "name": "glm52-pioneer-primary",
+      "description": "Candidate workflow: frontier-worker and plan mode both use Pioneer.ai GLM-5.2 while subagent routing stays the same.",
+      "cliModel": "pioneer/zai-org/GLM-5.2",
+      "configOverrides": {
+        "agent.frontier-worker.model": "pioneer/zai-org/GLM-5.2",
+        "mode.plan.model": "pioneer/zai-org/GLM-5.2"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/frontier-worker.md": {
+          "model": "pioneer/zai-org/GLM-5.2"
+        }
+      }
+    },
+    {
+      "name": "kimi-k27-code-pioneer-primary",
+      "description": "Candidate workflow: frontier-worker and plan mode both use Pioneer.ai Kimi K2.7 Code while subagent routing stays the same.",
+      "cliModel": "pioneer/moonshotai/Kimi-K2.7-Code",
+      "configOverrides": {
+        "agent.frontier-worker.model": "pioneer/moonshotai/Kimi-K2.7-Code",
+        "mode.plan.model": "pioneer/moonshotai/Kimi-K2.7-Code"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/frontier-worker.md": {
+          "model": "pioneer/moonshotai/Kimi-K2.7-Code"
+        }
+      }
+    },
+    {
+      "name": "gpt55-pioneer-primary",
+      "description": "Candidate workflow: frontier-worker and plan mode both use Pioneer.ai GPT-5.5 while subagent routing stays the same.",
+      "cliModel": "pioneer/gpt-5.5",
+      "configOverrides": {
+        "agent.frontier-worker.model": "pioneer/gpt-5.5",
+        "mode.plan.model": "pioneer/gpt-5.5"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/frontier-worker.md": {
+          "model": "pioneer/gpt-5.5"
+        }
+      }
+    },
+    {
+      "name": "pioneer-auto-primary",
+      "description": "Candidate workflow: frontier-worker and plan mode both use the Pioneer.ai auto router over the OpenAI-compatible endpoint.",
+      "cliModel": "pioneer/pioneer/auto",
+      "configOverrides": {
+        "agent.frontier-worker.model": "pioneer/pioneer/auto",
+        "mode.plan.model": "pioneer/pioneer/auto"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/frontier-worker.md": {
+          "model": "pioneer/pioneer/auto"
+        }
+      }
+    },
+    {
+      "name": "opus48-pioneer-primary",
+      "description": "Candidate workflow: frontier-worker and plan mode both use Pioneer.ai Claude Opus 4.8 while subagent routing stays the same.",
+      "cliModel": "pioneer/claude-opus-4-8",
+      "configOverrides": {
+        "agent.frontier-worker.model": "pioneer/claude-opus-4-8",
+        "mode.plan.model": "pioneer/claude-opus-4-8"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/frontier-worker.md": {
+          "model": "pioneer/claude-opus-4-8"
+        }
+      }
+    },
+    {
       "name": "mimo25pro-primary",
       "description": "Xiaomi MiMo v2.5 Pro used as the orchestrator/primary model with subagent routing unchanged.",
       "cliModel": "xiaomi/mimo-v2.5-pro",
@@ -467,6 +537,29 @@
         "agent/worker-general.md": {
           "mode": "primary",
           "model": "xiaomi/mimo-v2.5-pro"
+        }
+      }
+    },
+    {
+      "name": "matrix-mimo-v2.5-pro-pioneer",
+      "description": "Reference-matrix variant: both worker-explore and worker-general -> pioneer/XiaomiMiMo/MiMo-V2.5-Pro.",
+      "configOverrides": {
+        "agent.worker-explore.mode": "primary",
+        "agent.worker-explore.hidden": false,
+        "agent.worker-explore.model": "pioneer/XiaomiMiMo/MiMo-V2.5-Pro",
+        "agent.worker-explore.permission.bash": "allow",
+        "agent.worker-general.mode": "primary",
+        "agent.worker-general.hidden": false,
+        "agent.worker-general.model": "pioneer/XiaomiMiMo/MiMo-V2.5-Pro"
+      },
+      "promptFrontmatterOverrides": {
+        "agent/worker-explore.md": {
+          "mode": "primary",
+          "model": "pioneer/XiaomiMiMo/MiMo-V2.5-Pro"
+        },
+        "agent/worker-general.md": {
+          "mode": "primary",
+          "model": "pioneer/XiaomiMiMo/MiMo-V2.5-Pro"
         }
       }
     },

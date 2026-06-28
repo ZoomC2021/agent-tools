@@ -555,6 +555,80 @@
         }
       }
     },
+    "pioneer": {
+      "options": {
+        "apiKey": "{env:PIONEER_API_KEY}",
+        "baseURL": "https://api.pioneer.ai/v1"
+      },
+      "models": {
+        "pioneer/auto": {
+          "name": "Pioneer Auto Router",
+          "limit": {
+            "context": 1048576,
+            "output": 32000
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        },
+        "zai-org/GLM-5.2": {
+          "name": "GLM-5.2 (Pioneer.ai)",
+          "limit": {
+            "context": 1048576,
+            "output": 24000
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        },
+        "moonshotai/Kimi-K2.7-Code": {
+          "name": "Kimi K2.7 Code (Pioneer.ai)",
+          "limit": {
+            "context": 262144,
+            "output": 4096
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        },
+        "gpt-5.5": {
+          "name": "GPT-5.5 (Pioneer.ai)",
+          "limit": {
+            "context": 1000000,
+            "output": 32000
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        },
+        "claude-opus-4-8": {
+          "name": "Claude Opus 4.8 (Pioneer.ai)",
+          "limit": {
+            "context": 1000000,
+            "output": 32000
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        },
+        "XiaomiMiMo/MiMo-V2.5-Pro": {
+          "name": "MiMo v2.5 Pro (Pioneer.ai)",
+          "limit": {
+            "context": 1048576,
+            "output": 32000
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        }
+      }
+    },
     "nvidia": {
       "options": {
         "apiKey": "{env:NVIDIA_API_KEY}",

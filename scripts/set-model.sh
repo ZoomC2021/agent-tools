@@ -69,6 +69,12 @@ display_name() {
         tokenrouter/MiniMax-M4)            echo "MiniMax-M4" ;;
         xiaomi/mimo-v2.5-pro)              echo "MiMo v2.5 Pro" ;;
         openai/gpt-5.5)                    echo "GPT-5.5" ;;
+        pioneer/pioneer/auto)              echo "Pioneer Auto Router" ;;
+        pioneer/gpt-5.5)                   echo "GPT-5.5 (Pioneer.ai)" ;;
+        pioneer/claude-opus-4-8)           echo "Claude Opus 4.8 (Pioneer.ai)" ;;
+        pioneer/zai-org/GLM-5.2)           echo "GLM-5.2 (Pioneer.ai)" ;;
+        pioneer/moonshotai/Kimi-K2.7-Code) echo "Kimi K2.7 Code (Pioneer.ai)" ;;
+        pioneer/XiaomiMiMo/MiMo-V2.5-Pro)  echo "MiMo v2.5 Pro (Pioneer.ai)" ;;
         xai/grok-imagine-image-quality)    echo "xAI Grok Imagine Image Quality" ;;
         google/gemini-3-pro-image-preview) echo "Gemini 3 Pro Image Preview" ;;
         zenmux/z-ai/glm-5.2-free)          echo "GLM-5.2 Free (ZenMux)" ;;

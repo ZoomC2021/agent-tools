@@ -208,7 +208,7 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 
 **NEVER commit your `opencode.json` with real API keys to version control.**
 
-- Use environment variables: `OPENCODE_XIAOMI_API_KEY`
+- Use environment variables such as `XIAOMI_API_KEY` or `PIONEER_API_KEY`
 - Or keep the config file in a secure location with `apiKey: "YOUR_KEY_HERE"`
 - The example file includes placeholder warnings to help prevent accidental commits
 
@@ -941,6 +941,7 @@ Analyzes code for quality issues using established software engineering principl
 - **Gemini CLI (`gemini`)** plus `gemini login` for `ultrareview` and `ultrareview-lite` secondary review lanes
 - **`XAI_API_KEY`** *(or a SuperGrok subscription signed into OpenCode — note the curl workflow still needs the raw API key)*, `curl`, `jq`, and `python3` for OpenCode `imagegen-grok`
 - **`GOOGLE_API_KEY`** (Vertex AI Express), `python3`, and `google-genai` for OpenCode `imagegen-google`
+- **`PIONEER_API_KEY`** for Pioneer.ai OpenAI-compatible models such as `pioneer/zai-org/GLM-5.2`
 - **`ZENMUX_API_KEY`**, **`NVIDIA_API_KEY`**, and **Node.js** to run `bin/zenmux-throttle-proxy` when using rate-limited ZenMux or Nvidia models through the local throttle proxy
 - The respective coding agent installed and configured
 
