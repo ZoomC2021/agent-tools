@@ -83,36 +83,59 @@ function Install-Warp {
     Write-Success "Warp: $Dest"
 }
 
-function Install-Windsurf {
-    Write-Info "Installing Windsurf skills..."
+function Install-Devin {
+    Write-Info "Installing Devin CLI skills and agents..."
     
-    $SourceDir = Join-Path $PromptsDir "windsurf"
+    $SourceDir = Join-Path $PromptsDir "devin"
     
     if (-not (Test-Path -PathType Container $SourceDir)) {
         Write-Warn "Source directory not found: $SourceDir"
         return
     }
     
-    $Dest = Join-Path $env:USERPROFILE ".codeium\windsurf\skills"
-    $SkillDirs = Get-ChildItem -Path $SourceDir -Directory
+    $SkillsSource = Join-Path $SourceDir "skills"
+    $SkillsDest = Join-Path $env:USERPROFILE ".config\devin\skills"
+    $AgentsSource = Join-Path $SourceDir "agents"
+    $AgentsDest = Join-Path $env:USERPROFILE ".config\devin\agents"
+    $SkillDirs = if (Test-Path -PathType Container $SkillsSource) { Get-ChildItem -Path $SkillsSource -Directory } else { @() }
     $skillsFound = 0
     
     foreach ($dir in $SkillDirs) {
         $skillName = $dir.Name
         $skillMd = Join-Path $dir.FullName "SKILL.md"
         if (-not (Test-Path $skillMd)) {
-            Write-Warn "Skipping Windsurf skill '$skillName': missing SKILL.md"
+            Write-Warn "Skipping Devin skill '$skillName': missing SKILL.md"
             continue
         }
-        $SkillDest = Join-Path $Dest $skillName
+        $SkillDest = Join-Path $SkillsDest $skillName
         New-Item -ItemType Directory -Path $SkillDest -Force | Out-Null
         Copy-Item "$($dir.FullName)\*" -Destination $SkillDest -Recurse -Force
-        Write-Success "Windsurf skill '$skillName': $SkillDest"
+        Write-Success "Devin skill '$skillName': $SkillDest"
         $skillsFound++
     }
     
     if ($skillsFound -eq 0) {
-        Write-Warn "No skills found in $SourceDir"
+        Write-Warn "No skills found in $SkillsSource"
+    }
+
+    $AgentDirs = if (Test-Path -PathType Container $AgentsSource) { Get-ChildItem -Path $AgentsSource -Directory } else { @() }
+    $agentsFound = 0
+    foreach ($dir in $AgentDirs) {
+        $agentName = $dir.Name
+        $agentMd = Join-Path $dir.FullName "AGENT.md"
+        if (-not (Test-Path $agentMd)) {
+            Write-Warn "Skipping Devin agent '$agentName': missing AGENT.md"
+            continue
+        }
+        $AgentDest = Join-Path $AgentsDest $agentName
+        New-Item -ItemType Directory -Path $AgentDest -Force | Out-Null
+        Copy-Item "$($dir.FullName)\*" -Destination $AgentDest -Recurse -Force
+        Write-Success "Devin agent '$agentName': $AgentDest"
+        $agentsFound++
+    }
+
+    if ($agentsFound -eq 0) {
+        Write-Warn "No agents found in $AgentsSource"
     }
 }
 
@@ -728,7 +751,7 @@ Write-Host ""
 Install-Cursor
 Install-Pi
 Install-Warp
-Install-Windsurf
+Install-Devin
 Install-OpenCode
 Install-Gemini
 Install-Droid

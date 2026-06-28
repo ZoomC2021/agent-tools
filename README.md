@@ -6,7 +6,7 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 
 | Workflow | Description |
 |----------|-------------|
-| **frontier-worker** | *(Claude Code & Codex)* Orchestrate a task: delegate **all** exploration and coding to the `cmd` CLI (MiniMax-M3-Free), then dual-review every change with a clean-context host subagent **and** an independent `agy` reviewer (Gemini 3.1 Pro High), looping fixes until clean |
+| **frontier-worker** | *(Claude Code, Codex & Devin)* Orchestrate a task: delegate **all** exploration and coding to the `cmd` CLI (MiniMax-M3-Free), then dual-review every change with a clean-context host subagent **and** an independent `agy` reviewer (Gemini 3.1 Pro High), looping fixes until clean |
 | **refactor** | Analyze codebase for refactoring opportunities, prioritize by severity/effort |
 | **review** | Review uncommitted changes for bugs, regressions, and improvements |
 | **adversarial-review** | Spawn fresh subagents to adversarially review current changes, verify findings against live repo evidence, and fix confirmed issues |
@@ -24,15 +24,15 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 | **docs-research** | Research official documentation and external API behavior using web sources |
 | **walkthrough** | Explain local architecture and code flow with evidence-backed walkthroughs |
 
-## Frontier Worker (Claude Code & Codex)
+## Frontier Worker (Claude Code, Codex & Devin)
 
-A flexible, CLI-driven variant of the OpenCode `frontier-worker` orchestrator. Here the **host CLI (Claude Code or Codex) is the orchestrator**: it plans and routes but delegates **all** investigation and coding to the `cmd` CLI, then reviews every change with two independent reviewers in parallel. Because neither `cmd` nor `agy` exposes ACP or an SDK, both are driven one-shot via their `--print` modes.
+A flexible, CLI-driven variant of the OpenCode `frontier-worker` orchestrator. Here the **host CLI (Claude Code, Codex, or Devin) is the orchestrator**: it plans and routes but delegates **all** investigation and coding to the `cmd` CLI, then reviews every change with two independent reviewers in parallel. Because neither `cmd` nor `agy` exposes ACP or an SDK, both are driven one-shot via their `--print` modes.
 
-Invoke with `/frontier-worker <task>` (Claude Code) or the `frontier-worker` skill (Codex).
+Invoke with `/frontier-worker <task>` (Claude Code) or the `frontier-worker` skill (Codex/Devin).
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│  Orchestrator = host CLI (Claude Code / Codex)               │
+│  Orchestrator = host CLI (Claude Code / Codex / Devin)       │
 │  • Plans & sequences  • Writes briefs  • Consolidates review │
 │  • Never reads/edits project files itself                    │
 └───────────┬───────────────────────┬──────────────────────────┘
@@ -49,10 +49,10 @@ Invoke with `/frontier-worker <task>` (Claude Code) or the `frontier-worker` ski
 
 | Role | CLI / mechanism | Model |
 |------|-----------------|-------|
-| Orchestrator | host (Claude Code / Codex) | — |
+| Orchestrator | host (Claude Code / Codex / Devin) | — |
 | Explorer (read-only) | `cmd -p --permission-mode plan` | `MiniMaxAI/MiniMax-M3-Free` |
 | Worker (coding) | `cmd -p --yolo` | `MiniMaxAI/MiniMax-M3-Free` |
-| Reviewer A (clean context) | Claude `Task` subagent / Codex multi-agent (`codex exec` fallback) | host default |
+| Reviewer A (clean context) | Claude `Task` subagent / Codex multi-agent (`codex exec` fallback) / Devin subagent | host default |
 | Reviewer B (independent) | `agy -p` | `Gemini 3.1 Pro (High)` |
 
 **Flexible knobs** (env overrides): `FW_WORKER_MODEL`, `FW_REVIEW_MODEL`, `FW_TIMEOUT`, `FW_MAX_TURNS`, `FW_MAX_ITERS`.
@@ -281,7 +281,7 @@ Notes:
 | [Cursor](https://cursor.com) | Editor | `~/.cursor/commands/` |
 | [Cline](https://cline.bot) | Editor | `~/Documents/Cline/Rules/` |
 | [cmd](https://commandcode.ai) | CLI | `~/.commandcode/skills/` |
-| [Windsurf](https://codeium.com/windsurf) | Editor | `~/.codeium/windsurf/skills/` |
+| [Devin CLI](https://devin.ai) | CLI | `~/.config/devin/skills/` and `~/.config/devin/agents/` |
 
 ### Codex ccapi Provider
 
@@ -320,7 +320,7 @@ cd agent-tools
 ./scripts/install.sh claude codex amp warp
 ```
 
-Available options: `claude`, `codex`, `opencode`, `pi`, `warp`, `antigravity`, `agy`, `copilot-cli`, `cmd`, `grok`, `amp`, `gemini`, `droid`, `kilocode`, `cursor`, `cline`, `windsurf`
+Available options: `claude`, `codex`, `opencode`, `pi`, `warp`, `antigravity`, `agy`, `copilot-cli`, `cmd`, `grok`, `amp`, `gemini`, `droid`, `kilocode`, `cursor`, `cline`, `devin`
 
 ## Manual Installation
 
@@ -548,13 +548,18 @@ done
 </details>
 
 <details>
-<summary>Windsurf</summary>
+<summary>Devin CLI</summary>
 
 ```bash
-for skill_dir in prompts/windsurf/*/; do
+for skill_dir in prompts/devin/skills/*/; do
   skill_name=$(basename "$skill_dir")
-  mkdir -p ~/.codeium/windsurf/skills/$skill_name
-  cp "$skill_dir"* ~/.codeium/windsurf/skills/$skill_name/
+  mkdir -p ~/.config/devin/skills/$skill_name
+  cp -r "$skill_dir"* ~/.config/devin/skills/$skill_name/
+done
+for agent_dir in prompts/devin/agents/*/; do
+  agent_name=$(basename "$agent_dir")
+  mkdir -p ~/.config/devin/agents/$agent_name
+  cp -r "$agent_dir"* ~/.config/devin/agents/$agent_name/
 done
 ```
 </details>
@@ -782,13 +787,18 @@ done
 </details>
 
 <details>
-<summary>Windsurf</summary>
+<summary>Devin CLI</summary>
 
 ```bash
-for skill_dir in prompts/windsurf/*/; do
+for skill_dir in prompts/devin/skills/*/; do
   skill_name=$(basename "$skill_dir")
-  mkdir -p ~/.codeium/windsurf/skills/$skill_name
-  cp "$skill_dir"* ~/.codeium/windsurf/skills/$skill_name/
+  mkdir -p ~/.config/devin/skills/$skill_name
+  cp -r "$skill_dir"* ~/.config/devin/skills/$skill_name/
+done
+for agent_dir in prompts/devin/agents/*/; do
+  agent_name=$(basename "$agent_dir")
+  mkdir -p ~/.config/devin/agents/$agent_name
+  cp -r "$agent_dir"* ~/.config/devin/agents/$agent_name/
 done
 ```
 </details>
@@ -881,7 +891,7 @@ Grok Imagine is reachable two ways from OpenCode: a raw `XAI_API_KEY` (required 
 
 ### imagegen-google
 
-Generates and edits images using **Google Nano Banana Pro** (`gemini-3-pro-image-preview`) via the Vertex AI Express mode of the `google-genai` SDK. Shipped to every supported harness (OpenCode subagent, Claude command, Codex skill, Warp workflow, Amp/Gemini/Windsurf/Droid skills, etc.):
+Generates and edits images using **Google Nano Banana Pro** (`gemini-3-pro-image-preview`) via the Vertex AI Express mode of the `google-genai` SDK. Shipped to every supported harness (OpenCode subagent, Claude command, Codex skill, Warp workflow, Amp/Gemini/Devin/Droid skills, etc.):
 
 1. **Text-to-image**: `client.models.generate_content` with `response_modalities=["IMAGE"]` and an `ImageConfig` aspect ratio
 2. **Image editing / composition**: Passes up to 14 reference images as inline `Part`s alongside the prompt

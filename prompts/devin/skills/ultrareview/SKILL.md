@@ -1,6 +1,6 @@
 ---
 name: ultrareview
-description: Run parallel dual-model code review using Claude and Gemini 3.1 Pro Preview simultaneously, then consolidate findings
+description: Run parallel dual-model code review using Devin GPT-5.5 and Gemini 3.1 Pro Preview simultaneously, then consolidate findings
 ---
 
 # UltraReview: Parallel Dual-Model Code Review
@@ -12,7 +12,7 @@ Run simultaneous code reviews using **GPT 5.5** AND **Gemini 3.1 Pro Preview** (
 ## Overview
 
 This workflow performs parallel code reviews using two different AI models:
-1. **GPT 5.5** - Primary model for reasoning-heavy analysis (Windsurf uses Claude)
+1. **GPT 5.5** - Primary model for reasoning-heavy analysis via Devin
 2. **Gemini 3.1 Pro Preview** - Secondary model for pattern recognition (via Gemini CLI)
 
 The results are consolidated to catch issues each model might miss and surface conflicting interpretations.
@@ -38,11 +38,11 @@ Capture the complete set of changed files and their contents.
 
 Launch TWO review processes concurrently:
 
-### Process 1: Claude Review (Windsurf)
+### Process 1: Devin GPT-5.5 Review
 
 **READ-ONLY REVIEW - Do NOT modify files during review**
 
-Review all uncommitted changes:
+Use Devin's `review` or `oracle` subagent profile to review all uncommitted changes:
 1. Read full files for context (not just diff hunks)
 2. Check for: logic errors, edge cases, null access risks, error handling gaps, type safety, security vulnerabilities
 3. Check for regressions: breaking API changes, removed functionality
@@ -53,7 +53,7 @@ Review all uncommitted changes:
 
 ### Process 2: Gemini 3.1 Pro Review (Gemini CLI)
 
-Run in Windsurf terminal:
+Run in the terminal:
 
 ```bash
 # Write diff to temp file (safe method, no shell injection risk)
@@ -66,11 +66,11 @@ rm "$DIFF_FILE"
 ## Phase 3: Wait for Both Results
 
 Collect findings from both reviews:
-- Claude findings (from Windsurf)
+- Devin GPT-5.5 findings
 - Gemini 3.1 Pro findings (from CLI output)
 
 Handle failures gracefully:
-- If Claude review fails → Use Gemini results alone
+- If Devin GPT-5.5 review fails → Use Gemini results alone
 - If Gemini CLI fails → Use Claude results alone
 - If both fail → Report failure, suggest using standard `/review` instead
 

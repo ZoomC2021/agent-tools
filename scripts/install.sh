@@ -768,11 +768,14 @@ install_cline() {
     install_agent "Cline" "$PROMPTS_DIR/cline" "$HOME/Documents/Cline/Rules"
 }
 
-# Install Windsurf skills
-install_windsurf() {
-    log_info "Installing Windsurf skills..."
-    local source_dir="$PROMPTS_DIR/windsurf"
-    local dest="$HOME/.codeium/windsurf/skills"
+# Install Devin CLI skills and custom subagents
+install_devin() {
+    log_info "Installing Devin CLI skills and agents..."
+    local source_dir="$PROMPTS_DIR/devin"
+    local skills_source="$source_dir/skills"
+    local agents_source="$source_dir/agents"
+    local skills_dest="$HOME/.config/devin/skills"
+    local agents_dest="$HOME/.config/devin/agents"
     
     if [[ ! -d "$source_dir" ]]; then
         log_warn "Source directory not found: $source_dir"
@@ -780,23 +783,45 @@ install_windsurf() {
     fi
     
     local skills_found=0
-    for skill_dir in "$source_dir"/*/; do
+    for skill_dir in "$skills_source"/*/; do
         if [[ ! -d "$skill_dir" ]]; then
             continue
         fi
         local skill_name=$(basename "$skill_dir")
         if [[ ! -f "$skill_dir/SKILL.md" ]]; then
-            log_warn "Skipping Windsurf skill '$skill_name': missing SKILL.md"
+            log_warn "Skipping Devin skill '$skill_name': missing SKILL.md"
             continue
         fi
-        mkdir -p "$dest/$skill_name"
-        cp -r "$skill_dir"* "$dest/$skill_name/"
-        log_success "Windsurf skill '$skill_name': $dest/$skill_name"
+        mkdir -p "$skills_dest/$skill_name"
+        cp -r "$skill_dir"* "$skills_dest/$skill_name/"
+        log_success "Devin skill '$skill_name': $skills_dest/$skill_name"
         skills_found=1
     done
     
     if [[ $skills_found -eq 0 ]]; then
-        log_warn "No skills found in $source_dir"
+        log_warn "No skills found in $skills_source"
+    fi
+
+    local agents_found=0
+    if [[ -d "$agents_source" ]]; then
+        for agent_dir in "$agents_source"/*/; do
+            if [[ ! -d "$agent_dir" ]]; then
+                continue
+            fi
+            local agent_name=$(basename "$agent_dir")
+            if [[ ! -f "$agent_dir/AGENT.md" ]]; then
+                log_warn "Skipping Devin agent '$agent_name': missing AGENT.md"
+                continue
+            fi
+            mkdir -p "$agents_dest/$agent_name"
+            cp -r "$agent_dir"* "$agents_dest/$agent_name/"
+            log_success "Devin agent '$agent_name': $agents_dest/$agent_name"
+            agents_found=1
+        done
+    fi
+
+    if [[ $agents_found -eq 0 ]]; then
+        log_warn "No agents found in $agents_source"
     fi
 }
 
@@ -911,7 +936,7 @@ main() {
     install_warp
     install_cursor
     install_cline
-    install_windsurf
+    install_devin
     
     echo ""
     echo "=========================================="
@@ -966,7 +991,7 @@ else
             warp) install_warp ;;
             cursor) install_cursor ;;
             cline) install_cline ;;
-            windsurf) install_windsurf ;;
+            devin) install_devin ;;
             *) log_error "Unknown agent: $agent" ;;
         esac
     done
