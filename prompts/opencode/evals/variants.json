@@ -8,6 +8,20 @@
       "codexReasoningEffort": "high"
     },
     {
+      "name": "devin-glm52",
+      "description": "Devin CLI eval using GLM-5.2. Best used with task-outcome scenarios that do not assert OpenCode subagent routing.",
+      "runner": "devin",
+      "devinModel": "glm-5.2",
+      "devinPermissionMode": "dangerous"
+    },
+    {
+      "name": "devin-kimi27",
+      "description": "Devin CLI eval using Kimi K2.7. Best used with outcome-only scoring.",
+      "runner": "devin",
+      "devinModel": "kimi-k2.7",
+      "devinPermissionMode": "dangerous"
+    },
+    {
       "name": "baseline-gpt55-primary",
       "description": "Current workflow: frontier-worker and plan mode both use openai/gpt-5.5.",
       "cliModel": "openai/gpt-5.5",
