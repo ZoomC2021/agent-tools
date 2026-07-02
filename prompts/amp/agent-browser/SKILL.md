@@ -1,6 +1,6 @@
 ---
 name: agent-browser
-description: Use the agent-browser CLI for browser automation: open pages, inspect accessibility snapshots, click/fill/type/select elements by @refs, extract data, take screenshots/PDFs, test web apps, automate Electron/Slack, dogfood sites, or run cloud browser sessions.
+description: "Use the agent-browser CLI for browser automation: open pages, inspect accessibility snapshots, click/fill/type/select elements by @refs, extract data, take screenshots/PDFs, test web apps, automate Electron/Slack, dogfood sites, or run cloud browser sessions."
 ---
 
 # Agent Browser
