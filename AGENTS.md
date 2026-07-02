@@ -16,7 +16,9 @@ Guidance for coding agents working in this repository.
 - `prompts/opencode/bin/zenmux-throttle-proxy`: Streaming reverse proxy that enforces a hard requests-per-minute cap in front of a rate-limited OpenAI-compatible provider (e.g. ZenMux). See the "Rate-Limited Providers" section in `README.md`.
 - `README.md`: Source of truth for supported workflows and installation instructions.
 - `tests/test_utils.py`: Regression tests for `utils.py`.
+- `tests/test_devin_token_usage.py`: Tests for `scripts/devin-token-usage.py` (Devin token usage counter).
 - `tests/zenmux-throttle-proxy.test.js`: Node test for the throttle proxy (pacing, concurrency cap, queue-not-fail, SSE passthrough); runs fully locally with no network or API key.
+- `scripts/devin-token-usage.py`: Counts Devin token usage from CLI transcripts (`~/.local/share/devin/cli/transcripts/`) and Desktop ACP events (`~/Library/Application Support/Devin/User/acp-events/`), merges them, and estimates API cost from per-model pricing. Run with `python scripts/devin-token-usage.py` (use `--json` for machine-readable output, `--no-acp` for CLI-only).
 
 ## Editing Rules
 
@@ -51,8 +53,11 @@ Run the smallest relevant validation set after changes:
 # Python utility tests
 python tests/test_utils.py
 
+# Devin token usage counter tests
+python tests/test_devin_token_usage.py
+
 # Optional, if pytest is available
-pytest tests/test_utils.py
+pytest tests/test_utils.py tests/test_devin_token_usage.py
 ```
 
 When changing `prompts/opencode/bin/zenmux-throttle-proxy`, run its test (no network/API key required):
