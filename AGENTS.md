@@ -47,23 +47,21 @@ scripts/set-model.sh all xiaomi/mimo-v2.5-pro         # set every agent
 
 ## Validation
 
+Pytest configuration lives in `pyproject.toml` (`pythonpath = ["."]`) so root-level
+modules like `utils.py` are importable without manual `sys.path` hacks.
+
 Run the smallest relevant validation set after changes:
 
 ```bash
-# Python utility tests
-python tests/test_utils.py
+# All Python tests (preferred)
+make test
 
-# Devin token usage counter tests
-python tests/test_devin_token_usage.py
+# Or directly:
+python -m pytest tests/ -q
 
-# Optional, if pytest is available
-pytest tests/test_utils.py tests/test_devin_token_usage.py
-```
-
-When changing `prompts/opencode/bin/zenmux-throttle-proxy`, run its test (no network/API key required):
-
-```bash
-node tests/zenmux-throttle-proxy.test.js
+# JS tests (zenmux-throttle-proxy, no network/API key required)
+make test-js
+# Or: node tests/zenmux-throttle-proxy.test.js
 ```
 
 For prompt/doc-only changes:
