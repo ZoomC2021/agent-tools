@@ -628,6 +628,80 @@ function Install-Droid {
         Write-Warn "No skills found in $SkillsSource"
     }
 
+    # Merge Droid BYOK custom model definitions (for example Xiaomi Token Plan)
+    $SettingsExample = Join-Path $SourceDir "settings.json.example"
+    $SettingsDest = Join-Path $env:USERPROFILE ".factory\settings.json"
+    if (Test-Path $SettingsExample) {
+        New-Item -ItemType Directory -Path (Split-Path $SettingsDest) -Force | Out-Null
+        try {
+            function ConvertTo-DroidHashtable($value) {
+                if ($null -eq $value) { return $null }
+                if ($value -is [System.Collections.IDictionary]) { return $value }
+                if ($value -is [System.Management.Automation.PSCustomObject]) {
+                    $hash = @{}
+                    foreach ($prop in $value.PSObject.Properties) {
+                        $hash[$prop.Name] = ConvertTo-DroidHashtable $prop.Value
+                    }
+                    return $hash
+                }
+                if ($value -is [System.Collections.IEnumerable] -and $value -isnot [string]) {
+                    return @($value | ForEach-Object { ConvertTo-DroidHashtable $_ })
+                }
+                return $value
+            }
+
+            if (Test-Path $SettingsDest) {
+                $settings = ConvertTo-DroidHashtable (Get-Content $SettingsDest -Raw | ConvertFrom-Json)
+            } else {
+                $settings = @{}
+            }
+            $example = ConvertTo-DroidHashtable (Get-Content $SettingsExample -Raw | ConvertFrom-Json)
+
+            if (-not $settings.ContainsKey("customModels") -or $null -eq $settings["customModels"]) {
+                $existing = @()
+            } elseif ($settings["customModels"] -is [System.Collections.IEnumerable] -and $settings["customModels"] -isnot [string]) {
+                $existing = @($settings["customModels"])
+            } else {
+                throw "Droid settings customModels must be an array"
+            }
+
+            $merged = New-Object System.Collections.ArrayList
+            $index = @{}
+            for ($i = 0; $i -lt $existing.Count; $i++) {
+                [void]$merged.Add($existing[$i])
+                if ($existing[$i] -is [System.Collections.IDictionary] -and $existing[$i].ContainsKey("model")) {
+                    $index[[string]$existing[$i]["model"]] = $i
+                }
+            }
+
+            foreach ($model in @($example["customModels"])) {
+                if (-not ($model -is [System.Collections.IDictionary]) -or -not $model.ContainsKey("model")) { continue }
+                $modelId = [string]$model["model"]
+                if ($index.ContainsKey($modelId)) {
+                    $current = $merged[$index[$modelId]]
+                    $updated = @{}
+                    foreach ($key in $model.Keys) { $updated[$key] = $model[$key] }
+                    if ($current -is [System.Collections.IDictionary] -and $current.ContainsKey("apiKey") -and $current["apiKey"]) {
+                        $updated["apiKey"] = $current["apiKey"]
+                    }
+                    $merged[$index[$modelId]] = $updated
+                } else {
+                    $index[$modelId] = $merged.Count
+                    [void]$merged.Add($model)
+                }
+            }
+
+            $settings["customModels"] = @($merged)
+            $settings | ConvertTo-Json -Depth 20 | Set-Content -Path $SettingsDest -Encoding UTF8
+            Write-Success "Droid custom model settings: $SettingsDest"
+            Write-Warn "  ⚠️  IMPORTANT: Set XIAOMI_API_KEY in your environment before using Droid's Xiaomi Token Plan models"
+        } catch {
+            Write-Err "Failed to merge Droid custom model settings: $_"
+        }
+    } else {
+        Write-Warn "Droid settings template not found: $SettingsExample"
+    }
+
     # Install Droid-specific helper for github-librarian droid
     $GhLibrarianSource = Join-Path $SourceDir "bin\droid-gh-librarian"
     $GhLibrarianDest = Join-Path $env:USERPROFILE ".factory\bin"

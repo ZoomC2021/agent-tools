@@ -276,7 +276,7 @@ Notes:
 | [Amp](https://ampcode.com) | CLI/Editor | `~/.config/agents/skills/` |
 | [Gemini CLI](https://github.com/google-gemini/gemini-cli) | CLI | `~/.gemini/skills/` |
 | [Grok CLI (grok)](https://x.ai) | CLI | `~/.grok/skills/` |
-| [Droid](https://factory.ai) | CLI/Editor | `~/.factory/droids/` and `~/.factory/skills/` |
+| [Droid](https://factory.ai) | CLI/Editor | `~/.factory/droids/`, `~/.factory/skills/`, and `~/.factory/settings.json` custom models |
 | [Kilo Code](https://kilocode.com) | CLI | `~/.kilocode/prompts/` |
 | [Cursor](https://cursor.com) | Editor | `~/.cursor/commands/` |
 | [Cline](https://cline.bot) | Editor | `~/Documents/Cline/Rules/` |
@@ -494,18 +494,21 @@ done
 <summary>Droid</summary>
 
 ```bash
-mkdir -p ~/.factory/droids ~/.factory/skills ~/.config/opencode/bin
+mkdir -p ~/.factory/droids ~/.factory/skills ~/.factory/bin
 cp prompts/droid/droids/*.md ~/.factory/droids/
 cp -r prompts/droid/skills/* ~/.factory/skills/
-cp prompts/opencode/bin/opencode-gh-librarian ~/.config/opencode/bin/
-chmod +x ~/.config/opencode/bin/opencode-gh-librarian
+cp prompts/droid/bin/droid-gh-librarian ~/.factory/bin/
+chmod +x ~/.factory/bin/droid-gh-librarian
+
+# Merge prompts/droid/settings.json.example customModels into ~/.factory/settings.json,
+# preserving any existing local apiKey values for the same model ids.
 ```
 
 **Droids:** `oracle` (deep reasoning), `gemini-3-1-pro-reviewer` (Gemini 3.1 Pro read-only review), `github-librarian` (remote GitHub research), `docs-research` (official docs/API research), `walkthrough` (architecture walkthroughs with Mermaid diagrams)
 
 **Skills:** `oracle`, `adversarial-review`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`, `widereview`
 
-The shipped `oracle` droid uses Factory's built-in GPT-5.5 with `reasoningEffort: high`. For BYOK, change `~/.factory/droids/oracle.md` to `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
+The installer also adds Xiaomi Token Plan BYOK models (`mimo-v2.5`, `mimo-v2.5-pro`) to Droid's `customModels`; set `XIAOMI_API_KEY` in your environment before selecting them. The shipped `oracle` droid uses Factory's built-in GPT-5.5 with `reasoningEffort: high`. For BYOK, change `~/.factory/droids/oracle.md` to `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
 </details>
 
 <details>
@@ -733,18 +736,21 @@ done
 <summary>Droid</summary>
 
 ```bash
-mkdir -p ~/.factory/droids ~/.factory/skills ~/.config/opencode/bin
+mkdir -p ~/.factory/droids ~/.factory/skills ~/.factory/bin
 cp prompts/droid/droids/*.md ~/.factory/droids/
 cp -r prompts/droid/skills/* ~/.factory/skills/
-cp prompts/opencode/bin/opencode-gh-librarian ~/.config/opencode/bin/
-chmod +x ~/.config/opencode/bin/opencode-gh-librarian
+cp prompts/droid/bin/droid-gh-librarian ~/.factory/bin/
+chmod +x ~/.factory/bin/droid-gh-librarian
+
+# Merge prompts/droid/settings.json.example customModels into ~/.factory/settings.json,
+# preserving any existing local apiKey values for the same model ids.
 ```
 
 **Droids:** `oracle` (deep reasoning), `gemini-3-1-pro-reviewer` (Gemini 3.1 Pro read-only review), `github-librarian` (remote GitHub research), `docs-research` (official docs/API research), `walkthrough` (architecture walkthroughs with Mermaid diagrams)
 
 **Skills:** `oracle`, `adversarial-review`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`, `widereview`
 
-The shipped `oracle` droid uses Factory's built-in GPT-5.5 with `reasoningEffort: high`. For BYOK, change `~/.factory/droids/oracle.md` to `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
+The installer also adds Xiaomi Token Plan BYOK models (`mimo-v2.5`, `mimo-v2.5-pro`) to Droid's `customModels`; set `XIAOMI_API_KEY` in your environment before selecting them. The shipped `oracle` droid uses Factory's built-in GPT-5.5 with `reasoningEffort: high`. For BYOK, change `~/.factory/droids/oracle.md` to `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
 </details>
 
 <details>

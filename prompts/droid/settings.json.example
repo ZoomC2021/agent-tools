@@ -1,0 +1,22 @@
+{
+  "customModels": [
+    {
+      "model": "mimo-v2.5",
+      "displayName": "MiMo v2.5 (Xiaomi Token Plan)",
+      "baseUrl": "https://token-plan-ams.xiaomimimo.com/v1",
+      "apiKey": "${XIAOMI_API_KEY}",
+      "provider": "generic-chat-completion-api",
+      "maxOutputTokens": 128000,
+      "noImageSupport": true
+    },
+    {
+      "model": "mimo-v2.5-pro",
+      "displayName": "MiMo v2.5 Pro (Xiaomi Token Plan)",
+      "baseUrl": "https://token-plan-ams.xiaomimimo.com/v1",
+      "apiKey": "${XIAOMI_API_KEY}",
+      "provider": "generic-chat-completion-api",
+      "maxOutputTokens": 128000,
+      "noImageSupport": true
+    }
+  ]
+}

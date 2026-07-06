@@ -703,6 +703,70 @@ install_droid() {
         log_warn "No skills found in $skills_source"
     fi
 
+    # Merge Droid BYOK custom model definitions (for example Xiaomi Token Plan)
+    local settings_example="$source_dir/settings.json.example"
+    local settings_dest="$HOME/.factory/settings.json"
+    if [[ -f "$settings_example" ]]; then
+        mkdir -p "$(dirname "$settings_dest")"
+        python3 - "$settings_dest" "$settings_example" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+settings_path = Path(sys.argv[1])
+example_path = Path(sys.argv[2])
+
+try:
+    settings = json.loads(settings_path.read_text()) if settings_path.exists() else {}
+    example = json.loads(example_path.read_text())
+except json.JSONDecodeError as exc:
+    print(f"error: invalid Droid settings JSON: {exc}", file=sys.stderr)
+    sys.exit(1)
+
+if not isinstance(settings, dict):
+    print("error: Droid settings root must be a JSON object", file=sys.stderr)
+    sys.exit(1)
+
+existing = settings.get("customModels")
+if existing is None:
+    existing = []
+elif not isinstance(existing, list):
+    print("error: Droid settings customModels must be an array", file=sys.stderr)
+    sys.exit(1)
+
+merged = list(existing)
+index = {
+    m.get("model"): i
+    for i, m in enumerate(merged)
+    if isinstance(m, dict) and isinstance(m.get("model"), str)
+}
+
+for model in example.get("customModels", []):
+    model_id = model.get("model")
+    if not isinstance(model_id, str):
+        continue
+    if model_id in index:
+        current = merged[index[model_id]]
+        if isinstance(current, dict):
+            # Preserve any local apiKey while refreshing non-secret metadata from the repo template.
+            api_key = current.get("apiKey")
+            updated = dict(model)
+            if api_key:
+                updated["apiKey"] = api_key
+            merged[index[model_id]] = updated
+    else:
+        index[model_id] = len(merged)
+        merged.append(model)
+
+settings["customModels"] = merged
+settings_path.write_text(json.dumps(settings, indent=2) + "\n")
+PY
+        log_success "Droid custom model settings: $settings_dest"
+        log_warn "  ⚠️  IMPORTANT: Set XIAOMI_API_KEY in your environment before using Droid's Xiaomi Token Plan models"
+    else
+        log_warn "Droid settings template not found: $settings_example"
+    fi
+
     # Install Droid-specific helper for github-librarian droid
     local gh_librarian_source="$source_dir/bin/droid-gh-librarian"
     local gh_librarian_dest="$HOME/.factory/bin"
