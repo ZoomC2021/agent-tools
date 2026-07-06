@@ -19,6 +19,12 @@ Custom prompts, skills, and workflows for AI coding agents. Provides consistent 
 | **ship-it** | Commit current work with meaningful boundaries and push to origin |
 | **deslop** | Analyze code for quality issues using established software engineering principles |
 | **predict-issues** | Analyze codebase to predict potential problems before they impact the project |
+| **ce-compound** | Capture solved-problem learnings into `docs/solutions/` so future agents can reuse project-specific knowledge *(skill-directory targets only)* |
+| **ce-compound-refresh** | Review and refresh stale `docs/solutions/` learnings as the codebase changes *(skill-directory targets only)* |
+| **ce-pov** | Give a project-grounded adopt/reject/trial verdict on an external library, pattern, CVE, platform, or architecture choice *(skill-directory targets only)* |
+| **ce-optimize** | Run durable metric-driven optimization loops with specs, experiment logs, measurements, and crash recovery *(skill-directory targets only)* |
+| **ce-explain** | Produce a personal technical explainer for a concept, diff, idea, or recent work window *(skill-directory targets only)* |
+| **ce-strategy** | Create or update a concise root `STRATEGY.md` product strategy anchor *(skill-directory targets only)* |
 | **oracle** | Consult a deep-reasoning oracle subagent for complex bugs, architecture tradeoffs, and risky reviews |
 | **github-librarian** | Read-only remote GitHub code research on default-branch snapshots |
 | **docs-research** | Research official documentation and external API behavior using web sources |
