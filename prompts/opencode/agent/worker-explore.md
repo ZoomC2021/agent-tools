@@ -1,7 +1,7 @@
 ---
 description: Read-only discovery subagent for exploration and search tasks
 mode: subagent
-model: tokenrouter/MiniMax-M3
+model: xiaomi/mimo-v2.5
 permission:
   task:
     '*': deny

@@ -178,8 +178,8 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 | Subagent | Purpose | Model | Reasoning Effort |
 |----------|---------|-------|------------------|
 | **frontier-worker** | Primary orchestrator (plans, routes, delegates) | GPT-5.5 | High |
-| **worker-general** | Implementation, debugging, refactoring execution | MiniMax-M3 | — |
-| **worker-explore** | Local read-only codebase discovery and search | MiniMax-M3 | — |
+| **worker-general** | Implementation, debugging, refactoring execution | MiMo v2.5 | — |
+| **worker-explore** | Local read-only codebase discovery and search | MiMo v2.5 | — |
 | **github-librarian** | Remote GitHub research (default branches, history) | MiMo v2.5 Pro | — |
 | **docs-research** | Official docs, API behavior, release notes | MiMo v2.5 Pro | — |
 | **walkthrough** | Architecture walkthroughs with Mermaid diagrams | MiMo v2.5 Pro | — |

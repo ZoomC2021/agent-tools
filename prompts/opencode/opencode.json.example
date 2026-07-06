@@ -1475,7 +1475,7 @@
     "worker-general": {
       "description": "Concrete implementation, debugging, refactoring, and execution tasks.",
       "mode": "subagent",
-      "model": "tokenrouter/MiniMax-M3",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./agent/worker-general.md}",
       "permission": {
@@ -1492,7 +1492,7 @@
     "worker-explore": {
       "description": "Read-only local codebase discovery and search.",
       "mode": "subagent",
-      "model": "tokenrouter/MiniMax-M3",
+      "model": "xiaomi/mimo-v2.5",
       "hidden": true,
       "prompt": "{file:./agent/worker-explore.md}",
       "permission": {

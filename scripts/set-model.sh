@@ -67,6 +67,7 @@ display_name() {
     case "$1" in
         tokenrouter/MiniMax-M3)            echo "MiniMax-M3" ;;
         tokenrouter/MiniMax-M4)            echo "MiniMax-M4" ;;
+        xiaomi/mimo-v2.5)                  echo "MiMo v2.5" ;;
         xiaomi/mimo-v2.5-pro)              echo "MiMo v2.5 Pro" ;;
         openai/gpt-5.5)                    echo "GPT-5.5" ;;
         pioneer/pioneer/auto)              echo "Pioneer Auto Router" ;;
