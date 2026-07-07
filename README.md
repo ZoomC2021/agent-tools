@@ -289,6 +289,39 @@ Notes:
 | [cmd](https://commandcode.ai) | CLI | `~/.commandcode/skills/` |
 | [Devin CLI](https://devin.ai) | CLI | `~/.config/devin/skills/` and `~/.config/devin/agents/` |
 
+## Usage Utilities
+
+### Amp Token Usage
+
+Analyze Amp thread token usage from the local Amp CLI:
+
+```bash
+scripts/amp-token-usage.py
+scripts/amp-token-usage.py --limit 250 --include-archived
+scripts/amp-token-usage.py --thread T-019f...
+scripts/amp-token-usage.py --thread T-019f... --amp-costs
+scripts/amp-token-usage.py --concurrency 16   # parallelize per-thread exports (default: 8)
+```
+
+For repeatable/offline analysis, save Amp's thread export and read it back:
+
+```bash
+amp threads export T-019f... > /tmp/amp-thread.json
+scripts/amp-token-usage.py --export /tmp/amp-thread.json --json
+```
+
+The report aggregates `totalInputTokens`, `cacheReadInputTokens`, `cacheCreationInputTokens`, `outputTokens`, calls, threads, cache-hit share, and best-effort API cost estimates by model. `--amp-costs` additionally calls `amp threads usage` per thread and reports Amp credit cost separately; Amp's display cost excludes any direct provider billing through customer-managed model keys.
+
+### Devin Token Usage
+
+Analyze Devin CLI/Desktop token usage:
+
+```bash
+scripts/devin-token-usage.py
+scripts/devin-token-usage.py --json
+scripts/devin-token-usage.py --no-acp
+```
+
 ### Codex ccapi Provider
 
 The Codex installer also adds a persistent custom provider for the ccapi.us OpenAI-compatible endpoint in `~/.codex/config.toml`:
