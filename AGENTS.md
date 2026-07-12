@@ -17,8 +17,10 @@ Guidance for coding agents working in this repository.
 - `README.md`: Source of truth for supported workflows and installation instructions.
 - `tests/test_utils.py`: Regression tests for `utils.py`.
 - `tests/test_devin_token_usage.py`: Tests for `scripts/devin-token-usage.py` (Devin token usage counter).
+- `tests/test_codex_token_usage.py`: Tests for `scripts/codex-token-usage.py` (ChatGPT/Codex token usage counter).
 - `tests/zenmux-throttle-proxy.test.js`: Node test for the throttle proxy (pacing, concurrency cap, queue-not-fail, SSE passthrough); runs fully locally with no network or API key.
 - `scripts/devin-token-usage.py`: Counts Devin token usage from CLI transcripts (`~/.local/share/devin/cli/transcripts/`) and Desktop ACP events (`~/Library/Application Support/Devin/User/acp-events/`), merges them, and estimates API cost from per-model pricing. Run with `python scripts/devin-token-usage.py` (use `--json` for machine-readable output, `--no-acp` for CLI-only).
+- `scripts/codex-token-usage.py`: Counts ChatGPT/Codex subscription token usage from Codex CLI session rollouts (`~/.codex/sessions/`) and Hermes agent state (`~/.hermes/state.db`, filtered to `billing_provider = 'openai-codex'`), merges them, and estimates API cost from OpenAI per-model pricing. Run with `python scripts/codex-token-usage.py` (use `--json` for machine-readable output, `--no-codex`/`--no-hermes` for single-source, `--all-providers` to include non-Codex Hermes providers).
 
 ## Editing Rules
 
