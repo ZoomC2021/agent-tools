@@ -175,9 +175,9 @@ def load_codex_sessions(session_dir: str) -> dict[str, SessionUsage]:
                     if ptype == "event_msg":
                         payload = entry.get("payload", {})
                         if payload.get("type") == "token_count":
-                            info = payload.get("info", {})
+                            info = payload.get("info") or {}
                             total_usage = info.get("total_token_usage")
-                            rate_limits = payload.get("rate_limits", {})
+                            rate_limits = payload.get("rate_limits") or {}
                             plan = rate_limits.get("plan_type", plan)
         except OSError:
             continue
