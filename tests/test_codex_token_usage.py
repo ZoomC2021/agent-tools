@@ -331,8 +331,46 @@ def test_model_totals_cost_luna():
     assert abs(cost["total"] - 2.10) < 0.01
 
 
+def test_model_totals_cost_older_models():
+    """gpt-5.4, gpt-5.4-mini, and gpt-5.3-codex-spark use their own rates."""
+    # gpt-5.4: in=$2.50, cache=$0.25, out=$15
+    t54 = ctu.ModelTotals(model="gpt-5.4", uncached_input=1_000_000,
+                          cached_input=1_000_000, output=100_000, reasoning=0)
+    c54 = t54.cost(ctu.PRICING)
+    assert abs(c54["input"] - 2.50) < 0.01
+    assert abs(c54["cached"] - 0.25) < 0.01
+    assert abs(c54["output"] - 1.50) < 0.01
+
+    # gpt-5.4-mini: in=$0.75, cache=$0.075, out=$4.50
+    t54m = ctu.ModelTotals(model="gpt-5.4-mini", uncached_input=1_000_000,
+                           cached_input=1_000_000, output=100_000, reasoning=0)
+    c54m = t54m.cost(ctu.PRICING)
+    assert abs(c54m["input"] - 0.75) < 0.01
+    assert abs(c54m["cached"] - 0.075) < 0.01
+    assert abs(c54m["output"] - 0.45) < 0.01
+
+    # gpt-5.3-codex-spark: in=$1.75, cache=$0.175, out=$14
+    tspark = ctu.ModelTotals(model="gpt-5.3-codex-spark",
+                             uncached_input=1_000_000, cached_input=1_000_000,
+                             output=100_000, reasoning=0)
+    cspark = tspark.cost(ctu.PRICING)
+    assert abs(cspark["input"] - 1.75) < 0.01
+    assert abs(cspark["cached"] - 0.175) < 0.01
+    assert abs(cspark["output"] - 1.40) < 0.01
+
+
+def test_model_totals_cost_minimax_m3():
+    """MiniMax-M3 uses its own list rates."""
+    t = ctu.ModelTotals(model="MiniMax-M3", uncached_input=1_000_000,
+                        cached_input=1_000_000, output=100_000, reasoning=0)
+    c = t.cost(ctu.PRICING)
+    assert abs(c["input"] - 0.60) < 0.01
+    assert abs(c["cached"] - 0.12) < 0.01
+    assert abs(c["output"] - 0.24) < 0.01
+
+
 def test_model_totals_cost_unknown_model():
-    """Unknown models fall back to default pricing (gpt-5.6-sol)."""
+    """Unknown models with no API pricing are billed at zero."""
     totals = ctu.ModelTotals(
         model="unknown-model",
         sessions=1,
@@ -342,8 +380,11 @@ def test_model_totals_cost_unknown_model():
         reasoning=0,
     )
     cost = totals.cost(ctu.PRICING)
-    # Should use DEFAULT_PRICING = gpt-5.6-sol: in=$5
-    assert abs(cost["input"] - 5.00) < 0.01
+    # DEFAULT_PRICING is zero for all categories
+    assert cost["input"] == 0.0
+    assert cost["cached"] == 0.0
+    assert cost["output"] == 0.0
+    assert cost["total"] == 0.0
 
 
 def test_billable_output_includes_reasoning():

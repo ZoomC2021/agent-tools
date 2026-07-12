@@ -56,18 +56,25 @@ DEFAULT_CODEX_SESSION_DIR = os.path.join(HOME, ".codex", "sessions")
 DEFAULT_HERMES_DB = os.path.join(HOME, ".hermes", "state.db")
 
 # ---------------------------------------------------------------------------
-# Pricing (USD per 1M tokens, OpenAI list API rates)
+# Pricing (USD per 1M tokens, list API rates)
 # ---------------------------------------------------------------------------
 
 PRICING = {
-    "gpt-5.5":      {"in": 5.00, "cache": 0.50, "out": 30.00},
-    "gpt-5.6-sol":  {"in": 5.00, "cache": 0.50, "out": 30.00},
-    "gpt-5.6-luna": {"in": 1.00, "cache": 0.10, "out": 6.00},
-    "gpt-5.6-terra":{"in": 2.50, "cache": 0.25, "out": 15.00},
+    # OpenAI frontier / professional
+    "gpt-5.5":              {"in": 5.00, "cache": 0.50, "out": 30.00},
+    "gpt-5.6-sol":          {"in": 5.00, "cache": 0.50, "out": 30.00},
+    "gpt-5.6-luna":         {"in": 1.00, "cache": 0.10, "out": 6.00},
+    "gpt-5.6-terra":        {"in": 2.50, "cache": 0.25, "out": 15.00},
+    # OpenAI older / coding models
+    "gpt-5.4":              {"in": 2.50, "cache": 0.25, "out": 15.00},
+    "gpt-5.4-mini":         {"in": 0.75, "cache": 0.075,"out": 4.50},
+    "gpt-5.3-codex-spark":  {"in": 1.75, "cache": 0.175,"out": 14.00},
+    # Third-party (via Hermes)
+    "MiniMax-M3":           {"in": 0.60, "cache": 0.12, "out": 2.40},
 }
 
-# Fallback pricing for unknown models (use gpt-5.6-sol as conservative default)
-DEFAULT_PRICING = PRICING["gpt-5.6-sol"]
+# Fallback for models without known API pricing: bill at zero
+DEFAULT_PRICING = {"in": 0.0, "cache": 0.0, "out": 0.0}
 
 # Hermes billing providers that route through the ChatGPT/Codex subscription
 CODEX_BILLING_PROVIDERS = {"openai-codex"}
