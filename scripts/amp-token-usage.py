@@ -38,6 +38,13 @@ from typing import Any, Optional
 DEFAULT_PRICING = {
     "gpt-5.5": {"input": 5.00, "cache_read": 0.50, "output": 30.00},
     "GPT-5.5": {"input": 5.00, "cache_read": 0.50, "output": 30.00},
+    "gpt-5.6-sol": {"input": 5.00, "cache_read": 0.50, "output": 30.00},
+    "gpt-5.6-luna": {"input": 1.00, "cache_read": 0.10, "output": 6.00},
+    "gpt-5.6-terra": {"input": 2.50, "cache_read": 0.25, "output": 15.00},
+    "gpt-5.4": {"input": 2.50, "cache_read": 0.25, "output": 15.00},
+    "gpt-5.4-mini": {"input": 0.75, "cache_read": 0.075, "output": 4.50},
+    "gpt-5.3-codex-spark": {"input": 1.75, "cache_read": 0.175, "output": 14.00},
+    "MiniMax-M3": {"input": 0.60, "cache_read": 0.12, "output": 2.40},
     "GLM-5.2": {"input": 1.40, "cache_read": 0.26, "output": 4.40},
     "Kimi K2.7": {"input": 0.95, "cache_read": 0.19, "output": 4.00},
 }
@@ -325,6 +332,15 @@ def pricing_for_model(model: str, pricing: dict[str, dict[str, float]]) -> Optio
     for key, value in pricing.items():
         if key.lower() == lower_model:
             return value
+    # Dated model variants, e.g. "gpt-5.4-2026-03-05" -> "gpt-5.4"
+    base = re.sub(r"-\d{4}-\d{2}-\d{2}$", "", model)
+    if base != model and base in pricing:
+        return pricing[base]
+    lower_base = base.lower()
+    if lower_base != lower_model:
+        for key, value in pricing.items():
+            if key.lower() == lower_base:
+                return value
     return None
 
 

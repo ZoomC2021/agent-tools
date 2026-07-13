@@ -166,6 +166,14 @@ def test_main_returns_error_for_missing_export():
     assert rc == 2
 
 
+def test_pricing_for_model_matches_dated_variant():
+    pricing = atu.load_pricing(None)
+    assert atu.pricing_for_model("gpt-5.4-2026-03-05", pricing) == pricing["gpt-5.4"]
+    assert atu.pricing_for_model("gpt-5.5-2026-04-23", pricing) == pricing["gpt-5.5"]
+    assert atu.pricing_for_model("gpt-5.6-sol", pricing) == pricing["gpt-5.6-sol"]
+    assert atu.pricing_for_model("claude-opus-4-6", pricing) is None
+
+
 def test_live_thread_list_uses_injected_amp_json(monkeypatch):
     calls = []
 
