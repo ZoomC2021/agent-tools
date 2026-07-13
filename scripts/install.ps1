@@ -5,7 +5,8 @@ $ErrorActionPreference = "Stop"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoDir = Split-Path -Parent $ScriptDir
-$PromptsDir = Join-Path $RepoDir "prompts"
+$StagingDir = $null
+$PromptsDir = $null
 
 function Write-Info { param($Message) Write-Host "[INFO] $Message" -ForegroundColor Blue }
 function Write-Success { param($Message) Write-Host "[OK] $Message" -ForegroundColor Green }
@@ -239,7 +240,7 @@ function Install-OpenCode {
     # Setup config directory and copy example config
     $ConfigDir = Join-Path $env:USERPROFILE ".config\opencode"
     $ConfigFile = Join-Path $ConfigDir "opencode.json"
-    $ExampleFile = Join-Path $RepoDir "prompts\opencode\opencode.json.example"
+    $ExampleFile = Join-Path $PromptsDir "opencode\opencode.json.example"
 
     New-Item -ItemType Directory -Path $ConfigDir -Force | Out-Null
 
@@ -714,24 +715,21 @@ function Install-Droid {
     }
 }
 
-function Install-Agy {
-    Write-Info "Installing Antigravity CLI (agy) skills..."
-    
-    $SourceDir = Join-Path $PromptsDir "agy"
-    
+function Install-SkillTree {
+    param($DisplayName, $SourceDir, $Dest)
+
+    Write-Info "Installing $DisplayName skills..."
     if (-not (Test-Path -PathType Container $SourceDir)) {
         Write-Warn "Source directory not found: $SourceDir"
         return
     }
-    
-    $Dest = Join-Path $env:USERPROFILE ".gemini\antigravity-cli\skills"
+
     $SkillDirs = Get-ChildItem -Path $SourceDir -Directory
-    
     if ($SkillDirs.Count -eq 0) {
         Write-Warn "No skill directories found in $SourceDir"
         return
     }
-    
+
     New-Item -ItemType Directory -Path $Dest -Force | Out-Null
     $skillsFound = 0
     foreach ($dir in $SkillDirs) {
@@ -739,82 +737,36 @@ function Install-Agy {
         $SkillDest = Join-Path $Dest $skillName
         New-Item -ItemType Directory -Path $SkillDest -Force | Out-Null
         Copy-Item "$($dir.FullName)\*" -Destination $SkillDest -Recurse -Force
-        Write-Success "Antigravity CLI (agy): Copied skill '$skillName' to $Dest"
+        Write-Success "${DisplayName}: Copied skill '$skillName' to $Dest"
         $skillsFound++
     }
-    
+
     if ($skillsFound -eq 0) {
         Write-Warn "No skills found in $SourceDir"
     }
+}
+
+function Install-Agy {
+    Install-SkillTree "Antigravity CLI (agy)" (Join-Path $PromptsDir "agy") (Join-Path $env:USERPROFILE ".gemini\antigravity-cli\skills")
 }
 
 function Install-Cmd {
-    Write-Info "Installing Command Code (cmd) skills..."
-    
-    $SourceDir = Join-Path $PromptsDir "cmd"
-    
-    if (-not (Test-Path -PathType Container $SourceDir)) {
-        Write-Warn "Source directory not found: $SourceDir"
-        return
-    }
-    
-    $Dest = Join-Path $env:USERPROFILE ".commandcode\skills"
-    $SkillDirs = Get-ChildItem -Path $SourceDir -Directory
-    
-    if ($SkillDirs.Count -eq 0) {
-        Write-Warn "No skill directories found in $SourceDir"
-        return
-    }
-    
-    New-Item -ItemType Directory -Path $Dest -Force | Out-Null
-    $skillsFound = 0
-    foreach ($dir in $SkillDirs) {
-        $skillName = $dir.Name
-        $SkillDest = Join-Path $Dest $skillName
-        New-Item -ItemType Directory -Path $SkillDest -Force | Out-Null
-        Copy-Item "$($dir.FullName)\*" -Destination $SkillDest -Recurse -Force
-        Write-Success "Command Code (cmd): Copied skill '$skillName' to $Dest"
-        $skillsFound++
-    }
-    
-    if ($skillsFound -eq 0) {
-        Write-Warn "No skills found in $SourceDir"
-    }
+    Install-SkillTree "Command Code (cmd)" (Join-Path $PromptsDir "cmd") (Join-Path $env:USERPROFILE ".commandcode\skills")
 }
 
 function Install-Grok {
-    Write-Info "Installing Grok CLI (grok) skills..."
-    
-    $SourceDir = Join-Path $PromptsDir "grok"
-    
-    if (-not (Test-Path -PathType Container $SourceDir)) {
-        Write-Warn "Source directory not found: $SourceDir"
-        return
-    }
-    
-    $Dest = Join-Path $env:USERPROFILE ".grok\skills"
-    $SkillDirs = Get-ChildItem -Path $SourceDir -Directory
-    
-    if ($SkillDirs.Count -eq 0) {
-        Write-Warn "No skill directories found in $SourceDir"
-        return
-    }
-    
-    New-Item -ItemType Directory -Path $Dest -Force | Out-Null
-    $skillsFound = 0
-    foreach ($dir in $SkillDirs) {
-        $skillName = $dir.Name
-        $SkillDest = Join-Path $Dest $skillName
-        New-Item -ItemType Directory -Path $SkillDest -Force | Out-Null
-        Copy-Item "$($dir.FullName)\*" -Destination $SkillDest -Recurse -Force
-        Write-Success "Grok CLI (grok): Copied skill '$skillName' to $Dest"
-        $skillsFound++
-    }
-    
-    if ($skillsFound -eq 0) {
-        Write-Warn "No skills found in $SourceDir"
-    }
+    Install-SkillTree "Grok CLI (grok)" (Join-Path $PromptsDir "grok") (Join-Path $env:USERPROFILE ".grok\skills")
 }
+
+try {
+    $Python = Get-Command python3 -ErrorAction SilentlyContinue
+    if (-not $Python) { $Python = Get-Command python -ErrorAction SilentlyContinue }
+    if (-not $Python) { throw "Python 3 is required to render the prompt tree." }
+    $StagingDir = Join-Path ([System.IO.Path]::GetTempPath()) ("agent-tools-prompts-" + [guid]::NewGuid())
+    New-Item -ItemType Directory -Path $StagingDir | Out-Null
+    & $Python.Source (Join-Path $ScriptDir "render-prompts.py") render --output $StagingDir
+    if ($LASTEXITCODE -ne 0) { throw "Prompt rendering failed with exit code $LASTEXITCODE." }
+    $PromptsDir = Join-Path $StagingDir "prompts"
 
 Write-Host ""
 Write-Host "==========================================" -ForegroundColor Cyan
@@ -859,3 +811,8 @@ Write-Host "  - Walkthrough      : Local architecture walkthrough droid"
 Write-Host ""
 Write-Host "You may need to restart your editors to pick up the new prompts."
 Write-Host ""
+} finally {
+    if ($StagingDir -and (Test-Path $StagingDir)) {
+        Remove-Item -Path $StagingDir -Recurse -Force
+    }
+}

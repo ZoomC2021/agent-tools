@@ -8,7 +8,20 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
-PROMPTS_DIR="$REPO_DIR/prompts"
+STAGING_DIR=""
+
+cleanup_staging() {
+    [[ -z "$STAGING_DIR" ]] || rm -rf "$STAGING_DIR"
+}
+trap cleanup_staging EXIT
+
+if ! command -v python3 >/dev/null 2>&1; then
+    echo "[ERROR] Python 3 is required to render the prompt tree." >&2
+    exit 1
+fi
+STAGING_DIR="$(mktemp -d "${TMPDIR:-/tmp}/agent-tools-prompts.XXXXXX")"
+python3 "$SCRIPT_DIR/render-prompts.py" render --output "$STAGING_DIR"
+PROMPTS_DIR="$STAGING_DIR/prompts"
 
 # Colors for output
 RED='\033[0;31m'
@@ -261,7 +274,7 @@ install_opencode() {
     # Setup config directory and copy example config
     local config_dir="$HOME/.config/opencode"
     local config_file="$config_dir/opencode.json"
-    local example_file="$REPO_DIR/prompts/opencode/opencode.json.example"
+    local example_file="$PROMPTS_DIR/opencode/opencode.json.example"
 
     mkdir -p "$config_dir"
 
@@ -889,91 +902,48 @@ install_devin() {
     fi
 }
 
-# Install Antigravity CLI (agy) skills
-install_agy() {
-    log_info "Installing Antigravity CLI (agy) skills..."
-    local source_dir="$PROMPTS_DIR/agy"
-    local dest="$HOME/.gemini/antigravity-cli/skills"
-    
+install_skill_tree() {
+    local display_name="$1"
+    local source_dir="$2"
+    local dest="$3"
+
+    log_info "Installing $display_name skills..."
     if [[ ! -d "$source_dir" ]]; then
         log_warn "Source directory not found: $source_dir"
         return 0
     fi
-    
+
     local skills_found=0
     mkdir -p "$dest"
-    
+
     for skill_dir in "$source_dir"/*/; do
         if [[ -d "$skill_dir" ]]; then
             local skill_name=$(basename "$skill_dir")
             mkdir -p "$dest/$skill_name"
             cp -r "$skill_dir"* "$dest/$skill_name/"
-            log_success "Antigravity CLI (agy): Copied skill '$skill_name' to $dest"
+            log_success "$display_name: Copied skill '$skill_name' to $dest"
             skills_found=1
         fi
     done
-    
+
     if [[ $skills_found -eq 0 ]]; then
         log_warn "No skills found in $source_dir"
     fi
+}
+
+# Install Antigravity CLI (agy) skills
+install_agy() {
+    install_skill_tree "Antigravity CLI (agy)" "$PROMPTS_DIR/agy" "$HOME/.gemini/antigravity-cli/skills"
 }
 
 # Install Command Code (cmd) skills
 install_cmd() {
-    log_info "Installing Command Code (cmd) skills..."
-    local source_dir="$PROMPTS_DIR/cmd"
-    local dest="$HOME/.commandcode/skills"
-    
-    if [[ ! -d "$source_dir" ]]; then
-        log_warn "Source directory not found: $source_dir"
-        return 0
-    fi
-    
-    local skills_found=0
-    mkdir -p "$dest"
-    
-    for skill_dir in "$source_dir"/*/; do
-        if [[ -d "$skill_dir" ]]; then
-            local skill_name=$(basename "$skill_dir")
-            mkdir -p "$dest/$skill_name"
-            cp -r "$skill_dir"* "$dest/$skill_name/"
-            log_success "Command Code (cmd): Copied skill '$skill_name' to $dest"
-            skills_found=1
-        fi
-    done
-    
-    if [[ $skills_found -eq 0 ]]; then
-        log_warn "No skills found in $source_dir"
-    fi
+    install_skill_tree "Command Code (cmd)" "$PROMPTS_DIR/cmd" "$HOME/.commandcode/skills"
 }
 
 # Install Grok CLI (grok) skills
 install_grok() {
-    log_info "Installing Grok CLI (grok) skills..."
-    local source_dir="$PROMPTS_DIR/grok"
-    local dest="$HOME/.grok/skills"
-    
-    if [[ ! -d "$source_dir" ]]; then
-        log_warn "Source directory not found: $source_dir"
-        return 0
-    fi
-    
-    local skills_found=0
-    mkdir -p "$dest"
-    
-    for skill_dir in "$source_dir"/*/; do
-        if [[ -d "$skill_dir" ]]; then
-            local skill_name=$(basename "$skill_dir")
-            mkdir -p "$dest/$skill_name"
-            cp -r "$skill_dir"* "$dest/$skill_name/"
-            log_success "Grok CLI (grok): Copied skill '$skill_name' to $dest"
-            skills_found=1
-        fi
-    done
-    
-    if [[ $skills_found -eq 0 ]]; then
-        log_warn "No skills found in $source_dir"
-    fi
+    install_skill_tree "Grok CLI (grok)" "$PROMPTS_DIR/grok" "$HOME/.grok/skills"
 }
 
 # Main installation

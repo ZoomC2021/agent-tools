@@ -1,0 +1,4967 @@
+{
+  "version": 1,
+  "aliases": [
+    {
+      "path": "agy/adversarial-review/SKILL.md",
+      "source": "amp/adversarial-review/SKILL.md",
+      "sha256": "e836700ebef5262831b2c0265b142e31b6e406b397415c5c05ae14d141104dad",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound-refresh/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound-refresh/SKILL.md",
+      "source": "amp/ce-compound-refresh/SKILL.md",
+      "sha256": "73aab320fd23eb05915034ccbc3b07bff9bef8712f30a26f862b4adf86177855",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound-refresh/assets/resolution-template.md",
+      "source": "amp/ce-compound-refresh/assets/resolution-template.md",
+      "sha256": "8f184825c7f9e2a5bd6894e7567776cb4cf19e0c2be1c8c0589ccd73d3f00617",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound-refresh/references/concepts-vocabulary.md",
+      "source": "amp/ce-compound-refresh/references/concepts-vocabulary.md",
+      "sha256": "79ac66f7f9fa52d940ff71b725bce207c09cfa14269d4340b8831da8239e2c71",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound-refresh/references/per-action-flows.md",
+      "source": "amp/ce-compound-refresh/references/per-action-flows.md",
+      "sha256": "6a027bf6f07e50cebe81a56b901a14f73c0317d1513a8968aa3b371fd0400130",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound-refresh/references/schema.yaml",
+      "source": "amp/ce-compound-refresh/references/schema.yaml",
+      "sha256": "f6d9e2682d9f98742dd12319c05d4715b7d7123d6585a6404deb18c6542c2c24",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound-refresh/references/yaml-schema.md",
+      "source": "amp/ce-compound-refresh/references/yaml-schema.md",
+      "sha256": "079395c03f6abf89ac95e227ec31b9db13de6bc414ca7fbe0fc72fcbfa1a53d7",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound-refresh/scripts/validate-frontmatter.py",
+      "source": "amp/ce-compound-refresh/scripts/validate-frontmatter.py",
+      "sha256": "c165f67c1885875672d45cd447dc75968589a7bb00982c33140fe925d510cf89",
+      "mode": "100755"
+    },
+    {
+      "path": "agy/ce-compound/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound/SKILL.md",
+      "source": "amp/ce-compound/SKILL.md",
+      "sha256": "1a3333eb671e33c26013cd67c607eb3ed0de619d09ce36442d35c57c2b0d91ae",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound/assets/resolution-template.md",
+      "source": "amp/ce-compound-refresh/assets/resolution-template.md",
+      "sha256": "8f184825c7f9e2a5bd6894e7567776cb4cf19e0c2be1c8c0589ccd73d3f00617",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound/references/agents/best-practices-researcher.md",
+      "source": "amp/ce-compound/references/agents/best-practices-researcher.md",
+      "sha256": "76ec5850a63cd37859697feb1163b2b9857a5f40b5ed8a961de54381baa43e60",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound/references/agents/data-integrity-guardian.md",
+      "source": "amp/ce-compound/references/agents/data-integrity-guardian.md",
+      "sha256": "fa9549ff26a6f59eba73e57db839ded2470adb2134d76eba4010d2d7ae9f2468",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound/references/agents/framework-docs-researcher.md",
+      "source": "amp/ce-compound/references/agents/framework-docs-researcher.md",
+      "sha256": "100c7b5cbe64b9904fa59998e01f18924293cc9701709b6c54207e458dfb9e34",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound/references/agents/pattern-recognition-specialist.md",
+      "source": "amp/ce-compound/references/agents/pattern-recognition-specialist.md",
+      "sha256": "0d73822ccea06dd3e9a25e9e21e1908377cb9c5364b678b940fefef7f84c9580",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound/references/agents/performance-oracle.md",
+      "source": "amp/ce-compound/references/agents/performance-oracle.md",
+      "sha256": "79abcaee9a66355d996937cc6562a507b4b8d2de52060be3153ecb2088941491",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound/references/agents/security-sentinel.md",
+      "source": "amp/ce-compound/references/agents/security-sentinel.md",
+      "sha256": "f9fdc51c2b9febd057e80dbe1859b0fc875c360042aaa98415852d56b589d25c",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound/references/agents/session-historian.md",
+      "source": "amp/ce-compound/references/agents/session-historian.md",
+      "sha256": "9d266ba34adacf6943f3fc490e8f3c1cad04a68409f0a687d9c21cbb92f37a1b",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound/references/concepts-vocabulary.md",
+      "source": "amp/ce-compound-refresh/references/concepts-vocabulary.md",
+      "sha256": "79ac66f7f9fa52d940ff71b725bce207c09cfa14269d4340b8831da8239e2c71",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound/references/schema.yaml",
+      "source": "amp/ce-compound-refresh/references/schema.yaml",
+      "sha256": "f6d9e2682d9f98742dd12319c05d4715b7d7123d6585a6404deb18c6542c2c24",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound/references/yaml-schema.md",
+      "source": "amp/ce-compound-refresh/references/yaml-schema.md",
+      "sha256": "079395c03f6abf89ac95e227ec31b9db13de6bc414ca7fbe0fc72fcbfa1a53d7",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound/scripts/session-history/discover-sessions.sh",
+      "source": "amp/ce-compound/scripts/session-history/discover-sessions.sh",
+      "sha256": "2b00a0147dd33ab0c5d8beac5b2e92800e6de6ec955586861565edfb1b67abe4",
+      "mode": "100755"
+    },
+    {
+      "path": "agy/ce-compound/scripts/session-history/extract-errors.py",
+      "source": "amp/ce-compound/scripts/session-history/extract-errors.py",
+      "sha256": "7a3cc8ff7dec161d97e57c8a00544678a3c0ba7492595f7a67331ace9b5ae958",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound/scripts/session-history/extract-metadata.py",
+      "source": "amp/ce-compound/scripts/session-history/extract-metadata.py",
+      "sha256": "6f852aa85b563ff8f5edaa4d6a7788e29bb0fddf372046c4f51115487aa13c63",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound/scripts/session-history/extract-skeleton.py",
+      "source": "amp/ce-compound/scripts/session-history/extract-skeleton.py",
+      "sha256": "1134ce8505f7611d49a5945a06469fe5cd0323c1062b68e68ab65147b6517e49",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-compound/scripts/validate-frontmatter.py",
+      "source": "amp/ce-compound-refresh/scripts/validate-frontmatter.py",
+      "sha256": "c165f67c1885875672d45cd447dc75968589a7bb00982c33140fe925d510cf89",
+      "mode": "100755"
+    },
+    {
+      "path": "agy/ce-explain/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-explain/SKILL.md",
+      "source": "amp/ce-explain/SKILL.md",
+      "sha256": "215a7189c43860ba7dd7109084d5a74070336520b907675eaaa976a0098260df",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-explain/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-explain/references/agents/work-recap-scout.md",
+      "source": "amp/ce-explain/references/agents/work-recap-scout.md",
+      "sha256": "9e9f9f419a7b4c9313a2ac471b50f4766b78461d67f026670493691eb9984b20",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-explain/references/check-in.md",
+      "source": "amp/ce-explain/references/check-in.md",
+      "sha256": "de187f983e5ac5f8c8eb917c068056396407ca1482c85daa46569691a8dc9e47",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-explain/references/destinations.md",
+      "source": "amp/ce-explain/references/destinations.md",
+      "sha256": "f3e038187cefabeb3d39c0f5a7f78873c476e2cb396d4242108e3940adcd6da3",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-explain/references/explainer-html.md",
+      "source": "amp/ce-explain/references/explainer-html.md",
+      "sha256": "baa717488f08cda491d8994cb452472e1e3aed380830a45b985ff1cdbae7d7ad",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-explain/references/explainer-markdown.md",
+      "source": "amp/ce-explain/references/explainer-markdown.md",
+      "sha256": "9826edbeb23874051a04fdfa409a3b83d60518c5a2ebef7015dd0e4eb13bbb64",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-explain/references/intake.md",
+      "source": "amp/ce-explain/references/intake.md",
+      "sha256": "3c41d71bd2a68a9988324516531a9e32cf57f6ccc9829e13b230c611c4f653b8",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-explain/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-explain/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-optimize/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-optimize/SKILL.md",
+      "source": "amp/ce-optimize/SKILL.md",
+      "sha256": "8fea61ecddeac47a2185eb49ebe2cbeeccd1e48d3d88b3b0f08b06036d894c00",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-optimize/references/agents/learnings-researcher.md",
+      "source": "amp/ce-optimize/references/agents/learnings-researcher.md",
+      "sha256": "48aad27f09f04c024483d469fa0a7ee99f00bfd1988781304abb221bd0c26b85",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-optimize/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-optimize/references/agents/repo-research-analyst.md",
+      "source": "amp/ce-optimize/references/agents/repo-research-analyst.md",
+      "sha256": "761d1a2c2128fd1e90781b5385c3b8b18da3bd46c7c2aff54148a7603a97eab0",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-optimize/references/example-hard-spec.yaml",
+      "source": "amp/ce-optimize/references/example-hard-spec.yaml",
+      "sha256": "c909945709c0b17e6be81dd95e17c329871625d61d72be9d8f3f74f6548fe22b",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-optimize/references/example-judge-spec.yaml",
+      "source": "amp/ce-optimize/references/example-judge-spec.yaml",
+      "sha256": "e1e813720e508d16c02c80c0ce95cdcb12c2ed9152aa94d946e176ced096b3ec",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-optimize/references/experiment-log-schema.yaml",
+      "source": "amp/ce-optimize/references/experiment-log-schema.yaml",
+      "sha256": "413c839392bddb1ce38f6516657159daedacba58d28625acafaa0499fc5b3188",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-optimize/references/experiment-prompt-template.md",
+      "source": "amp/ce-optimize/references/experiment-prompt-template.md",
+      "sha256": "fc3db54f99d60cd4ff440974f606c6afc9d743131bfeb01d0e0d4589a1040654",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-optimize/references/judge-prompt-template.md",
+      "source": "amp/ce-optimize/references/judge-prompt-template.md",
+      "sha256": "423423690dbef08e75bc4c27d9255076e641f3b0ab13eb27c3f9281d58197801",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-optimize/references/optimize-spec-schema.yaml",
+      "source": "amp/ce-optimize/references/optimize-spec-schema.yaml",
+      "sha256": "213966e930747c10b629ba8004110acd9246c353c5e1ac614ed1fabc62369c22",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-optimize/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-optimize/references/usage-guide.md",
+      "source": "amp/ce-optimize/references/usage-guide.md",
+      "sha256": "87976654dfc241c51504c6e04639c6d067c7a01739b37b2678da6fa4565c96ee",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-optimize/scripts/experiment-worktree.sh",
+      "source": "amp/ce-optimize/scripts/experiment-worktree.sh",
+      "sha256": "f71d0ef7fdfe7c8b763a7d2686ecb4021346dcb3be897bb664759b69e6769e96",
+      "mode": "100755"
+    },
+    {
+      "path": "agy/ce-optimize/scripts/measure.sh",
+      "source": "amp/ce-optimize/scripts/measure.sh",
+      "sha256": "1fc92a941e93be8994d01fe103aa2dcda1bd0c7bc2727b8cd801f5f5f3f8af2a",
+      "mode": "100755"
+    },
+    {
+      "path": "agy/ce-optimize/scripts/parallel-probe.sh",
+      "source": "amp/ce-optimize/scripts/parallel-probe.sh",
+      "sha256": "5e254560975304f8a24ecbabaddc426e2b935c09c92bb2f8703cbf30da9f57ff",
+      "mode": "100755"
+    },
+    {
+      "path": "agy/ce-optimize/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-pov/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-pov/SKILL.md",
+      "source": "amp/ce-pov/SKILL.md",
+      "sha256": "cd4b4743af437402055317b8c081136e4b077639855d4e259e38e836ff734959",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-pov/references/agents/external-evidence-researcher.md",
+      "source": "amp/ce-pov/references/agents/external-evidence-researcher.md",
+      "sha256": "0766dee4c79f67add69afc7d9dfb9ceb0d0b3dfcccac4dee61c4cf49e1a04371",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-pov/references/agents/precedent-activity-scout.md",
+      "source": "amp/ce-pov/references/agents/precedent-activity-scout.md",
+      "sha256": "497b0ff7fa4ba1e26be4af3062152c727b59aa8afbb882ad3b31425809280002",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-pov/references/agents/project-grounding-scout.md",
+      "source": "amp/ce-pov/references/agents/project-grounding-scout.md",
+      "sha256": "6510c127d33b4f96da721b1e5becad235ac246a5518f548b80e326df76ebd57e",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-pov/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-pov/references/boundaries.md",
+      "source": "amp/ce-pov/references/boundaries.md",
+      "sha256": "7c7e64a2b4bc43857acec1de7c588941d870a2091e2d5b23db9a5c310f0112ee",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-pov/references/intake.md",
+      "source": "amp/ce-pov/references/intake.md",
+      "sha256": "e26c5edd8ca5941baa9e730c63d522721c8d5f1254c2aac78e8c21c09c07e77d",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-pov/references/invocation.md",
+      "source": "amp/ce-pov/references/invocation.md",
+      "sha256": "73efd9a7c518c9afe0a7f785d26367bccf40276aeea8f89dba7ea05cf28c6501",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-pov/references/method.md",
+      "source": "amp/ce-pov/references/method.md",
+      "sha256": "2097e2376a529aef7771910b989000e31bb358f0a95e5a52105ea1c56e86d97e",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-pov/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-pov/references/report.md",
+      "source": "amp/ce-pov/references/report.md",
+      "sha256": "88baad331472d33f5a1bf217e1e4a064ac6c7587b4ef9cd5d88faf54707bf6e1",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-pov/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-strategy/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-strategy/SKILL.md",
+      "source": "amp/ce-strategy/SKILL.md",
+      "sha256": "c4684af51eec0c2c3a65f330dc4ceea9469e482a151c833a3bd77e99f87845d5",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-strategy/references/interview.md",
+      "source": "amp/ce-strategy/references/interview.md",
+      "sha256": "a1995afc344fda1de05b996a9e74ecc0073a82dc77fb716c0e1b03fc2490bb43",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ce-strategy/references/strategy-template.md",
+      "source": "amp/ce-strategy/references/strategy-template.md",
+      "sha256": "f7f8a85ce53b06604502c697daf525ee33cc37c411f33d4ead8974c3c55886f3",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/create-cli/LICENSE",
+      "source": "amp/create-cli/LICENSE",
+      "sha256": "14293556b79940745123d0160c71d27ed0e9fe9b8a848093f3ed78f4853caafe",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/create-cli/SKILL.md",
+      "source": "amp/create-cli/SKILL.md",
+      "sha256": "e38bccc69413c27d7ef3b5a5759dc9a49b306bb42146c81d381a7aa4bc568bfb",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/create-cli/references/cli-guidelines.md",
+      "source": "amp/create-cli/references/cli-guidelines.md",
+      "sha256": "93e6d7af840ffb658e0ea7e53801ac7290c60636f7aa6a3dc32dc4129df005c1",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/create-pr/SKILL.md",
+      "source": "amp/create-pr/SKILL.md",
+      "sha256": "fecec121ac78b22a286566eb177aa715fed4b6332af822bcfad56f7f460bd5e4",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/deslop/SKILL.md",
+      "source": "amp/deslop/SKILL.md",
+      "sha256": "e7700c74263d1f3a389ea17e37e043ddcb5ffc1f57caf99de00761454694102e",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/diagnose/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/diagnose/SKILL.md",
+      "source": "amp/diagnose/SKILL.md",
+      "sha256": "28886402bbfa0470248086eab9106a103b964b76ae9496e63ff0c8a6761b6d13",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/diagnose/scripts/hitl-loop.template.sh",
+      "source": "amp/diagnose/scripts/hitl-loop.template.sh",
+      "sha256": "b2932630950e5210075bcd6f850e5accf30c101c5367b29eac3a29b4dd8084c8",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/frontend-design/LICENSE.txt",
+      "source": "amp/frontend-design/LICENSE.txt",
+      "sha256": "aa6bf6dbfda4a311fd132030d3d860441413109412d2d0e5bb919bdb62f14ea3",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/frontend-design/SKILL.md",
+      "source": "amp/frontend-design/SKILL.md",
+      "sha256": "024d1274e1329e52a3a008cfa6ec6706300f64a3a8342c730061fe8045023847",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/grill-me/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/grill-me/SKILL.md",
+      "source": "amp/grill-me/SKILL.md",
+      "sha256": "74147eb6010a65957efef2b9e0f0b3ff935c1def7fc117697151b1d0f3610556",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/imagegen-google/SKILL.md",
+      "source": "amp/imagegen-google/SKILL.md",
+      "sha256": "e05c9ffb329b4914d45731fd06b59569ad1a4530ae83caf5fb309154bdc17e2b",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/markdown-converter/LICENSE",
+      "source": "amp/create-cli/LICENSE",
+      "sha256": "14293556b79940745123d0160c71d27ed0e9fe9b8a848093f3ed78f4853caafe",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/markdown-converter/SKILL.md",
+      "source": "amp/markdown-converter/SKILL.md",
+      "sha256": "dcc6b92171d4997e79fddee174eb82418a1ee090c6232e75079aecc78a09200d",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/pr-reviewer-only/SKILL.md",
+      "source": "amp/pr-reviewer-only/SKILL.md",
+      "sha256": "779ccbb572a71df453bd366a4d88ea1bdcb62e223307a37d20a6f15b73b7cac6",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/pr-reviewer/SKILL.md",
+      "source": "amp/pr-reviewer/SKILL.md",
+      "sha256": "288c13beadef95ba93568800acfb8c81dfba52cc63dd7136624d4f6e875e91c1",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/predict-issues/SKILL.md",
+      "source": "amp/predict-issues/SKILL.md",
+      "sha256": "8095c60665d910cd30f98986c82d62b9a38805663c54b8dc696a9ce57237df7e",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/refactor/SKILL.md",
+      "source": "amp/refactor/SKILL.md",
+      "sha256": "a4429ebd24835923dbb8b41365cb357f0e4478147ac34bf90daa5a23aa288098",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/review/SKILL.md",
+      "source": "amp/review/SKILL.md",
+      "sha256": "4b63f0364d39ed5a4d85ea29e9dfd62b7872d920b22ffd6adea37bb58032c6a5",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/ship-it/SKILL.md",
+      "source": "amp/ship-it/SKILL.md",
+      "sha256": "682edcdd7e8abc722d4e3bfb6bbcad4dca4af7a84f12a7357bf9e812d24ce7cb",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/tdd/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/tdd/SKILL.md",
+      "source": "amp/tdd/SKILL.md",
+      "sha256": "af059705061156fd4845ddbb736fe92b564118ac5f03551e09ef9e8f6d970638",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/tdd/deep-modules.md",
+      "source": "amp/tdd/deep-modules.md",
+      "sha256": "f2123700bf953db1740625686c75bdd145efd486357c47c6818c869fee657a32",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/tdd/interface-design.md",
+      "source": "amp/tdd/interface-design.md",
+      "sha256": "764c5ff0e3fa6b4ab7095eb65ccc7201e090baf19fa16051dfdb72c06d27417d",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/tdd/mocking.md",
+      "source": "amp/tdd/mocking.md",
+      "sha256": "3ceb807fdf4a47d6a93d4d9a891e5ba6d362a6247bd08adc451feebfc17361ef",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/tdd/refactoring.md",
+      "source": "amp/tdd/refactoring.md",
+      "sha256": "54fced22dd1911b7094c3fe7979b7c1a40d40be307482c4adf7dc0588f27d6cc",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/tdd/tests.md",
+      "source": "amp/tdd/tests.md",
+      "sha256": "e12182f5c4c6a844b7c6ab4b8d2623b642aaaae5460fe58ed087efd4f3d5fb8a",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/thermo-nuclear-code-quality-review/SKILL.md",
+      "source": "amp/thermo-nuclear-code-quality-review/SKILL.md",
+      "sha256": "943c1e2acd6a7971247366272d5764fb0f89e9e6c2f3ec4ee173098f3d2f5024",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/to-issues/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/to-issues/SKILL.md",
+      "source": "amp/to-issues/SKILL.md",
+      "sha256": "0e6a2973fa5bdf32570227c578f7e474d945dd9281615d31439664c3ef016fce",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/to-prd/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/to-prd/SKILL.md",
+      "source": "amp/to-prd/SKILL.md",
+      "sha256": "b60e3805e361e4eabc6f3df48d305299e0fde64cb24b6e95443c01de907a2e7d",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/triage/AGENT-BRIEF.md",
+      "source": "amp/triage/AGENT-BRIEF.md",
+      "sha256": "1c71c747aa97d938f75ec7a4b8fe87451763b38a3ce6348acf2b222e5819b2e5",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/triage/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/triage/OUT-OF-SCOPE.md",
+      "source": "amp/triage/OUT-OF-SCOPE.md",
+      "sha256": "8ed8cf27833444060c81b3961a83c0e3d8e6cf2fcb2ddf6f8b07c6655cbb0d85",
+      "mode": "100644"
+    },
+    {
+      "path": "agy/triage/SKILL.md",
+      "source": "amp/triage/SKILL.md",
+      "sha256": "b819f0285e4e5814ac6472d0217f07dc9f23d2fdae3ebb0dd31d98360d8ac029",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/ce-compound/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/ce-compound/assets/resolution-template.md",
+      "source": "amp/ce-compound-refresh/assets/resolution-template.md",
+      "sha256": "8f184825c7f9e2a5bd6894e7567776cb4cf19e0c2be1c8c0589ccd73d3f00617",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/ce-compound/references/concepts-vocabulary.md",
+      "source": "amp/ce-compound-refresh/references/concepts-vocabulary.md",
+      "sha256": "79ac66f7f9fa52d940ff71b725bce207c09cfa14269d4340b8831da8239e2c71",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/ce-compound/references/schema.yaml",
+      "source": "amp/ce-compound-refresh/references/schema.yaml",
+      "sha256": "f6d9e2682d9f98742dd12319c05d4715b7d7123d6585a6404deb18c6542c2c24",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/ce-compound/references/yaml-schema.md",
+      "source": "amp/ce-compound-refresh/references/yaml-schema.md",
+      "sha256": "079395c03f6abf89ac95e227ec31b9db13de6bc414ca7fbe0fc72fcbfa1a53d7",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/ce-compound/scripts/validate-frontmatter.py",
+      "source": "amp/ce-compound-refresh/scripts/validate-frontmatter.py",
+      "sha256": "c165f67c1885875672d45cd447dc75968589a7bb00982c33140fe925d510cf89",
+      "mode": "100755"
+    },
+    {
+      "path": "amp/ce-explain/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/ce-explain/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/ce-explain/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/ce-explain/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/ce-optimize/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/ce-optimize/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/ce-optimize/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/ce-optimize/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/ce-pov/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/ce-pov/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/ce-pov/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/ce-pov/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/ce-strategy/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/grill-me/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/markdown-converter/LICENSE",
+      "source": "amp/create-cli/LICENSE",
+      "sha256": "14293556b79940745123d0160c71d27ed0e9fe9b8a848093f3ed78f4853caafe",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/tdd/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/to-issues/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/to-prd/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "amp/triage/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "antigravity/agent-browser.md",
+      "source": "opencode/commands/agent-browser.md",
+      "sha256": "020e3c011df42ace07714ce38dab5360c4aa7199a4e8c84041a435cba4222082",
+      "mode": "100644"
+    },
+    {
+      "path": "antigravity/create-cli.md",
+      "source": "opencode/commands/create-cli.md",
+      "sha256": "a9dc9863467c384b40424794528645b30b5c535d58fffd98905ccc46c55f90b2",
+      "mode": "100644"
+    },
+    {
+      "path": "antigravity/diagnose.md",
+      "source": "opencode/commands/diagnose.md",
+      "sha256": "f651cb084b07bee2ccab16a28bae8f40b45c2c5bbc7c39954739c0a07b123eae",
+      "mode": "100644"
+    },
+    {
+      "path": "antigravity/frontend-design.md",
+      "source": "opencode/commands/frontend-design.md",
+      "sha256": "cf9b2e869aaa1be62b4dc95a05306e41700963087b549d8cc728c1bffb17e818",
+      "mode": "100644"
+    },
+    {
+      "path": "antigravity/grill-me.md",
+      "source": "opencode/commands/grill-me.md",
+      "sha256": "ee0ca25f1dc743959ba4b3b647e0e118e5f0311458980008f6566ef4be1f7ee6",
+      "mode": "100644"
+    },
+    {
+      "path": "antigravity/imagegen-google.md",
+      "source": "claude/imagegen-google.md",
+      "sha256": "5915648ccbeb2bb02ea956dd5645eb16601c56ebbc3a31651befc7e386e7161b",
+      "mode": "100644"
+    },
+    {
+      "path": "antigravity/markdown-converter.md",
+      "source": "opencode/commands/markdown-converter.md",
+      "sha256": "c0a3e6664b72b51882f6c76adf1b1ece1597e29d4650a3232d93c4140c25166e",
+      "mode": "100644"
+    },
+    {
+      "path": "antigravity/predict-issues.md",
+      "source": "opencode/commands/predict-issues.md",
+      "sha256": "86b047d8c517b9e85d89b7abb1c61d015434ab79c60ca285dc22dfbc28f91c99",
+      "mode": "100644"
+    },
+    {
+      "path": "antigravity/ship-it.md",
+      "source": "claude/ship-it.md",
+      "sha256": "e6889cd05b8914ac2c7759092afc34942a950493d9163fe6c6a95690a56581a1",
+      "mode": "100644"
+    },
+    {
+      "path": "antigravity/tdd.md",
+      "source": "opencode/commands/tdd.md",
+      "sha256": "722144ebccf148596d6cccf333cb21e115a0249b3e4b545152d5aad42bd4d439",
+      "mode": "100644"
+    },
+    {
+      "path": "antigravity/to-issues.md",
+      "source": "opencode/commands/to-issues.md",
+      "sha256": "f3ffbbf60271c6c31dfc482e5126d89ab3f6b547f8f637d8c62fa2c7f0b1a995",
+      "mode": "100644"
+    },
+    {
+      "path": "antigravity/to-prd.md",
+      "source": "opencode/commands/to-prd.md",
+      "sha256": "62ae887b41b93de366c95edbc98677ca3686247eb4767f697ac6b25795ca66f2",
+      "mode": "100644"
+    },
+    {
+      "path": "antigravity/triage.md",
+      "source": "opencode/commands/triage.md",
+      "sha256": "2e91d6c2338c3eb923ff4a99c5015b2836e9450bf3c8d02db4cfb7be3fe0f581",
+      "mode": "100644"
+    },
+    {
+      "path": "claude/agent-browser.md",
+      "source": "opencode/commands/agent-browser.md",
+      "sha256": "020e3c011df42ace07714ce38dab5360c4aa7199a4e8c84041a435cba4222082",
+      "mode": "100644"
+    },
+    {
+      "path": "claude/create-cli.md",
+      "source": "opencode/commands/create-cli.md",
+      "sha256": "a9dc9863467c384b40424794528645b30b5c535d58fffd98905ccc46c55f90b2",
+      "mode": "100644"
+    },
+    {
+      "path": "claude/create-pr.md",
+      "source": "opencode/commands/create-pr.md",
+      "sha256": "238ae63f367fc5b2f97c1e2aa786321696782924b2a89585877af0139d05ca20",
+      "mode": "100644"
+    },
+    {
+      "path": "claude/deslop.md",
+      "source": "opencode/commands/deslop.md",
+      "sha256": "47c5150449e8efcca4c2ad88bcf6afe808b683dc1c431f2da5f7ebb16b6d4ada",
+      "mode": "100644"
+    },
+    {
+      "path": "claude/diagnose.md",
+      "source": "opencode/commands/diagnose.md",
+      "sha256": "f651cb084b07bee2ccab16a28bae8f40b45c2c5bbc7c39954739c0a07b123eae",
+      "mode": "100644"
+    },
+    {
+      "path": "claude/frontend-design.md",
+      "source": "opencode/commands/frontend-design.md",
+      "sha256": "cf9b2e869aaa1be62b4dc95a05306e41700963087b549d8cc728c1bffb17e818",
+      "mode": "100644"
+    },
+    {
+      "path": "claude/grill-me.md",
+      "source": "opencode/commands/grill-me.md",
+      "sha256": "ee0ca25f1dc743959ba4b3b647e0e118e5f0311458980008f6566ef4be1f7ee6",
+      "mode": "100644"
+    },
+    {
+      "path": "claude/markdown-converter.md",
+      "source": "opencode/commands/markdown-converter.md",
+      "sha256": "c0a3e6664b72b51882f6c76adf1b1ece1597e29d4650a3232d93c4140c25166e",
+      "mode": "100644"
+    },
+    {
+      "path": "claude/pr-reviewer-only.md",
+      "source": "opencode/commands/pr-reviewer-only.md",
+      "sha256": "d19892e42ec542619cd204f49cef5581049e1e7afd50bb639cfc62bea9bf90fd",
+      "mode": "100644"
+    },
+    {
+      "path": "claude/pr-reviewer.md",
+      "source": "opencode/commands/pr-reviewer.md",
+      "sha256": "0b66345c90b7b6ecfad504931027af5790c3b0c800ae3d46b862dc710650d066",
+      "mode": "100644"
+    },
+    {
+      "path": "claude/predict-issues.md",
+      "source": "opencode/commands/predict-issues.md",
+      "sha256": "86b047d8c517b9e85d89b7abb1c61d015434ab79c60ca285dc22dfbc28f91c99",
+      "mode": "100644"
+    },
+    {
+      "path": "claude/refactor.md",
+      "source": "opencode/commands/refactor.md",
+      "sha256": "f9d3dfccca5b213818b7664dd6da1db6f519105a04d369f2aab7fd37e6225350",
+      "mode": "100644"
+    },
+    {
+      "path": "claude/tdd.md",
+      "source": "opencode/commands/tdd.md",
+      "sha256": "722144ebccf148596d6cccf333cb21e115a0249b3e4b545152d5aad42bd4d439",
+      "mode": "100644"
+    },
+    {
+      "path": "claude/to-issues.md",
+      "source": "opencode/commands/to-issues.md",
+      "sha256": "f3ffbbf60271c6c31dfc482e5126d89ab3f6b547f8f637d8c62fa2c7f0b1a995",
+      "mode": "100644"
+    },
+    {
+      "path": "claude/to-prd.md",
+      "source": "opencode/commands/to-prd.md",
+      "sha256": "62ae887b41b93de366c95edbc98677ca3686247eb4767f697ac6b25795ca66f2",
+      "mode": "100644"
+    },
+    {
+      "path": "claude/triage.md",
+      "source": "opencode/commands/triage.md",
+      "sha256": "2e91d6c2338c3eb923ff4a99c5015b2836e9450bf3c8d02db4cfb7be3fe0f581",
+      "mode": "100644"
+    },
+    {
+      "path": "cline/adversarial-review.md",
+      "source": "antigravity/adversarial-review.md",
+      "sha256": "57828e7b47e64133b03d604b56a8d030d54b574a62ddb3efa3eee8a095f51062",
+      "mode": "100644"
+    },
+    {
+      "path": "cline/agent-browser.md",
+      "source": "opencode/commands/agent-browser.md",
+      "sha256": "020e3c011df42ace07714ce38dab5360c4aa7199a4e8c84041a435cba4222082",
+      "mode": "100644"
+    },
+    {
+      "path": "cline/create-cli.md",
+      "source": "opencode/commands/create-cli.md",
+      "sha256": "a9dc9863467c384b40424794528645b30b5c535d58fffd98905ccc46c55f90b2",
+      "mode": "100644"
+    },
+    {
+      "path": "cline/create-pr.md",
+      "source": "opencode/commands/create-pr.md",
+      "sha256": "238ae63f367fc5b2f97c1e2aa786321696782924b2a89585877af0139d05ca20",
+      "mode": "100644"
+    },
+    {
+      "path": "cline/deslop.md",
+      "source": "opencode/commands/deslop.md",
+      "sha256": "47c5150449e8efcca4c2ad88bcf6afe808b683dc1c431f2da5f7ebb16b6d4ada",
+      "mode": "100644"
+    },
+    {
+      "path": "cline/diagnose.md",
+      "source": "opencode/commands/diagnose.md",
+      "sha256": "f651cb084b07bee2ccab16a28bae8f40b45c2c5bbc7c39954739c0a07b123eae",
+      "mode": "100644"
+    },
+    {
+      "path": "cline/frontend-design.md",
+      "source": "opencode/commands/frontend-design.md",
+      "sha256": "cf9b2e869aaa1be62b4dc95a05306e41700963087b549d8cc728c1bffb17e818",
+      "mode": "100644"
+    },
+    {
+      "path": "cline/grill-me.md",
+      "source": "opencode/commands/grill-me.md",
+      "sha256": "ee0ca25f1dc743959ba4b3b647e0e118e5f0311458980008f6566ef4be1f7ee6",
+      "mode": "100644"
+    },
+    {
+      "path": "cline/handoff.md",
+      "source": "claude/handoff.md",
+      "sha256": "6bb9152e7962c75f0cd57228251f0b5cd73a7e403cffb571355342b79f998d42",
+      "mode": "100644"
+    },
+    {
+      "path": "cline/imagegen-google.md",
+      "source": "claude/imagegen-google.md",
+      "sha256": "5915648ccbeb2bb02ea956dd5645eb16601c56ebbc3a31651befc7e386e7161b",
+      "mode": "100644"
+    },
+    {
+      "path": "cline/markdown-converter.md",
+      "source": "opencode/commands/markdown-converter.md",
+      "sha256": "c0a3e6664b72b51882f6c76adf1b1ece1597e29d4650a3232d93c4140c25166e",
+      "mode": "100644"
+    },
+    {
+      "path": "cline/pr-reviewer.md",
+      "source": "opencode/commands/pr-reviewer.md",
+      "sha256": "0b66345c90b7b6ecfad504931027af5790c3b0c800ae3d46b862dc710650d066",
+      "mode": "100644"
+    },
+    {
+      "path": "cline/predict-issues.md",
+      "source": "opencode/commands/predict-issues.md",
+      "sha256": "86b047d8c517b9e85d89b7abb1c61d015434ab79c60ca285dc22dfbc28f91c99",
+      "mode": "100644"
+    },
+    {
+      "path": "cline/review.md",
+      "source": "claude/review.md",
+      "sha256": "1d175e225f18bbfd9611f3c9e7fced95972a8c716fe9d252a2cde7a11bd4a56e",
+      "mode": "100644"
+    },
+    {
+      "path": "cline/ship-it.md",
+      "source": "opencode/commands/ship-it.md",
+      "sha256": "3d1303e8604e7c7dd36b805cdaf8ba2017f2b4abc11ffe7a2ffe8f196c6ca763",
+      "mode": "100644"
+    },
+    {
+      "path": "cline/tdd.md",
+      "source": "opencode/commands/tdd.md",
+      "sha256": "722144ebccf148596d6cccf333cb21e115a0249b3e4b545152d5aad42bd4d439",
+      "mode": "100644"
+    },
+    {
+      "path": "cline/thermonuclear.md",
+      "source": "claude/thermonuclear.md",
+      "sha256": "dd65e348dec998cdc5703c6d5ec6d5168ae77bba462e99e09a8f9d192a92d095",
+      "mode": "100644"
+    },
+    {
+      "path": "cline/to-issues.md",
+      "source": "opencode/commands/to-issues.md",
+      "sha256": "f3ffbbf60271c6c31dfc482e5126d89ab3f6b547f8f637d8c62fa2c7f0b1a995",
+      "mode": "100644"
+    },
+    {
+      "path": "cline/to-prd.md",
+      "source": "opencode/commands/to-prd.md",
+      "sha256": "62ae887b41b93de366c95edbc98677ca3686247eb4767f697ac6b25795ca66f2",
+      "mode": "100644"
+    },
+    {
+      "path": "cline/triage.md",
+      "source": "opencode/commands/triage.md",
+      "sha256": "2e91d6c2338c3eb923ff4a99c5015b2836e9450bf3c8d02db4cfb7be3fe0f581",
+      "mode": "100644"
+    },
+    {
+      "path": "cline/widereview.md",
+      "source": "claude/widereview.md",
+      "sha256": "816b9e3e349d220985e4a6027181c91f3cb9f77db2f101f0ac924a02f4fe1bc8",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/adversarial-review/SKILL.md",
+      "source": "amp/adversarial-review/SKILL.md",
+      "sha256": "e836700ebef5262831b2c0265b142e31b6e406b397415c5c05ae14d141104dad",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/agent-browser/SKILL.md",
+      "source": "agy/agent-browser/SKILL.md",
+      "sha256": "a564807af225d36d9f7b1642683c8aed0c99b896d08eeea1bdae260a034de17f",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound-refresh/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound-refresh/SKILL.md",
+      "source": "amp/ce-compound-refresh/SKILL.md",
+      "sha256": "73aab320fd23eb05915034ccbc3b07bff9bef8712f30a26f862b4adf86177855",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound-refresh/assets/resolution-template.md",
+      "source": "amp/ce-compound-refresh/assets/resolution-template.md",
+      "sha256": "8f184825c7f9e2a5bd6894e7567776cb4cf19e0c2be1c8c0589ccd73d3f00617",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound-refresh/references/concepts-vocabulary.md",
+      "source": "amp/ce-compound-refresh/references/concepts-vocabulary.md",
+      "sha256": "79ac66f7f9fa52d940ff71b725bce207c09cfa14269d4340b8831da8239e2c71",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound-refresh/references/per-action-flows.md",
+      "source": "amp/ce-compound-refresh/references/per-action-flows.md",
+      "sha256": "6a027bf6f07e50cebe81a56b901a14f73c0317d1513a8968aa3b371fd0400130",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound-refresh/references/schema.yaml",
+      "source": "amp/ce-compound-refresh/references/schema.yaml",
+      "sha256": "f6d9e2682d9f98742dd12319c05d4715b7d7123d6585a6404deb18c6542c2c24",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound-refresh/references/yaml-schema.md",
+      "source": "amp/ce-compound-refresh/references/yaml-schema.md",
+      "sha256": "079395c03f6abf89ac95e227ec31b9db13de6bc414ca7fbe0fc72fcbfa1a53d7",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound-refresh/scripts/validate-frontmatter.py",
+      "source": "amp/ce-compound-refresh/scripts/validate-frontmatter.py",
+      "sha256": "c165f67c1885875672d45cd447dc75968589a7bb00982c33140fe925d510cf89",
+      "mode": "100755"
+    },
+    {
+      "path": "cmd/ce-compound/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound/SKILL.md",
+      "source": "amp/ce-compound/SKILL.md",
+      "sha256": "1a3333eb671e33c26013cd67c607eb3ed0de619d09ce36442d35c57c2b0d91ae",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound/assets/resolution-template.md",
+      "source": "amp/ce-compound-refresh/assets/resolution-template.md",
+      "sha256": "8f184825c7f9e2a5bd6894e7567776cb4cf19e0c2be1c8c0589ccd73d3f00617",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound/references/agents/best-practices-researcher.md",
+      "source": "amp/ce-compound/references/agents/best-practices-researcher.md",
+      "sha256": "76ec5850a63cd37859697feb1163b2b9857a5f40b5ed8a961de54381baa43e60",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound/references/agents/data-integrity-guardian.md",
+      "source": "amp/ce-compound/references/agents/data-integrity-guardian.md",
+      "sha256": "fa9549ff26a6f59eba73e57db839ded2470adb2134d76eba4010d2d7ae9f2468",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound/references/agents/framework-docs-researcher.md",
+      "source": "amp/ce-compound/references/agents/framework-docs-researcher.md",
+      "sha256": "100c7b5cbe64b9904fa59998e01f18924293cc9701709b6c54207e458dfb9e34",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound/references/agents/pattern-recognition-specialist.md",
+      "source": "amp/ce-compound/references/agents/pattern-recognition-specialist.md",
+      "sha256": "0d73822ccea06dd3e9a25e9e21e1908377cb9c5364b678b940fefef7f84c9580",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound/references/agents/performance-oracle.md",
+      "source": "amp/ce-compound/references/agents/performance-oracle.md",
+      "sha256": "79abcaee9a66355d996937cc6562a507b4b8d2de52060be3153ecb2088941491",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound/references/agents/security-sentinel.md",
+      "source": "amp/ce-compound/references/agents/security-sentinel.md",
+      "sha256": "f9fdc51c2b9febd057e80dbe1859b0fc875c360042aaa98415852d56b589d25c",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound/references/agents/session-historian.md",
+      "source": "amp/ce-compound/references/agents/session-historian.md",
+      "sha256": "9d266ba34adacf6943f3fc490e8f3c1cad04a68409f0a687d9c21cbb92f37a1b",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound/references/concepts-vocabulary.md",
+      "source": "amp/ce-compound-refresh/references/concepts-vocabulary.md",
+      "sha256": "79ac66f7f9fa52d940ff71b725bce207c09cfa14269d4340b8831da8239e2c71",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound/references/schema.yaml",
+      "source": "amp/ce-compound-refresh/references/schema.yaml",
+      "sha256": "f6d9e2682d9f98742dd12319c05d4715b7d7123d6585a6404deb18c6542c2c24",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound/references/yaml-schema.md",
+      "source": "amp/ce-compound-refresh/references/yaml-schema.md",
+      "sha256": "079395c03f6abf89ac95e227ec31b9db13de6bc414ca7fbe0fc72fcbfa1a53d7",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound/scripts/session-history/discover-sessions.sh",
+      "source": "amp/ce-compound/scripts/session-history/discover-sessions.sh",
+      "sha256": "2b00a0147dd33ab0c5d8beac5b2e92800e6de6ec955586861565edfb1b67abe4",
+      "mode": "100755"
+    },
+    {
+      "path": "cmd/ce-compound/scripts/session-history/extract-errors.py",
+      "source": "amp/ce-compound/scripts/session-history/extract-errors.py",
+      "sha256": "7a3cc8ff7dec161d97e57c8a00544678a3c0ba7492595f7a67331ace9b5ae958",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound/scripts/session-history/extract-metadata.py",
+      "source": "amp/ce-compound/scripts/session-history/extract-metadata.py",
+      "sha256": "6f852aa85b563ff8f5edaa4d6a7788e29bb0fddf372046c4f51115487aa13c63",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound/scripts/session-history/extract-skeleton.py",
+      "source": "amp/ce-compound/scripts/session-history/extract-skeleton.py",
+      "sha256": "1134ce8505f7611d49a5945a06469fe5cd0323c1062b68e68ab65147b6517e49",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-compound/scripts/validate-frontmatter.py",
+      "source": "amp/ce-compound-refresh/scripts/validate-frontmatter.py",
+      "sha256": "c165f67c1885875672d45cd447dc75968589a7bb00982c33140fe925d510cf89",
+      "mode": "100755"
+    },
+    {
+      "path": "cmd/ce-explain/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-explain/SKILL.md",
+      "source": "amp/ce-explain/SKILL.md",
+      "sha256": "215a7189c43860ba7dd7109084d5a74070336520b907675eaaa976a0098260df",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-explain/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-explain/references/agents/work-recap-scout.md",
+      "source": "amp/ce-explain/references/agents/work-recap-scout.md",
+      "sha256": "9e9f9f419a7b4c9313a2ac471b50f4766b78461d67f026670493691eb9984b20",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-explain/references/check-in.md",
+      "source": "amp/ce-explain/references/check-in.md",
+      "sha256": "de187f983e5ac5f8c8eb917c068056396407ca1482c85daa46569691a8dc9e47",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-explain/references/destinations.md",
+      "source": "amp/ce-explain/references/destinations.md",
+      "sha256": "f3e038187cefabeb3d39c0f5a7f78873c476e2cb396d4242108e3940adcd6da3",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-explain/references/explainer-html.md",
+      "source": "amp/ce-explain/references/explainer-html.md",
+      "sha256": "baa717488f08cda491d8994cb452472e1e3aed380830a45b985ff1cdbae7d7ad",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-explain/references/explainer-markdown.md",
+      "source": "amp/ce-explain/references/explainer-markdown.md",
+      "sha256": "9826edbeb23874051a04fdfa409a3b83d60518c5a2ebef7015dd0e4eb13bbb64",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-explain/references/intake.md",
+      "source": "amp/ce-explain/references/intake.md",
+      "sha256": "3c41d71bd2a68a9988324516531a9e32cf57f6ccc9829e13b230c611c4f653b8",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-explain/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-explain/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-optimize/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-optimize/SKILL.md",
+      "source": "amp/ce-optimize/SKILL.md",
+      "sha256": "8fea61ecddeac47a2185eb49ebe2cbeeccd1e48d3d88b3b0f08b06036d894c00",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-optimize/references/agents/learnings-researcher.md",
+      "source": "amp/ce-optimize/references/agents/learnings-researcher.md",
+      "sha256": "48aad27f09f04c024483d469fa0a7ee99f00bfd1988781304abb221bd0c26b85",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-optimize/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-optimize/references/agents/repo-research-analyst.md",
+      "source": "amp/ce-optimize/references/agents/repo-research-analyst.md",
+      "sha256": "761d1a2c2128fd1e90781b5385c3b8b18da3bd46c7c2aff54148a7603a97eab0",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-optimize/references/example-hard-spec.yaml",
+      "source": "amp/ce-optimize/references/example-hard-spec.yaml",
+      "sha256": "c909945709c0b17e6be81dd95e17c329871625d61d72be9d8f3f74f6548fe22b",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-optimize/references/example-judge-spec.yaml",
+      "source": "amp/ce-optimize/references/example-judge-spec.yaml",
+      "sha256": "e1e813720e508d16c02c80c0ce95cdcb12c2ed9152aa94d946e176ced096b3ec",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-optimize/references/experiment-log-schema.yaml",
+      "source": "amp/ce-optimize/references/experiment-log-schema.yaml",
+      "sha256": "413c839392bddb1ce38f6516657159daedacba58d28625acafaa0499fc5b3188",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-optimize/references/experiment-prompt-template.md",
+      "source": "amp/ce-optimize/references/experiment-prompt-template.md",
+      "sha256": "fc3db54f99d60cd4ff440974f606c6afc9d743131bfeb01d0e0d4589a1040654",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-optimize/references/judge-prompt-template.md",
+      "source": "amp/ce-optimize/references/judge-prompt-template.md",
+      "sha256": "423423690dbef08e75bc4c27d9255076e641f3b0ab13eb27c3f9281d58197801",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-optimize/references/optimize-spec-schema.yaml",
+      "source": "amp/ce-optimize/references/optimize-spec-schema.yaml",
+      "sha256": "213966e930747c10b629ba8004110acd9246c353c5e1ac614ed1fabc62369c22",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-optimize/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-optimize/references/usage-guide.md",
+      "source": "amp/ce-optimize/references/usage-guide.md",
+      "sha256": "87976654dfc241c51504c6e04639c6d067c7a01739b37b2678da6fa4565c96ee",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-optimize/scripts/experiment-worktree.sh",
+      "source": "amp/ce-optimize/scripts/experiment-worktree.sh",
+      "sha256": "f71d0ef7fdfe7c8b763a7d2686ecb4021346dcb3be897bb664759b69e6769e96",
+      "mode": "100755"
+    },
+    {
+      "path": "cmd/ce-optimize/scripts/measure.sh",
+      "source": "amp/ce-optimize/scripts/measure.sh",
+      "sha256": "1fc92a941e93be8994d01fe103aa2dcda1bd0c7bc2727b8cd801f5f5f3f8af2a",
+      "mode": "100755"
+    },
+    {
+      "path": "cmd/ce-optimize/scripts/parallel-probe.sh",
+      "source": "amp/ce-optimize/scripts/parallel-probe.sh",
+      "sha256": "5e254560975304f8a24ecbabaddc426e2b935c09c92bb2f8703cbf30da9f57ff",
+      "mode": "100755"
+    },
+    {
+      "path": "cmd/ce-optimize/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-pov/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-pov/SKILL.md",
+      "source": "amp/ce-pov/SKILL.md",
+      "sha256": "cd4b4743af437402055317b8c081136e4b077639855d4e259e38e836ff734959",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-pov/references/agents/external-evidence-researcher.md",
+      "source": "amp/ce-pov/references/agents/external-evidence-researcher.md",
+      "sha256": "0766dee4c79f67add69afc7d9dfb9ceb0d0b3dfcccac4dee61c4cf49e1a04371",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-pov/references/agents/precedent-activity-scout.md",
+      "source": "amp/ce-pov/references/agents/precedent-activity-scout.md",
+      "sha256": "497b0ff7fa4ba1e26be4af3062152c727b59aa8afbb882ad3b31425809280002",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-pov/references/agents/project-grounding-scout.md",
+      "source": "amp/ce-pov/references/agents/project-grounding-scout.md",
+      "sha256": "6510c127d33b4f96da721b1e5becad235ac246a5518f548b80e326df76ebd57e",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-pov/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-pov/references/boundaries.md",
+      "source": "amp/ce-pov/references/boundaries.md",
+      "sha256": "7c7e64a2b4bc43857acec1de7c588941d870a2091e2d5b23db9a5c310f0112ee",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-pov/references/intake.md",
+      "source": "amp/ce-pov/references/intake.md",
+      "sha256": "e26c5edd8ca5941baa9e730c63d522721c8d5f1254c2aac78e8c21c09c07e77d",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-pov/references/invocation.md",
+      "source": "amp/ce-pov/references/invocation.md",
+      "sha256": "73efd9a7c518c9afe0a7f785d26367bccf40276aeea8f89dba7ea05cf28c6501",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-pov/references/method.md",
+      "source": "amp/ce-pov/references/method.md",
+      "sha256": "2097e2376a529aef7771910b989000e31bb358f0a95e5a52105ea1c56e86d97e",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-pov/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-pov/references/report.md",
+      "source": "amp/ce-pov/references/report.md",
+      "sha256": "88baad331472d33f5a1bf217e1e4a064ac6c7587b4ef9cd5d88faf54707bf6e1",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-pov/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-strategy/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-strategy/SKILL.md",
+      "source": "amp/ce-strategy/SKILL.md",
+      "sha256": "c4684af51eec0c2c3a65f330dc4ceea9469e482a151c833a3bd77e99f87845d5",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-strategy/references/interview.md",
+      "source": "amp/ce-strategy/references/interview.md",
+      "sha256": "a1995afc344fda1de05b996a9e74ecc0073a82dc77fb716c0e1b03fc2490bb43",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ce-strategy/references/strategy-template.md",
+      "source": "amp/ce-strategy/references/strategy-template.md",
+      "sha256": "f7f8a85ce53b06604502c697daf525ee33cc37c411f33d4ead8974c3c55886f3",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/create-cli/LICENSE",
+      "source": "amp/create-cli/LICENSE",
+      "sha256": "14293556b79940745123d0160c71d27ed0e9fe9b8a848093f3ed78f4853caafe",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/create-cli/SKILL.md",
+      "source": "amp/create-cli/SKILL.md",
+      "sha256": "e38bccc69413c27d7ef3b5a5759dc9a49b306bb42146c81d381a7aa4bc568bfb",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/create-cli/references/cli-guidelines.md",
+      "source": "amp/create-cli/references/cli-guidelines.md",
+      "sha256": "93e6d7af840ffb658e0ea7e53801ac7290c60636f7aa6a3dc32dc4129df005c1",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/create-pr/SKILL.md",
+      "source": "amp/create-pr/SKILL.md",
+      "sha256": "fecec121ac78b22a286566eb177aa715fed4b6332af822bcfad56f7f460bd5e4",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/deslop/SKILL.md",
+      "source": "amp/deslop/SKILL.md",
+      "sha256": "e7700c74263d1f3a389ea17e37e043ddcb5ffc1f57caf99de00761454694102e",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/diagnose/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/diagnose/SKILL.md",
+      "source": "amp/diagnose/SKILL.md",
+      "sha256": "28886402bbfa0470248086eab9106a103b964b76ae9496e63ff0c8a6761b6d13",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/diagnose/scripts/hitl-loop.template.sh",
+      "source": "amp/diagnose/scripts/hitl-loop.template.sh",
+      "sha256": "b2932630950e5210075bcd6f850e5accf30c101c5367b29eac3a29b4dd8084c8",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/frontend-design/LICENSE.txt",
+      "source": "amp/frontend-design/LICENSE.txt",
+      "sha256": "aa6bf6dbfda4a311fd132030d3d860441413109412d2d0e5bb919bdb62f14ea3",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/frontend-design/SKILL.md",
+      "source": "amp/frontend-design/SKILL.md",
+      "sha256": "024d1274e1329e52a3a008cfa6ec6706300f64a3a8342c730061fe8045023847",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/grill-me/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/grill-me/SKILL.md",
+      "source": "amp/grill-me/SKILL.md",
+      "sha256": "74147eb6010a65957efef2b9e0f0b3ff935c1def7fc117697151b1d0f3610556",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/imagegen-google/SKILL.md",
+      "source": "amp/imagegen-google/SKILL.md",
+      "sha256": "e05c9ffb329b4914d45731fd06b59569ad1a4530ae83caf5fb309154bdc17e2b",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/markdown-converter/LICENSE",
+      "source": "amp/create-cli/LICENSE",
+      "sha256": "14293556b79940745123d0160c71d27ed0e9fe9b8a848093f3ed78f4853caafe",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/markdown-converter/SKILL.md",
+      "source": "amp/markdown-converter/SKILL.md",
+      "sha256": "dcc6b92171d4997e79fddee174eb82418a1ee090c6232e75079aecc78a09200d",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/pr-reviewer-only/SKILL.md",
+      "source": "amp/pr-reviewer-only/SKILL.md",
+      "sha256": "779ccbb572a71df453bd366a4d88ea1bdcb62e223307a37d20a6f15b73b7cac6",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/pr-reviewer/SKILL.md",
+      "source": "amp/pr-reviewer/SKILL.md",
+      "sha256": "288c13beadef95ba93568800acfb8c81dfba52cc63dd7136624d4f6e875e91c1",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/predict-issues/SKILL.md",
+      "source": "amp/predict-issues/SKILL.md",
+      "sha256": "8095c60665d910cd30f98986c82d62b9a38805663c54b8dc696a9ce57237df7e",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/refactor/SKILL.md",
+      "source": "amp/refactor/SKILL.md",
+      "sha256": "a4429ebd24835923dbb8b41365cb357f0e4478147ac34bf90daa5a23aa288098",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/review/SKILL.md",
+      "source": "amp/review/SKILL.md",
+      "sha256": "4b63f0364d39ed5a4d85ea29e9dfd62b7872d920b22ffd6adea37bb58032c6a5",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/ship-it/SKILL.md",
+      "source": "amp/ship-it/SKILL.md",
+      "sha256": "682edcdd7e8abc722d4e3bfb6bbcad4dca4af7a84f12a7357bf9e812d24ce7cb",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/tdd/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/tdd/SKILL.md",
+      "source": "amp/tdd/SKILL.md",
+      "sha256": "af059705061156fd4845ddbb736fe92b564118ac5f03551e09ef9e8f6d970638",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/tdd/deep-modules.md",
+      "source": "amp/tdd/deep-modules.md",
+      "sha256": "f2123700bf953db1740625686c75bdd145efd486357c47c6818c869fee657a32",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/tdd/interface-design.md",
+      "source": "amp/tdd/interface-design.md",
+      "sha256": "764c5ff0e3fa6b4ab7095eb65ccc7201e090baf19fa16051dfdb72c06d27417d",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/tdd/mocking.md",
+      "source": "amp/tdd/mocking.md",
+      "sha256": "3ceb807fdf4a47d6a93d4d9a891e5ba6d362a6247bd08adc451feebfc17361ef",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/tdd/refactoring.md",
+      "source": "amp/tdd/refactoring.md",
+      "sha256": "54fced22dd1911b7094c3fe7979b7c1a40d40be307482c4adf7dc0588f27d6cc",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/tdd/tests.md",
+      "source": "amp/tdd/tests.md",
+      "sha256": "e12182f5c4c6a844b7c6ab4b8d2623b642aaaae5460fe58ed087efd4f3d5fb8a",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/thermo-nuclear-code-quality-review/SKILL.md",
+      "source": "amp/thermo-nuclear-code-quality-review/SKILL.md",
+      "sha256": "943c1e2acd6a7971247366272d5764fb0f89e9e6c2f3ec4ee173098f3d2f5024",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/to-issues/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/to-issues/SKILL.md",
+      "source": "amp/to-issues/SKILL.md",
+      "sha256": "0e6a2973fa5bdf32570227c578f7e474d945dd9281615d31439664c3ef016fce",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/to-prd/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/to-prd/SKILL.md",
+      "source": "amp/to-prd/SKILL.md",
+      "sha256": "b60e3805e361e4eabc6f3df48d305299e0fde64cb24b6e95443c01de907a2e7d",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/triage/AGENT-BRIEF.md",
+      "source": "amp/triage/AGENT-BRIEF.md",
+      "sha256": "1c71c747aa97d938f75ec7a4b8fe87451763b38a3ce6348acf2b222e5819b2e5",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/triage/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/triage/OUT-OF-SCOPE.md",
+      "source": "amp/triage/OUT-OF-SCOPE.md",
+      "sha256": "8ed8cf27833444060c81b3961a83c0e3d8e6cf2fcb2ddf6f8b07c6655cbb0d85",
+      "mode": "100644"
+    },
+    {
+      "path": "cmd/triage/SKILL.md",
+      "source": "amp/triage/SKILL.md",
+      "sha256": "b819f0285e4e5814ac6472d0217f07dc9f23d2fdae3ebb0dd31d98360d8ac029",
+      "mode": "100644"
+    },
+    {
+      "path": "copilot-cli/adversarial-review.md",
+      "source": "antigravity/adversarial-review.md",
+      "sha256": "57828e7b47e64133b03d604b56a8d030d54b574a62ddb3efa3eee8a095f51062",
+      "mode": "100644"
+    },
+    {
+      "path": "copilot-cli/agent-browser.md",
+      "source": "opencode/commands/agent-browser.md",
+      "sha256": "020e3c011df42ace07714ce38dab5360c4aa7199a4e8c84041a435cba4222082",
+      "mode": "100644"
+    },
+    {
+      "path": "copilot-cli/create-cli.md",
+      "source": "opencode/commands/create-cli.md",
+      "sha256": "a9dc9863467c384b40424794528645b30b5c535d58fffd98905ccc46c55f90b2",
+      "mode": "100644"
+    },
+    {
+      "path": "copilot-cli/deslop.md",
+      "source": "antigravity/deslop.md",
+      "sha256": "69ca958a95d24cf9df762f61672333bfcc39b7a2bb6a3b9bc3f20fdd245c636e",
+      "mode": "100644"
+    },
+    {
+      "path": "copilot-cli/diagnose.md",
+      "source": "opencode/commands/diagnose.md",
+      "sha256": "f651cb084b07bee2ccab16a28bae8f40b45c2c5bbc7c39954739c0a07b123eae",
+      "mode": "100644"
+    },
+    {
+      "path": "copilot-cli/frontend-design.md",
+      "source": "opencode/commands/frontend-design.md",
+      "sha256": "cf9b2e869aaa1be62b4dc95a05306e41700963087b549d8cc728c1bffb17e818",
+      "mode": "100644"
+    },
+    {
+      "path": "copilot-cli/grill-me.md",
+      "source": "opencode/commands/grill-me.md",
+      "sha256": "ee0ca25f1dc743959ba4b3b647e0e118e5f0311458980008f6566ef4be1f7ee6",
+      "mode": "100644"
+    },
+    {
+      "path": "copilot-cli/handoff.md",
+      "source": "claude/handoff.md",
+      "sha256": "6bb9152e7962c75f0cd57228251f0b5cd73a7e403cffb571355342b79f998d42",
+      "mode": "100644"
+    },
+    {
+      "path": "copilot-cli/imagegen-google.md",
+      "source": "claude/imagegen-google.md",
+      "sha256": "5915648ccbeb2bb02ea956dd5645eb16601c56ebbc3a31651befc7e386e7161b",
+      "mode": "100644"
+    },
+    {
+      "path": "copilot-cli/markdown-converter.md",
+      "source": "opencode/commands/markdown-converter.md",
+      "sha256": "c0a3e6664b72b51882f6c76adf1b1ece1597e29d4650a3232d93c4140c25166e",
+      "mode": "100644"
+    },
+    {
+      "path": "copilot-cli/predict-issues.md",
+      "source": "opencode/commands/predict-issues.md",
+      "sha256": "86b047d8c517b9e85d89b7abb1c61d015434ab79c60ca285dc22dfbc28f91c99",
+      "mode": "100644"
+    },
+    {
+      "path": "copilot-cli/ship-it.md",
+      "source": "claude/ship-it.md",
+      "sha256": "e6889cd05b8914ac2c7759092afc34942a950493d9163fe6c6a95690a56581a1",
+      "mode": "100644"
+    },
+    {
+      "path": "copilot-cli/tdd.md",
+      "source": "opencode/commands/tdd.md",
+      "sha256": "722144ebccf148596d6cccf333cb21e115a0249b3e4b545152d5aad42bd4d439",
+      "mode": "100644"
+    },
+    {
+      "path": "copilot-cli/thermonuclear.md",
+      "source": "claude/thermonuclear.md",
+      "sha256": "dd65e348dec998cdc5703c6d5ec6d5168ae77bba462e99e09a8f9d192a92d095",
+      "mode": "100644"
+    },
+    {
+      "path": "copilot-cli/to-issues.md",
+      "source": "opencode/commands/to-issues.md",
+      "sha256": "f3ffbbf60271c6c31dfc482e5126d89ab3f6b547f8f637d8c62fa2c7f0b1a995",
+      "mode": "100644"
+    },
+    {
+      "path": "copilot-cli/to-prd.md",
+      "source": "opencode/commands/to-prd.md",
+      "sha256": "62ae887b41b93de366c95edbc98677ca3686247eb4767f697ac6b25795ca66f2",
+      "mode": "100644"
+    },
+    {
+      "path": "copilot-cli/triage.md",
+      "source": "opencode/commands/triage.md",
+      "sha256": "2e91d6c2338c3eb923ff4a99c5015b2836e9450bf3c8d02db4cfb7be3fe0f581",
+      "mode": "100644"
+    },
+    {
+      "path": "copilot-cli/widereview.md",
+      "source": "claude/widereview.md",
+      "sha256": "816b9e3e349d220985e4a6027181c91f3cb9f77db2f101f0ac924a02f4fe1bc8",
+      "mode": "100644"
+    },
+    {
+      "path": "cursor/adversarial-review.md",
+      "source": "antigravity/adversarial-review.md",
+      "sha256": "57828e7b47e64133b03d604b56a8d030d54b574a62ddb3efa3eee8a095f51062",
+      "mode": "100644"
+    },
+    {
+      "path": "cursor/agent-browser.md",
+      "source": "opencode/commands/agent-browser.md",
+      "sha256": "020e3c011df42ace07714ce38dab5360c4aa7199a4e8c84041a435cba4222082",
+      "mode": "100644"
+    },
+    {
+      "path": "cursor/create-cli.md",
+      "source": "opencode/commands/create-cli.md",
+      "sha256": "a9dc9863467c384b40424794528645b30b5c535d58fffd98905ccc46c55f90b2",
+      "mode": "100644"
+    },
+    {
+      "path": "cursor/deslop.md",
+      "source": "opencode/commands/deslop.md",
+      "sha256": "47c5150449e8efcca4c2ad88bcf6afe808b683dc1c431f2da5f7ebb16b6d4ada",
+      "mode": "100644"
+    },
+    {
+      "path": "cursor/diagnose.md",
+      "source": "opencode/commands/diagnose.md",
+      "sha256": "f651cb084b07bee2ccab16a28bae8f40b45c2c5bbc7c39954739c0a07b123eae",
+      "mode": "100644"
+    },
+    {
+      "path": "cursor/frontend-design.md",
+      "source": "opencode/commands/frontend-design.md",
+      "sha256": "cf9b2e869aaa1be62b4dc95a05306e41700963087b549d8cc728c1bffb17e818",
+      "mode": "100644"
+    },
+    {
+      "path": "cursor/grill-me.md",
+      "source": "opencode/commands/grill-me.md",
+      "sha256": "ee0ca25f1dc743959ba4b3b647e0e118e5f0311458980008f6566ef4be1f7ee6",
+      "mode": "100644"
+    },
+    {
+      "path": "cursor/handoff.md",
+      "source": "claude/handoff.md",
+      "sha256": "6bb9152e7962c75f0cd57228251f0b5cd73a7e403cffb571355342b79f998d42",
+      "mode": "100644"
+    },
+    {
+      "path": "cursor/imagegen-google.md",
+      "source": "claude/imagegen-google.md",
+      "sha256": "5915648ccbeb2bb02ea956dd5645eb16601c56ebbc3a31651befc7e386e7161b",
+      "mode": "100644"
+    },
+    {
+      "path": "cursor/markdown-converter.md",
+      "source": "opencode/commands/markdown-converter.md",
+      "sha256": "c0a3e6664b72b51882f6c76adf1b1ece1597e29d4650a3232d93c4140c25166e",
+      "mode": "100644"
+    },
+    {
+      "path": "cursor/predict-issues.md",
+      "source": "opencode/commands/predict-issues.md",
+      "sha256": "86b047d8c517b9e85d89b7abb1c61d015434ab79c60ca285dc22dfbc28f91c99",
+      "mode": "100644"
+    },
+    {
+      "path": "cursor/ship-it.md",
+      "source": "opencode/commands/ship-it.md",
+      "sha256": "3d1303e8604e7c7dd36b805cdaf8ba2017f2b4abc11ffe7a2ffe8f196c6ca763",
+      "mode": "100644"
+    },
+    {
+      "path": "cursor/tdd.md",
+      "source": "opencode/commands/tdd.md",
+      "sha256": "722144ebccf148596d6cccf333cb21e115a0249b3e4b545152d5aad42bd4d439",
+      "mode": "100644"
+    },
+    {
+      "path": "cursor/thermonuclear.md",
+      "source": "claude/thermonuclear.md",
+      "sha256": "dd65e348dec998cdc5703c6d5ec6d5168ae77bba462e99e09a8f9d192a92d095",
+      "mode": "100644"
+    },
+    {
+      "path": "cursor/to-issues.md",
+      "source": "opencode/commands/to-issues.md",
+      "sha256": "f3ffbbf60271c6c31dfc482e5126d89ab3f6b547f8f637d8c62fa2c7f0b1a995",
+      "mode": "100644"
+    },
+    {
+      "path": "cursor/to-prd.md",
+      "source": "opencode/commands/to-prd.md",
+      "sha256": "62ae887b41b93de366c95edbc98677ca3686247eb4767f697ac6b25795ca66f2",
+      "mode": "100644"
+    },
+    {
+      "path": "cursor/triage.md",
+      "source": "opencode/commands/triage.md",
+      "sha256": "2e91d6c2338c3eb923ff4a99c5015b2836e9450bf3c8d02db4cfb7be3fe0f581",
+      "mode": "100644"
+    },
+    {
+      "path": "cursor/ultrareview.md",
+      "source": "cline/ultrareview.md",
+      "sha256": "561a422e3164a2efb3c9bdac682d4ace0bafa8f498520abcd45a94cb29652894",
+      "mode": "100644"
+    },
+    {
+      "path": "cursor/widereview.md",
+      "source": "claude/widereview.md",
+      "sha256": "816b9e3e349d220985e4a6027181c91f3cb9f77db2f101f0ac924a02f4fe1bc8",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/adversarial-review/SKILL.md",
+      "source": "amp/adversarial-review/SKILL.md",
+      "sha256": "e836700ebef5262831b2c0265b142e31b6e406b397415c5c05ae14d141104dad",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/agent-browser/SKILL.md",
+      "source": "agy/agent-browser/SKILL.md",
+      "sha256": "a564807af225d36d9f7b1642683c8aed0c99b896d08eeea1bdae260a034de17f",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound-refresh/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound-refresh/SKILL.md",
+      "source": "amp/ce-compound-refresh/SKILL.md",
+      "sha256": "73aab320fd23eb05915034ccbc3b07bff9bef8712f30a26f862b4adf86177855",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound-refresh/assets/resolution-template.md",
+      "source": "amp/ce-compound-refresh/assets/resolution-template.md",
+      "sha256": "8f184825c7f9e2a5bd6894e7567776cb4cf19e0c2be1c8c0589ccd73d3f00617",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound-refresh/references/concepts-vocabulary.md",
+      "source": "amp/ce-compound-refresh/references/concepts-vocabulary.md",
+      "sha256": "79ac66f7f9fa52d940ff71b725bce207c09cfa14269d4340b8831da8239e2c71",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound-refresh/references/per-action-flows.md",
+      "source": "amp/ce-compound-refresh/references/per-action-flows.md",
+      "sha256": "6a027bf6f07e50cebe81a56b901a14f73c0317d1513a8968aa3b371fd0400130",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound-refresh/references/schema.yaml",
+      "source": "amp/ce-compound-refresh/references/schema.yaml",
+      "sha256": "f6d9e2682d9f98742dd12319c05d4715b7d7123d6585a6404deb18c6542c2c24",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound-refresh/references/yaml-schema.md",
+      "source": "amp/ce-compound-refresh/references/yaml-schema.md",
+      "sha256": "079395c03f6abf89ac95e227ec31b9db13de6bc414ca7fbe0fc72fcbfa1a53d7",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound-refresh/scripts/validate-frontmatter.py",
+      "source": "amp/ce-compound-refresh/scripts/validate-frontmatter.py",
+      "sha256": "c165f67c1885875672d45cd447dc75968589a7bb00982c33140fe925d510cf89",
+      "mode": "100755"
+    },
+    {
+      "path": "devin/skills/ce-compound/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound/SKILL.md",
+      "source": "amp/ce-compound/SKILL.md",
+      "sha256": "1a3333eb671e33c26013cd67c607eb3ed0de619d09ce36442d35c57c2b0d91ae",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound/assets/resolution-template.md",
+      "source": "amp/ce-compound-refresh/assets/resolution-template.md",
+      "sha256": "8f184825c7f9e2a5bd6894e7567776cb4cf19e0c2be1c8c0589ccd73d3f00617",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound/references/agents/best-practices-researcher.md",
+      "source": "amp/ce-compound/references/agents/best-practices-researcher.md",
+      "sha256": "76ec5850a63cd37859697feb1163b2b9857a5f40b5ed8a961de54381baa43e60",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound/references/agents/data-integrity-guardian.md",
+      "source": "amp/ce-compound/references/agents/data-integrity-guardian.md",
+      "sha256": "fa9549ff26a6f59eba73e57db839ded2470adb2134d76eba4010d2d7ae9f2468",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound/references/agents/framework-docs-researcher.md",
+      "source": "amp/ce-compound/references/agents/framework-docs-researcher.md",
+      "sha256": "100c7b5cbe64b9904fa59998e01f18924293cc9701709b6c54207e458dfb9e34",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound/references/agents/pattern-recognition-specialist.md",
+      "source": "amp/ce-compound/references/agents/pattern-recognition-specialist.md",
+      "sha256": "0d73822ccea06dd3e9a25e9e21e1908377cb9c5364b678b940fefef7f84c9580",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound/references/agents/performance-oracle.md",
+      "source": "amp/ce-compound/references/agents/performance-oracle.md",
+      "sha256": "79abcaee9a66355d996937cc6562a507b4b8d2de52060be3153ecb2088941491",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound/references/agents/security-sentinel.md",
+      "source": "amp/ce-compound/references/agents/security-sentinel.md",
+      "sha256": "f9fdc51c2b9febd057e80dbe1859b0fc875c360042aaa98415852d56b589d25c",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound/references/agents/session-historian.md",
+      "source": "amp/ce-compound/references/agents/session-historian.md",
+      "sha256": "9d266ba34adacf6943f3fc490e8f3c1cad04a68409f0a687d9c21cbb92f37a1b",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound/references/concepts-vocabulary.md",
+      "source": "amp/ce-compound-refresh/references/concepts-vocabulary.md",
+      "sha256": "79ac66f7f9fa52d940ff71b725bce207c09cfa14269d4340b8831da8239e2c71",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound/references/schema.yaml",
+      "source": "amp/ce-compound-refresh/references/schema.yaml",
+      "sha256": "f6d9e2682d9f98742dd12319c05d4715b7d7123d6585a6404deb18c6542c2c24",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound/references/yaml-schema.md",
+      "source": "amp/ce-compound-refresh/references/yaml-schema.md",
+      "sha256": "079395c03f6abf89ac95e227ec31b9db13de6bc414ca7fbe0fc72fcbfa1a53d7",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound/scripts/session-history/discover-sessions.sh",
+      "source": "amp/ce-compound/scripts/session-history/discover-sessions.sh",
+      "sha256": "2b00a0147dd33ab0c5d8beac5b2e92800e6de6ec955586861565edfb1b67abe4",
+      "mode": "100755"
+    },
+    {
+      "path": "devin/skills/ce-compound/scripts/session-history/extract-errors.py",
+      "source": "amp/ce-compound/scripts/session-history/extract-errors.py",
+      "sha256": "7a3cc8ff7dec161d97e57c8a00544678a3c0ba7492595f7a67331ace9b5ae958",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound/scripts/session-history/extract-metadata.py",
+      "source": "amp/ce-compound/scripts/session-history/extract-metadata.py",
+      "sha256": "6f852aa85b563ff8f5edaa4d6a7788e29bb0fddf372046c4f51115487aa13c63",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound/scripts/session-history/extract-skeleton.py",
+      "source": "amp/ce-compound/scripts/session-history/extract-skeleton.py",
+      "sha256": "1134ce8505f7611d49a5945a06469fe5cd0323c1062b68e68ab65147b6517e49",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-compound/scripts/validate-frontmatter.py",
+      "source": "amp/ce-compound-refresh/scripts/validate-frontmatter.py",
+      "sha256": "c165f67c1885875672d45cd447dc75968589a7bb00982c33140fe925d510cf89",
+      "mode": "100755"
+    },
+    {
+      "path": "devin/skills/ce-explain/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-explain/SKILL.md",
+      "source": "amp/ce-explain/SKILL.md",
+      "sha256": "215a7189c43860ba7dd7109084d5a74070336520b907675eaaa976a0098260df",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-explain/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-explain/references/agents/work-recap-scout.md",
+      "source": "amp/ce-explain/references/agents/work-recap-scout.md",
+      "sha256": "9e9f9f419a7b4c9313a2ac471b50f4766b78461d67f026670493691eb9984b20",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-explain/references/check-in.md",
+      "source": "amp/ce-explain/references/check-in.md",
+      "sha256": "de187f983e5ac5f8c8eb917c068056396407ca1482c85daa46569691a8dc9e47",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-explain/references/destinations.md",
+      "source": "amp/ce-explain/references/destinations.md",
+      "sha256": "f3e038187cefabeb3d39c0f5a7f78873c476e2cb396d4242108e3940adcd6da3",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-explain/references/explainer-html.md",
+      "source": "amp/ce-explain/references/explainer-html.md",
+      "sha256": "baa717488f08cda491d8994cb452472e1e3aed380830a45b985ff1cdbae7d7ad",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-explain/references/explainer-markdown.md",
+      "source": "amp/ce-explain/references/explainer-markdown.md",
+      "sha256": "9826edbeb23874051a04fdfa409a3b83d60518c5a2ebef7015dd0e4eb13bbb64",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-explain/references/intake.md",
+      "source": "amp/ce-explain/references/intake.md",
+      "sha256": "3c41d71bd2a68a9988324516531a9e32cf57f6ccc9829e13b230c611c4f653b8",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-explain/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-explain/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-optimize/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-optimize/SKILL.md",
+      "source": "amp/ce-optimize/SKILL.md",
+      "sha256": "8fea61ecddeac47a2185eb49ebe2cbeeccd1e48d3d88b3b0f08b06036d894c00",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-optimize/references/agents/learnings-researcher.md",
+      "source": "amp/ce-optimize/references/agents/learnings-researcher.md",
+      "sha256": "48aad27f09f04c024483d469fa0a7ee99f00bfd1988781304abb221bd0c26b85",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-optimize/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-optimize/references/agents/repo-research-analyst.md",
+      "source": "amp/ce-optimize/references/agents/repo-research-analyst.md",
+      "sha256": "761d1a2c2128fd1e90781b5385c3b8b18da3bd46c7c2aff54148a7603a97eab0",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-optimize/references/example-hard-spec.yaml",
+      "source": "amp/ce-optimize/references/example-hard-spec.yaml",
+      "sha256": "c909945709c0b17e6be81dd95e17c329871625d61d72be9d8f3f74f6548fe22b",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-optimize/references/example-judge-spec.yaml",
+      "source": "amp/ce-optimize/references/example-judge-spec.yaml",
+      "sha256": "e1e813720e508d16c02c80c0ce95cdcb12c2ed9152aa94d946e176ced096b3ec",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-optimize/references/experiment-log-schema.yaml",
+      "source": "amp/ce-optimize/references/experiment-log-schema.yaml",
+      "sha256": "413c839392bddb1ce38f6516657159daedacba58d28625acafaa0499fc5b3188",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-optimize/references/experiment-prompt-template.md",
+      "source": "amp/ce-optimize/references/experiment-prompt-template.md",
+      "sha256": "fc3db54f99d60cd4ff440974f606c6afc9d743131bfeb01d0e0d4589a1040654",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-optimize/references/judge-prompt-template.md",
+      "source": "amp/ce-optimize/references/judge-prompt-template.md",
+      "sha256": "423423690dbef08e75bc4c27d9255076e641f3b0ab13eb27c3f9281d58197801",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-optimize/references/optimize-spec-schema.yaml",
+      "source": "amp/ce-optimize/references/optimize-spec-schema.yaml",
+      "sha256": "213966e930747c10b629ba8004110acd9246c353c5e1ac614ed1fabc62369c22",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-optimize/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-optimize/references/usage-guide.md",
+      "source": "amp/ce-optimize/references/usage-guide.md",
+      "sha256": "87976654dfc241c51504c6e04639c6d067c7a01739b37b2678da6fa4565c96ee",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-optimize/scripts/experiment-worktree.sh",
+      "source": "amp/ce-optimize/scripts/experiment-worktree.sh",
+      "sha256": "f71d0ef7fdfe7c8b763a7d2686ecb4021346dcb3be897bb664759b69e6769e96",
+      "mode": "100755"
+    },
+    {
+      "path": "devin/skills/ce-optimize/scripts/measure.sh",
+      "source": "amp/ce-optimize/scripts/measure.sh",
+      "sha256": "1fc92a941e93be8994d01fe103aa2dcda1bd0c7bc2727b8cd801f5f5f3f8af2a",
+      "mode": "100755"
+    },
+    {
+      "path": "devin/skills/ce-optimize/scripts/parallel-probe.sh",
+      "source": "amp/ce-optimize/scripts/parallel-probe.sh",
+      "sha256": "5e254560975304f8a24ecbabaddc426e2b935c09c92bb2f8703cbf30da9f57ff",
+      "mode": "100755"
+    },
+    {
+      "path": "devin/skills/ce-optimize/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-pov/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-pov/SKILL.md",
+      "source": "amp/ce-pov/SKILL.md",
+      "sha256": "cd4b4743af437402055317b8c081136e4b077639855d4e259e38e836ff734959",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-pov/references/agents/external-evidence-researcher.md",
+      "source": "amp/ce-pov/references/agents/external-evidence-researcher.md",
+      "sha256": "0766dee4c79f67add69afc7d9dfb9ceb0d0b3dfcccac4dee61c4cf49e1a04371",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-pov/references/agents/precedent-activity-scout.md",
+      "source": "amp/ce-pov/references/agents/precedent-activity-scout.md",
+      "sha256": "497b0ff7fa4ba1e26be4af3062152c727b59aa8afbb882ad3b31425809280002",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-pov/references/agents/project-grounding-scout.md",
+      "source": "amp/ce-pov/references/agents/project-grounding-scout.md",
+      "sha256": "6510c127d33b4f96da721b1e5becad235ac246a5518f548b80e326df76ebd57e",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-pov/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-pov/references/boundaries.md",
+      "source": "amp/ce-pov/references/boundaries.md",
+      "sha256": "7c7e64a2b4bc43857acec1de7c588941d870a2091e2d5b23db9a5c310f0112ee",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-pov/references/intake.md",
+      "source": "amp/ce-pov/references/intake.md",
+      "sha256": "e26c5edd8ca5941baa9e730c63d522721c8d5f1254c2aac78e8c21c09c07e77d",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-pov/references/invocation.md",
+      "source": "amp/ce-pov/references/invocation.md",
+      "sha256": "73efd9a7c518c9afe0a7f785d26367bccf40276aeea8f89dba7ea05cf28c6501",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-pov/references/method.md",
+      "source": "amp/ce-pov/references/method.md",
+      "sha256": "2097e2376a529aef7771910b989000e31bb358f0a95e5a52105ea1c56e86d97e",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-pov/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-pov/references/report.md",
+      "source": "amp/ce-pov/references/report.md",
+      "sha256": "88baad331472d33f5a1bf217e1e4a064ac6c7587b4ef9cd5d88faf54707bf6e1",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-pov/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-strategy/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-strategy/SKILL.md",
+      "source": "amp/ce-strategy/SKILL.md",
+      "sha256": "c4684af51eec0c2c3a65f330dc4ceea9469e482a151c833a3bd77e99f87845d5",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-strategy/references/interview.md",
+      "source": "amp/ce-strategy/references/interview.md",
+      "sha256": "a1995afc344fda1de05b996a9e74ecc0073a82dc77fb716c0e1b03fc2490bb43",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ce-strategy/references/strategy-template.md",
+      "source": "amp/ce-strategy/references/strategy-template.md",
+      "sha256": "f7f8a85ce53b06604502c697daf525ee33cc37c411f33d4ead8974c3c55886f3",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/create-cli/LICENSE",
+      "source": "amp/create-cli/LICENSE",
+      "sha256": "14293556b79940745123d0160c71d27ed0e9fe9b8a848093f3ed78f4853caafe",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/create-cli/SKILL.md",
+      "source": "amp/create-cli/SKILL.md",
+      "sha256": "e38bccc69413c27d7ef3b5a5759dc9a49b306bb42146c81d381a7aa4bc568bfb",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/create-cli/references/cli-guidelines.md",
+      "source": "amp/create-cli/references/cli-guidelines.md",
+      "sha256": "93e6d7af840ffb658e0ea7e53801ac7290c60636f7aa6a3dc32dc4129df005c1",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/create-pr/SKILL.md",
+      "source": "amp/create-pr/SKILL.md",
+      "sha256": "fecec121ac78b22a286566eb177aa715fed4b6332af822bcfad56f7f460bd5e4",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/deslop/SKILL.md",
+      "source": "amp/deslop/SKILL.md",
+      "sha256": "e7700c74263d1f3a389ea17e37e043ddcb5ffc1f57caf99de00761454694102e",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/diagnose/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/diagnose/SKILL.md",
+      "source": "amp/diagnose/SKILL.md",
+      "sha256": "28886402bbfa0470248086eab9106a103b964b76ae9496e63ff0c8a6761b6d13",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/diagnose/scripts/hitl-loop.template.sh",
+      "source": "amp/diagnose/scripts/hitl-loop.template.sh",
+      "sha256": "b2932630950e5210075bcd6f850e5accf30c101c5367b29eac3a29b4dd8084c8",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/frontend-design/LICENSE.txt",
+      "source": "amp/frontend-design/LICENSE.txt",
+      "sha256": "aa6bf6dbfda4a311fd132030d3d860441413109412d2d0e5bb919bdb62f14ea3",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/frontend-design/SKILL.md",
+      "source": "amp/frontend-design/SKILL.md",
+      "sha256": "024d1274e1329e52a3a008cfa6ec6706300f64a3a8342c730061fe8045023847",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/grill-me/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/grill-me/SKILL.md",
+      "source": "amp/grill-me/SKILL.md",
+      "sha256": "74147eb6010a65957efef2b9e0f0b3ff935c1def7fc117697151b1d0f3610556",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/imagegen-google/SKILL.md",
+      "source": "amp/imagegen-google/SKILL.md",
+      "sha256": "e05c9ffb329b4914d45731fd06b59569ad1a4530ae83caf5fb309154bdc17e2b",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/markdown-converter/LICENSE",
+      "source": "amp/create-cli/LICENSE",
+      "sha256": "14293556b79940745123d0160c71d27ed0e9fe9b8a848093f3ed78f4853caafe",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/markdown-converter/SKILL.md",
+      "source": "amp/markdown-converter/SKILL.md",
+      "sha256": "dcc6b92171d4997e79fddee174eb82418a1ee090c6232e75079aecc78a09200d",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/pr-reviewer-only/SKILL.md",
+      "source": "amp/pr-reviewer-only/SKILL.md",
+      "sha256": "779ccbb572a71df453bd366a4d88ea1bdcb62e223307a37d20a6f15b73b7cac6",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/predict-issues/SKILL.md",
+      "source": "amp/predict-issues/SKILL.md",
+      "sha256": "8095c60665d910cd30f98986c82d62b9a38805663c54b8dc696a9ce57237df7e",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/refactor/SKILL.md",
+      "source": "amp/refactor/SKILL.md",
+      "sha256": "a4429ebd24835923dbb8b41365cb357f0e4478147ac34bf90daa5a23aa288098",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/review/SKILL.md",
+      "source": "amp/review/SKILL.md",
+      "sha256": "4b63f0364d39ed5a4d85ea29e9dfd62b7872d920b22ffd6adea37bb58032c6a5",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/ship-it/SKILL.md",
+      "source": "amp/ship-it/SKILL.md",
+      "sha256": "682edcdd7e8abc722d4e3bfb6bbcad4dca4af7a84f12a7357bf9e812d24ce7cb",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/tdd/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/tdd/SKILL.md",
+      "source": "amp/tdd/SKILL.md",
+      "sha256": "af059705061156fd4845ddbb736fe92b564118ac5f03551e09ef9e8f6d970638",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/tdd/deep-modules.md",
+      "source": "amp/tdd/deep-modules.md",
+      "sha256": "f2123700bf953db1740625686c75bdd145efd486357c47c6818c869fee657a32",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/tdd/interface-design.md",
+      "source": "amp/tdd/interface-design.md",
+      "sha256": "764c5ff0e3fa6b4ab7095eb65ccc7201e090baf19fa16051dfdb72c06d27417d",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/tdd/mocking.md",
+      "source": "amp/tdd/mocking.md",
+      "sha256": "3ceb807fdf4a47d6a93d4d9a891e5ba6d362a6247bd08adc451feebfc17361ef",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/tdd/refactoring.md",
+      "source": "amp/tdd/refactoring.md",
+      "sha256": "54fced22dd1911b7094c3fe7979b7c1a40d40be307482c4adf7dc0588f27d6cc",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/tdd/tests.md",
+      "source": "amp/tdd/tests.md",
+      "sha256": "e12182f5c4c6a844b7c6ab4b8d2623b642aaaae5460fe58ed087efd4f3d5fb8a",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/thermo-nuclear-code-quality-review/SKILL.md",
+      "source": "amp/thermo-nuclear-code-quality-review/SKILL.md",
+      "sha256": "943c1e2acd6a7971247366272d5764fb0f89e9e6c2f3ec4ee173098f3d2f5024",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/to-issues/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/to-issues/SKILL.md",
+      "source": "amp/to-issues/SKILL.md",
+      "sha256": "0e6a2973fa5bdf32570227c578f7e474d945dd9281615d31439664c3ef016fce",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/to-prd/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/to-prd/SKILL.md",
+      "source": "amp/to-prd/SKILL.md",
+      "sha256": "b60e3805e361e4eabc6f3df48d305299e0fde64cb24b6e95443c01de907a2e7d",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/triage/AGENT-BRIEF.md",
+      "source": "amp/triage/AGENT-BRIEF.md",
+      "sha256": "1c71c747aa97d938f75ec7a4b8fe87451763b38a3ce6348acf2b222e5819b2e5",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/triage/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/triage/OUT-OF-SCOPE.md",
+      "source": "amp/triage/OUT-OF-SCOPE.md",
+      "sha256": "8ed8cf27833444060c81b3961a83c0e3d8e6cf2fcb2ddf6f8b07c6655cbb0d85",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/triage/SKILL.md",
+      "source": "amp/triage/SKILL.md",
+      "sha256": "b819f0285e4e5814ac6472d0217f07dc9f23d2fdae3ebb0dd31d98360d8ac029",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/agent-browser/SKILL.md",
+      "source": "agy/agent-browser/SKILL.md",
+      "sha256": "a564807af225d36d9f7b1642683c8aed0c99b896d08eeea1bdae260a034de17f",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound-refresh/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound-refresh/SKILL.md",
+      "source": "amp/ce-compound-refresh/SKILL.md",
+      "sha256": "73aab320fd23eb05915034ccbc3b07bff9bef8712f30a26f862b4adf86177855",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound-refresh/assets/resolution-template.md",
+      "source": "amp/ce-compound-refresh/assets/resolution-template.md",
+      "sha256": "8f184825c7f9e2a5bd6894e7567776cb4cf19e0c2be1c8c0589ccd73d3f00617",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound-refresh/references/concepts-vocabulary.md",
+      "source": "amp/ce-compound-refresh/references/concepts-vocabulary.md",
+      "sha256": "79ac66f7f9fa52d940ff71b725bce207c09cfa14269d4340b8831da8239e2c71",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound-refresh/references/per-action-flows.md",
+      "source": "amp/ce-compound-refresh/references/per-action-flows.md",
+      "sha256": "6a027bf6f07e50cebe81a56b901a14f73c0317d1513a8968aa3b371fd0400130",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound-refresh/references/schema.yaml",
+      "source": "amp/ce-compound-refresh/references/schema.yaml",
+      "sha256": "f6d9e2682d9f98742dd12319c05d4715b7d7123d6585a6404deb18c6542c2c24",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound-refresh/references/yaml-schema.md",
+      "source": "amp/ce-compound-refresh/references/yaml-schema.md",
+      "sha256": "079395c03f6abf89ac95e227ec31b9db13de6bc414ca7fbe0fc72fcbfa1a53d7",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound-refresh/scripts/validate-frontmatter.py",
+      "source": "amp/ce-compound-refresh/scripts/validate-frontmatter.py",
+      "sha256": "c165f67c1885875672d45cd447dc75968589a7bb00982c33140fe925d510cf89",
+      "mode": "100755"
+    },
+    {
+      "path": "droid/skills/ce-compound/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound/SKILL.md",
+      "source": "amp/ce-compound/SKILL.md",
+      "sha256": "1a3333eb671e33c26013cd67c607eb3ed0de619d09ce36442d35c57c2b0d91ae",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound/assets/resolution-template.md",
+      "source": "amp/ce-compound-refresh/assets/resolution-template.md",
+      "sha256": "8f184825c7f9e2a5bd6894e7567776cb4cf19e0c2be1c8c0589ccd73d3f00617",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound/references/agents/best-practices-researcher.md",
+      "source": "amp/ce-compound/references/agents/best-practices-researcher.md",
+      "sha256": "76ec5850a63cd37859697feb1163b2b9857a5f40b5ed8a961de54381baa43e60",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound/references/agents/data-integrity-guardian.md",
+      "source": "amp/ce-compound/references/agents/data-integrity-guardian.md",
+      "sha256": "fa9549ff26a6f59eba73e57db839ded2470adb2134d76eba4010d2d7ae9f2468",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound/references/agents/framework-docs-researcher.md",
+      "source": "amp/ce-compound/references/agents/framework-docs-researcher.md",
+      "sha256": "100c7b5cbe64b9904fa59998e01f18924293cc9701709b6c54207e458dfb9e34",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound/references/agents/pattern-recognition-specialist.md",
+      "source": "amp/ce-compound/references/agents/pattern-recognition-specialist.md",
+      "sha256": "0d73822ccea06dd3e9a25e9e21e1908377cb9c5364b678b940fefef7f84c9580",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound/references/agents/performance-oracle.md",
+      "source": "amp/ce-compound/references/agents/performance-oracle.md",
+      "sha256": "79abcaee9a66355d996937cc6562a507b4b8d2de52060be3153ecb2088941491",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound/references/agents/security-sentinel.md",
+      "source": "amp/ce-compound/references/agents/security-sentinel.md",
+      "sha256": "f9fdc51c2b9febd057e80dbe1859b0fc875c360042aaa98415852d56b589d25c",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound/references/agents/session-historian.md",
+      "source": "amp/ce-compound/references/agents/session-historian.md",
+      "sha256": "9d266ba34adacf6943f3fc490e8f3c1cad04a68409f0a687d9c21cbb92f37a1b",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound/references/concepts-vocabulary.md",
+      "source": "amp/ce-compound-refresh/references/concepts-vocabulary.md",
+      "sha256": "79ac66f7f9fa52d940ff71b725bce207c09cfa14269d4340b8831da8239e2c71",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound/references/schema.yaml",
+      "source": "amp/ce-compound-refresh/references/schema.yaml",
+      "sha256": "f6d9e2682d9f98742dd12319c05d4715b7d7123d6585a6404deb18c6542c2c24",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound/references/yaml-schema.md",
+      "source": "amp/ce-compound-refresh/references/yaml-schema.md",
+      "sha256": "079395c03f6abf89ac95e227ec31b9db13de6bc414ca7fbe0fc72fcbfa1a53d7",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound/scripts/session-history/discover-sessions.sh",
+      "source": "amp/ce-compound/scripts/session-history/discover-sessions.sh",
+      "sha256": "2b00a0147dd33ab0c5d8beac5b2e92800e6de6ec955586861565edfb1b67abe4",
+      "mode": "100755"
+    },
+    {
+      "path": "droid/skills/ce-compound/scripts/session-history/extract-errors.py",
+      "source": "amp/ce-compound/scripts/session-history/extract-errors.py",
+      "sha256": "7a3cc8ff7dec161d97e57c8a00544678a3c0ba7492595f7a67331ace9b5ae958",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound/scripts/session-history/extract-metadata.py",
+      "source": "amp/ce-compound/scripts/session-history/extract-metadata.py",
+      "sha256": "6f852aa85b563ff8f5edaa4d6a7788e29bb0fddf372046c4f51115487aa13c63",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound/scripts/session-history/extract-skeleton.py",
+      "source": "amp/ce-compound/scripts/session-history/extract-skeleton.py",
+      "sha256": "1134ce8505f7611d49a5945a06469fe5cd0323c1062b68e68ab65147b6517e49",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-compound/scripts/validate-frontmatter.py",
+      "source": "amp/ce-compound-refresh/scripts/validate-frontmatter.py",
+      "sha256": "c165f67c1885875672d45cd447dc75968589a7bb00982c33140fe925d510cf89",
+      "mode": "100755"
+    },
+    {
+      "path": "droid/skills/ce-explain/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-explain/SKILL.md",
+      "source": "amp/ce-explain/SKILL.md",
+      "sha256": "215a7189c43860ba7dd7109084d5a74070336520b907675eaaa976a0098260df",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-explain/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-explain/references/agents/work-recap-scout.md",
+      "source": "amp/ce-explain/references/agents/work-recap-scout.md",
+      "sha256": "9e9f9f419a7b4c9313a2ac471b50f4766b78461d67f026670493691eb9984b20",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-explain/references/check-in.md",
+      "source": "amp/ce-explain/references/check-in.md",
+      "sha256": "de187f983e5ac5f8c8eb917c068056396407ca1482c85daa46569691a8dc9e47",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-explain/references/destinations.md",
+      "source": "amp/ce-explain/references/destinations.md",
+      "sha256": "f3e038187cefabeb3d39c0f5a7f78873c476e2cb396d4242108e3940adcd6da3",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-explain/references/explainer-html.md",
+      "source": "amp/ce-explain/references/explainer-html.md",
+      "sha256": "baa717488f08cda491d8994cb452472e1e3aed380830a45b985ff1cdbae7d7ad",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-explain/references/explainer-markdown.md",
+      "source": "amp/ce-explain/references/explainer-markdown.md",
+      "sha256": "9826edbeb23874051a04fdfa409a3b83d60518c5a2ebef7015dd0e4eb13bbb64",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-explain/references/intake.md",
+      "source": "amp/ce-explain/references/intake.md",
+      "sha256": "3c41d71bd2a68a9988324516531a9e32cf57f6ccc9829e13b230c611c4f653b8",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-explain/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-explain/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-optimize/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-optimize/SKILL.md",
+      "source": "amp/ce-optimize/SKILL.md",
+      "sha256": "8fea61ecddeac47a2185eb49ebe2cbeeccd1e48d3d88b3b0f08b06036d894c00",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-optimize/references/agents/learnings-researcher.md",
+      "source": "amp/ce-optimize/references/agents/learnings-researcher.md",
+      "sha256": "48aad27f09f04c024483d469fa0a7ee99f00bfd1988781304abb221bd0c26b85",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-optimize/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-optimize/references/agents/repo-research-analyst.md",
+      "source": "amp/ce-optimize/references/agents/repo-research-analyst.md",
+      "sha256": "761d1a2c2128fd1e90781b5385c3b8b18da3bd46c7c2aff54148a7603a97eab0",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-optimize/references/example-hard-spec.yaml",
+      "source": "amp/ce-optimize/references/example-hard-spec.yaml",
+      "sha256": "c909945709c0b17e6be81dd95e17c329871625d61d72be9d8f3f74f6548fe22b",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-optimize/references/example-judge-spec.yaml",
+      "source": "amp/ce-optimize/references/example-judge-spec.yaml",
+      "sha256": "e1e813720e508d16c02c80c0ce95cdcb12c2ed9152aa94d946e176ced096b3ec",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-optimize/references/experiment-log-schema.yaml",
+      "source": "amp/ce-optimize/references/experiment-log-schema.yaml",
+      "sha256": "413c839392bddb1ce38f6516657159daedacba58d28625acafaa0499fc5b3188",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-optimize/references/experiment-prompt-template.md",
+      "source": "amp/ce-optimize/references/experiment-prompt-template.md",
+      "sha256": "fc3db54f99d60cd4ff440974f606c6afc9d743131bfeb01d0e0d4589a1040654",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-optimize/references/judge-prompt-template.md",
+      "source": "amp/ce-optimize/references/judge-prompt-template.md",
+      "sha256": "423423690dbef08e75bc4c27d9255076e641f3b0ab13eb27c3f9281d58197801",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-optimize/references/optimize-spec-schema.yaml",
+      "source": "amp/ce-optimize/references/optimize-spec-schema.yaml",
+      "sha256": "213966e930747c10b629ba8004110acd9246c353c5e1ac614ed1fabc62369c22",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-optimize/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-optimize/references/usage-guide.md",
+      "source": "amp/ce-optimize/references/usage-guide.md",
+      "sha256": "87976654dfc241c51504c6e04639c6d067c7a01739b37b2678da6fa4565c96ee",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-optimize/scripts/experiment-worktree.sh",
+      "source": "amp/ce-optimize/scripts/experiment-worktree.sh",
+      "sha256": "f71d0ef7fdfe7c8b763a7d2686ecb4021346dcb3be897bb664759b69e6769e96",
+      "mode": "100755"
+    },
+    {
+      "path": "droid/skills/ce-optimize/scripts/measure.sh",
+      "source": "amp/ce-optimize/scripts/measure.sh",
+      "sha256": "1fc92a941e93be8994d01fe103aa2dcda1bd0c7bc2727b8cd801f5f5f3f8af2a",
+      "mode": "100755"
+    },
+    {
+      "path": "droid/skills/ce-optimize/scripts/parallel-probe.sh",
+      "source": "amp/ce-optimize/scripts/parallel-probe.sh",
+      "sha256": "5e254560975304f8a24ecbabaddc426e2b935c09c92bb2f8703cbf30da9f57ff",
+      "mode": "100755"
+    },
+    {
+      "path": "droid/skills/ce-optimize/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-pov/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-pov/SKILL.md",
+      "source": "amp/ce-pov/SKILL.md",
+      "sha256": "cd4b4743af437402055317b8c081136e4b077639855d4e259e38e836ff734959",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-pov/references/agents/external-evidence-researcher.md",
+      "source": "amp/ce-pov/references/agents/external-evidence-researcher.md",
+      "sha256": "0766dee4c79f67add69afc7d9dfb9ceb0d0b3dfcccac4dee61c4cf49e1a04371",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-pov/references/agents/precedent-activity-scout.md",
+      "source": "amp/ce-pov/references/agents/precedent-activity-scout.md",
+      "sha256": "497b0ff7fa4ba1e26be4af3062152c727b59aa8afbb882ad3b31425809280002",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-pov/references/agents/project-grounding-scout.md",
+      "source": "amp/ce-pov/references/agents/project-grounding-scout.md",
+      "sha256": "6510c127d33b4f96da721b1e5becad235ac246a5518f548b80e326df76ebd57e",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-pov/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-pov/references/boundaries.md",
+      "source": "amp/ce-pov/references/boundaries.md",
+      "sha256": "7c7e64a2b4bc43857acec1de7c588941d870a2091e2d5b23db9a5c310f0112ee",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-pov/references/intake.md",
+      "source": "amp/ce-pov/references/intake.md",
+      "sha256": "e26c5edd8ca5941baa9e730c63d522721c8d5f1254c2aac78e8c21c09c07e77d",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-pov/references/invocation.md",
+      "source": "amp/ce-pov/references/invocation.md",
+      "sha256": "73efd9a7c518c9afe0a7f785d26367bccf40276aeea8f89dba7ea05cf28c6501",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-pov/references/method.md",
+      "source": "amp/ce-pov/references/method.md",
+      "sha256": "2097e2376a529aef7771910b989000e31bb358f0a95e5a52105ea1c56e86d97e",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-pov/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-pov/references/report.md",
+      "source": "amp/ce-pov/references/report.md",
+      "sha256": "88baad331472d33f5a1bf217e1e4a064ac6c7587b4ef9cd5d88faf54707bf6e1",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-pov/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-strategy/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-strategy/SKILL.md",
+      "source": "amp/ce-strategy/SKILL.md",
+      "sha256": "c4684af51eec0c2c3a65f330dc4ceea9469e482a151c833a3bd77e99f87845d5",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-strategy/references/interview.md",
+      "source": "amp/ce-strategy/references/interview.md",
+      "sha256": "a1995afc344fda1de05b996a9e74ecc0073a82dc77fb716c0e1b03fc2490bb43",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ce-strategy/references/strategy-template.md",
+      "source": "amp/ce-strategy/references/strategy-template.md",
+      "sha256": "f7f8a85ce53b06604502c697daf525ee33cc37c411f33d4ead8974c3c55886f3",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/create-cli/LICENSE",
+      "source": "amp/create-cli/LICENSE",
+      "sha256": "14293556b79940745123d0160c71d27ed0e9fe9b8a848093f3ed78f4853caafe",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/create-cli/SKILL.md",
+      "source": "amp/create-cli/SKILL.md",
+      "sha256": "e38bccc69413c27d7ef3b5a5759dc9a49b306bb42146c81d381a7aa4bc568bfb",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/create-cli/references/cli-guidelines.md",
+      "source": "amp/create-cli/references/cli-guidelines.md",
+      "sha256": "93e6d7af840ffb658e0ea7e53801ac7290c60636f7aa6a3dc32dc4129df005c1",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/diagnose/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/diagnose/SKILL.md",
+      "source": "amp/diagnose/SKILL.md",
+      "sha256": "28886402bbfa0470248086eab9106a103b964b76ae9496e63ff0c8a6761b6d13",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/diagnose/scripts/hitl-loop.template.sh",
+      "source": "amp/diagnose/scripts/hitl-loop.template.sh",
+      "sha256": "b2932630950e5210075bcd6f850e5accf30c101c5367b29eac3a29b4dd8084c8",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/frontend-design/LICENSE.txt",
+      "source": "amp/frontend-design/LICENSE.txt",
+      "sha256": "aa6bf6dbfda4a311fd132030d3d860441413109412d2d0e5bb919bdb62f14ea3",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/frontend-design/SKILL.md",
+      "source": "amp/frontend-design/SKILL.md",
+      "sha256": "024d1274e1329e52a3a008cfa6ec6706300f64a3a8342c730061fe8045023847",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/grill-me/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/grill-me/SKILL.md",
+      "source": "amp/grill-me/SKILL.md",
+      "sha256": "74147eb6010a65957efef2b9e0f0b3ff935c1def7fc117697151b1d0f3610556",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/imagegen-google/SKILL.md",
+      "source": "amp/imagegen-google/SKILL.md",
+      "sha256": "e05c9ffb329b4914d45731fd06b59569ad1a4530ae83caf5fb309154bdc17e2b",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/markdown-converter/LICENSE",
+      "source": "amp/create-cli/LICENSE",
+      "sha256": "14293556b79940745123d0160c71d27ed0e9fe9b8a848093f3ed78f4853caafe",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/markdown-converter/SKILL.md",
+      "source": "amp/markdown-converter/SKILL.md",
+      "sha256": "dcc6b92171d4997e79fddee174eb82418a1ee090c6232e75079aecc78a09200d",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/predict-issues/SKILL.md",
+      "source": "amp/predict-issues/SKILL.md",
+      "sha256": "8095c60665d910cd30f98986c82d62b9a38805663c54b8dc696a9ce57237df7e",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/ship-it/SKILL.md",
+      "source": "amp/ship-it/SKILL.md",
+      "sha256": "682edcdd7e8abc722d4e3bfb6bbcad4dca4af7a84f12a7357bf9e812d24ce7cb",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/tdd/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/tdd/SKILL.md",
+      "source": "amp/tdd/SKILL.md",
+      "sha256": "af059705061156fd4845ddbb736fe92b564118ac5f03551e09ef9e8f6d970638",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/tdd/deep-modules.md",
+      "source": "amp/tdd/deep-modules.md",
+      "sha256": "f2123700bf953db1740625686c75bdd145efd486357c47c6818c869fee657a32",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/tdd/interface-design.md",
+      "source": "amp/tdd/interface-design.md",
+      "sha256": "764c5ff0e3fa6b4ab7095eb65ccc7201e090baf19fa16051dfdb72c06d27417d",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/tdd/mocking.md",
+      "source": "amp/tdd/mocking.md",
+      "sha256": "3ceb807fdf4a47d6a93d4d9a891e5ba6d362a6247bd08adc451feebfc17361ef",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/tdd/refactoring.md",
+      "source": "amp/tdd/refactoring.md",
+      "sha256": "54fced22dd1911b7094c3fe7979b7c1a40d40be307482c4adf7dc0588f27d6cc",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/tdd/tests.md",
+      "source": "amp/tdd/tests.md",
+      "sha256": "e12182f5c4c6a844b7c6ab4b8d2623b642aaaae5460fe58ed087efd4f3d5fb8a",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/to-issues/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/to-issues/SKILL.md",
+      "source": "amp/to-issues/SKILL.md",
+      "sha256": "0e6a2973fa5bdf32570227c578f7e474d945dd9281615d31439664c3ef016fce",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/to-prd/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/to-prd/SKILL.md",
+      "source": "amp/to-prd/SKILL.md",
+      "sha256": "b60e3805e361e4eabc6f3df48d305299e0fde64cb24b6e95443c01de907a2e7d",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/triage/AGENT-BRIEF.md",
+      "source": "amp/triage/AGENT-BRIEF.md",
+      "sha256": "1c71c747aa97d938f75ec7a4b8fe87451763b38a3ce6348acf2b222e5819b2e5",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/triage/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/triage/OUT-OF-SCOPE.md",
+      "source": "amp/triage/OUT-OF-SCOPE.md",
+      "sha256": "8ed8cf27833444060c81b3961a83c0e3d8e6cf2fcb2ddf6f8b07c6655cbb0d85",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/triage/SKILL.md",
+      "source": "amp/triage/SKILL.md",
+      "sha256": "b819f0285e4e5814ac6472d0217f07dc9f23d2fdae3ebb0dd31d98360d8ac029",
+      "mode": "100644"
+    },
+    {
+      "path": "droid/skills/widereview/SKILL.md",
+      "source": "devin/skills/widereview/SKILL.md",
+      "sha256": "ffd015f0e1a44bc7596939a0d2dc1fc76a89f6092f6fa2c12cd76e9fb5272a6a",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/adversarial-review/SKILL.md",
+      "source": "amp/adversarial-review/SKILL.md",
+      "sha256": "e836700ebef5262831b2c0265b142e31b6e406b397415c5c05ae14d141104dad",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/agent-browser/SKILL.md",
+      "source": "agy/agent-browser/SKILL.md",
+      "sha256": "a564807af225d36d9f7b1642683c8aed0c99b896d08eeea1bdae260a034de17f",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound-refresh/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound-refresh/SKILL.md",
+      "source": "amp/ce-compound-refresh/SKILL.md",
+      "sha256": "73aab320fd23eb05915034ccbc3b07bff9bef8712f30a26f862b4adf86177855",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound-refresh/assets/resolution-template.md",
+      "source": "amp/ce-compound-refresh/assets/resolution-template.md",
+      "sha256": "8f184825c7f9e2a5bd6894e7567776cb4cf19e0c2be1c8c0589ccd73d3f00617",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound-refresh/references/concepts-vocabulary.md",
+      "source": "amp/ce-compound-refresh/references/concepts-vocabulary.md",
+      "sha256": "79ac66f7f9fa52d940ff71b725bce207c09cfa14269d4340b8831da8239e2c71",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound-refresh/references/per-action-flows.md",
+      "source": "amp/ce-compound-refresh/references/per-action-flows.md",
+      "sha256": "6a027bf6f07e50cebe81a56b901a14f73c0317d1513a8968aa3b371fd0400130",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound-refresh/references/schema.yaml",
+      "source": "amp/ce-compound-refresh/references/schema.yaml",
+      "sha256": "f6d9e2682d9f98742dd12319c05d4715b7d7123d6585a6404deb18c6542c2c24",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound-refresh/references/yaml-schema.md",
+      "source": "amp/ce-compound-refresh/references/yaml-schema.md",
+      "sha256": "079395c03f6abf89ac95e227ec31b9db13de6bc414ca7fbe0fc72fcbfa1a53d7",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound-refresh/scripts/validate-frontmatter.py",
+      "source": "amp/ce-compound-refresh/scripts/validate-frontmatter.py",
+      "sha256": "c165f67c1885875672d45cd447dc75968589a7bb00982c33140fe925d510cf89",
+      "mode": "100755"
+    },
+    {
+      "path": "gemini/ce-compound/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound/SKILL.md",
+      "source": "amp/ce-compound/SKILL.md",
+      "sha256": "1a3333eb671e33c26013cd67c607eb3ed0de619d09ce36442d35c57c2b0d91ae",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound/assets/resolution-template.md",
+      "source": "amp/ce-compound-refresh/assets/resolution-template.md",
+      "sha256": "8f184825c7f9e2a5bd6894e7567776cb4cf19e0c2be1c8c0589ccd73d3f00617",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound/references/agents/best-practices-researcher.md",
+      "source": "amp/ce-compound/references/agents/best-practices-researcher.md",
+      "sha256": "76ec5850a63cd37859697feb1163b2b9857a5f40b5ed8a961de54381baa43e60",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound/references/agents/data-integrity-guardian.md",
+      "source": "amp/ce-compound/references/agents/data-integrity-guardian.md",
+      "sha256": "fa9549ff26a6f59eba73e57db839ded2470adb2134d76eba4010d2d7ae9f2468",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound/references/agents/framework-docs-researcher.md",
+      "source": "amp/ce-compound/references/agents/framework-docs-researcher.md",
+      "sha256": "100c7b5cbe64b9904fa59998e01f18924293cc9701709b6c54207e458dfb9e34",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound/references/agents/pattern-recognition-specialist.md",
+      "source": "amp/ce-compound/references/agents/pattern-recognition-specialist.md",
+      "sha256": "0d73822ccea06dd3e9a25e9e21e1908377cb9c5364b678b940fefef7f84c9580",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound/references/agents/performance-oracle.md",
+      "source": "amp/ce-compound/references/agents/performance-oracle.md",
+      "sha256": "79abcaee9a66355d996937cc6562a507b4b8d2de52060be3153ecb2088941491",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound/references/agents/security-sentinel.md",
+      "source": "amp/ce-compound/references/agents/security-sentinel.md",
+      "sha256": "f9fdc51c2b9febd057e80dbe1859b0fc875c360042aaa98415852d56b589d25c",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound/references/agents/session-historian.md",
+      "source": "amp/ce-compound/references/agents/session-historian.md",
+      "sha256": "9d266ba34adacf6943f3fc490e8f3c1cad04a68409f0a687d9c21cbb92f37a1b",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound/references/concepts-vocabulary.md",
+      "source": "amp/ce-compound-refresh/references/concepts-vocabulary.md",
+      "sha256": "79ac66f7f9fa52d940ff71b725bce207c09cfa14269d4340b8831da8239e2c71",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound/references/schema.yaml",
+      "source": "amp/ce-compound-refresh/references/schema.yaml",
+      "sha256": "f6d9e2682d9f98742dd12319c05d4715b7d7123d6585a6404deb18c6542c2c24",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound/references/yaml-schema.md",
+      "source": "amp/ce-compound-refresh/references/yaml-schema.md",
+      "sha256": "079395c03f6abf89ac95e227ec31b9db13de6bc414ca7fbe0fc72fcbfa1a53d7",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound/scripts/session-history/discover-sessions.sh",
+      "source": "amp/ce-compound/scripts/session-history/discover-sessions.sh",
+      "sha256": "2b00a0147dd33ab0c5d8beac5b2e92800e6de6ec955586861565edfb1b67abe4",
+      "mode": "100755"
+    },
+    {
+      "path": "gemini/ce-compound/scripts/session-history/extract-errors.py",
+      "source": "amp/ce-compound/scripts/session-history/extract-errors.py",
+      "sha256": "7a3cc8ff7dec161d97e57c8a00544678a3c0ba7492595f7a67331ace9b5ae958",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound/scripts/session-history/extract-metadata.py",
+      "source": "amp/ce-compound/scripts/session-history/extract-metadata.py",
+      "sha256": "6f852aa85b563ff8f5edaa4d6a7788e29bb0fddf372046c4f51115487aa13c63",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound/scripts/session-history/extract-skeleton.py",
+      "source": "amp/ce-compound/scripts/session-history/extract-skeleton.py",
+      "sha256": "1134ce8505f7611d49a5945a06469fe5cd0323c1062b68e68ab65147b6517e49",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-compound/scripts/validate-frontmatter.py",
+      "source": "amp/ce-compound-refresh/scripts/validate-frontmatter.py",
+      "sha256": "c165f67c1885875672d45cd447dc75968589a7bb00982c33140fe925d510cf89",
+      "mode": "100755"
+    },
+    {
+      "path": "gemini/ce-explain/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-explain/SKILL.md",
+      "source": "amp/ce-explain/SKILL.md",
+      "sha256": "215a7189c43860ba7dd7109084d5a74070336520b907675eaaa976a0098260df",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-explain/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-explain/references/agents/work-recap-scout.md",
+      "source": "amp/ce-explain/references/agents/work-recap-scout.md",
+      "sha256": "9e9f9f419a7b4c9313a2ac471b50f4766b78461d67f026670493691eb9984b20",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-explain/references/check-in.md",
+      "source": "amp/ce-explain/references/check-in.md",
+      "sha256": "de187f983e5ac5f8c8eb917c068056396407ca1482c85daa46569691a8dc9e47",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-explain/references/destinations.md",
+      "source": "amp/ce-explain/references/destinations.md",
+      "sha256": "f3e038187cefabeb3d39c0f5a7f78873c476e2cb396d4242108e3940adcd6da3",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-explain/references/explainer-html.md",
+      "source": "amp/ce-explain/references/explainer-html.md",
+      "sha256": "baa717488f08cda491d8994cb452472e1e3aed380830a45b985ff1cdbae7d7ad",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-explain/references/explainer-markdown.md",
+      "source": "amp/ce-explain/references/explainer-markdown.md",
+      "sha256": "9826edbeb23874051a04fdfa409a3b83d60518c5a2ebef7015dd0e4eb13bbb64",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-explain/references/intake.md",
+      "source": "amp/ce-explain/references/intake.md",
+      "sha256": "3c41d71bd2a68a9988324516531a9e32cf57f6ccc9829e13b230c611c4f653b8",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-explain/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-explain/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-optimize/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-optimize/SKILL.md",
+      "source": "amp/ce-optimize/SKILL.md",
+      "sha256": "8fea61ecddeac47a2185eb49ebe2cbeeccd1e48d3d88b3b0f08b06036d894c00",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-optimize/references/agents/learnings-researcher.md",
+      "source": "amp/ce-optimize/references/agents/learnings-researcher.md",
+      "sha256": "48aad27f09f04c024483d469fa0a7ee99f00bfd1988781304abb221bd0c26b85",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-optimize/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-optimize/references/agents/repo-research-analyst.md",
+      "source": "amp/ce-optimize/references/agents/repo-research-analyst.md",
+      "sha256": "761d1a2c2128fd1e90781b5385c3b8b18da3bd46c7c2aff54148a7603a97eab0",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-optimize/references/example-hard-spec.yaml",
+      "source": "amp/ce-optimize/references/example-hard-spec.yaml",
+      "sha256": "c909945709c0b17e6be81dd95e17c329871625d61d72be9d8f3f74f6548fe22b",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-optimize/references/example-judge-spec.yaml",
+      "source": "amp/ce-optimize/references/example-judge-spec.yaml",
+      "sha256": "e1e813720e508d16c02c80c0ce95cdcb12c2ed9152aa94d946e176ced096b3ec",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-optimize/references/experiment-log-schema.yaml",
+      "source": "amp/ce-optimize/references/experiment-log-schema.yaml",
+      "sha256": "413c839392bddb1ce38f6516657159daedacba58d28625acafaa0499fc5b3188",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-optimize/references/experiment-prompt-template.md",
+      "source": "amp/ce-optimize/references/experiment-prompt-template.md",
+      "sha256": "fc3db54f99d60cd4ff440974f606c6afc9d743131bfeb01d0e0d4589a1040654",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-optimize/references/judge-prompt-template.md",
+      "source": "amp/ce-optimize/references/judge-prompt-template.md",
+      "sha256": "423423690dbef08e75bc4c27d9255076e641f3b0ab13eb27c3f9281d58197801",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-optimize/references/optimize-spec-schema.yaml",
+      "source": "amp/ce-optimize/references/optimize-spec-schema.yaml",
+      "sha256": "213966e930747c10b629ba8004110acd9246c353c5e1ac614ed1fabc62369c22",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-optimize/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-optimize/references/usage-guide.md",
+      "source": "amp/ce-optimize/references/usage-guide.md",
+      "sha256": "87976654dfc241c51504c6e04639c6d067c7a01739b37b2678da6fa4565c96ee",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-optimize/scripts/experiment-worktree.sh",
+      "source": "amp/ce-optimize/scripts/experiment-worktree.sh",
+      "sha256": "f71d0ef7fdfe7c8b763a7d2686ecb4021346dcb3be897bb664759b69e6769e96",
+      "mode": "100755"
+    },
+    {
+      "path": "gemini/ce-optimize/scripts/measure.sh",
+      "source": "amp/ce-optimize/scripts/measure.sh",
+      "sha256": "1fc92a941e93be8994d01fe103aa2dcda1bd0c7bc2727b8cd801f5f5f3f8af2a",
+      "mode": "100755"
+    },
+    {
+      "path": "gemini/ce-optimize/scripts/parallel-probe.sh",
+      "source": "amp/ce-optimize/scripts/parallel-probe.sh",
+      "sha256": "5e254560975304f8a24ecbabaddc426e2b935c09c92bb2f8703cbf30da9f57ff",
+      "mode": "100755"
+    },
+    {
+      "path": "gemini/ce-optimize/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-pov/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-pov/SKILL.md",
+      "source": "amp/ce-pov/SKILL.md",
+      "sha256": "cd4b4743af437402055317b8c081136e4b077639855d4e259e38e836ff734959",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-pov/references/agents/external-evidence-researcher.md",
+      "source": "amp/ce-pov/references/agents/external-evidence-researcher.md",
+      "sha256": "0766dee4c79f67add69afc7d9dfb9ceb0d0b3dfcccac4dee61c4cf49e1a04371",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-pov/references/agents/precedent-activity-scout.md",
+      "source": "amp/ce-pov/references/agents/precedent-activity-scout.md",
+      "sha256": "497b0ff7fa4ba1e26be4af3062152c727b59aa8afbb882ad3b31425809280002",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-pov/references/agents/project-grounding-scout.md",
+      "source": "amp/ce-pov/references/agents/project-grounding-scout.md",
+      "sha256": "6510c127d33b4f96da721b1e5becad235ac246a5518f548b80e326df76ebd57e",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-pov/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-pov/references/boundaries.md",
+      "source": "amp/ce-pov/references/boundaries.md",
+      "sha256": "7c7e64a2b4bc43857acec1de7c588941d870a2091e2d5b23db9a5c310f0112ee",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-pov/references/intake.md",
+      "source": "amp/ce-pov/references/intake.md",
+      "sha256": "e26c5edd8ca5941baa9e730c63d522721c8d5f1254c2aac78e8c21c09c07e77d",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-pov/references/invocation.md",
+      "source": "amp/ce-pov/references/invocation.md",
+      "sha256": "73efd9a7c518c9afe0a7f785d26367bccf40276aeea8f89dba7ea05cf28c6501",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-pov/references/method.md",
+      "source": "amp/ce-pov/references/method.md",
+      "sha256": "2097e2376a529aef7771910b989000e31bb358f0a95e5a52105ea1c56e86d97e",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-pov/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-pov/references/report.md",
+      "source": "amp/ce-pov/references/report.md",
+      "sha256": "88baad331472d33f5a1bf217e1e4a064ac6c7587b4ef9cd5d88faf54707bf6e1",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-pov/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-strategy/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-strategy/SKILL.md",
+      "source": "amp/ce-strategy/SKILL.md",
+      "sha256": "c4684af51eec0c2c3a65f330dc4ceea9469e482a151c833a3bd77e99f87845d5",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-strategy/references/interview.md",
+      "source": "amp/ce-strategy/references/interview.md",
+      "sha256": "a1995afc344fda1de05b996a9e74ecc0073a82dc77fb716c0e1b03fc2490bb43",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ce-strategy/references/strategy-template.md",
+      "source": "amp/ce-strategy/references/strategy-template.md",
+      "sha256": "f7f8a85ce53b06604502c697daf525ee33cc37c411f33d4ead8974c3c55886f3",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/create-cli/LICENSE",
+      "source": "amp/create-cli/LICENSE",
+      "sha256": "14293556b79940745123d0160c71d27ed0e9fe9b8a848093f3ed78f4853caafe",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/create-cli/SKILL.md",
+      "source": "amp/create-cli/SKILL.md",
+      "sha256": "e38bccc69413c27d7ef3b5a5759dc9a49b306bb42146c81d381a7aa4bc568bfb",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/create-cli/references/cli-guidelines.md",
+      "source": "amp/create-cli/references/cli-guidelines.md",
+      "sha256": "93e6d7af840ffb658e0ea7e53801ac7290c60636f7aa6a3dc32dc4129df005c1",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/create-pr/SKILL.md",
+      "source": "amp/create-pr/SKILL.md",
+      "sha256": "fecec121ac78b22a286566eb177aa715fed4b6332af822bcfad56f7f460bd5e4",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/deslop/SKILL.md",
+      "source": "amp/deslop/SKILL.md",
+      "sha256": "e7700c74263d1f3a389ea17e37e043ddcb5ffc1f57caf99de00761454694102e",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/diagnose/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/diagnose/SKILL.md",
+      "source": "amp/diagnose/SKILL.md",
+      "sha256": "28886402bbfa0470248086eab9106a103b964b76ae9496e63ff0c8a6761b6d13",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/diagnose/scripts/hitl-loop.template.sh",
+      "source": "amp/diagnose/scripts/hitl-loop.template.sh",
+      "sha256": "b2932630950e5210075bcd6f850e5accf30c101c5367b29eac3a29b4dd8084c8",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/frontend-design/LICENSE.txt",
+      "source": "amp/frontend-design/LICENSE.txt",
+      "sha256": "aa6bf6dbfda4a311fd132030d3d860441413109412d2d0e5bb919bdb62f14ea3",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/frontend-design/SKILL.md",
+      "source": "amp/frontend-design/SKILL.md",
+      "sha256": "024d1274e1329e52a3a008cfa6ec6706300f64a3a8342c730061fe8045023847",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/grill-me/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/grill-me/SKILL.md",
+      "source": "amp/grill-me/SKILL.md",
+      "sha256": "74147eb6010a65957efef2b9e0f0b3ff935c1def7fc117697151b1d0f3610556",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/imagegen-google/SKILL.md",
+      "source": "amp/imagegen-google/SKILL.md",
+      "sha256": "e05c9ffb329b4914d45731fd06b59569ad1a4530ae83caf5fb309154bdc17e2b",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/markdown-converter/LICENSE",
+      "source": "amp/create-cli/LICENSE",
+      "sha256": "14293556b79940745123d0160c71d27ed0e9fe9b8a848093f3ed78f4853caafe",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/markdown-converter/SKILL.md",
+      "source": "amp/markdown-converter/SKILL.md",
+      "sha256": "dcc6b92171d4997e79fddee174eb82418a1ee090c6232e75079aecc78a09200d",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/pr-reviewer-only/SKILL.md",
+      "source": "amp/pr-reviewer-only/SKILL.md",
+      "sha256": "779ccbb572a71df453bd366a4d88ea1bdcb62e223307a37d20a6f15b73b7cac6",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/pr-reviewer/SKILL.md",
+      "source": "amp/pr-reviewer/SKILL.md",
+      "sha256": "288c13beadef95ba93568800acfb8c81dfba52cc63dd7136624d4f6e875e91c1",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/predict-issues/SKILL.md",
+      "source": "amp/predict-issues/SKILL.md",
+      "sha256": "8095c60665d910cd30f98986c82d62b9a38805663c54b8dc696a9ce57237df7e",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/refactor/SKILL.md",
+      "source": "amp/refactor/SKILL.md",
+      "sha256": "a4429ebd24835923dbb8b41365cb357f0e4478147ac34bf90daa5a23aa288098",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/review/SKILL.md",
+      "source": "amp/review/SKILL.md",
+      "sha256": "4b63f0364d39ed5a4d85ea29e9dfd62b7872d920b22ffd6adea37bb58032c6a5",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/ship-it/SKILL.md",
+      "source": "amp/ship-it/SKILL.md",
+      "sha256": "682edcdd7e8abc722d4e3bfb6bbcad4dca4af7a84f12a7357bf9e812d24ce7cb",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/tdd/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/tdd/SKILL.md",
+      "source": "amp/tdd/SKILL.md",
+      "sha256": "af059705061156fd4845ddbb736fe92b564118ac5f03551e09ef9e8f6d970638",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/tdd/deep-modules.md",
+      "source": "amp/tdd/deep-modules.md",
+      "sha256": "f2123700bf953db1740625686c75bdd145efd486357c47c6818c869fee657a32",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/tdd/interface-design.md",
+      "source": "amp/tdd/interface-design.md",
+      "sha256": "764c5ff0e3fa6b4ab7095eb65ccc7201e090baf19fa16051dfdb72c06d27417d",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/tdd/mocking.md",
+      "source": "amp/tdd/mocking.md",
+      "sha256": "3ceb807fdf4a47d6a93d4d9a891e5ba6d362a6247bd08adc451feebfc17361ef",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/tdd/refactoring.md",
+      "source": "amp/tdd/refactoring.md",
+      "sha256": "54fced22dd1911b7094c3fe7979b7c1a40d40be307482c4adf7dc0588f27d6cc",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/tdd/tests.md",
+      "source": "amp/tdd/tests.md",
+      "sha256": "e12182f5c4c6a844b7c6ab4b8d2623b642aaaae5460fe58ed087efd4f3d5fb8a",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/thermo-nuclear-code-quality-review/SKILL.md",
+      "source": "amp/thermo-nuclear-code-quality-review/SKILL.md",
+      "sha256": "943c1e2acd6a7971247366272d5764fb0f89e9e6c2f3ec4ee173098f3d2f5024",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/to-issues/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/to-issues/SKILL.md",
+      "source": "amp/to-issues/SKILL.md",
+      "sha256": "0e6a2973fa5bdf32570227c578f7e474d945dd9281615d31439664c3ef016fce",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/to-prd/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/to-prd/SKILL.md",
+      "source": "amp/to-prd/SKILL.md",
+      "sha256": "b60e3805e361e4eabc6f3df48d305299e0fde64cb24b6e95443c01de907a2e7d",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/triage/AGENT-BRIEF.md",
+      "source": "amp/triage/AGENT-BRIEF.md",
+      "sha256": "1c71c747aa97d938f75ec7a4b8fe87451763b38a3ce6348acf2b222e5819b2e5",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/triage/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/triage/OUT-OF-SCOPE.md",
+      "source": "amp/triage/OUT-OF-SCOPE.md",
+      "sha256": "8ed8cf27833444060c81b3961a83c0e3d8e6cf2fcb2ddf6f8b07c6655cbb0d85",
+      "mode": "100644"
+    },
+    {
+      "path": "gemini/triage/SKILL.md",
+      "source": "amp/triage/SKILL.md",
+      "sha256": "b819f0285e4e5814ac6472d0217f07dc9f23d2fdae3ebb0dd31d98360d8ac029",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/adversarial-review/SKILL.md",
+      "source": "amp/adversarial-review/SKILL.md",
+      "sha256": "e836700ebef5262831b2c0265b142e31b6e406b397415c5c05ae14d141104dad",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/agent-browser/SKILL.md",
+      "source": "agy/agent-browser/SKILL.md",
+      "sha256": "a564807af225d36d9f7b1642683c8aed0c99b896d08eeea1bdae260a034de17f",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound-refresh/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound-refresh/SKILL.md",
+      "source": "amp/ce-compound-refresh/SKILL.md",
+      "sha256": "73aab320fd23eb05915034ccbc3b07bff9bef8712f30a26f862b4adf86177855",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound-refresh/assets/resolution-template.md",
+      "source": "amp/ce-compound-refresh/assets/resolution-template.md",
+      "sha256": "8f184825c7f9e2a5bd6894e7567776cb4cf19e0c2be1c8c0589ccd73d3f00617",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound-refresh/references/concepts-vocabulary.md",
+      "source": "amp/ce-compound-refresh/references/concepts-vocabulary.md",
+      "sha256": "79ac66f7f9fa52d940ff71b725bce207c09cfa14269d4340b8831da8239e2c71",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound-refresh/references/per-action-flows.md",
+      "source": "amp/ce-compound-refresh/references/per-action-flows.md",
+      "sha256": "6a027bf6f07e50cebe81a56b901a14f73c0317d1513a8968aa3b371fd0400130",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound-refresh/references/schema.yaml",
+      "source": "amp/ce-compound-refresh/references/schema.yaml",
+      "sha256": "f6d9e2682d9f98742dd12319c05d4715b7d7123d6585a6404deb18c6542c2c24",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound-refresh/references/yaml-schema.md",
+      "source": "amp/ce-compound-refresh/references/yaml-schema.md",
+      "sha256": "079395c03f6abf89ac95e227ec31b9db13de6bc414ca7fbe0fc72fcbfa1a53d7",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound-refresh/scripts/validate-frontmatter.py",
+      "source": "amp/ce-compound-refresh/scripts/validate-frontmatter.py",
+      "sha256": "c165f67c1885875672d45cd447dc75968589a7bb00982c33140fe925d510cf89",
+      "mode": "100755"
+    },
+    {
+      "path": "grok/ce-compound/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound/SKILL.md",
+      "source": "amp/ce-compound/SKILL.md",
+      "sha256": "1a3333eb671e33c26013cd67c607eb3ed0de619d09ce36442d35c57c2b0d91ae",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound/assets/resolution-template.md",
+      "source": "amp/ce-compound-refresh/assets/resolution-template.md",
+      "sha256": "8f184825c7f9e2a5bd6894e7567776cb4cf19e0c2be1c8c0589ccd73d3f00617",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound/references/agents/best-practices-researcher.md",
+      "source": "amp/ce-compound/references/agents/best-practices-researcher.md",
+      "sha256": "76ec5850a63cd37859697feb1163b2b9857a5f40b5ed8a961de54381baa43e60",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound/references/agents/data-integrity-guardian.md",
+      "source": "amp/ce-compound/references/agents/data-integrity-guardian.md",
+      "sha256": "fa9549ff26a6f59eba73e57db839ded2470adb2134d76eba4010d2d7ae9f2468",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound/references/agents/framework-docs-researcher.md",
+      "source": "amp/ce-compound/references/agents/framework-docs-researcher.md",
+      "sha256": "100c7b5cbe64b9904fa59998e01f18924293cc9701709b6c54207e458dfb9e34",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound/references/agents/pattern-recognition-specialist.md",
+      "source": "amp/ce-compound/references/agents/pattern-recognition-specialist.md",
+      "sha256": "0d73822ccea06dd3e9a25e9e21e1908377cb9c5364b678b940fefef7f84c9580",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound/references/agents/performance-oracle.md",
+      "source": "amp/ce-compound/references/agents/performance-oracle.md",
+      "sha256": "79abcaee9a66355d996937cc6562a507b4b8d2de52060be3153ecb2088941491",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound/references/agents/security-sentinel.md",
+      "source": "amp/ce-compound/references/agents/security-sentinel.md",
+      "sha256": "f9fdc51c2b9febd057e80dbe1859b0fc875c360042aaa98415852d56b589d25c",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound/references/agents/session-historian.md",
+      "source": "amp/ce-compound/references/agents/session-historian.md",
+      "sha256": "9d266ba34adacf6943f3fc490e8f3c1cad04a68409f0a687d9c21cbb92f37a1b",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound/references/concepts-vocabulary.md",
+      "source": "amp/ce-compound-refresh/references/concepts-vocabulary.md",
+      "sha256": "79ac66f7f9fa52d940ff71b725bce207c09cfa14269d4340b8831da8239e2c71",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound/references/schema.yaml",
+      "source": "amp/ce-compound-refresh/references/schema.yaml",
+      "sha256": "f6d9e2682d9f98742dd12319c05d4715b7d7123d6585a6404deb18c6542c2c24",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound/references/yaml-schema.md",
+      "source": "amp/ce-compound-refresh/references/yaml-schema.md",
+      "sha256": "079395c03f6abf89ac95e227ec31b9db13de6bc414ca7fbe0fc72fcbfa1a53d7",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound/scripts/session-history/discover-sessions.sh",
+      "source": "amp/ce-compound/scripts/session-history/discover-sessions.sh",
+      "sha256": "2b00a0147dd33ab0c5d8beac5b2e92800e6de6ec955586861565edfb1b67abe4",
+      "mode": "100755"
+    },
+    {
+      "path": "grok/ce-compound/scripts/session-history/extract-errors.py",
+      "source": "amp/ce-compound/scripts/session-history/extract-errors.py",
+      "sha256": "7a3cc8ff7dec161d97e57c8a00544678a3c0ba7492595f7a67331ace9b5ae958",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound/scripts/session-history/extract-metadata.py",
+      "source": "amp/ce-compound/scripts/session-history/extract-metadata.py",
+      "sha256": "6f852aa85b563ff8f5edaa4d6a7788e29bb0fddf372046c4f51115487aa13c63",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound/scripts/session-history/extract-skeleton.py",
+      "source": "amp/ce-compound/scripts/session-history/extract-skeleton.py",
+      "sha256": "1134ce8505f7611d49a5945a06469fe5cd0323c1062b68e68ab65147b6517e49",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-compound/scripts/validate-frontmatter.py",
+      "source": "amp/ce-compound-refresh/scripts/validate-frontmatter.py",
+      "sha256": "c165f67c1885875672d45cd447dc75968589a7bb00982c33140fe925d510cf89",
+      "mode": "100755"
+    },
+    {
+      "path": "grok/ce-explain/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-explain/SKILL.md",
+      "source": "amp/ce-explain/SKILL.md",
+      "sha256": "215a7189c43860ba7dd7109084d5a74070336520b907675eaaa976a0098260df",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-explain/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-explain/references/agents/work-recap-scout.md",
+      "source": "amp/ce-explain/references/agents/work-recap-scout.md",
+      "sha256": "9e9f9f419a7b4c9313a2ac471b50f4766b78461d67f026670493691eb9984b20",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-explain/references/check-in.md",
+      "source": "amp/ce-explain/references/check-in.md",
+      "sha256": "de187f983e5ac5f8c8eb917c068056396407ca1482c85daa46569691a8dc9e47",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-explain/references/destinations.md",
+      "source": "amp/ce-explain/references/destinations.md",
+      "sha256": "f3e038187cefabeb3d39c0f5a7f78873c476e2cb396d4242108e3940adcd6da3",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-explain/references/explainer-html.md",
+      "source": "amp/ce-explain/references/explainer-html.md",
+      "sha256": "baa717488f08cda491d8994cb452472e1e3aed380830a45b985ff1cdbae7d7ad",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-explain/references/explainer-markdown.md",
+      "source": "amp/ce-explain/references/explainer-markdown.md",
+      "sha256": "9826edbeb23874051a04fdfa409a3b83d60518c5a2ebef7015dd0e4eb13bbb64",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-explain/references/intake.md",
+      "source": "amp/ce-explain/references/intake.md",
+      "sha256": "3c41d71bd2a68a9988324516531a9e32cf57f6ccc9829e13b230c611c4f653b8",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-explain/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-explain/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-optimize/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-optimize/SKILL.md",
+      "source": "amp/ce-optimize/SKILL.md",
+      "sha256": "8fea61ecddeac47a2185eb49ebe2cbeeccd1e48d3d88b3b0f08b06036d894c00",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-optimize/references/agents/learnings-researcher.md",
+      "source": "amp/ce-optimize/references/agents/learnings-researcher.md",
+      "sha256": "48aad27f09f04c024483d469fa0a7ee99f00bfd1988781304abb221bd0c26b85",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-optimize/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-optimize/references/agents/repo-research-analyst.md",
+      "source": "amp/ce-optimize/references/agents/repo-research-analyst.md",
+      "sha256": "761d1a2c2128fd1e90781b5385c3b8b18da3bd46c7c2aff54148a7603a97eab0",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-optimize/references/example-hard-spec.yaml",
+      "source": "amp/ce-optimize/references/example-hard-spec.yaml",
+      "sha256": "c909945709c0b17e6be81dd95e17c329871625d61d72be9d8f3f74f6548fe22b",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-optimize/references/example-judge-spec.yaml",
+      "source": "amp/ce-optimize/references/example-judge-spec.yaml",
+      "sha256": "e1e813720e508d16c02c80c0ce95cdcb12c2ed9152aa94d946e176ced096b3ec",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-optimize/references/experiment-log-schema.yaml",
+      "source": "amp/ce-optimize/references/experiment-log-schema.yaml",
+      "sha256": "413c839392bddb1ce38f6516657159daedacba58d28625acafaa0499fc5b3188",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-optimize/references/experiment-prompt-template.md",
+      "source": "amp/ce-optimize/references/experiment-prompt-template.md",
+      "sha256": "fc3db54f99d60cd4ff440974f606c6afc9d743131bfeb01d0e0d4589a1040654",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-optimize/references/judge-prompt-template.md",
+      "source": "amp/ce-optimize/references/judge-prompt-template.md",
+      "sha256": "423423690dbef08e75bc4c27d9255076e641f3b0ab13eb27c3f9281d58197801",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-optimize/references/optimize-spec-schema.yaml",
+      "source": "amp/ce-optimize/references/optimize-spec-schema.yaml",
+      "sha256": "213966e930747c10b629ba8004110acd9246c353c5e1ac614ed1fabc62369c22",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-optimize/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-optimize/references/usage-guide.md",
+      "source": "amp/ce-optimize/references/usage-guide.md",
+      "sha256": "87976654dfc241c51504c6e04639c6d067c7a01739b37b2678da6fa4565c96ee",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-optimize/scripts/experiment-worktree.sh",
+      "source": "amp/ce-optimize/scripts/experiment-worktree.sh",
+      "sha256": "f71d0ef7fdfe7c8b763a7d2686ecb4021346dcb3be897bb664759b69e6769e96",
+      "mode": "100755"
+    },
+    {
+      "path": "grok/ce-optimize/scripts/measure.sh",
+      "source": "amp/ce-optimize/scripts/measure.sh",
+      "sha256": "1fc92a941e93be8994d01fe103aa2dcda1bd0c7bc2727b8cd801f5f5f3f8af2a",
+      "mode": "100755"
+    },
+    {
+      "path": "grok/ce-optimize/scripts/parallel-probe.sh",
+      "source": "amp/ce-optimize/scripts/parallel-probe.sh",
+      "sha256": "5e254560975304f8a24ecbabaddc426e2b935c09c92bb2f8703cbf30da9f57ff",
+      "mode": "100755"
+    },
+    {
+      "path": "grok/ce-optimize/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-pov/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-pov/SKILL.md",
+      "source": "amp/ce-pov/SKILL.md",
+      "sha256": "cd4b4743af437402055317b8c081136e4b077639855d4e259e38e836ff734959",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-pov/references/agents/external-evidence-researcher.md",
+      "source": "amp/ce-pov/references/agents/external-evidence-researcher.md",
+      "sha256": "0766dee4c79f67add69afc7d9dfb9ceb0d0b3dfcccac4dee61c4cf49e1a04371",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-pov/references/agents/precedent-activity-scout.md",
+      "source": "amp/ce-pov/references/agents/precedent-activity-scout.md",
+      "sha256": "497b0ff7fa4ba1e26be4af3062152c727b59aa8afbb882ad3b31425809280002",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-pov/references/agents/project-grounding-scout.md",
+      "source": "amp/ce-pov/references/agents/project-grounding-scout.md",
+      "sha256": "6510c127d33b4f96da721b1e5becad235ac246a5518f548b80e326df76ebd57e",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-pov/references/agents/repo-profiler.md",
+      "source": "amp/ce-compound/references/agents/repo-profiler.md",
+      "sha256": "bbcb7474bcdbb26ece5ae9afa5c28eb97833ea46d5e7bd563438dd0e7b9dee7c",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-pov/references/boundaries.md",
+      "source": "amp/ce-pov/references/boundaries.md",
+      "sha256": "7c7e64a2b4bc43857acec1de7c588941d870a2091e2d5b23db9a5c310f0112ee",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-pov/references/intake.md",
+      "source": "amp/ce-pov/references/intake.md",
+      "sha256": "e26c5edd8ca5941baa9e730c63d522721c8d5f1254c2aac78e8c21c09c07e77d",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-pov/references/invocation.md",
+      "source": "amp/ce-pov/references/invocation.md",
+      "sha256": "73efd9a7c518c9afe0a7f785d26367bccf40276aeea8f89dba7ea05cf28c6501",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-pov/references/method.md",
+      "source": "amp/ce-pov/references/method.md",
+      "sha256": "2097e2376a529aef7771910b989000e31bb358f0a95e5a52105ea1c56e86d97e",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-pov/references/repo-profile-cache.md",
+      "source": "amp/ce-compound/references/repo-profile-cache.md",
+      "sha256": "ca87bb3f2d171582437adb6d11a2629db5b9ee2e737f78eacd6d2d0f8fc44fbb",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-pov/references/report.md",
+      "source": "amp/ce-pov/references/report.md",
+      "sha256": "88baad331472d33f5a1bf217e1e4a064ac6c7587b4ef9cd5d88faf54707bf6e1",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-pov/scripts/repo-profile-cache.py",
+      "source": "amp/ce-compound/scripts/repo-profile-cache.py",
+      "sha256": "4bfaf86686d4e577c6cb5b33f5ed0b7c65d994259282d5dfe2b99f0519303d05",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-strategy/LICENSE",
+      "source": "amp/ce-compound-refresh/LICENSE",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-strategy/SKILL.md",
+      "source": "amp/ce-strategy/SKILL.md",
+      "sha256": "c4684af51eec0c2c3a65f330dc4ceea9469e482a151c833a3bd77e99f87845d5",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-strategy/references/interview.md",
+      "source": "amp/ce-strategy/references/interview.md",
+      "sha256": "a1995afc344fda1de05b996a9e74ecc0073a82dc77fb716c0e1b03fc2490bb43",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ce-strategy/references/strategy-template.md",
+      "source": "amp/ce-strategy/references/strategy-template.md",
+      "sha256": "f7f8a85ce53b06604502c697daf525ee33cc37c411f33d4ead8974c3c55886f3",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/create-cli/LICENSE",
+      "source": "amp/create-cli/LICENSE",
+      "sha256": "14293556b79940745123d0160c71d27ed0e9fe9b8a848093f3ed78f4853caafe",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/create-cli/SKILL.md",
+      "source": "amp/create-cli/SKILL.md",
+      "sha256": "e38bccc69413c27d7ef3b5a5759dc9a49b306bb42146c81d381a7aa4bc568bfb",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/create-cli/references/cli-guidelines.md",
+      "source": "amp/create-cli/references/cli-guidelines.md",
+      "sha256": "93e6d7af840ffb658e0ea7e53801ac7290c60636f7aa6a3dc32dc4129df005c1",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/create-pr/SKILL.md",
+      "source": "amp/create-pr/SKILL.md",
+      "sha256": "fecec121ac78b22a286566eb177aa715fed4b6332af822bcfad56f7f460bd5e4",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/deslop/SKILL.md",
+      "source": "amp/deslop/SKILL.md",
+      "sha256": "e7700c74263d1f3a389ea17e37e043ddcb5ffc1f57caf99de00761454694102e",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/diagnose/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/diagnose/SKILL.md",
+      "source": "amp/diagnose/SKILL.md",
+      "sha256": "28886402bbfa0470248086eab9106a103b964b76ae9496e63ff0c8a6761b6d13",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/diagnose/scripts/hitl-loop.template.sh",
+      "source": "amp/diagnose/scripts/hitl-loop.template.sh",
+      "sha256": "b2932630950e5210075bcd6f850e5accf30c101c5367b29eac3a29b4dd8084c8",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/frontend-design/LICENSE.txt",
+      "source": "amp/frontend-design/LICENSE.txt",
+      "sha256": "aa6bf6dbfda4a311fd132030d3d860441413109412d2d0e5bb919bdb62f14ea3",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/frontend-design/SKILL.md",
+      "source": "amp/frontend-design/SKILL.md",
+      "sha256": "024d1274e1329e52a3a008cfa6ec6706300f64a3a8342c730061fe8045023847",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/grill-me/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/grill-me/SKILL.md",
+      "source": "amp/grill-me/SKILL.md",
+      "sha256": "74147eb6010a65957efef2b9e0f0b3ff935c1def7fc117697151b1d0f3610556",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/imagegen-google/SKILL.md",
+      "source": "amp/imagegen-google/SKILL.md",
+      "sha256": "e05c9ffb329b4914d45731fd06b59569ad1a4530ae83caf5fb309154bdc17e2b",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/markdown-converter/LICENSE",
+      "source": "amp/create-cli/LICENSE",
+      "sha256": "14293556b79940745123d0160c71d27ed0e9fe9b8a848093f3ed78f4853caafe",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/markdown-converter/SKILL.md",
+      "source": "amp/markdown-converter/SKILL.md",
+      "sha256": "dcc6b92171d4997e79fddee174eb82418a1ee090c6232e75079aecc78a09200d",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/pr-reviewer-only/SKILL.md",
+      "source": "amp/pr-reviewer-only/SKILL.md",
+      "sha256": "779ccbb572a71df453bd366a4d88ea1bdcb62e223307a37d20a6f15b73b7cac6",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/pr-reviewer/SKILL.md",
+      "source": "amp/pr-reviewer/SKILL.md",
+      "sha256": "288c13beadef95ba93568800acfb8c81dfba52cc63dd7136624d4f6e875e91c1",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/predict-issues/SKILL.md",
+      "source": "amp/predict-issues/SKILL.md",
+      "sha256": "8095c60665d910cd30f98986c82d62b9a38805663c54b8dc696a9ce57237df7e",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/refactor/SKILL.md",
+      "source": "amp/refactor/SKILL.md",
+      "sha256": "a4429ebd24835923dbb8b41365cb357f0e4478147ac34bf90daa5a23aa288098",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/review/SKILL.md",
+      "source": "amp/review/SKILL.md",
+      "sha256": "4b63f0364d39ed5a4d85ea29e9dfd62b7872d920b22ffd6adea37bb58032c6a5",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/ship-it/SKILL.md",
+      "source": "amp/ship-it/SKILL.md",
+      "sha256": "682edcdd7e8abc722d4e3bfb6bbcad4dca4af7a84f12a7357bf9e812d24ce7cb",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/tdd/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/tdd/SKILL.md",
+      "source": "amp/tdd/SKILL.md",
+      "sha256": "af059705061156fd4845ddbb736fe92b564118ac5f03551e09ef9e8f6d970638",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/tdd/deep-modules.md",
+      "source": "amp/tdd/deep-modules.md",
+      "sha256": "f2123700bf953db1740625686c75bdd145efd486357c47c6818c869fee657a32",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/tdd/interface-design.md",
+      "source": "amp/tdd/interface-design.md",
+      "sha256": "764c5ff0e3fa6b4ab7095eb65ccc7201e090baf19fa16051dfdb72c06d27417d",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/tdd/mocking.md",
+      "source": "amp/tdd/mocking.md",
+      "sha256": "3ceb807fdf4a47d6a93d4d9a891e5ba6d362a6247bd08adc451feebfc17361ef",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/tdd/refactoring.md",
+      "source": "amp/tdd/refactoring.md",
+      "sha256": "54fced22dd1911b7094c3fe7979b7c1a40d40be307482c4adf7dc0588f27d6cc",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/tdd/tests.md",
+      "source": "amp/tdd/tests.md",
+      "sha256": "e12182f5c4c6a844b7c6ab4b8d2623b642aaaae5460fe58ed087efd4f3d5fb8a",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/thermo-nuclear-code-quality-review/SKILL.md",
+      "source": "amp/thermo-nuclear-code-quality-review/SKILL.md",
+      "sha256": "943c1e2acd6a7971247366272d5764fb0f89e9e6c2f3ec4ee173098f3d2f5024",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/to-issues/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/to-issues/SKILL.md",
+      "source": "amp/to-issues/SKILL.md",
+      "sha256": "0e6a2973fa5bdf32570227c578f7e474d945dd9281615d31439664c3ef016fce",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/to-prd/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/to-prd/SKILL.md",
+      "source": "amp/to-prd/SKILL.md",
+      "sha256": "b60e3805e361e4eabc6f3df48d305299e0fde64cb24b6e95443c01de907a2e7d",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/triage/AGENT-BRIEF.md",
+      "source": "amp/triage/AGENT-BRIEF.md",
+      "sha256": "1c71c747aa97d938f75ec7a4b8fe87451763b38a3ce6348acf2b222e5819b2e5",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/triage/LICENSE",
+      "source": "amp/diagnose/LICENSE",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/triage/OUT-OF-SCOPE.md",
+      "source": "amp/triage/OUT-OF-SCOPE.md",
+      "sha256": "8ed8cf27833444060c81b3961a83c0e3d8e6cf2fcb2ddf6f8b07c6655cbb0d85",
+      "mode": "100644"
+    },
+    {
+      "path": "grok/triage/SKILL.md",
+      "source": "amp/triage/SKILL.md",
+      "sha256": "b819f0285e4e5814ac6472d0217f07dc9f23d2fdae3ebb0dd31d98360d8ac029",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/adversarial-review.md",
+      "source": "antigravity/adversarial-review.md",
+      "sha256": "57828e7b47e64133b03d604b56a8d030d54b574a62ddb3efa3eee8a095f51062",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/agent-browser.md",
+      "source": "opencode/commands/agent-browser.md",
+      "sha256": "020e3c011df42ace07714ce38dab5360c4aa7199a4e8c84041a435cba4222082",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/create-cli.md",
+      "source": "opencode/commands/create-cli.md",
+      "sha256": "a9dc9863467c384b40424794528645b30b5c535d58fffd98905ccc46c55f90b2",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/deslop.md",
+      "source": "opencode/commands/deslop.md",
+      "sha256": "47c5150449e8efcca4c2ad88bcf6afe808b683dc1c431f2da5f7ebb16b6d4ada",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/diagnose.md",
+      "source": "opencode/commands/diagnose.md",
+      "sha256": "f651cb084b07bee2ccab16a28bae8f40b45c2c5bbc7c39954739c0a07b123eae",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/frontend-design.md",
+      "source": "opencode/commands/frontend-design.md",
+      "sha256": "cf9b2e869aaa1be62b4dc95a05306e41700963087b549d8cc728c1bffb17e818",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/grill-me.md",
+      "source": "opencode/commands/grill-me.md",
+      "sha256": "ee0ca25f1dc743959ba4b3b647e0e118e5f0311458980008f6566ef4be1f7ee6",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/handoff.md",
+      "source": "claude/handoff.md",
+      "sha256": "6bb9152e7962c75f0cd57228251f0b5cd73a7e403cffb571355342b79f998d42",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/imagegen-google.md",
+      "source": "claude/imagegen-google.md",
+      "sha256": "5915648ccbeb2bb02ea956dd5645eb16601c56ebbc3a31651befc7e386e7161b",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/markdown-converter.md",
+      "source": "opencode/commands/markdown-converter.md",
+      "sha256": "c0a3e6664b72b51882f6c76adf1b1ece1597e29d4650a3232d93c4140c25166e",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/pr-reviewer.md",
+      "source": "opencode/commands/pr-reviewer.md",
+      "sha256": "0b66345c90b7b6ecfad504931027af5790c3b0c800ae3d46b862dc710650d066",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/predict-issues.md",
+      "source": "opencode/commands/predict-issues.md",
+      "sha256": "86b047d8c517b9e85d89b7abb1c61d015434ab79c60ca285dc22dfbc28f91c99",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/refactor.md",
+      "source": "opencode/commands/refactor.md",
+      "sha256": "f9d3dfccca5b213818b7664dd6da1db6f519105a04d369f2aab7fd37e6225350",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/review.md",
+      "source": "claude/review.md",
+      "sha256": "1d175e225f18bbfd9611f3c9e7fced95972a8c716fe9d252a2cde7a11bd4a56e",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/ship-it.md",
+      "source": "opencode/commands/ship-it.md",
+      "sha256": "3d1303e8604e7c7dd36b805cdaf8ba2017f2b4abc11ffe7a2ffe8f196c6ca763",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/tdd.md",
+      "source": "opencode/commands/tdd.md",
+      "sha256": "722144ebccf148596d6cccf333cb21e115a0249b3e4b545152d5aad42bd4d439",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/thermonuclear.md",
+      "source": "claude/thermonuclear.md",
+      "sha256": "dd65e348dec998cdc5703c6d5ec6d5168ae77bba462e99e09a8f9d192a92d095",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/to-issues.md",
+      "source": "opencode/commands/to-issues.md",
+      "sha256": "f3ffbbf60271c6c31dfc482e5126d89ab3f6b547f8f637d8c62fa2c7f0b1a995",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/to-prd.md",
+      "source": "opencode/commands/to-prd.md",
+      "sha256": "62ae887b41b93de366c95edbc98677ca3686247eb4767f697ac6b25795ca66f2",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/triage.md",
+      "source": "opencode/commands/triage.md",
+      "sha256": "2e91d6c2338c3eb923ff4a99c5015b2836e9450bf3c8d02db4cfb7be3fe0f581",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/ultrareview.md",
+      "source": "cline/ultrareview.md",
+      "sha256": "561a422e3164a2efb3c9bdac682d4ace0bafa8f498520abcd45a94cb29652894",
+      "mode": "100644"
+    },
+    {
+      "path": "kilocode/widereview.md",
+      "source": "claude/widereview.md",
+      "sha256": "816b9e3e349d220985e4a6027181c91f3cb9f77db2f101f0ac924a02f4fe1bc8",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/adversarial-review.md",
+      "source": "antigravity/adversarial-review.md",
+      "sha256": "57828e7b47e64133b03d604b56a8d030d54b574a62ddb3efa3eee8a095f51062",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/agent-browser.md",
+      "source": "opencode/commands/agent-browser.md",
+      "sha256": "020e3c011df42ace07714ce38dab5360c4aa7199a4e8c84041a435cba4222082",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/create-cli.md",
+      "source": "opencode/commands/create-cli.md",
+      "sha256": "a9dc9863467c384b40424794528645b30b5c535d58fffd98905ccc46c55f90b2",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/create-pr.md",
+      "source": "cursor/create-pr.md",
+      "sha256": "d9799076a6ab2a492ecf39018d47a326d504256c6e7383929e504d1eac45f47b",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/deslop.md",
+      "source": "opencode/commands/deslop.md",
+      "sha256": "47c5150449e8efcca4c2ad88bcf6afe808b683dc1c431f2da5f7ebb16b6d4ada",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/diagnose.md",
+      "source": "opencode/commands/diagnose.md",
+      "sha256": "f651cb084b07bee2ccab16a28bae8f40b45c2c5bbc7c39954739c0a07b123eae",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/frontend-design.md",
+      "source": "opencode/commands/frontend-design.md",
+      "sha256": "cf9b2e869aaa1be62b4dc95a05306e41700963087b549d8cc728c1bffb17e818",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/grill-me.md",
+      "source": "opencode/commands/grill-me.md",
+      "sha256": "ee0ca25f1dc743959ba4b3b647e0e118e5f0311458980008f6566ef4be1f7ee6",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/handoff.md",
+      "source": "claude/handoff.md",
+      "sha256": "6bb9152e7962c75f0cd57228251f0b5cd73a7e403cffb571355342b79f998d42",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/imagegen-google.md",
+      "source": "claude/imagegen-google.md",
+      "sha256": "5915648ccbeb2bb02ea956dd5645eb16601c56ebbc3a31651befc7e386e7161b",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/markdown-converter.md",
+      "source": "opencode/commands/markdown-converter.md",
+      "sha256": "c0a3e6664b72b51882f6c76adf1b1ece1597e29d4650a3232d93c4140c25166e",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/pr-reviewer-only.md",
+      "source": "cursor/pr-reviewer-only.md",
+      "sha256": "b14de19f9bf8e9e49ce5793eefec8be237b4bdd34da85a6e08c671c638c91815",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/pr-reviewer.md",
+      "source": "cursor/pr-reviewer.md",
+      "sha256": "f51f41be86610f817f4a48bc92ca86c43bf29d83ebb18234d3bd4605e4193478",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/predict-issues.md",
+      "source": "opencode/commands/predict-issues.md",
+      "sha256": "86b047d8c517b9e85d89b7abb1c61d015434ab79c60ca285dc22dfbc28f91c99",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/refactor.md",
+      "source": "cursor/refactor.md",
+      "sha256": "42999a1bc1760c65c94655dc0ec10595e152795af6a99c7b5c15af16c2e1fb61",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/review.md",
+      "source": "cursor/review.md",
+      "sha256": "24bcc0da22b0d8530c59245bab64892d1de49f36bc840d22fda63ddd178c1d28",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/ship-it.md",
+      "source": "opencode/commands/ship-it.md",
+      "sha256": "3d1303e8604e7c7dd36b805cdaf8ba2017f2b4abc11ffe7a2ffe8f196c6ca763",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/tdd.md",
+      "source": "opencode/commands/tdd.md",
+      "sha256": "722144ebccf148596d6cccf333cb21e115a0249b3e4b545152d5aad42bd4d439",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/thermonuclear.md",
+      "source": "claude/thermonuclear.md",
+      "sha256": "dd65e348dec998cdc5703c6d5ec6d5168ae77bba462e99e09a8f9d192a92d095",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/to-issues.md",
+      "source": "opencode/commands/to-issues.md",
+      "sha256": "f3ffbbf60271c6c31dfc482e5126d89ab3f6b547f8f637d8c62fa2c7f0b1a995",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/to-prd.md",
+      "source": "opencode/commands/to-prd.md",
+      "sha256": "62ae887b41b93de366c95edbc98677ca3686247eb4767f697ac6b25795ca66f2",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/triage.md",
+      "source": "opencode/commands/triage.md",
+      "sha256": "2e91d6c2338c3eb923ff4a99c5015b2836e9450bf3c8d02db4cfb7be3fe0f581",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/ultrareview.md",
+      "source": "cline/ultrareview.md",
+      "sha256": "561a422e3164a2efb3c9bdac682d4ace0bafa8f498520abcd45a94cb29652894",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/widereview.md",
+      "source": "claude/widereview.md",
+      "sha256": "816b9e3e349d220985e4a6027181c91f3cb9f77db2f101f0ac924a02f4fe1bc8",
+      "mode": "100644"
+    }
+  ]
+}

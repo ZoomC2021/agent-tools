@@ -11,6 +11,7 @@ Guidance for coding agents working in this repository.
 ## Important Paths
 
 - `prompts/`: Agent prompts, workflows, and eval fixtures.
+- `prompts/aliases.json`: Exact-byte duplicate paths mapped to canonical retained files. Edit canonical files, run `python scripts/render-prompts.py refresh` to update alias metadata, then run `python scripts/render-prompts.py check`.
 - `prompts/opencode/evals/`: OpenCode eval harness (`scenarios.json`, `variants.json`, fixtures, and run outputs under `out/`).
 - `scripts/install.sh` and `scripts/install.ps1`: Installer logic for all supported agent targets.
 - `prompts/opencode/bin/zenmux-throttle-proxy`: Streaming reverse proxy that enforces a hard requests-per-minute cap in front of a rate-limited OpenAI-compatible provider (e.g. ZenMux). See the "Rate-Limited Providers" section in `README.md`.
@@ -27,6 +28,7 @@ Guidance for coding agents working in this repository.
 - Keep docs and prompts concise and deterministic; avoid contradictory instructions across agents.
 - Preserve existing frontmatter and heading structure in prompt files unless a migration requires updates.
 - Prefer minimal, targeted edits over broad rewrites.
+- Installers render aliases into a temporary complete physical `prompts/` tree before copying files to agent targets.
 - When changing install behavior, keep Linux and macOS paths aligned where applicable.
 - Never commit real secrets or API keys (for example in `opencode.json`-style config files).
 - `prompts/opencode/opencode.json.example` is the authoritative shipped OpenCode config. Any change to agents, commands, plugins, providers, models, permissions, or `{file:...}` references under `prompts/opencode/` must be reflected in the example in the same commit — the installer uses it as the source of truth to sync existing user configs.

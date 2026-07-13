@@ -2,6 +2,8 @@
 
 Custom prompts, skills, and workflows for AI coding agents. Provides consistent developer workflows across multiple coding assistants.
 
+Tracked prompts use exact-byte deduplication: canonical files remain under `prompts/`, while removed duplicate paths are recorded in `prompts/aliases.json`. The installers materialize every alias in a temporary complete tree, so installed paths and contents are unchanged. Contributors should edit retained canonical files, run `python scripts/render-prompts.py refresh`, then run `python scripts/render-prompts.py check`.
+
 ## Workflows Included
 
 | Workflow | Description |
@@ -184,6 +186,7 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 | Subagent | Purpose | Model | Reasoning Effort |
 |----------|---------|-------|------------------|
 | **frontier-worker** | Primary orchestrator (plans, routes, delegates) | GPT-5.5 | High |
+| **worker-worker** | Worker-model orchestrator variant | MiniMax-M3 | — |
 | **worker-general** | Implementation, debugging, refactoring execution | MiMo v2.5 | — |
 | **worker-explore** | Local read-only codebase discovery and search | MiMo v2.5 | — |
 | **github-librarian** | Remote GitHub research (default branches, history) | MiMo v2.5 Pro | — |
@@ -291,6 +294,19 @@ Notes:
 
 ## Usage Utilities
 
+### Claude provider launchers
+
+Use `scripts/claude-agentrouter.sh`, `scripts/claude-bai.sh`, or
+`scripts/claude-xiaomi.sh` to launch Claude Code through the corresponding
+Anthropic-compatible provider. Set `AGENT_ROUTER_TOKEN`, `BAI_API_KEY`, or
+`XIAOMI_API_KEY` respectively (`MIMO_API_KEY` is also accepted for Xiaomi).
+All wrappers also accept `ANTHROPIC_API_KEY` or `ANTHROPIC_AUTH_TOKEN` as a
+fallback; use `ANTHROPIC_MODEL`, `CLAUDE_MODEL`, and `ANTHROPIC_BASE_URL` for
+overrides. Run a wrapper with `--help` for its defaults and examples.
+
+These launchers always pass `--dangerously-skip-permissions` to Claude Code.
+Only use them in an environment where bypassing permission prompts is safe.
+
 ### Amp Token Usage
 
 Analyze Amp thread token usage from the local Amp CLI:
@@ -362,6 +378,19 @@ cd agent-tools
 Available options: `claude`, `codex`, `opencode`, `pi`, `warp`, `antigravity`, `agy`, `copilot-cli`, `cmd`, `grok`, `amp`, `gemini`, `droid`, `kilocode`, `cursor`, `cline`, `devin`
 
 ## Manual Installation
+
+The tracked tree omits exact duplicate files. Before using any manual-install
+snippet below, materialize the complete tree and make it the current directory:
+
+```bash
+PROMPT_STAGE="$(mktemp -d)"
+python3 scripts/render-prompts.py render --output "$PROMPT_STAGE"
+cd "$PROMPT_STAGE"
+```
+
+The snippets' `prompts/...` paths refer to that rendered tree. Remove
+`$PROMPT_STAGE` after installation. The automated installers perform this
+staging and cleanup themselves.
 
 ### macOS
 

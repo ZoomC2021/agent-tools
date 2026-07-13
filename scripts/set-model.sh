@@ -224,17 +224,17 @@ main() {
         local old
         old="$(agent_model "$t")"
         if [[ "$old" == "$new_model" ]]; then
-            log_info "$t already '$new_model' — skipping."
-            continue
-        fi
-        changed=1
-        log_info "$t: '${old:-<unset>}' -> '$new_model'"
+            log_info "$t already '$new_model' — reconciling derived files."
+        else
+            changed=1
+            log_info "$t: '${old:-<unset>}' -> '$new_model'"
 
-        # 1) Canonical config model.
-        local tmp
-        tmp="$(mktemp)"
-        jq --arg n "$t" --arg m "$new_model" '.agent[$n].model = $m' "$CONFIG_FILE" > "$tmp"
-        mv "$tmp" "$CONFIG_FILE"
+            # 1) Canonical config model.
+            local tmp
+            tmp="$(mktemp)"
+            jq --arg n "$t" --arg m "$new_model" '.agent[$n].model = $m' "$CONFIG_FILE" > "$tmp"
+            mv "$tmp" "$CONFIG_FILE"
+        fi
 
         # 2) Repo .md frontmatter (skip built-in agents with no prompt file).
         local pf
@@ -249,8 +249,7 @@ main() {
     done
 
     if [[ $changed -eq 0 ]]; then
-        log_info "Nothing to change."
-        exit 0
+        log_info "Canonical models were unchanged; derived files were reconciled."
     fi
 
     # Validate the JSON we just edited.

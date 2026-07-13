@@ -10,28 +10,22 @@ arguments:
     description: File, directory, or code area to analyze.
     default_value: .
 command: |
-  Run a focused deslop pass on `{{target}}`.
+  Run deslop on `{{target}}`. Behavior first; evidence over vibes.
 
-  Goal:
-  Improve code quality with the smallest cohesive set of changes that materially reduces complexity, duplication, confusion, or maintenance burden.
+  Boundary: deslop covers dead/unused code, locally provable type tightening, small owned duplication, dishonest error handling, inactive legacy/fallback/compatibility code, AI placeholders/stale comments, and local complexity. Defer architecture, broad responsibility/API moves, cross-domain design, large dependency changes, and structural redesign to refactor.
 
-  Working rules:
-  - Start with a quick scan only. Learn the repository shape, the likely validation commands, and the files in scope before editing.
-  - Prefer small, local improvements over speculative abstractions.
-  - Preserve existing behavior unless a bug is clearly part of the problem.
-  - Reduce cognitive load: simpler control flow, clearer naming, less indirection, fewer moving pieces.
-  - Remove dead code, obvious duplication, and unnecessary helpers when it makes the code easier to understand.
-  - Keep one-time logic inline unless extracting it hides real complexity or names a real domain concept.
-  - Do not clean up unrelated areas.
+  Workflow:
+  1. Quick scan (2-3 reads/searches maximum) for repository shape, tooling, validation, scope, and generated/vendor/public surfaces.
+  2. Run baseline validation and record pre-existing failures.
+  3. Inspect eight cleanup lanes: duplication/DRY; shared or weak types; unused code/exports/dependencies; cycles/boundary tangles; error honesty; deprecated/legacy/fallback leftovers; AI slop/stubs/comments/placeholders; local complexity/cognitive load/naming.
+  4. Build a cleanup ledger. Classify each item Implement now, Needs human review, or Defer to refactor, with evidence, benefit, and validation path.
+  5. Select the smallest cohesive high-confidence batch. For audit-only intent, report without editing; otherwise implement it.
+  6. Verify narrowly first, then broadly for shared types/dependencies/public surfaces; confirm removals are gone.
 
-  Process:
-  1. Inspect the target and surrounding files.
-  2. Identify the highest-leverage issues worth fixing now.
-  3. Apply the smallest useful batch of fixes.
-  4. Run the smallest relevant validation commands.
-  5. Summarize what changed, what improved, and any issues intentionally left alone.
+  Output contract: Summary; Baseline Validation; Findings; Cleanup Ledger; If Changes Were Made; Deferred Work. Each finding includes Location, Evidence, Why it matters, Recommended fix, Risk (Low/Medium/High), and Status. Report changes, intentional omissions, and verification.
 
-  Report:
-  - Fixed issues.
-  - Remaining issues worth future attention.
-  - Validation performed.
+  Rules: cleanup is not redesign; do not delete on one signal; avoid speculative abstractions and incidental-similarity deduplication; strengthen types honestly; preserve meaningful boundary handling; scrutinize tests/scripts/migrations/registries/public APIs contextually; never edit generated/vendor files unless requested.
+
+  Priority guide: P0 security/data loss/correctness immediately; P1 bugs/hidden risk this change; P2 safe maintainability when confidence is high; P3 local clarity when touching the area; P4 polish only if free.
+
+  Principles are heuristics, compactly attributed to Hunt & Thomas, Fowler, Martin, Ousterhout, Meyer, Feathers, Metz, King, and Zakirullin.
