@@ -33,6 +33,8 @@ Usage::
     scripts/codex-token-usage.py --no-codex     # Hermes only
     scripts/codex-token-usage.py --no-hermes    # Codex CLI only
     scripts/codex-token-usage.py --all-providers # include non-Codex Hermes providers
+    scripts/codex-token-usage.py --since 2026-07-13            # only sessions on/after date
+    scripts/codex-token-usage.py --since 2026-07-13 --until 2026-07-13  # single day
 """
 
 from __future__ import annotations
@@ -41,10 +43,12 @@ import argparse
 import glob
 import json
 import os
+import re
 import sqlite3
 import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from typing import Optional
 
 # ---------------------------------------------------------------------------
@@ -78,6 +82,31 @@ DEFAULT_PRICING = {"in": 0.0, "cache": 0.0, "out": 0.0}
 
 # Hermes billing providers that route through the ChatGPT/Codex subscription
 CODEX_BILLING_PROVIDERS = {"openai-codex"}
+
+
+# ---------------------------------------------------------------------------
+# Date filtering helpers
+# ---------------------------------------------------------------------------
+
+def _parse_date(s: str) -> str:
+    """Validate and normalize a YYYY-MM-DD date string."""
+    datetime.strptime(s, "%Y-%m-%d")
+    return s
+
+
+def _date_to_epoch(d: str) -> float:
+    """Convert YYYY-MM-DD to unix epoch at start-of-day UTC."""
+    return datetime.strptime(d, "%Y-%m-%d").replace(tzinfo=timezone.utc).timestamp()
+
+
+# rollout-YYYY-MM-DDT... filename prefix
+_ROLLOUT_DATE_RE = re.compile(r"rollout-(\d{4}-\d{2}-\d{2})T")
+
+
+def _rollout_date(path: str) -> Optional[str]:
+    """Extract the YYYY-MM-DD date from a rollout filename, or None."""
+    m = _ROLLOUT_DATE_RE.search(os.path.basename(path))
+    return m.group(1) if m else None
 
 
 # ---------------------------------------------------------------------------
@@ -133,15 +162,29 @@ class ModelTotals:
 # Loaders
 # ---------------------------------------------------------------------------
 
-def load_codex_sessions(session_dir: str) -> dict[str, SessionUsage]:
+def load_codex_sessions(
+    session_dir: str,
+    since: Optional[str] = None,
+    until: Optional[str] = None,
+) -> dict[str, SessionUsage]:
     """Load token usage from Codex CLI session rollout JSONL files.
 
     Returns a dict mapping session_id to SessionUsage.  Sessions without
-    any ``token_count`` events are omitted.
+    any ``token_count`` events are omitted.  When ``since``/``until`` are
+    provided (YYYY-MM-DD), only sessions dated within that inclusive
+    range are loaded (date parsed from the rollout filename).
     """
     result: dict[str, SessionUsage] = {}
     pattern = os.path.join(session_dir, "**", "rollout-*.jsonl")
     for path in sorted(glob.glob(pattern, recursive=True)):
+        if since or until:
+            fdate = _rollout_date(path)
+            if fdate is None:
+                continue  # can't date-filter undated files
+            if since and fdate < since:
+                continue
+            if until and fdate > until:
+                continue
         sid = os.path.basename(path)
         # Strip rollout- prefix and split timestamp from UUID
         # rollout-2026-06-29T18-53-50-019f1303-...-....jsonl
@@ -214,16 +257,35 @@ def load_codex_sessions(session_dir: str) -> dict[str, SessionUsage]:
 def load_hermes_sessions(
     db_path: str,
     all_providers: bool = False,
+    since: Optional[str] = None,
+    until: Optional[str] = None,
 ) -> dict[str, SessionUsage]:
     """Load token usage from the Hermes agent state database.
 
     Returns a dict mapping ``hermes-{session_id}-{model}`` to SessionUsage.
     Only rows with ``billing_provider = 'openai-codex'`` are included
-    unless ``all_providers`` is True.
+    unless ``all_providers`` is True.  When ``since``/``until`` are
+    provided (YYYY-MM-DD), only rows with ``last_seen`` within that
+    inclusive range are loaded.
     """
     result: dict[str, SessionUsage] = {}
     if not os.path.exists(db_path):
         return result
+
+    # Build optional date filter on last_seen (unix epoch REAL)
+    date_conditions: list[str] = []
+    date_params: list = []
+    if since:
+        date_conditions.append("last_seen >= ?")
+        date_params.append(_date_to_epoch(since))
+    if until:
+        # end of day: +86400 seconds
+        date_conditions.append("last_seen < ?")
+        date_params.append(_date_to_epoch(until) + 86400)
+
+    date_clause = ""
+    if date_conditions:
+        date_clause = " AND " + " AND ".join(date_conditions)
 
     try:
         con = sqlite3.connect(db_path)
@@ -233,7 +295,8 @@ def load_hermes_sessions(
                 "SELECT session_id, model, billing_provider, billing_mode, "
                 "input_tokens, output_tokens, cache_read_tokens, "
                 "cache_write_tokens, reasoning_tokens "
-                "FROM session_model_usage"
+                "FROM session_model_usage WHERE 1=1" + date_clause,
+                date_params,
             )
         else:
             placeholders = ",".join("?" * len(CODEX_BILLING_PROVIDERS))
@@ -242,8 +305,9 @@ def load_hermes_sessions(
                 f"input_tokens, output_tokens, cache_read_tokens, "
                 f"cache_write_tokens, reasoning_tokens "
                 f"FROM session_model_usage "
-                f"WHERE billing_provider IN ({placeholders})",
-                list(CODEX_BILLING_PROVIDERS),
+                f"WHERE billing_provider IN ({placeholders})"
+                f"{date_clause}",
+                list(CODEX_BILLING_PROVIDERS) + date_params,
             )
         for row in cur.fetchall():
             (sid, model, provider, mode,
@@ -313,6 +377,8 @@ def _fmt(n: int) -> str:
 def compute_report(
     per_model: dict[str, ModelTotals],
     all_providers: bool = False,
+    since: Optional[str] = None,
+    until: Optional[str] = None,
 ) -> dict:
     """Compute the full report dict (for JSON output)."""
     models = {}
@@ -358,6 +424,8 @@ def compute_report(
         "totals": grand,
         "pricing": PRICING,
         "all_providers": all_providers,
+        "since": since,
+        "until": until,
     }
 
 
@@ -366,8 +434,13 @@ def print_text_report(report: dict) -> None:
     models = report["models"]
     grand = report["totals"]
     scope = "all providers" if report.get("all_providers") else "ChatGPT/Codex subscription"
+    date_range = ""
+    if report.get("since") or report.get("until"):
+        lo = report.get("since") or "begin"
+        hi = report.get("until") or "now"
+        date_range = f"  [{lo} .. {hi}]"
     print("=" * 90)
-    print(f"CHATGPT/CODEX TOKEN USAGE & API COST ESTIMATE ({scope})")
+    print(f"CHATGPT/CODEX TOKEN USAGE & API COST ESTIMATE ({scope}){date_range}")
     print("=" * 90)
     print()
     print(f"{'Model':<16}{'Sessions':>9}  {'Uncached In':>13}{'Cached In':>13}{'Output':>11}  {'Cost (USD)':>12}")
@@ -416,20 +489,26 @@ def main(argv: Optional[list[str]] = None) -> int:
                         help="Skip Hermes processing (Codex CLI only)")
     parser.add_argument("--all-providers", action="store_true",
                         help="Include all Hermes billing providers, not just openai-codex")
+    parser.add_argument("--since", type=_parse_date, metavar="YYYY-MM-DD",
+                        help="Only count sessions on/after this date")
+    parser.add_argument("--until", type=_parse_date, metavar="YYYY-MM-DD",
+                        help="Only count sessions on/before this date")
     parser.add_argument("--json", action="store_true",
                         help="Output machine-readable JSON instead of text")
     args = parser.parse_args(argv)
 
     codex: dict[str, SessionUsage] = {}
     if not args.no_codex and os.path.isdir(args.session_dir):
-        codex = load_codex_sessions(args.session_dir)
+        codex = load_codex_sessions(args.session_dir, since=args.since, until=args.until)
 
     hermes: dict[str, SessionUsage] = {}
     if not args.no_hermes:
-        hermes = load_hermes_sessions(args.hermes_db, all_providers=args.all_providers)
+        hermes = load_hermes_sessions(args.hermes_db, all_providers=args.all_providers,
+                                      since=args.since, until=args.until)
 
     per_model = merge_usage(codex, hermes)
-    report = compute_report(per_model, all_providers=args.all_providers)
+    report = compute_report(per_model, all_providers=args.all_providers,
+                            since=args.since, until=args.until)
 
     if args.json:
         print(json.dumps(report, indent=2))

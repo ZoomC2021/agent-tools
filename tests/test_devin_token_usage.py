@@ -320,6 +320,94 @@ def test_main_no_acp_flag():
         assert data["totals"]["sessions"] == 1
 
 
+# ---------------------------------------------------------------------------
+# Date filter tests
+# ---------------------------------------------------------------------------
+
+def test_load_cli_transcripts_since_filter():
+    """--since filters out transcripts by file mtime."""
+    import os
+    import time
+    with tempfile.TemporaryDirectory() as tmp:
+        tdir = Path(tmp)
+        _write_transcript(tdir / "old.json", "old", "GLM-5.2", 10000, 500, 8000)
+        # Set old.json mtime to 2026-07-10
+        old_ts = dtu._date_to_epoch("2026-07-10") + 3600
+        os.utime(tdir / "old.json", (old_ts, old_ts))
+        _write_transcript(tdir / "new.json", "new", "GLM-5.2", 20000, 1000, 15000)
+        # Set new.json mtime to 2026-07-13
+        new_ts = dtu._date_to_epoch("2026-07-13") + 3600
+        os.utime(tdir / "new.json", (new_ts, new_ts))
+        result = dtu.load_cli_transcripts(str(tdir), since="2026-07-13")
+        assert "new" in result
+        assert "old" not in result
+
+
+def test_load_cli_transcripts_until_filter():
+    """--until filters out transcripts by file mtime."""
+    import os
+    with tempfile.TemporaryDirectory() as tmp:
+        tdir = Path(tmp)
+        _write_transcript(tdir / "old.json", "old", "GLM-5.2", 10000, 500, 8000)
+        old_ts = dtu._date_to_epoch("2026-07-10") + 3600
+        os.utime(tdir / "old.json", (old_ts, old_ts))
+        _write_transcript(tdir / "new.json", "new", "GLM-5.2", 20000, 1000, 15000)
+        new_ts = dtu._date_to_epoch("2026-07-13") + 3600
+        os.utime(tdir / "new.json", (new_ts, new_ts))
+        result = dtu.load_cli_transcripts(str(tdir), until="2026-07-10")
+        assert "old" in result
+        assert "new" not in result
+
+
+def test_load_acp_events_since_filter():
+    """--since filters ACP files by mtime."""
+    import os
+    with tempfile.TemporaryDirectory() as tmp:
+        adir = Path(tmp)
+        _write_acp_file(adir / "old.ndjson", "Old", [(1000, 100, 900)])
+        old_ts = dtu._date_to_epoch("2026-07-10") + 3600
+        os.utime(adir / "old.ndjson", (old_ts, old_ts))
+        _write_acp_file(adir / "new.ndjson", "New", [(2000, 200, 1800)])
+        new_ts = dtu._date_to_epoch("2026-07-13") + 3600
+        os.utime(adir / "new.ndjson", (new_ts, new_ts))
+        result = dtu.load_acp_events(str(adir), since="2026-07-13")
+        assert "new" in result
+        assert "old" not in result
+
+
+def test_compute_report_includes_date_range():
+    """compute_report includes since/until in the report dict."""
+    per_model = {
+        "GLM-5.2": dtu.ModelTotals(model="GLM-5.2", sessions=1, prompt=1000, completion=100, cached=500),
+    }
+    report = dtu.compute_report(per_model, since="2026-07-13", until="2026-07-13")
+    assert report["since"] == "2026-07-13"
+    assert report["until"] == "2026-07-13"
+
+
+def test_main_since_flag_filters_transcripts():
+    """main() with --since filters transcripts by mtime."""
+    import io
+    import os
+    from contextlib import redirect_stdout
+    with tempfile.TemporaryDirectory() as tmp:
+        tdir = Path(tmp)
+        _write_transcript(tdir / "old.json", "old", "GLM-5.2", 10000, 500, 8000)
+        old_ts = dtu._date_to_epoch("2026-07-10") + 3600
+        os.utime(tdir / "old.json", (old_ts, old_ts))
+        _write_transcript(tdir / "new.json", "new", "GLM-5.2", 20000, 1000, 15000)
+        new_ts = dtu._date_to_epoch("2026-07-13") + 3600
+        os.utime(tdir / "new.json", (new_ts, new_ts))
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            rc = dtu.main(["--transcript-dir", str(tdir), "--no-acp", "--no-db",
+                           "--since", "2026-07-13", "--json"])
+        assert rc == 0
+        data = json.loads(buf.getvalue())
+        assert data["totals"]["sessions"] == 1
+        assert data["since"] == "2026-07-13"
+
+
 if __name__ == "__main__":
     tests = [
         test_load_cli_transcripts_basic,

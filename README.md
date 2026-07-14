@@ -317,6 +317,8 @@ scripts/amp-token-usage.py --limit 250 --include-archived
 scripts/amp-token-usage.py --thread T-019f...
 scripts/amp-token-usage.py --thread T-019f... --amp-costs
 scripts/amp-token-usage.py --concurrency 16   # parallelize per-thread exports (default: 8)
+scripts/amp-token-usage.py --since 2026-07-13            # only threads updated on/after date
+scripts/amp-token-usage.py --since 2026-07-13 --until 2026-07-13  # single day
 ```
 
 For repeatable/offline analysis, save Amp's thread export and read it back:
@@ -326,7 +328,7 @@ amp threads export T-019f... > /tmp/amp-thread.json
 scripts/amp-token-usage.py --export /tmp/amp-thread.json --json
 ```
 
-The report aggregates `totalInputTokens`, `cacheReadInputTokens`, `cacheCreationInputTokens`, `outputTokens`, calls, threads, cache-hit share, and best-effort API cost estimates by model. `--amp-costs` additionally calls `amp threads usage` per thread and reports Amp credit cost separately; Amp's display cost excludes any direct provider billing through customer-managed model keys.
+The report aggregates `totalInputTokens`, `cacheReadInputTokens`, `cacheCreationInputTokens`, `outputTokens`, calls, threads, cache-hit share, and best-effort API cost estimates by model. `--amp-costs` additionally calls `amp threads usage` per thread and reports Amp credit cost separately; Amp's display cost excludes any direct provider billing through customer-managed model keys. `--since`/`--until` filter by thread `updatedAt` timestamp (YYYY-MM-DD, inclusive).
 
 ### Devin Token Usage
 
@@ -336,6 +338,8 @@ Analyze Devin CLI/Desktop token usage:
 scripts/devin-token-usage.py
 scripts/devin-token-usage.py --json
 scripts/devin-token-usage.py --no-acp
+scripts/devin-token-usage.py --since 2026-07-13            # only sessions on/after date
+scripts/devin-token-usage.py --since 2026-07-13 --until 2026-07-13  # single day
 ```
 
 ### Codex ccapi Provider

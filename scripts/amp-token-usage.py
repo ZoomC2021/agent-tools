@@ -18,6 +18,8 @@ Usage::
     scripts/amp-token-usage.py --thread T-...
     scripts/amp-token-usage.py --export thread.json --json
     scripts/amp-token-usage.py --amp-costs
+    scripts/amp-token-usage.py --since 2026-07-13            # only threads updated on/after date
+    scripts/amp-token-usage.py --since 2026-07-13 --until 2026-07-13  # single day
 """
 
 from __future__ import annotations
@@ -31,6 +33,7 @@ import re
 import subprocess
 import sys
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from typing import Any, Optional
 
 # USD per 1M tokens. These are best-effort local estimates for models this
@@ -48,6 +51,33 @@ DEFAULT_PRICING = {
     "GLM-5.2": {"input": 1.40, "cache_read": 0.26, "output": 4.40},
     "Kimi K2.7": {"input": 0.95, "cache_read": 0.19, "output": 4.00},
 }
+
+
+# ---------------------------------------------------------------------------
+# Date filtering helpers
+# ---------------------------------------------------------------------------
+
+def _parse_date(s: str) -> str:
+    """Validate and normalize a YYYY-MM-DD date string."""
+    datetime.strptime(s, "%Y-%m-%d")
+    return s
+
+
+def _date_to_epoch(d: str) -> float:
+    """Convert YYYY-MM-DD to unix epoch at start-of-day UTC."""
+    return datetime.strptime(d, "%Y-%m-%d").replace(tzinfo=timezone.utc).timestamp()
+
+
+def _iso_to_epoch(s: str) -> Optional[float]:
+    """Parse an ISO-8601 timestamp (e.g. 2026-07-13T04:02:15.737Z) to epoch."""
+    if not s:
+        return None
+    try:
+        # Handle trailing Z
+        clean = s.replace("Z", "+00:00")
+        return datetime.fromisoformat(clean).timestamp()
+    except (ValueError, TypeError):
+        return None
 
 
 @dataclass
@@ -254,8 +284,18 @@ def run_amp_text(amp_bin: str, args: list[str]) -> str:
     return proc.stdout
 
 
-def list_amp_thread_ids(amp_bin: str, limit: int, include_archived: bool) -> list[str]:
-    """Return thread IDs from ``amp threads list --json``."""
+def list_amp_thread_ids(
+    amp_bin: str,
+    limit: int,
+    include_archived: bool,
+    since: Optional[str] = None,
+    until: Optional[str] = None,
+) -> list[str]:
+    """Return thread IDs from ``amp threads list --json``.
+
+    When ``since``/``until`` are provided (YYYY-MM-DD), only threads
+    whose ``updated`` field falls within the inclusive range are returned.
+    """
     args = ["threads", "list", "--limit", str(limit), "--json"]
     if include_archived:
         args.append("--include-archived")
@@ -266,10 +306,21 @@ def list_amp_thread_ids(amp_bin: str, limit: int, include_archived: bool) -> lis
         rows = data
     if not isinstance(rows, list):
         raise RuntimeError("amp threads list returned an unexpected shape")
+    since_epoch = _date_to_epoch(since) if since else None
+    until_epoch = _date_to_epoch(until) + 86400 if until else None
     ids: list[str] = []
     for row in rows:
-        if isinstance(row, dict) and row.get("id"):
-            ids.append(str(row["id"]))
+        if not isinstance(row, dict) or not row.get("id"):
+            continue
+        if since_epoch or until_epoch:
+            updated = _iso_to_epoch(str(row.get("updated", "")))
+            if updated is None:
+                continue
+            if since_epoch and updated < since_epoch:
+                continue
+            if until_epoch and updated >= until_epoch:
+                continue
+        ids.append(str(row["id"]))
     return ids
 
 
@@ -344,6 +395,28 @@ def pricing_for_model(model: str, pricing: dict[str, dict[str, float]]) -> Optio
     return None
 
 
+def _thread_in_date_range(thread: ThreadUsage, since_epoch: Optional[float], until_epoch: Optional[float]) -> bool:
+    """Check if a thread's updated timestamp falls within the date range."""
+    if since_epoch is None and until_epoch is None:
+        return True
+    # Try the thread-level updated field first
+    ts = _iso_to_epoch(thread.updated) or _iso_to_epoch(thread.created)
+    if ts is None:
+        # Fall back to the last event timestamp
+        last = ""
+        for event in thread.events:
+            if event.timestamp and event.timestamp > last:
+                last = event.timestamp
+        ts = _iso_to_epoch(last)
+    if ts is None:
+        return False  # can't date-filter undated threads
+    if since_epoch and ts < since_epoch:
+        return False
+    if until_epoch and ts >= until_epoch:
+        return False
+    return True
+
+
 def aggregate_by_model(threads: list[ThreadUsage]) -> dict[str, ModelTotals]:
     per_model: dict[str, ModelTotals] = {}
     for thread in threads:
@@ -403,7 +476,12 @@ def _model_to_json(totals: ModelTotals, pricing: dict[str, dict[str, float]]) ->
     }
 
 
-def compute_report(threads: list[ThreadUsage], pricing: dict[str, dict[str, float]]) -> dict[str, Any]:
+def compute_report(
+    threads: list[ThreadUsage],
+    pricing: dict[str, dict[str, float]],
+    since: Optional[str] = None,
+    until: Optional[str] = None,
+) -> dict[str, Any]:
     per_model = aggregate_by_model(threads)
     model_rows = {
         model: _model_to_json(totals, pricing)
@@ -451,6 +529,8 @@ def compute_report(threads: list[ThreadUsage], pricing: dict[str, dict[str, floa
             "amp_cost_total_usd": amp_cost_total if amp_cost_count else None,
         },
         "pricing": pricing,
+        "since": since,
+        "until": until,
         "notes": [
             "Estimated API costs use local pricing assumptions and are separate from Amp credits.",
             "Amp thread usage cost reflects Amp credits only and excludes direct customer-managed provider billing.",
@@ -469,8 +549,13 @@ def _fmt_cost(value: Optional[dict[str, float]]) -> str:
 
 
 def print_text_report(report: dict[str, Any]) -> None:
+    date_range = ""
+    if report.get("since") or report.get("until"):
+        lo = report.get("since") or "begin"
+        hi = report.get("until") or "now"
+        date_range = f"  [{lo} .. {hi}]"
     print("=" * 104)
-    print("AMP TOKEN USAGE")
+    print(f"AMP TOKEN USAGE{date_range}")
     print("=" * 104)
     print()
     print(f"{'Model':<24}{'Threads':>8}{'Calls':>8}  {'Billable In':>13}{'Cache Read':>13}{'Output':>11}  {'Cache %':>8}  {'Est. Cost':>10}")
@@ -521,7 +606,10 @@ def collect_threads(args: argparse.Namespace) -> list[ThreadUsage]:
 
     live_thread_ids = list(args.threads)
     if not threads and not live_thread_ids:
-        live_thread_ids = list_amp_thread_ids(args.amp_bin, args.limit, args.include_archived)
+        live_thread_ids = list_amp_thread_ids(
+            args.amp_bin, args.limit, args.include_archived,
+            since=args.since, until=args.until,
+        )
 
     # Fetch live thread exports concurrently. Each ``amp threads export`` is an
     # independent network round-trip, so a bounded thread pool speeds this up
@@ -546,7 +634,14 @@ def collect_threads(args: argparse.Namespace) -> list[ThreadUsage]:
         key = thread.thread_id or thread.source
         deduped[key] = thread
 
-    result = list(deduped.values())
+    # Apply date filtering to export-file/directory threads (live threads
+    # were already filtered at list time).
+    since_epoch = _date_to_epoch(args.since) if args.since else None
+    until_epoch = _date_to_epoch(args.until) + 86400 if args.until else None
+    result = [
+        t for t in deduped.values()
+        if _thread_in_date_range(t, since_epoch, until_epoch)
+    ]
     if args.amp_costs:
         cost_ids = [t.thread_id for t in result if t.thread_id]
         if cost_ids:
@@ -587,6 +682,10 @@ def main(argv: Optional[list[str]] = None) -> int:
                         help="Max parallel amp threads export/usage calls (default: %(default)s)")
     parser.add_argument("--pricing-file",
                         help="JSON pricing override keyed by model, values per 1M tokens")
+    parser.add_argument("--since", type=_parse_date, metavar="YYYY-MM-DD",
+                        help="Only count threads updated on/after this date")
+    parser.add_argument("--until", type=_parse_date, metavar="YYYY-MM-DD",
+                        help="Only count threads updated on/before this date")
     parser.add_argument("--json", action="store_true",
                         help="Output machine-readable JSON instead of text")
     args = parser.parse_args(argv)
@@ -594,7 +693,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     try:
         pricing = load_pricing(args.pricing_file)
         threads = collect_threads(args)
-        report = compute_report(threads, pricing)
+        report = compute_report(threads, pricing, since=args.since, until=args.until)
     except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2

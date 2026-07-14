@@ -442,6 +442,121 @@ def test_compute_report_grand_totals():
 
 
 # ---------------------------------------------------------------------------
+# Date filter tests
+# ---------------------------------------------------------------------------
+
+def test_load_codex_sessions_since_filter():
+    """--since filters out sessions dated before the given date."""
+    with tempfile.TemporaryDirectory() as d:
+        s_old = Path(d) / "2026" / "07" / "10"
+        s_old.mkdir(parents=True)
+        _write_codex_rollout(
+            s_old / "rollout-2026-07-10T10-00-00-old.jsonl",
+            "old", "gpt-5.5", 1000, 500, 100,
+        )
+        s_new = Path(d) / "2026" / "07" / "13"
+        s_new.mkdir(parents=True)
+        _write_codex_rollout(
+            s_new / "rollout-2026-07-13T10-00-00-new.jsonl",
+            "new", "gpt-5.5", 2000, 1000, 200,
+        )
+        result = ctu.load_codex_sessions(d, since="2026-07-13")
+        assert len(result) == 1
+        usage = list(result.values())[0]
+        assert usage.uncached_input == 1000  # 2000 - 1000
+
+
+def test_load_codex_sessions_until_filter():
+    """--until filters out sessions dated after the given date."""
+    with tempfile.TemporaryDirectory() as d:
+        s_old = Path(d) / "2026" / "07" / "10"
+        s_old.mkdir(parents=True)
+        _write_codex_rollout(
+            s_old / "rollout-2026-07-10T10-00-00-old.jsonl",
+            "old", "gpt-5.5", 1000, 500, 100,
+        )
+        s_new = Path(d) / "2026" / "07" / "13"
+        s_new.mkdir(parents=True)
+        _write_codex_rollout(
+            s_new / "rollout-2026-07-13T10-00-00-new.jsonl",
+            "new", "gpt-5.5", 2000, 1000, 200,
+        )
+        result = ctu.load_codex_sessions(d, until="2026-07-10")
+        assert len(result) == 1
+        usage = list(result.values())[0]
+        assert usage.uncached_input == 500  # 1000 - 500
+
+
+def test_load_codex_sessions_date_range():
+    """--since + --until selects only sessions within the inclusive range."""
+    with tempfile.TemporaryDirectory() as d:
+        for day in ("2026-07-09", "2026-07-10", "2026-07-11", "2026-07-12"):
+            sd = Path(d) / "2026" / "07" / day.split("-")[2]
+            sd.mkdir(parents=True, exist_ok=True)
+            _write_codex_rollout(
+                sd / f"rollout-{day}T10-00-00-{day}.jsonl",
+                day, "gpt-5.5", 1000, 500, 100,
+            )
+        result = ctu.load_codex_sessions(d, since="2026-07-10", until="2026-07-11")
+        assert len(result) == 2
+
+
+def test_load_hermes_sessions_since_filter():
+    """--since filters Hermes rows by last_seen epoch."""
+    with tempfile.TemporaryDirectory() as d:
+        db = Path(d) / "state.db"
+        con = sqlite3.connect(str(db))
+        con.execute("""
+            CREATE TABLE session_model_usage (
+                session_id TEXT, model TEXT, billing_provider TEXT,
+                billing_base_url TEXT, billing_mode TEXT,
+                api_call_count INTEGER, input_tokens INTEGER, output_tokens INTEGER,
+                cache_read_tokens INTEGER, cache_write_tokens INTEGER,
+                reasoning_tokens INTEGER, estimated_cost_usd REAL,
+                actual_cost_usd REAL, cost_status TEXT, cost_source TEXT,
+                first_seen REAL, last_seen REAL,
+                PRIMARY KEY (session_id, model, billing_provider, billing_base_url, billing_mode)
+            )
+        """)
+        # 2026-07-10 00:00 UTC = 1782662400 (approx); use explicit epochs
+        con.execute(
+            "INSERT INTO session_model_usage (session_id, model, billing_provider, "
+            "billing_mode, input_tokens, output_tokens, cache_read_tokens, "
+            "cache_write_tokens, reasoning_tokens, last_seen) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            ("old", "gpt-5.5", "openai-codex", "", 1000, 100, 500, 0, 0,
+             ctu._date_to_epoch("2026-07-10")),
+        )
+        con.execute(
+            "INSERT INTO session_model_usage (session_id, model, billing_provider, "
+            "billing_mode, input_tokens, output_tokens, cache_read_tokens, "
+            "cache_write_tokens, reasoning_tokens, last_seen) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            ("new", "gpt-5.5", "openai-codex", "", 2000, 200, 1000, 0, 0,
+             ctu._date_to_epoch("2026-07-13")),
+        )
+        con.commit()
+        con.close()
+        result = ctu.load_hermes_sessions(str(db), since="2026-07-13")
+        assert len(result) == 1
+        usage = list(result.values())[0]
+        assert usage.uncached_input == 2000
+
+
+def test_compute_report_includes_date_range():
+    """compute_report includes since/until in the report dict."""
+    per_model = {
+        "gpt-5.5": ctu.ModelTotals(
+            model="gpt-5.5", sessions=1,
+            uncached_input=1000, cached_input=5000, output=100, reasoning=50,
+        ),
+    }
+    report = ctu.compute_report(per_model, since="2026-07-13", until="2026-07-13")
+    assert report["since"] == "2026-07-13"
+    assert report["until"] == "2026-07-13"
+
+
+# ---------------------------------------------------------------------------
 # End-to-end test
 # ---------------------------------------------------------------------------
 

@@ -27,6 +27,8 @@ Usage::
     scripts/devin-token-usage.py --json         # machine-readable JSON
     scripts/devin-token-usage.py --no-acp       # CLI transcripts only
     scripts/devin-token-usage.py --no-db        # skip DB model lookup
+    scripts/devin-token-usage.py --since 2026-07-13            # only sessions on/after date
+    scripts/devin-token-usage.py --since 2026-07-13 --until 2026-07-13  # single day
 """
 
 from __future__ import annotations
@@ -39,6 +41,7 @@ import sqlite3
 import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from typing import Optional
 
 # ---------------------------------------------------------------------------
@@ -76,6 +79,36 @@ TRANSCRIPT_MODEL_MAP = {
     "GPT-5.5": "GPT-5.5",
     "Kimi K2.7": "Kimi K2.7",
 }
+
+
+# ---------------------------------------------------------------------------
+# Date filtering helpers
+# ---------------------------------------------------------------------------
+
+def _parse_date(s: str) -> str:
+    """Validate and normalize a YYYY-MM-DD date string."""
+    datetime.strptime(s, "%Y-%m-%d")
+    return s
+
+
+def _date_to_epoch(d: str) -> float:
+    """Convert YYYY-MM-DD to unix epoch at start-of-day UTC."""
+    return datetime.strptime(d, "%Y-%m-%d").replace(tzinfo=timezone.utc).timestamp()
+
+
+def _file_in_date_range(path: str, since_epoch: Optional[float], until_epoch: Optional[float]) -> bool:
+    """Check if a file's modification time falls within the date range."""
+    if since_epoch is None and until_epoch is None:
+        return True
+    try:
+        mtime = os.path.getmtime(path)
+    except OSError:
+        return False
+    if since_epoch and mtime < since_epoch:
+        return False
+    if until_epoch and mtime >= until_epoch:
+        return False
+    return True
 
 
 # ---------------------------------------------------------------------------
@@ -122,13 +155,23 @@ class ModelTotals:
 # Loaders
 # ---------------------------------------------------------------------------
 
-def load_cli_transcripts(transcript_dir: str) -> dict[str, SessionUsage]:
+def load_cli_transcripts(
+    transcript_dir: str,
+    since: Optional[str] = None,
+    until: Optional[str] = None,
+) -> dict[str, SessionUsage]:
     """Load token usage from CLI transcript JSON files.
 
-    Returns a dict mapping session_id to SessionUsage.
+    Returns a dict mapping session_id to SessionUsage.  When
+    ``since``/``until`` are provided (YYYY-MM-DD), only files whose
+    modification time falls within the inclusive range are loaded.
     """
+    since_epoch = _date_to_epoch(since) if since else None
+    until_epoch = _date_to_epoch(until) + 86400 if until else None
     result: dict[str, SessionUsage] = {}
     for path in sorted(glob.glob(os.path.join(transcript_dir, "*.json"))):
+        if not _file_in_date_range(path, since_epoch, until_epoch):
+            continue
         try:
             with open(path) as f:
                 data = json.load(f)
@@ -150,7 +193,11 @@ def load_cli_transcripts(transcript_dir: str) -> dict[str, SessionUsage]:
     return result
 
 
-def load_acp_events(acp_dir: str) -> dict[str, SessionUsage]:
+def load_acp_events(
+    acp_dir: str,
+    since: Optional[str] = None,
+    until: Optional[str] = None,
+) -> dict[str, SessionUsage]:
     """Load token usage from Desktop ACP event NDJSON files.
 
     Each ``usage_update`` event carries per-step token counts.  Input and
@@ -158,10 +205,16 @@ def load_acp_events(acp_dir: str) -> dict[str, SessionUsage]:
     tokens are per-step and must be summed.
 
     Returns a dict mapping file UUID to SessionUsage.  Sessions without any
-    ``usage_update`` events are omitted.
+    ``usage_update`` events are omitted.  When ``since``/``until`` are
+    provided (YYYY-MM-DD), only files whose modification time falls within
+    the inclusive range are loaded.
     """
+    since_epoch = _date_to_epoch(since) if since else None
+    until_epoch = _date_to_epoch(until) + 86400 if until else None
     result: dict[str, SessionUsage] = {}
     for path in sorted(glob.glob(os.path.join(acp_dir, "*.ndjson"))):
+        if not _file_in_date_range(path, since_epoch, until_epoch):
+            continue
         fid = os.path.basename(path).replace(".ndjson", "")
         usages: list[tuple[int, int, int]] = []
         try:
@@ -199,13 +252,23 @@ def load_acp_events(acp_dir: str) -> dict[str, SessionUsage]:
     return result
 
 
-def load_acp_titles(acp_dir: str) -> dict[str, str]:
+def load_acp_titles(
+    acp_dir: str,
+    since: Optional[str] = None,
+    until: Optional[str] = None,
+) -> dict[str, str]:
     """Extract session titles from ACP event files.
 
-    Returns a dict mapping file UUID to title string.
+    Returns a dict mapping file UUID to title string.  When
+    ``since``/``until`` are provided (YYYY-MM-DD), only files whose
+    modification time falls within the inclusive range are scanned.
     """
+    since_epoch = _date_to_epoch(since) if since else None
+    until_epoch = _date_to_epoch(until) + 86400 if until else None
     result: dict[str, str] = {}
     for path in sorted(glob.glob(os.path.join(acp_dir, "*.ndjson"))):
+        if not _file_in_date_range(path, since_epoch, until_epoch):
+            continue
         fid = os.path.basename(path).replace(".ndjson", "")
         try:
             with open(path) as f:
@@ -311,7 +374,11 @@ def merge_usage(
 # Reporting
 # ---------------------------------------------------------------------------
 
-def compute_report(per_model: dict[str, ModelTotals]) -> dict:
+def compute_report(
+    per_model: dict[str, ModelTotals],
+    since: Optional[str] = None,
+    until: Optional[str] = None,
+) -> dict:
     """Compute the full report dict (for JSON output)."""
     models = {}
     grand = {"sessions": 0, "prompt": 0, "completion": 0, "cached": 0,
@@ -338,15 +405,21 @@ def compute_report(per_model: dict[str, ModelTotals]) -> dict:
         grand["total"] += cost["total"]
 
     grand["uncached_input"] = grand["prompt"] - grand["cached"]
-    return {"models": models, "totals": grand, "pricing": PRICING}
+    return {"models": models, "totals": grand, "pricing": PRICING,
+            "since": since, "until": until}
 
 
 def print_text_report(report: dict) -> None:
     """Print a human-readable cost report."""
     models = report["models"]
     grand = report["totals"]
+    date_range = ""
+    if report.get("since") or report.get("until"):
+        lo = report.get("since") or "begin"
+        hi = report.get("until") or "now"
+        date_range = f"  [{lo} .. {hi}]"
     print("=" * 90)
-    print("DEVIN TOKEN USAGE & API COST ESTIMATE")
+    print(f"DEVIN TOKEN USAGE & API COST ESTIMATE{date_range}")
     print("=" * 90)
     print()
     print(f"{'Model':<12}{'Sessions':>9}  {'Uncached In':>13}{'Cached In':>13}{'Output':>11}  {'Cost (USD)':>12}")
@@ -391,22 +464,26 @@ def main(argv: Optional[list[str]] = None) -> int:
                         help="Skip ACP event processing (CLI transcripts only)")
     parser.add_argument("--no-db", action="store_true",
                         help="Skip DB model lookup (ACP sessions default to GLM-5.2)")
+    parser.add_argument("--since", type=_parse_date, metavar="YYYY-MM-DD",
+                        help="Only count sessions on/after this date")
+    parser.add_argument("--until", type=_parse_date, metavar="YYYY-MM-DD",
+                        help="Only count sessions on/before this date")
     parser.add_argument("--json", action="store_true",
                         help="Output machine-readable JSON instead of text")
     args = parser.parse_args(argv)
 
-    cli = load_cli_transcripts(args.transcript_dir)
+    cli = load_cli_transcripts(args.transcript_dir, since=args.since, until=args.until)
 
     acp: dict[str, SessionUsage] = {}
     acp_titles: dict[str, str] = {}
     if not args.no_acp and os.path.isdir(args.acp_dir):
-        acp = load_acp_events(args.acp_dir)
-        acp_titles = load_acp_titles(args.acp_dir)
+        acp = load_acp_events(args.acp_dir, since=args.since, until=args.until)
+        acp_titles = load_acp_titles(args.acp_dir, since=args.since, until=args.until)
 
     _, db_by_title = ({}, {}) if args.no_db else load_db_sessions(args.db_path)
 
     per_model = merge_usage(cli, acp, acp_titles, db_by_title)
-    report = compute_report(per_model)
+    report = compute_report(per_model, since=args.since, until=args.until)
 
     if args.json:
         print(json.dumps(report, indent=2))
