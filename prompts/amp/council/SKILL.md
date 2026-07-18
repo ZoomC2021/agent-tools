@@ -1,11 +1,11 @@
 ---
 name: council
-description: 'Wide fan-out multi-model consultation across four model CLIs (Grok Composer 2.5 via grok, Cursor Grok 4.5 High via cursor-agent, GPT-5.6 Sol via codex, and Kimi K3 via cmd), consolidated into a vote-weighted council report with explicit dissent. Use for non-review questions: architecture tradeoffs, technology choice, design stress-test, second opinions, "should I do X" decisions.'
+description: 'Wide fan-out multi-model consultation across four model CLIs (Grok 4.5 via grok, Composer 2.5 Fast via cursor-agent, GPT-5.6 Sol via codex, and Kimi K3 via cmd), consolidated into a vote-weighted council report with explicit dissent. Use for non-review questions: architecture tradeoffs, technology choice, design stress-test, second opinions, "should I do X" decisions.'
 ---
 
 # Council: Wide Fan-Out Multi-Model Consultation
 
-Run a **four-model council in parallel** — `grok` (Grok Composer 2.5), `cursor-agent` (Cursor Grok 4.5 High), `codex` (GPT-5.6 Sol), and `cmd` (Kimi K3) — on a single question, then consolidate the answers into a vote-weighted report that surfaces consensus **and** dissent.
+Run a **four-model council in parallel** — `grok` (Grok 4.5), `cursor-agent` (Composer 2.5 Fast), `codex` (GPT-5.6 Sol), and `cmd` (Kimi K3) — on a single question, then consolidate the answers into a vote-weighted report that surfaces consensus **and** dissent.
 
 Council is the consultation analog of `widereview`. Same lanes, same parallel scaffolding, different prompt and output contract: instead of `SEVERITY | CATEGORY | file:line | description | CONFIDENCE`, each lane emits `POSITION | CONFIDENCE | KEY-REASONING | CAVEATS`.
 
@@ -20,8 +20,8 @@ The host agent is the **orchestrator only** — it gathers the question, launche
 
 | Lane | CLI | Model | Reasoning effort |
 |------|-----|-------|------------------|
-| A | `grok` | `grok-composer-2.5-fast` | model default |
-| B | `cursor-agent` | `cursor-grok-4.5-high` | encoded in model variant |
+| A | `grok` | `grok-4.5` | model default |
+| B | `cursor-agent` | `composer-2.5-fast` | encoded in model variant |
 | C | `codex exec` | `gpt-5.6-sol` | model default |
 | D | `cmd` | `moonshotai/Kimi-K3` | model default |
 
@@ -36,7 +36,7 @@ Each lane is optional. Missing or unauthenticated CLIs are **skipped**, and the 
 - `codex` (Codex) — `command -v codex`
 - `cmd` (Command Code) — `command -v cmd`
 
-⚠️ **Secret hygiene**: Reference the model ids `grok-composer-2.5-fast`, `cursor-grok-4.5-high`, `gpt-5.6-sol`, and `moonshotai/Kimi-K3` only — never read, print, or copy provider API keys or auth tokens from any lane's config.
+⚠️ **Secret hygiene**: Reference the model ids `grok-4.5`, `composer-2.5-fast`, `gpt-5.6-sol`, and `moonshotai/Kimi-K3` only — never read, print, or copy provider API keys or auth tokens from any lane's config.
 
 ## Phase 1: Capture the Question
 
@@ -108,9 +108,9 @@ c_timeout() {
 Every lane gets `< /dev/null`: under an orchestrator, stdin is an open pipe that never closes, and some CLIs block forever reading it. Each lane uses its native working-directory option:
 
 ```bash
-c_timeout grok -p "$C_PROMPT" -m grok-composer-2.5-fast --always-approve --cwd "${ROOT:-.}" < /dev/null \
+c_timeout grok -p "$C_PROMPT" -m grok-4.5 --always-approve --cwd "${ROOT:-.}" < /dev/null \
   > "$C_DIR/laneA.txt" 2>&1 & A=$!
-c_timeout cursor-agent -p --model cursor-grok-4.5-high --mode ask --trust --workspace "${ROOT:-.}" "$C_PROMPT" < /dev/null \
+c_timeout cursor-agent -p --model composer-2.5-fast --mode ask --trust --workspace "${ROOT:-.}" "$C_PROMPT" < /dev/null \
   > "$C_DIR/laneB.txt" 2>&1 & B=$!
 c_timeout codex exec --ephemeral -s read-only --skip-git-repo-check -C "${ROOT:-.}" -m gpt-5.6-sol "$C_PROMPT" < /dev/null \
   > "$C_DIR/laneC.txt" 2>&1 & C=$!
@@ -161,8 +161,8 @@ Normalize each position into a **stance signature**: lowercase, strip punctuatio
 ### Lane status
 | Lane | Model                | Status        | Position |
 |------|----------------------|---------------|----------|
-| A    | Grok Composer 2.5    | ok/timeout/.. | <short>  |
-| B    | Cursor Grok 4.5 High | ...           | <short>  |
+| A    | Grok 4.5    | ok/timeout/.. | <short>  |
+| B    | Composer 2.5 Fast | ...           | <short>  |
 | C    | GPT-5.6 Sol          | ...           | <short>  |
 | D    | Kimi K3              | ...           | <short>  |
 
@@ -185,7 +185,7 @@ For **Divergent** buckets, additionally include every lane's full position line 
 
 ```
 ⚠️ Divergent — competing stances
-   Lane A (Grok Composer 2.5, High): <verbatim position line>
+   Lane A (Grok 4.5, High): <verbatim position line>
    Lane C (GPT-5.6 Sol, Medium):     <verbatim position line>
    ...
 ```

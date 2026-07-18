@@ -2500,7 +2500,7 @@
     {
       "path": "devin/skills/council/SKILL.md",
       "source": "amp/council/SKILL.md",
-      "sha256": "9f47acf3fa9e90dd5ef77a7ce5f1e6baa2b1e2679c43c1e3c8a7fc38eb752684",
+      "sha256": "5ddd8389ee9f6f723c3d2b41328628716e43fee336e7f757ff40ef0cec1b1536",
       "mode": "100644"
     },
     {
@@ -2722,7 +2722,7 @@
     {
       "path": "devin/skills/widereview/SKILL.md",
       "source": "amp/widereview/SKILL.md",
-      "sha256": "a7c4ec51d8b13b1569edcadc2353764d40d533122f67e0de709adbe3d1cd2a63",
+      "sha256": "8d20dcc7688684ddda11e08faf5e0791430ad542025820b36410d6e5ecb3cd2b",
       "mode": "100644"
     },
     {
@@ -3178,7 +3178,7 @@
     {
       "path": "droid/skills/council/SKILL.md",
       "source": "amp/council/SKILL.md",
-      "sha256": "9f47acf3fa9e90dd5ef77a7ce5f1e6baa2b1e2679c43c1e3c8a7fc38eb752684",
+      "sha256": "5ddd8389ee9f6f723c3d2b41328628716e43fee336e7f757ff40ef0cec1b1536",
       "mode": "100644"
     },
     {
@@ -3364,7 +3364,7 @@
     {
       "path": "droid/skills/widereview/SKILL.md",
       "source": "amp/widereview/SKILL.md",
-      "sha256": "a7c4ec51d8b13b1569edcadc2353764d40d533122f67e0de709adbe3d1cd2a63",
+      "sha256": "8d20dcc7688684ddda11e08faf5e0791430ad542025820b36410d6e5ecb3cd2b",
       "mode": "100644"
     },
     {

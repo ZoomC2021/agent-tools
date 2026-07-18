@@ -14,8 +14,8 @@ Tracked prompts use exact-byte deduplication: canonical files remain under `prom
 | **adversarial-review** | Spawn fresh subagents to adversarially review current changes, verify findings against live repo evidence, and fix confirmed issues |
 | **ultrareview** | Parallel dual-model review using GPT 5.5 + Gemini 3.1 Pro Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
 | **ultrareview-lite** | Parallel dual-model review using Grok Composer 2.5 Fast + Gemini 3 Flash Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
-| **widereview** | Wide fan-out review across four model CLIs (Grok Composer 2.5 via Grok CLI, Cursor Grok 4.5 High via Cursor Agent, GPT-5.6 Sol via Codex, Kimi K3 via Command Code) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (`--full`) *(Not available: Gemini, Antigravity)* |
-| **council** | Wide fan-out consultation across four model CLIs (Grok Composer 2.5 via Grok CLI, Cursor Grok 4.5 High via Cursor Agent, GPT-5.6 Sol via Codex, Kimi K3 via Command Code) on a single question, consolidated into a vote-weighted verdict with explicit dissent. The consultation analog of `widereview` *(Not available: Gemini, Antigravity)* |
+| **widereview** | Wide fan-out review across four model CLIs (Grok 4.5 via Grok CLI, Composer 2.5 Fast via Cursor Agent, GPT-5.6 Sol via Codex, Kimi K3 via Command Code) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (`--full`) *(Not available: Gemini, Antigravity)* |
+| **council** | Wide fan-out consultation across four model CLIs (Grok 4.5 via Grok CLI, Composer 2.5 Fast via Cursor Agent, GPT-5.6 Sol via Codex, Kimi K3 via Command Code) on a single question, consolidated into a vote-weighted verdict with explicit dissent. The consultation analog of `widereview` *(Not available: Gemini, Antigravity)* |
 | **pr-reviewer** | Fetch PR comments, summarize issues, address them, update PR |
 | **pr-reviewer-only** | Fetch PR comments, summarize issues, generate implementation prompt for another agent |
 | **create-pr** | Create PR with auto-generated title and description |
@@ -205,8 +205,8 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 | **adversarial-review** | Subagent-backed review, finding verification, and fix loop | GPT-5.5 | **High** |
 | **ultrareview** | Parallel dual-model review (GPT 5.5 + Gemini 3.1 Pro Preview) | Grok Composer 2.5 Fast | — |
 | **ultrareview-lite** | Parallel dual-model review (Grok Composer 2.5 Fast + Gemini 3 Flash Preview) | Grok Composer 2.5 Fast | — |
-| **widereview** | Wide fan-out review across 4 model CLIs (Grok Composer 2.5 + Cursor Grok 4.5 High + GPT-5.6 Sol + Kimi K3); diff or full-codebase (`--full`) | Active model | — |
-| **council** | Wide fan-out consultation across 4 model CLIs (Grok Composer 2.5 + Cursor Grok 4.5 High + GPT-5.6 Sol + Kimi K3); vote-weighted verdict with explicit dissent | Active model | — |
+| **widereview** | Wide fan-out review across 4 model CLIs (Grok 4.5 + Composer 2.5 Fast + GPT-5.6 Sol + Kimi K3); diff or full-codebase (`--full`) | Active model | — |
+| **council** | Wide fan-out consultation across 4 model CLIs (Grok 4.5 + Composer 2.5 Fast + GPT-5.6 Sol + Kimi K3); vote-weighted verdict with explicit dissent | Active model | — |
 | **deslop** | Code quality audit against principles | Grok Composer 2.5 Fast | — |
 | **imagegen-grok** | Generate/edit images with xAI Grok Imagine | xAI Grok Imagine Image Quality | — |
 | **imagegen-google** | Generate/edit images with Google Nano Banana Pro | Gemini 3 Pro Image Preview | — |

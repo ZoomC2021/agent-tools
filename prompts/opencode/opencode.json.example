@@ -1294,13 +1294,13 @@
       "prompt": "{file:./commands/ultrareview-lite.md}"
     },
     "widereview": {
-      "description": "Wide fan-out review across four model CLIs (Grok Composer 2.5 via grok, Cursor Grok 4.5 High via cursor-agent, GPT-5.6 Sol via codex, and Kimi K3 via cmd) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (--full).",
+      "description": "Wide fan-out review across four model CLIs (Grok 4.5 via grok, Composer 2.5 Fast via cursor-agent, GPT-5.6 Sol via codex, and Kimi K3 via cmd) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (--full).",
       "mode": "subagent",
       "hidden": true,
       "prompt": "{file:./commands/widereview.md}"
     },
     "council": {
-      "description": "Wide fan-out consultation across four model CLIs (Grok Composer 2.5 via grok, Cursor Grok 4.5 High via cursor-agent, GPT-5.6 Sol via codex, and Kimi K3 via cmd) on a single question, consolidated into a vote-weighted verdict with explicit dissent. The consultation analog of widereview.",
+      "description": "Wide fan-out consultation across four model CLIs (Grok 4.5 via grok, Composer 2.5 Fast via cursor-agent, GPT-5.6 Sol via codex, and Kimi K3 via cmd) on a single question, consolidated into a vote-weighted verdict with explicit dissent. The consultation analog of widereview.",
       "mode": "subagent",
       "hidden": true,
       "prompt": "{file:./commands/council.md}"

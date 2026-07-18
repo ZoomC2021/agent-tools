@@ -1,11 +1,11 @@
 ---
-description: Wide fan-out code review across four model CLIs (Grok Composer 2.5 via grok, Cursor Grok 4.5 High via cursor-agent, GPT-5.6 Sol via codex, and Kimi K3 via cmd) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (--full)
+description: Wide fan-out code review across four model CLIs (Grok 4.5 via grok, Composer 2.5 Fast via cursor-agent, GPT-5.6 Sol via codex, and Kimi K3 via cmd) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (--full)
 mode: subagent
 ---
 
 # WideReview: Wide Fan-Out Multi-Model Code Review
 
-Run code reviews across **four independent model CLIs in parallel** — `grok` (Grok Composer 2.5), `cursor-agent` (Cursor Grok 4.5 High), `codex` (GPT-5.6 Sol), and `cmd` (Kimi K3) — then consolidate the findings into a single vote-weighted report.
+Run code reviews across **four independent model CLIs in parallel** — `grok` (Grok 4.5), `cursor-agent` (Composer 2.5 Fast), `codex` (GPT-5.6 Sol), and `cmd` (Kimi K3) — then consolidate the findings into a single vote-weighted report.
 
 WideReview favors **breadth**: four independent harness/model combinations provide broad coverage and diverse second opinions.
 
@@ -24,8 +24,8 @@ Pick the mode from the user's request, then follow Phase 1 for that mode. Phases
 
 | Lane | CLI | Model | Reasoning effort |
 |------|-----|-------|------------------|
-| A | `grok` | `grok-composer-2.5-fast` | model default |
-| B | `cursor-agent` | `cursor-grok-4.5-high` | encoded in model variant |
+| A | `grok` | `grok-4.5` | model default |
+| B | `cursor-agent` | `composer-2.5-fast` | encoded in model variant |
 | C | `codex exec` | `gpt-5.6-sol` | model default |
 | D | `cmd` | `moonshotai/Kimi-K3` | model default |
 
@@ -147,9 +147,9 @@ wr_timeout() {
 Every lane gets `< /dev/null`: under an orchestrator, stdin is an open pipe that never closes, and some CLIs block forever reading it. Each lane uses its native working-directory option:
 
 ```bash
-wr_timeout grok -p "$WR_PROMPT" -m grok-composer-2.5-fast --always-approve --cwd "${ROOT:-.}" < /dev/null \
+wr_timeout grok -p "$WR_PROMPT" -m grok-4.5 --always-approve --cwd "${ROOT:-.}" < /dev/null \
   > "$WR_DIR/laneA.txt" 2>&1 & A=$!
-wr_timeout cursor-agent -p --model cursor-grok-4.5-high --mode ask --trust --workspace "${ROOT:-.}" "$WR_PROMPT" < /dev/null \
+wr_timeout cursor-agent -p --model composer-2.5-fast --mode ask --trust --workspace "${ROOT:-.}" "$WR_PROMPT" < /dev/null \
   > "$WR_DIR/laneB.txt" 2>&1 & B=$!
 wr_timeout codex exec --ephemeral -s read-only --skip-git-repo-check -C "${ROOT:-.}" -m gpt-5.6-sol "$WR_PROMPT" < /dev/null \
   > "$WR_DIR/laneC.txt" 2>&1 & C=$!
@@ -200,8 +200,8 @@ Build a normalized signature for each finding: `file:line:category` (fuzzy-match
 ### Lane status
 | Lane | Model              | Status        | Findings |
 |------|--------------------|---------------|----------|
-| A    | Grok Composer 2.5  | ok/timeout/.. | <n>      |
-| B    | Cursor Grok 4.5 High | ...         | <n>      |
+| A    | Grok 4.5  | ok/timeout/.. | <n>      |
+| B    | Composer 2.5 Fast | ...         | <n>      |
 | C    | GPT-5.6 Sol        | ...           | <n>      |
 | D    | Kimi K3            | ...           | <n>      |
 
