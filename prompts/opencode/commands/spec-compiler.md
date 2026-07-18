@@ -1,7 +1,7 @@
 ---
 description: Compile Execution Contract before implementation work
 mode: subagent
-model: xiaomi/mimo-v2.5-pro
+model: tokenrouter/MiniMax-M3
 permission:
   task:
     '*': deny

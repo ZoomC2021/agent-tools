@@ -1,7 +1,7 @@
 ---
 description: Research official documentation and external API behavior using web sources
 mode: subagent
-model: xiaomi/mimo-v2.5-pro
+model: tokenrouter/MiniMax-M3
 permission:
   task:
     '*': deny

@@ -70,10 +70,10 @@ Run Devin Kimi K2.7 the same way:
 bin/opencode-eval run --runner devin --variants devin-kimi27 --outcome-only
 ```
 
-Run the end-to-end primary workflow result suite across the current GPT 5.5 orchestrator and the MiMo Turbo orchestrator:
+Run the end-to-end primary workflow result suite with the current GPT 5.5 orchestrator:
 
 ```bash
-bin/opencode-eval run --variants baseline-gpt55-primary,mimo25pro-primary --tags workflow-results
+bin/opencode-eval run --variants baseline-gpt55-primary --tags workflow-results
 ```
 
 Run only the GPT 5.5 primary variant against the sandbox implementation scenario:
@@ -82,28 +82,22 @@ Run only the GPT 5.5 primary variant against the sandbox implementation scenario
 bin/opencode-eval run --variants gpt55-primary --scenarios implementation-sandbox
 ```
 
-Run mission-scrutiny subagent evals on MiMo v2.5 Pro only:
-
-```bash
-bin/opencode-eval run --variants mission-scrutiny-mimo25pro --tags mission-scrutiny
-```
-
 Run mission-scrutiny subagent evals on GPT-5.5 (current default) only:
 
 ```bash
 bin/opencode-eval run --variants mission-scrutiny-gpt55 --tags mission-scrutiny
 ```
 
-Run plan-review subagent A/B evals comparing MiMo v2.5 Pro (current default) against GPT-5.5:
+Run plan-review subagent evals on GPT-5.5:
 
 ```bash
-bin/opencode-eval run --variants plan-review-mimo25pro,plan-review-gpt55 --tags plan-review
+bin/opencode-eval run --variants plan-review-gpt55 --tags plan-review
 ```
 
 Run only the adversarial plan-review subset (anti-perfectionism, hidden blockers, format discipline, STOP IF triggers):
 
 ```bash
-bin/opencode-eval run --variants plan-review-mimo25pro,plan-review-gpt55 --tags plan-review-adversarial
+bin/opencode-eval run --variants plan-review-gpt55 --tags plan-review-adversarial
 ```
 
 Rebuild the summary for an existing run directory:

@@ -40,9 +40,9 @@ Do not hand-edit model fields. The model for any OpenCode skill/subagent lives i
 ```bash
 scripts/set-model.sh                                  # list every agent and its model
 scripts/set-model.sh plan-review                      # show one agent's current model
-scripts/set-model.sh plan-review xiaomi/mimo-v2.5-pro # set one skill
+scripts/set-model.sh plan-review tokenrouter/MiniMax-M3 # set one skill
 scripts/set-model.sh review change-auditor openai/gpt-5.5  # set several at once
-scripts/set-model.sh all xiaomi/mimo-v2.5-pro         # set every agent
+scripts/set-model.sh all tokenrouter/MiniMax-M3         # set every agent
 ```
 
 - The model is the last argument containing a `/`; everything before it is a target name (or `all`).

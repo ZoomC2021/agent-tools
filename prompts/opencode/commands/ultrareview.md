@@ -1,7 +1,7 @@
 ---
 description: Run parallel code reviews using GPT 5.5 (OpenCode) AND Gemini 3.1 Pro Preview (Gemini CLI) simultaneously, then consolidate results
 mode: subagent
-model: xiaomi/mimo-v2.5-pro
+model: tokenrouter/MiniMax-M3
 ---
 
 # UltraReview: Parallel Dual-Model Code Review

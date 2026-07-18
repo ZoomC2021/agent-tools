@@ -13,8 +13,9 @@ Tracked prompts use exact-byte deduplication: canonical files remain under `prom
 | **review** | Review uncommitted changes for bugs, regressions, and improvements |
 | **adversarial-review** | Spawn fresh subagents to adversarially review current changes, verify findings against live repo evidence, and fix confirmed issues |
 | **ultrareview** | Parallel dual-model review using GPT 5.5 + Gemini 3.1 Pro Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
-| **ultrareview-lite** | Parallel dual-model review using MiMo v2.5 Pro + Gemini 3 Flash Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
-| **widereview** | Wide fan-out review across four cheap-model CLIs (Grok Composer 2.5, Qwen3.7-Max, MiMo v2.5 Pro via OpenCode, MiniMax-M3 via pi) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (`--full`) *(Not available: Gemini, Antigravity, Amp)* |
+| **ultrareview-lite** | Parallel dual-model review using MiniMax-M3 + Gemini 3 Flash Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
+| **widereview** | Wide fan-out review across four model CLIs (Grok Composer 2.5 via Grok CLI, Cursor Grok 4.5 High via Cursor Agent, GPT-5.6 Sol via Codex, Kimi K3 via Command Code) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (`--full`) *(Not available: Gemini, Antigravity)* |
+| **council** | Wide fan-out consultation across four model CLIs (Grok Composer 2.5 via Grok CLI, Cursor Grok 4.5 High via Cursor Agent, GPT-5.6 Sol via Codex, Kimi K3 via Command Code) on a single question, consolidated into a vote-weighted verdict with explicit dissent. The consultation analog of `widereview` *(Not available: Gemini, Antigravity)* |
 | **pr-reviewer** | Fetch PR comments, summarize issues, address them, update PR |
 | **pr-reviewer-only** | Fetch PR comments, summarize issues, generate implementation prompt for another agent |
 | **create-pr** | Create PR with auto-generated title and description |
@@ -168,6 +169,7 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
     ├── ultrareview.md
     ├── ultrareview-lite.md
     ├── widereview.md
+    ├── council.md
     ├── deslop.md
     ├── mission-scrutiny.md
     ├── milestone-validator.md
@@ -187,44 +189,46 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 |----------|---------|-------|------------------|
 | **frontier-worker** | Primary orchestrator (plans, routes, delegates) | GPT-5.5 | High |
 | **worker-worker** | Worker-model orchestrator variant | MiniMax-M3 | — |
-| **worker-general** | Implementation, debugging, refactoring execution | MiMo v2.5 | — |
-| **worker-explore** | Local read-only codebase discovery and search | MiMo v2.5 | — |
-| **github-librarian** | Remote GitHub research (default branches, history) | MiMo v2.5 Pro | — |
-| **docs-research** | Official docs, API behavior, release notes | MiMo v2.5 Pro | — |
-| **walkthrough** | Architecture walkthroughs with Mermaid diagrams | MiMo v2.5 Pro | — |
+| **worker-general** | Implementation, debugging, refactoring execution | MiniMax-M3 | — |
+| **worker-explore** | Local read-only codebase discovery and search | MiniMax-M3 | — |
+| **github-librarian** | Remote GitHub research (default branches, history) | MiniMax-M3 | — |
+| **docs-research** | Official docs, API behavior, release notes | MiniMax-M3 | — |
+| **walkthrough** | Architecture walkthroughs with Mermaid diagrams | MiniMax-M3 | — |
 | **oracle** | Deep reasoning for complex problems | GPT-5.5 | **High** |
-| **spec-compiler** | Compile Execution Contracts before implementation | MiMo v2.5 Pro | — |
-| **plan-review** | Binary validation of Execution Contracts | MiMo v2.5 Pro | — |
-| **quick-validator** | Fast validation of implementation output | MiMo v2.5 Pro | — |
+| **spec-compiler** | Compile Execution Contracts before implementation | MiniMax-M3 | — |
+| **plan-review** | Binary validation of Execution Contracts | MiniMax-M3 | — |
+| **quick-validator** | Fast validation of implementation output | MiniMax-M3 | — |
 | **mission-scrutiny** | Front-load scrutiny, milestone planning | GPT-5.5 | — |
 | **milestone-validator** | Validate each milestone before advancing | GPT-5.5 | — |
 | **change-auditor** | Deep audit for security, breaking changes | GPT-5.5 | **High** |
 | **review** | Review uncommitted changes | GPT-5.5 | **High** |
 | **adversarial-review** | Subagent-backed review, finding verification, and fix loop | GPT-5.5 | **High** |
-| **ultrareview** | Parallel dual-model review (GPT 5.5 + Gemini 3.1 Pro Preview) | MiMo v2.5 Pro | — |
-| **ultrareview-lite** | Parallel dual-model review (MiMo v2.5 Pro + Gemini 3 Flash Preview) | MiMo v2.5 Pro | — |
-| **widereview** | Wide fan-out review across 4 cheap-model CLIs (Grok Composer 2.5 + Qwen3.7-Max + MiMo v2.5 Pro via OpenCode + MiniMax-M3 via pi); diff or full-codebase (`--full`) | MiMo v2.5 Pro | — |
-| **deslop** | Code quality audit against principles | MiMo v2.5 Pro | — |
+| **ultrareview** | Parallel dual-model review (GPT 5.5 + Gemini 3.1 Pro Preview) | MiniMax-M3 | — |
+| **ultrareview-lite** | Parallel dual-model review (MiniMax-M3 + Gemini 3 Flash Preview) | MiniMax-M3 | — |
+| **widereview** | Wide fan-out review across 4 model CLIs (Grok Composer 2.5 + Cursor Grok 4.5 High + GPT-5.6 Sol + Kimi K3); diff or full-codebase (`--full`) | Active model | — |
+| **council** | Wide fan-out consultation across 4 model CLIs (Grok Composer 2.5 + Cursor Grok 4.5 High + GPT-5.6 Sol + Kimi K3); vote-weighted verdict with explicit dissent | Active model | — |
+| **deslop** | Code quality audit against principles | MiniMax-M3 | — |
 | **imagegen-grok** | Generate/edit images with xAI Grok Imagine | xAI Grok Imagine Image Quality | — |
 | **imagegen-google** | Generate/edit images with Google Nano Banana Pro | Gemini 3 Pro Image Preview | — |
-| **pr-reviewer** | Fetch PR comments and apply fixes | MiMo v2.5 Pro | — |
-| **pr-reviewer-only** | Fetch PR comments, produce implementation prompt | MiMo v2.5 Pro | — |
-| **create-pr** | Create PR with auto-generated title/description | MiMo v2.5 Pro | — |
+| **pr-reviewer** | Fetch PR comments and apply fixes | MiniMax-M3 | — |
+| **pr-reviewer-only** | Fetch PR comments, produce implementation prompt | MiniMax-M3 | — |
+| **create-pr** | Create PR with auto-generated title/description | MiniMax-M3 | — |
 
-| **refactor** | Analyze and prioritize refactoring opportunities | MiMo v2.5 Pro | — |
+| **refactor** | Analyze and prioritize refactoring opportunities | MiniMax-M3 | — |
 
 ### ⚠️ Security Warning
 
 **NEVER commit your `opencode.json` with real API keys to version control.**
 
-- Use environment variables such as `XIAOMI_API_KEY` or `PIONEER_API_KEY`
+- Use environment variables such as `TOKENROUTER_API_KEY` or `PIONEER_API_KEY`
 - Or keep the config file in a secure location with `apiKey: "YOUR_KEY_HERE"`
 - The example file includes placeholder warnings to help prevent accidental commits
 
 ### Reference Example
 
 A local reference setup uses:
-- Xiaomi MiMo v2.5 Pro for build mode and subagents
+- GPT-5.6 Sol for the default build mode
+- MiniMax-M3 for worker and utility subagents
 - GPT-5.5 for the orchestrator (plan mode)
 - Specialized subagents for local discovery, remote GitHub research, docs research, architecture walkthroughs, and execution
 
@@ -296,10 +300,9 @@ Notes:
 
 ### Claude provider launchers
 
-Use `scripts/claude-agentrouter.sh`, `scripts/claude-bai.sh`, or
-`scripts/claude-xiaomi.sh` to launch Claude Code through the corresponding
-Anthropic-compatible provider. Set `AGENT_ROUTER_TOKEN`, `BAI_API_KEY`, or
-`XIAOMI_API_KEY` respectively (`MIMO_API_KEY` is also accepted for Xiaomi).
+Use `scripts/claude-agentrouter.sh` or `scripts/claude-bai.sh` to launch Claude
+Code through the corresponding Anthropic-compatible provider. Set
+`AGENT_ROUTER_TOKEN` or `BAI_API_KEY`, respectively.
 All wrappers also accept `ANTHROPIC_API_KEY` or `ANTHROPIC_AUTH_TOKEN` as a
 fallback; use `ANTHROPIC_MODEL`, `CLAUDE_MODEL`, and `ANTHROPIC_BASE_URL` for
 overrides. Run a wrapper with `--help` for its defaults and examples.
@@ -451,6 +454,7 @@ for f in prompts/opencode/commands/review.md prompts/opencode/commands/adversari
          prompts/opencode/commands/spec-compiler.md prompts/opencode/commands/quick-validator.md \
          prompts/opencode/commands/change-auditor.md prompts/opencode/commands/ultrareview.md \
          prompts/opencode/commands/ultrareview-lite.md prompts/opencode/commands/widereview.md \
+         prompts/opencode/commands/council.md \
          prompts/opencode/commands/refactor.md prompts/opencode/commands/plan-review.md \
          prompts/opencode/commands/pr-reviewer-only.md; do
   [ -f "$f" ] && cp "$f" ~/.config/opencode/commands/
@@ -471,8 +475,6 @@ chmod +x ~/.config/opencode/bin/*
 # Copy and edit config (⚠️ NEVER commit with real API key)
 cp prompts/opencode/opencode.json.example ~/.config/opencode/opencode.json
 ```
-
-**⚠️ Security Warning**: Edit `~/.config/opencode/opencode.json` and replace `YOUR_XIAOMI_API_KEY_HERE` with your actual API key. **Do not commit this file.**
 
 **Note**: `github-librarian` requires `gh` to be installed and authenticated. `docs-research` works best when `websearch` is available, which OpenCode enables when using the OpenCode provider or when `OPENCODE_ENABLE_EXA=1` is set.
 
@@ -572,15 +574,13 @@ cp -r prompts/droid/skills/* ~/.factory/skills/
 cp prompts/droid/bin/droid-gh-librarian ~/.factory/bin/
 chmod +x ~/.factory/bin/droid-gh-librarian
 
-# Merge prompts/droid/settings.json.example customModels into ~/.factory/settings.json,
-# preserving any existing local apiKey values for the same model ids.
 ```
 
 **Droids:** `oracle` (deep reasoning), `gemini-3-1-pro-reviewer` (Gemini 3.1 Pro read-only review), `github-librarian` (remote GitHub research), `docs-research` (official docs/API research), `walkthrough` (architecture walkthroughs with Mermaid diagrams)
 
-**Skills:** `oracle`, `adversarial-review`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`, `widereview`
+**Skills:** `oracle`, `adversarial-review`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`, `widereview`, `council`
 
-The installer also adds Xiaomi Token Plan BYOK models (`mimo-v2.5`, `mimo-v2.5-pro`) to Droid's `customModels`; set `XIAOMI_API_KEY` in your environment before selecting them. The shipped `oracle` droid uses Factory's built-in GPT-5.5 with `reasoningEffort: high`. For BYOK, change `~/.factory/droids/oracle.md` to `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
+The shipped `oracle` droid uses Factory's built-in GPT-5.5 with `reasoningEffort: high`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
 </details>
 
 <details>
@@ -694,6 +694,7 @@ for f in prompts/opencode/commands/review.md prompts/opencode/commands/adversari
          prompts/opencode/commands/spec-compiler.md prompts/opencode/commands/quick-validator.md \
          prompts/opencode/commands/change-auditor.md prompts/opencode/commands/ultrareview.md \
          prompts/opencode/commands/ultrareview-lite.md prompts/opencode/commands/widereview.md \
+         prompts/opencode/commands/council.md \
          prompts/opencode/commands/refactor.md prompts/opencode/commands/plan-review.md \
          prompts/opencode/commands/pr-reviewer-only.md; do
   [ -f "$f" ] && cp "$f" ~/.config/opencode/commands/
@@ -714,8 +715,6 @@ chmod +x ~/.config/opencode/bin/*
 # Copy and edit config (⚠️ NEVER commit with real API key)
 cp prompts/opencode/opencode.json.example ~/.config/opencode/opencode.json
 ```
-
-**⚠️ Security Warning**: Edit `~/.config/opencode/opencode.json` and replace `YOUR_XIAOMI_API_KEY_HERE` with your actual API key. **Do not commit this file.**
 
 **Note**: `github-librarian` requires `gh` to be installed and authenticated. `docs-research` works best when `websearch` is available, which OpenCode enables when using the OpenCode provider or when `OPENCODE_ENABLE_EXA=1` is set.
 
@@ -814,15 +813,13 @@ cp -r prompts/droid/skills/* ~/.factory/skills/
 cp prompts/droid/bin/droid-gh-librarian ~/.factory/bin/
 chmod +x ~/.factory/bin/droid-gh-librarian
 
-# Merge prompts/droid/settings.json.example customModels into ~/.factory/settings.json,
-# preserving any existing local apiKey values for the same model ids.
 ```
 
 **Droids:** `oracle` (deep reasoning), `gemini-3-1-pro-reviewer` (Gemini 3.1 Pro read-only review), `github-librarian` (remote GitHub research), `docs-research` (official docs/API research), `walkthrough` (architecture walkthroughs with Mermaid diagrams)
 
-**Skills:** `oracle`, `adversarial-review`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`, `widereview`
+**Skills:** `oracle`, `adversarial-review`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`, `widereview`, `council`
 
-The installer also adds Xiaomi Token Plan BYOK models (`mimo-v2.5`, `mimo-v2.5-pro`) to Droid's `customModels`; set `XIAOMI_API_KEY` in your environment before selecting them. The shipped `oracle` droid uses Factory's built-in GPT-5.5 with `reasoningEffort: high`. For BYOK, change `~/.factory/droids/oracle.md` to `model: custom:<configured-model-name>`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
+The shipped `oracle` droid uses Factory's built-in GPT-5.5 with `reasoningEffort: high`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
 </details>
 
 <details>
@@ -936,13 +933,13 @@ Runs parallel code reviews using **GPT 5.5** (via OpenCode) AND **Gemini 3.1 Pro
 
 Lower-cost dual-model variant of `ultrareview`.
 
-Runs parallel code reviews using **MiMo v2.5 Pro** (via OpenCode) AND **Gemini 3 Flash Preview** (via Gemini CLI), then consolidates using the same consensus/exclusive/divergent reporting structure.
+Runs parallel code reviews using **MiniMax-M3** (via OpenCode) AND **Gemini 3 Flash Preview** (via Gemini CLI), then consolidates using the same consensus/exclusive/divergent reporting structure.
 
 1. **Launch parallel reviews**: Both models review the same `git diff -U40 HEAD` bundle
 2. **Consolidate findings** with identical severity-preserving rules from `ultrareview`
 3. **Use helper-managed Gemini execution**: deterministic bundle generation, chunking, retries, and `summary.json` status/failure metadata
 4. **Graceful fallback and partial reporting**: if Gemini lane is partial or unavailable, report `failure_reason` and proceed with available results
-5. **Lower operating cost** than `ultrareview` by replacing GPT 5.5 with MiMo in the OpenCode lane
+5. **Lower operating cost** than `ultrareview` by replacing GPT 5.5 with MiniMax-M3 in the OpenCode lane
 
 ### cc (Claude CLI)
 

@@ -1,7 +1,7 @@
 ---
 description: General-purpose execution worker for implementation and execution tasks
 mode: subagent
-model: xiaomi/mimo-v2.5
+model: tokenrouter/MiniMax-M3
 permission:
   task:
     '*': deny

@@ -1,7 +1,7 @@
 ---
 description: Execute Claude CLI commands and code reviews from OpenCode
 mode: subagent
-model: xiaomi/mimo-v2.5-pro
+model: tokenrouter/MiniMax-M3
 ---
 
 # CC: Claude CLI Command Execution
@@ -231,9 +231,9 @@ The helper returns:
 
 | Workflow | Primary Model | Use Case |
 |----------|---------------|----------|
-| `/review` | MiMo v2.5 Pro | Standard single-model review |
+| `/review` | GPT 5.5 | Standard single-model review |
 | `/ultrareview` | GPT 5.5 + Gemini 3.1 Pro | Dual high-tier model review |
-| `/ultrareview-lite` | MiMo v2.5 Pro + Gemini 3 Flash | Cost-effective dual review |
+| `/ultrareview-lite` | MiniMax-M3 + Gemini 3 Flash | Cost-effective dual review |
 | `/cc` | Claude Sonnet/Opus | Claude-specific analysis or multi-step tasks |
 
 Claude Code excels at:

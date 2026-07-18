@@ -1,7 +1,7 @@
 ---
 description: Quick validation that implementation meets contract and passes tests
 mode: subagent
-model: xiaomi/mimo-v2.5-pro
+model: tokenrouter/MiniMax-M3
 permission:
   task:
     '*': deny

@@ -24,8 +24,6 @@ const MODEL_MAP = {
   "tokenrouter/deepseek/deepseek-v4-pro": "deepseek/deepseek-v4-pro",
   "tokenrouter/deepseek/deepseek-v4-flash": "deepseek/deepseek-v4-flash",
   "tokenrouter/MiniMax-M3": "MiniMaxAI/MiniMax-M3",
-  "xiaomi/mimo-v2.5": "xiaomi/mimo-v2.5",
-  "xiaomi/mimo-v2.5-pro": "xiaomi/mimo-v2.5-pro",
   "tokenrouter/z-ai/glm-5.1": "zai-org/GLM-5.1",
   "nvidia/z-ai/glm-5.1": "zai-org/GLM-5.1",
   "nousresearch/nvidia/nemotron-3-ultra:free": "nvidia/nemotron-3-ultra-550b-a55b",
@@ -55,8 +53,8 @@ Defaults:
 Examples:
   cmd-eval list
   cmd-eval run
-  cmd-eval run --variants matrix-mimo-v2.5 --scenarios subagent-worker-general-add-helper
-  cmd-eval run --variants matrix-mimo-v2.5 --scenarios "subagent-worker-*"
+  cmd-eval run --variants matrix-minimax-m3 --scenarios subagent-worker-general-add-helper
+  cmd-eval run --variants matrix-minimax-m3 --scenarios "subagent-worker-*"
   cmd-eval report evals/cmd-out/20260422T120000Z
 `)
 }

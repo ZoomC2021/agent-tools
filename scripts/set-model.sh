@@ -21,7 +21,7 @@
 #   scripts/set-model.sh all <provider/model>    # set every agent at once
 #
 # Examples:
-#   scripts/set-model.sh plan-review xiaomi/mimo-v2.5-pro
+#   scripts/set-model.sh plan-review tokenrouter/MiniMax-M3
 #   scripts/set-model.sh review change-auditor openai/gpt-5.5
 #   scripts/set-model.sh worker-general worker-explore tokenrouter/MiniMax-M4
 #
@@ -67,8 +67,7 @@ display_name() {
     case "$1" in
         tokenrouter/MiniMax-M3)            echo "MiniMax-M3" ;;
         tokenrouter/MiniMax-M4)            echo "MiniMax-M4" ;;
-        xiaomi/mimo-v2.5)                  echo "MiMo v2.5" ;;
-        xiaomi/mimo-v2.5-pro)              echo "MiMo v2.5 Pro" ;;
+        openai/gpt-5.6-sol)                echo "GPT-5.6 Sol" ;;
         openai/gpt-5.5)                    echo "GPT-5.5" ;;
         pioneer/pioneer/auto)              echo "Pioneer Auto Router" ;;
         pioneer/gpt-5.5)                   echo "GPT-5.5 (Pioneer.ai)" ;;

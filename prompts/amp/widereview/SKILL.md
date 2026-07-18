@@ -1,17 +1,17 @@
 ---
 name: widereview
-description: Wide fan-out code review across four cheap-model CLIs (Grok Composer 2.5, Qwen3.7-Max, OpenCode / MiMo v2.5 Pro, MiniMax-M3 via pi) run in parallel, then consolidated into a vote-weighted report. Supports diff mode (default) and full-codebase mode (--full).
+description: Wide fan-out code review across four model CLIs (Grok Composer 2.5 via grok, Cursor Grok 4.5 High via cursor-agent, GPT-5.6 Sol via codex, and Kimi K3 via cmd), consolidated into a vote-weighted report. Supports diff mode and full-codebase mode (--full).
 ---
 
-# WideReview: Wide Fan-Out Cheap-Model Code Review
+# WideReview: Wide Fan-Out Multi-Model Code Review
 
-Run code reviews across **four independent cheap-model CLIs in parallel** — `Grok Composer 2.5`, `Qwen3.7-Max`, `OpenCode` (MiMo v2.5 Pro), and `pi` (MiniMax-M3) — then consolidate the findings into a single vote-weighted report.
+Run code reviews across **four independent model CLIs in parallel** — `grok` (Grok Composer 2.5), `cursor-agent` (Cursor Grok 4.5 High), `codex` (GPT-5.6 Sol), and `cmd` (Kimi K3) — then consolidate the findings into a single vote-weighted report.
 
-💡 **Cost note**: All four are low-cost models. Unlike `ultrareview` (2 premium models, depth), WideReview favors **breadth** — several independent reviewers at near-zero cost. Use it for broad coverage and cheap second opinions.
+WideReview favors **breadth**: four independent harness/model combinations provide broad coverage and diverse second opinions.
 
 ## Modes
 
-WideReview has two modes. The host agent is the **orchestrator only** — it gathers context, launches the lanes, and consolidates results; it does not review the code itself.
+WideReview has two modes. The host agent is the **orchestrator only** — it gathers context, launches the lanes, and consolidates results; it does not review the code itself. Use the host harness's active or primary model for orchestration; do not select or override the orchestrator model.
 
 | Mode | Invocation | What is reviewed |
 |------|-----------|------------------|
@@ -25,9 +25,9 @@ Pick the mode from the user's request, then follow Phase 1 for that mode. Phases
 | Lane | CLI | Model | Reasoning effort |
 |------|-----|-------|------------------|
 | A | `grok` | `grok-composer-2.5-fast` | model default |
-| B | `qodercli` | `Qwen3.7-Max` | max (flag) |
-| C | `opencode run` | `xiaomi/mimo-v2.5-pro` (MiMo v2.5 Pro) | model default |
-| D | `pi` | `MiniMax-M3` (via `tokenrouter` provider) | n/a |
+| B | `cursor-agent` | `cursor-grok-4.5-high` | encoded in model variant |
+| C | `codex exec` | `gpt-5.6-sol` | model default |
+| D | `cmd` | `moonshotai/Kimi-K3` | model default |
 
 Consolidating four independent reviewers catches issues any single model misses and surfaces conflicting interpretations.
 
@@ -36,11 +36,9 @@ Consolidating four independent reviewers catches issues any single model misses 
 Each lane is optional. Missing or unauthenticated CLIs are **skipped**, and the review proceeds with whatever is available (at least one lane is required).
 
 - `grok` (Grok) — `command -v grok`
-- `qodercli` (Qoder) — `command -v qodercli`
-- `opencode` (MiMo v2.5 Pro) — `command -v opencode`
-- `pi` (MiniMax-M3) — `command -v pi`
-
-⚠️ **Secret hygiene**: The OpenCode lane is backed by OpenCode's xiaomi provider configuration; the `pi` lane is backed by pi's `tokenrouter` provider configuration (custom provider defined in `~/.pi/agent/models.json`, OpenAI-compatible API at `https://api.tokenrouter.com/v1`, auth via `$TOKENROUTER_API_KEY`). Reference the model ids `xiaomi/mimo-v2.5-pro` and `MiniMax-M3` only — never read, print, or copy provider API keys.
+- `cursor-agent` (Cursor) — `command -v cursor-agent`
+- `codex` (Codex) — `command -v codex`
+- `cmd` (Command Code) — `command -v cmd`
 
 ## Phase 1 (Diff mode): Gather Context
 
@@ -90,7 +88,7 @@ WR_TIMEOUT=${WR_TIMEOUT:-720}
 
 ## Phase 2: Pre-flight
 
-Detect available lanes with `command -v` (`grok`, `qodercli`, `opencode`, `pi`) and build the active lane list. Note any skipped lanes for the final report. No per-lane configuration is required — each lane sets its model on the command line.
+Detect available lanes with `command -v` (`grok`, `cursor-agent`, `codex`, `cmd`) and build the active lane list. Note any skipped lanes for the final report. No per-lane configuration is required — each lane sets its model on the command line.
 
 ## Phase 3: Launch Parallel Reviews
 
@@ -146,18 +144,16 @@ wr_timeout() {
 }
 ```
 
-Every lane gets `< /dev/null`: under an orchestrator, stdin is an open pipe that never closes, and some CLIs block forever reading it. Lanes with a native working-directory flag use it; `pi` has no `--cwd`, so lane D runs in a subshell `cd`:
+Every lane gets `< /dev/null`: under an orchestrator, stdin is an open pipe that never closes, and some CLIs block forever reading it. Each lane uses its native working-directory option:
 
 ```bash
 wr_timeout grok -p "$WR_PROMPT" -m grok-composer-2.5-fast --always-approve --cwd "${ROOT:-.}" < /dev/null \
   > "$WR_DIR/laneA.txt" 2>&1 & A=$!
-wr_timeout qodercli -p --model "Qwen3.7-Max" --reasoning-effort max --dangerously-skip-permissions --cwd "${ROOT:-.}" "$WR_PROMPT" < /dev/null \
+wr_timeout cursor-agent -p --model cursor-grok-4.5-high --mode ask --trust --workspace "${ROOT:-.}" "$WR_PROMPT" < /dev/null \
   > "$WR_DIR/laneB.txt" 2>&1 & B=$!
-wr_timeout opencode run "$WR_PROMPT" --pure -m xiaomi/mimo-v2.5-pro --dir "${ROOT:-.}" --dangerously-skip-permissions -f "${BUNDLE:-$MANIFEST}" < /dev/null \
+wr_timeout codex exec --ephemeral -s read-only --skip-git-repo-check -C "${ROOT:-.}" -m gpt-5.6-sol "$WR_PROMPT" < /dev/null \
   > "$WR_DIR/laneC.txt" 2>&1 & C=$!
-# Lane D: pi has no --cwd, so wrap in a subshell cd. The bundle/manifest is inlined
-# via @ so diff mode needs no tool use; in full mode pi reads files itself.
-( cd "${ROOT:-.}" && wr_timeout pi -p --provider tokenrouter --model MiniMax-M3 @"${BUNDLE:-$MANIFEST}" "$WR_PROMPT" < /dev/null \
+( cd "${ROOT:-.}" && wr_timeout cmd -p "$WR_PROMPT" --model moonshotai/Kimi-K3 --permission-mode plan --max-turns 30 < /dev/null \
   ) > "$WR_DIR/laneD.txt" 2>&1 & D=$!
 wait "$A"; A_STATUS=$?
 wait "$B"; B_STATUS=$?
@@ -205,12 +201,11 @@ Build a normalized signature for each finding: `file:line:category` (fuzzy-match
 | Lane | Model              | Status        | Findings |
 |------|--------------------|---------------|----------|
 | A    | Grok Composer 2.5  | ok/timeout/.. | <n>      |
-| B    | Qwen3.7-Max        | ...           | <n>      |
-| C    | OpenCode           | ...           | <n>      |
-| D    | MiniMax-M3 (pi)    | ...           | <n>      |
+| B    | Cursor Grok 4.5 High | ...         | <n>      |
+| C    | GPT-5.6 Sol        | ...           | <n>      |
+| D    | Kimi K3            | ...           | <n>      |
 
 - Lanes used: <k>/4
-- Cost Level: Low (4 cheap models)
 
 Recommendation: <prioritized next steps — consensus issues first>
 ```

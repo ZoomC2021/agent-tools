@@ -255,7 +255,36 @@ function Install-OpenCode {
         Write-Warn "Example config not found: $ExampleFile"
     }
 
-    Write-Warn "  ⚠️  IMPORTANT: Edit $ConfigFile and replace YOUR_XIAOMI_API_KEY_HERE with your actual API key (DO NOT commit)"
+    # Apply managed model defaults and retire the discontinued Xiaomi Token Plan.
+    if (Test-Path $ConfigFile) {
+        try {
+            $config = Get-Content $ConfigFile -Raw | ConvertFrom-Json
+            $config.provider.PSObject.Properties.Remove("xiaomi")
+            $containers = @($config)
+            $containers += @($config.mode.PSObject.Properties.Value)
+            $containers += @($config.agent.PSObject.Properties.Value)
+            foreach ($entry in $containers) {
+                if ($null -ne $entry.model -and [string]$entry.model -like "xiaomi/mimo-v2.5*") {
+                    $entry.model = "tokenrouter/MiniMax-M3"
+                }
+            }
+            $config.model = "openai/gpt-5.6-sol"
+            $config.mode.build.model = "openai/gpt-5.6-sol"
+            $sol = [PSCustomObject]@{
+                name = "GPT-5.6 Sol (OAuth)"
+                limit = [PSCustomObject]@{ context = 1050000; output = 128000 }
+                modalities = [PSCustomObject]@{ input = @("text", "image"); output = @("text") }
+            }
+            $config.provider.openai.models | Add-Member -NotePropertyName "gpt-5.6-sol" -NotePropertyValue $sol -Force
+            if ($null -ne $config.provider.tokenrouter.models) {
+                $config.provider.tokenrouter.models.PSObject.Properties.Remove("xiaomi/mimo-v2.5-pro")
+            }
+            $config | ConvertTo-Json -Depth 100 | Set-Content -Path $ConfigFile -Encoding UTF8
+            Write-Success "OpenCode managed model configuration synchronized: $ConfigFile"
+        } catch {
+            Write-Err "Failed to synchronize OpenCode managed model configuration: $_"
+        }
+    }
 
     # Self-check: verify installed files
     Test-OpenCodeInstallation -AgentDest $AgentDest -CommandsDest $CommandsDest -BinDest $BinDest -ConfigFile $ConfigFile
@@ -629,78 +658,23 @@ function Install-Droid {
         Write-Warn "No skills found in $SkillsSource"
     }
 
-    # Merge Droid BYOK custom model definitions (for example Xiaomi Token Plan)
-    $SettingsExample = Join-Path $SourceDir "settings.json.example"
     $SettingsDest = Join-Path $env:USERPROFILE ".factory\settings.json"
-    if (Test-Path $SettingsExample) {
-        New-Item -ItemType Directory -Path (Split-Path $SettingsDest) -Force | Out-Null
+    if (Test-Path $SettingsDest) {
         try {
-            function ConvertTo-DroidHashtable($value) {
-                if ($null -eq $value) { return $null }
-                if ($value -is [System.Collections.IDictionary]) { return $value }
-                if ($value -is [System.Management.Automation.PSCustomObject]) {
-                    $hash = @{}
-                    foreach ($prop in $value.PSObject.Properties) {
-                        $hash[$prop.Name] = ConvertTo-DroidHashtable $prop.Value
-                    }
-                    return $hash
-                }
-                if ($value -is [System.Collections.IEnumerable] -and $value -isnot [string]) {
-                    return @($value | ForEach-Object { ConvertTo-DroidHashtable $_ })
-                }
-                return $value
+            $settings = Get-Content $SettingsDest -Raw | ConvertFrom-Json
+            if ($settings.customModels -is [System.Collections.IEnumerable]) {
+                $settings.customModels = @($settings.customModels | Where-Object {
+                    -not (
+                        $_.model -in @("mimo-v2.5", "mimo-v2.5-pro") -and
+                        [string]$_.baseUrl -like "*xiaomimimo.com*"
+                    )
+                })
+                $settings | ConvertTo-Json -Depth 100 | Set-Content -Path $SettingsDest -Encoding UTF8
             }
-
-            if (Test-Path $SettingsDest) {
-                $settings = ConvertTo-DroidHashtable (Get-Content $SettingsDest -Raw | ConvertFrom-Json)
-            } else {
-                $settings = @{}
-            }
-            $example = ConvertTo-DroidHashtable (Get-Content $SettingsExample -Raw | ConvertFrom-Json)
-
-            if (-not $settings.ContainsKey("customModels") -or $null -eq $settings["customModels"]) {
-                $existing = @()
-            } elseif ($settings["customModels"] -is [System.Collections.IEnumerable] -and $settings["customModels"] -isnot [string]) {
-                $existing = @($settings["customModels"])
-            } else {
-                throw "Droid settings customModels must be an array"
-            }
-
-            $merged = New-Object System.Collections.ArrayList
-            $index = @{}
-            for ($i = 0; $i -lt $existing.Count; $i++) {
-                [void]$merged.Add($existing[$i])
-                if ($existing[$i] -is [System.Collections.IDictionary] -and $existing[$i].ContainsKey("model")) {
-                    $index[[string]$existing[$i]["model"]] = $i
-                }
-            }
-
-            foreach ($model in @($example["customModels"])) {
-                if (-not ($model -is [System.Collections.IDictionary]) -or -not $model.ContainsKey("model")) { continue }
-                $modelId = [string]$model["model"]
-                if ($index.ContainsKey($modelId)) {
-                    $current = $merged[$index[$modelId]]
-                    $updated = @{}
-                    foreach ($key in $model.Keys) { $updated[$key] = $model[$key] }
-                    if ($current -is [System.Collections.IDictionary] -and $current.ContainsKey("apiKey") -and $current["apiKey"]) {
-                        $updated["apiKey"] = $current["apiKey"]
-                    }
-                    $merged[$index[$modelId]] = $updated
-                } else {
-                    $index[$modelId] = $merged.Count
-                    [void]$merged.Add($model)
-                }
-            }
-
-            $settings["customModels"] = @($merged)
-            $settings | ConvertTo-Json -Depth 20 | Set-Content -Path $SettingsDest -Encoding UTF8
-            Write-Success "Droid custom model settings: $SettingsDest"
-            Write-Warn "  ⚠️  IMPORTANT: Set XIAOMI_API_KEY in your environment before using Droid's Xiaomi Token Plan models"
+            Write-Success "Droid Xiaomi Token Plan models removed: $SettingsDest"
         } catch {
-            Write-Err "Failed to merge Droid custom model settings: $_"
+            Write-Err "Failed to remove Droid Xiaomi Token Plan models: $_"
         }
-    } else {
-        Write-Warn "Droid settings template not found: $SettingsExample"
     }
 
     # Install Droid-specific helper for github-librarian droid
@@ -795,7 +769,7 @@ Write-Host "  - Refactor         : Analyze codebase for refactoring opportunitie
 Write-Host "  - Review           : Review uncommitted changes"
 Write-Host "  - AdversarialReview: Spawn subagents to review changes, verify findings, and fix confirmed issues"
 Write-Host "  - UltraReview      : Parallel dual-model review (GPT 5.5 + Gemini 3.1 Pro)"
-Write-Host "  - UltraReview-Lite : Parallel dual-model review (MiMo v2.5 Pro + Gemini 3 Flash Preview)"
+Write-Host "  - UltraReview-Lite : Parallel dual-model review (MiniMax-M3 + Gemini 3 Flash Preview)"
 Write-Host "  - CC               : Execute Claude CLI commands and code reviews"
 Write-Host "  - PR-Reviewer      : Address PR review feedback"
 Write-Host "  - PR-Reviewer-Only : Generate implementation prompt for PR feedback"

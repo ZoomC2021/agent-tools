@@ -1010,6 +1010,12 @@
       "mode": "100644"
     },
     {
+      "path": "cline/council.md",
+      "source": "claude/council.md",
+      "sha256": "c1ca24e1f6652b77b716d2846700f0b7a6c35b50420f66b2fd3e7ce93d4bb0d5",
+      "mode": "100644"
+    },
+    {
       "path": "cline/create-cli.md",
       "source": "opencode/commands/create-cli.md",
       "sha256": "a9dc9863467c384b40424794528645b30b5c535d58fffd98905ccc46c55f90b2",
@@ -1120,7 +1126,7 @@
     {
       "path": "cline/widereview.md",
       "source": "claude/widereview.md",
-      "sha256": "816b9e3e349d220985e4a6027181c91f3cb9f77db2f101f0ac924a02f4fe1bc8",
+      "sha256": "72bab897ae8ed163dfb2c2301577e50d86fb040a65549c65aee99ef3d4e135cc",
       "mode": "100644"
     },
     {
@@ -1814,6 +1820,12 @@
       "mode": "100644"
     },
     {
+      "path": "copilot-cli/council.md",
+      "source": "claude/council.md",
+      "sha256": "c1ca24e1f6652b77b716d2846700f0b7a6c35b50420f66b2fd3e7ce93d4bb0d5",
+      "mode": "100644"
+    },
+    {
       "path": "copilot-cli/create-cli.md",
       "source": "opencode/commands/create-cli.md",
       "sha256": "a9dc9863467c384b40424794528645b30b5c535d58fffd98905ccc46c55f90b2",
@@ -1906,7 +1918,7 @@
     {
       "path": "copilot-cli/widereview.md",
       "source": "claude/widereview.md",
-      "sha256": "816b9e3e349d220985e4a6027181c91f3cb9f77db2f101f0ac924a02f4fe1bc8",
+      "sha256": "72bab897ae8ed163dfb2c2301577e50d86fb040a65549c65aee99ef3d4e135cc",
       "mode": "100644"
     },
     {
@@ -1919,6 +1931,12 @@
       "path": "cursor/agent-browser.md",
       "source": "opencode/commands/agent-browser.md",
       "sha256": "020e3c011df42ace07714ce38dab5360c4aa7199a4e8c84041a435cba4222082",
+      "mode": "100644"
+    },
+    {
+      "path": "cursor/council.md",
+      "source": "claude/council.md",
+      "sha256": "c1ca24e1f6652b77b716d2846700f0b7a6c35b50420f66b2fd3e7ce93d4bb0d5",
       "mode": "100644"
     },
     {
@@ -2020,7 +2038,7 @@
     {
       "path": "cursor/widereview.md",
       "source": "claude/widereview.md",
-      "sha256": "816b9e3e349d220985e4a6027181c91f3cb9f77db2f101f0ac924a02f4fe1bc8",
+      "sha256": "72bab897ae8ed163dfb2c2301577e50d86fb040a65549c65aee99ef3d4e135cc",
       "mode": "100644"
     },
     {
@@ -2480,6 +2498,12 @@
       "mode": "100644"
     },
     {
+      "path": "devin/skills/council/SKILL.md",
+      "source": "amp/council/SKILL.md",
+      "sha256": "eff93111768d1474edaf7e024a37647f21358c2289576f9d58d12b423cfc88da",
+      "mode": "100644"
+    },
+    {
       "path": "devin/skills/create-cli/LICENSE",
       "source": "amp/create-cli/LICENSE",
       "sha256": "14293556b79940745123d0160c71d27ed0e9fe9b8a848093f3ed78f4853caafe",
@@ -2693,6 +2717,12 @@
       "path": "devin/skills/triage/SKILL.md",
       "source": "amp/triage/SKILL.md",
       "sha256": "b819f0285e4e5814ac6472d0217f07dc9f23d2fdae3ebb0dd31d98360d8ac029",
+      "mode": "100644"
+    },
+    {
+      "path": "devin/skills/widereview/SKILL.md",
+      "source": "amp/widereview/SKILL.md",
+      "sha256": "a7c4ec51d8b13b1569edcadc2353764d40d533122f67e0de709adbe3d1cd2a63",
       "mode": "100644"
     },
     {
@@ -3146,6 +3176,12 @@
       "mode": "100644"
     },
     {
+      "path": "droid/skills/council/SKILL.md",
+      "source": "amp/council/SKILL.md",
+      "sha256": "eff93111768d1474edaf7e024a37647f21358c2289576f9d58d12b423cfc88da",
+      "mode": "100644"
+    },
+    {
       "path": "droid/skills/create-cli/LICENSE",
       "source": "amp/create-cli/LICENSE",
       "sha256": "14293556b79940745123d0160c71d27ed0e9fe9b8a848093f3ed78f4853caafe",
@@ -3327,8 +3363,8 @@
     },
     {
       "path": "droid/skills/widereview/SKILL.md",
-      "source": "devin/skills/widereview/SKILL.md",
-      "sha256": "ffd015f0e1a44bc7596939a0d2dc1fc76a89f6092f6fa2c12cd76e9fb5272a6a",
+      "source": "amp/widereview/SKILL.md",
+      "sha256": "a7c4ec51d8b13b1569edcadc2353764d40d533122f67e0de709adbe3d1cd2a63",
       "mode": "100644"
     },
     {
@@ -4700,6 +4736,12 @@
       "mode": "100644"
     },
     {
+      "path": "kilocode/council.md",
+      "source": "claude/council.md",
+      "sha256": "c1ca24e1f6652b77b716d2846700f0b7a6c35b50420f66b2fd3e7ce93d4bb0d5",
+      "mode": "100644"
+    },
+    {
       "path": "kilocode/create-cli.md",
       "source": "opencode/commands/create-cli.md",
       "sha256": "a9dc9863467c384b40424794528645b30b5c535d58fffd98905ccc46c55f90b2",
@@ -4816,7 +4858,7 @@
     {
       "path": "kilocode/widereview.md",
       "source": "claude/widereview.md",
-      "sha256": "816b9e3e349d220985e4a6027181c91f3cb9f77db2f101f0ac924a02f4fe1bc8",
+      "sha256": "72bab897ae8ed163dfb2c2301577e50d86fb040a65549c65aee99ef3d4e135cc",
       "mode": "100644"
     },
     {
@@ -4829,6 +4871,12 @@
       "path": "pi/agent-browser.md",
       "source": "opencode/commands/agent-browser.md",
       "sha256": "020e3c011df42ace07714ce38dab5360c4aa7199a4e8c84041a435cba4222082",
+      "mode": "100644"
+    },
+    {
+      "path": "pi/council.md",
+      "source": "claude/council.md",
+      "sha256": "c1ca24e1f6652b77b716d2846700f0b7a6c35b50420f66b2fd3e7ce93d4bb0d5",
       "mode": "100644"
     },
     {
@@ -4960,7 +5008,7 @@
     {
       "path": "pi/widereview.md",
       "source": "claude/widereview.md",
-      "sha256": "816b9e3e349d220985e4a6027181c91f3cb9f77db2f101f0ac924a02f4fe1bc8",
+      "sha256": "72bab897ae8ed163dfb2c2301577e50d86fb040a65549c65aee99ef3d4e135cc",
       "mode": "100644"
     }
   ]

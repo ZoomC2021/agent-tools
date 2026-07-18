@@ -868,7 +868,7 @@
     },
     {
       "id": "primary-mimo-workflow-spec-compliance",
-      "description": "Test the full MiMo primary workflow on the workflow spec-compliance task that direct MiMo general failed.",
+      "description": "Test the full primary workflow on the workflow spec-compliance task that a direct worker failed.",
       "agent": "frontier-worker",
       "prompt": "In this project, bring the workflow engine into compliance with `SPEC.md`. This is a high-risk state-machine and lease-recovery change, so review the execution contract before implementation. The existing tests are intentionally incomplete, so do not assume a passing test suite is sufficient. Read the spec, inspect the implementation, make the smallest safe source/build fixes, preserve public function names, do not modify `SPEC.md` or `package.json`, and verify with `npm test`, `npm run build`, and `npm start` only long enough to confirm it prints `workflow engine ready`.",
       "timeoutMs": 240000,

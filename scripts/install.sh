@@ -289,7 +289,54 @@ install_opencode() {
         log_warn "Example config not found: $example_file"
     fi
 
-    log_warn "  ⚠️  IMPORTANT: Edit $config_file and replace YOUR_XIAOMI_API_KEY_HERE with your actual API key (DO NOT commit)"
+    # Apply managed model defaults and retire the discontinued Xiaomi Token Plan.
+    if [[ -f "$config_file" ]]; then
+        python3 - "$config_file" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+config = json.loads(path.read_text())
+changed = config.get("provider", {}).pop("xiaomi", None) is not None
+
+def replace_model(container):
+    global changed
+    if isinstance(container, dict) and str(container.get("model", "")).startswith("xiaomi/mimo-v2.5"):
+        container["model"] = "tokenrouter/MiniMax-M3"
+        changed = True
+
+replace_model(config)
+for mode in config.get("mode", {}).values():
+    replace_model(mode)
+for agent in config.get("agent", {}).values():
+    replace_model(agent)
+
+if config.get("model") != "openai/gpt-5.6-sol":
+    config["model"] = "openai/gpt-5.6-sol"
+    changed = True
+build = config.setdefault("mode", {}).setdefault("build", {})
+if build.get("model") != "openai/gpt-5.6-sol":
+    build["model"] = "openai/gpt-5.6-sol"
+    changed = True
+
+openai_models = config.setdefault("provider", {}).setdefault("openai", {}).setdefault("models", {})
+sol = {
+    "name": "GPT-5.6 Sol (OAuth)",
+    "limit": {"context": 1050000, "output": 128000},
+    "modalities": {"input": ["text", "image"], "output": ["text"]},
+}
+if openai_models.get("gpt-5.6-sol") != sol:
+    openai_models["gpt-5.6-sol"] = sol
+    changed = True
+
+tokenrouter_models = config.get("provider", {}).get("tokenrouter", {}).get("models", {})
+changed = tokenrouter_models.pop("xiaomi/mimo-v2.5-pro", None) is not None or changed
+if changed:
+    path.write_text(json.dumps(config, indent=2) + "\n")
+PY
+        log_success "OpenCode managed model configuration synchronized: $config_file"
+    fi
 
     # Self-check: verify installed files
     _self_check_opencode "$agent_dest" "$commands_dest" "$bin_dest" "$config_file"
@@ -338,6 +385,7 @@ _self_check_opencode() {
         "ultrareview.md"
         "ultrareview-lite.md"
         "widereview.md"
+        "council.md"
         "cc.md"
         "pr-reviewer.md"
         "change-auditor.md"
@@ -716,68 +764,30 @@ install_droid() {
         log_warn "No skills found in $skills_source"
     fi
 
-    # Merge Droid BYOK custom model definitions (for example Xiaomi Token Plan)
-    local settings_example="$source_dir/settings.json.example"
     local settings_dest="$HOME/.factory/settings.json"
-    if [[ -f "$settings_example" ]]; then
-        mkdir -p "$(dirname "$settings_dest")"
-        python3 - "$settings_dest" "$settings_example" <<'PY'
+    if [[ -f "$settings_dest" ]]; then
+        python3 - "$settings_dest" <<'PY'
 import json
 import sys
 from pathlib import Path
 
-settings_path = Path(sys.argv[1])
-example_path = Path(sys.argv[2])
-
-try:
-    settings = json.loads(settings_path.read_text()) if settings_path.exists() else {}
-    example = json.loads(example_path.read_text())
-except json.JSONDecodeError as exc:
-    print(f"error: invalid Droid settings JSON: {exc}", file=sys.stderr)
-    sys.exit(1)
-
-if not isinstance(settings, dict):
-    print("error: Droid settings root must be a JSON object", file=sys.stderr)
-    sys.exit(1)
-
-existing = settings.get("customModels")
-if existing is None:
-    existing = []
-elif not isinstance(existing, list):
-    print("error: Droid settings customModels must be an array", file=sys.stderr)
-    sys.exit(1)
-
-merged = list(existing)
-index = {
-    m.get("model"): i
-    for i, m in enumerate(merged)
-    if isinstance(m, dict) and isinstance(m.get("model"), str)
-}
-
-for model in example.get("customModels", []):
-    model_id = model.get("model")
-    if not isinstance(model_id, str):
-        continue
-    if model_id in index:
-        current = merged[index[model_id]]
-        if isinstance(current, dict):
-            # Preserve any local apiKey while refreshing non-secret metadata from the repo template.
-            api_key = current.get("apiKey")
-            updated = dict(model)
-            if api_key:
-                updated["apiKey"] = api_key
-            merged[index[model_id]] = updated
-    else:
-        index[model_id] = len(merged)
-        merged.append(model)
-
-settings["customModels"] = merged
-settings_path.write_text(json.dumps(settings, indent=2) + "\n")
+path = Path(sys.argv[1])
+settings = json.loads(path.read_text())
+models = settings.get("customModels")
+if isinstance(models, list):
+    retained = [
+        model for model in models
+        if not (
+            isinstance(model, dict)
+            and model.get("model") in {"mimo-v2.5", "mimo-v2.5-pro"}
+            and "xiaomimimo.com" in str(model.get("baseUrl", ""))
+        )
+    ]
+    if retained != models:
+        settings["customModels"] = retained
+        path.write_text(json.dumps(settings, indent=2) + "\n")
 PY
-        log_success "Droid custom model settings: $settings_dest"
-        log_warn "  ⚠️  IMPORTANT: Set XIAOMI_API_KEY in your environment before using Droid's Xiaomi Token Plan models"
-    else
-        log_warn "Droid settings template not found: $settings_example"
+        log_success "Droid Xiaomi Token Plan models removed: $settings_dest"
     fi
 
     # Install Droid-specific helper for github-librarian droid
@@ -982,8 +992,9 @@ main() {
     echo "  - review           : Review uncommitted changes"
     echo "  - adversarial-review : Spawn subagents to review changes, verify findings, and fix confirmed issues"
     echo "  - ultrareview      : Parallel dual-model review (GPT 5.5 + Gemini 3.1 Pro)"
-    echo "  - ultrareview-lite : Parallel dual-model review (MiMo v2.5 Pro + Gemini 3 Flash Preview)"
-    echo "  - widereview       : Wide fan-out review across 4 cheap-model CLIs (Grok Composer 2.5 + Qwen3.7-Max + MiMo v2.5 Pro via OpenCode + MiniMax-M3 via pi); diff or full-codebase (--full)"
+    echo "  - ultrareview-lite : Parallel dual-model review (MiniMax-M3 + Gemini 3 Flash Preview)"
+    echo "  - widereview       : Wide fan-out review across 4 model CLIs (Grok Composer 2.5 + Cursor Grok 4.5 High + GPT-5.6 Sol + Kimi K3); diff or full-codebase (--full)"
+    echo "  - council          : Wide fan-out consultation across 4 model CLIs (Grok Composer 2.5 + Cursor Grok 4.5 High + GPT-5.6 Sol + Kimi K3); vote-weighted verdict with explicit dissent"
     echo "  - cc               : Execute Claude CLI commands and code reviews"
     echo "  - pr-reviewer      : Address PR review feedback"
     echo "  - pr-reviewer-only : Generate implementation prompt for PR feedback"

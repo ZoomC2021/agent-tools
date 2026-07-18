@@ -1,7 +1,7 @@
 ---
 description: Generate handoff context for continuing work in a new session
 mode: subagent
-model: xiaomi/mimo-v2.5-pro
+model: tokenrouter/MiniMax-M3
 hidden: true
 permission:
   read: allow
