@@ -1,6 +1,6 @@
 ---
 name: council
-description: Wide fan-out multi-model consultation across four model CLIs (Grok Composer 2.5 via grok, Cursor Grok 4.5 High via cursor-agent, GPT-5.6 Sol via codex, and Kimi K3 via cmd), consolidated into a vote-weighted council report with explicit dissent. Use for non-review questions: architecture tradeoffs, technology choice, design stress-test, second opinions, "should I do X" decisions.
+description: 'Wide fan-out multi-model consultation across four model CLIs (Grok Composer 2.5 via grok, Cursor Grok 4.5 High via cursor-agent, GPT-5.6 Sol via codex, and Kimi K3 via cmd), consolidated into a vote-weighted council report with explicit dissent. Use for non-review questions: architecture tradeoffs, technology choice, design stress-test, second opinions, "should I do X" decisions.'
 ---
 
 # Council: Wide Fan-Out Multi-Model Consultation
