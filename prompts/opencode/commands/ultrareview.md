@@ -1,7 +1,7 @@
 ---
 description: Run parallel code reviews using GPT 5.5 (OpenCode) AND Gemini 3.1 Pro Preview (Gemini CLI) simultaneously, then consolidate results
 mode: subagent
-model: tokenrouter/MiniMax-M3
+model: xai/grok-composer-2.5-fast
 ---
 
 # UltraReview: Parallel Dual-Model Code Review

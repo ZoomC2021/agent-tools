@@ -1,7 +1,7 @@
 ---
 description: Quick validation that implementation meets contract and passes tests
 mode: subagent
-model: tokenrouter/MiniMax-M3
+model: xai/grok-composer-2.5-fast
 permission:
   task:
     '*': deny

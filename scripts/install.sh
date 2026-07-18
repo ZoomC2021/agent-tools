@@ -311,6 +311,13 @@ for mode in config.get("mode", {}).values():
     replace_model(mode)
 for agent in config.get("agent", {}).values():
     replace_model(agent)
+    if isinstance(agent, dict) and agent.get("model") == "tokenrouter/MiniMax-M3":
+        agent["model"] = "xai/grok-composer-2.5-fast"
+        changed = True
+for active_model_agent in ("widereview", "council"):
+    agent = config.get("agent", {}).get(active_model_agent)
+    if isinstance(agent, dict) and agent.pop("model", None) is not None:
+        changed = True
 
 if config.get("model") != "openai/gpt-5.6-sol":
     config["model"] = "openai/gpt-5.6-sol"
@@ -328,6 +335,12 @@ sol = {
 }
 if openai_models.get("gpt-5.6-sol") != sol:
     openai_models["gpt-5.6-sol"] = sol
+    changed = True
+
+xai_models = config.setdefault("provider", {}).setdefault("xai", {}).setdefault("models", {})
+composer = {"name": "Grok Composer 2.5 Fast"}
+if xai_models.get("grok-composer-2.5-fast") != composer:
+    xai_models["grok-composer-2.5-fast"] = composer
     changed = True
 
 tokenrouter_models = config.get("provider", {}).get("tokenrouter", {}).get("models", {})
@@ -992,7 +1005,7 @@ main() {
     echo "  - review           : Review uncommitted changes"
     echo "  - adversarial-review : Spawn subagents to review changes, verify findings, and fix confirmed issues"
     echo "  - ultrareview      : Parallel dual-model review (GPT 5.5 + Gemini 3.1 Pro)"
-    echo "  - ultrareview-lite : Parallel dual-model review (MiniMax-M3 + Gemini 3 Flash Preview)"
+    echo "  - ultrareview-lite : Parallel dual-model review (Grok Composer 2.5 Fast + Gemini 3 Flash Preview)"
     echo "  - widereview       : Wide fan-out review across 4 model CLIs (Grok Composer 2.5 + Cursor Grok 4.5 High + GPT-5.6 Sol + Kimi K3); diff or full-codebase (--full)"
     echo "  - council          : Wide fan-out consultation across 4 model CLIs (Grok Composer 2.5 + Cursor Grok 4.5 High + GPT-5.6 Sol + Kimi K3); vote-weighted verdict with explicit dissent"
     echo "  - cc               : Execute Claude CLI commands and code reviews"

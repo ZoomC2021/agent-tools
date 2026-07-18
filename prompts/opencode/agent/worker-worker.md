@@ -3,7 +3,7 @@ description: >-
   Optimized orchestrator (worker-worker variant) that delegates
   implementation and research work to subagents.
 mode: primary
-model: tokenrouter/MiniMax-M3
+model: xai/grok-composer-2.5-fast
 permission:
   task:
     '*': deny

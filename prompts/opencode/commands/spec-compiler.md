@@ -1,7 +1,7 @@
 ---
 description: Compile Execution Contract before implementation work
 mode: subagent
-model: tokenrouter/MiniMax-M3
+model: xai/grok-composer-2.5-fast
 permission:
   task:
     '*': deny

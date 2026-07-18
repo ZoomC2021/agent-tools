@@ -1,14 +1,14 @@
 ---
-description: Run parallel code reviews using MiniMax-M3 (OpenCode) AND Gemini 3 Flash Preview (Gemini CLI), then consolidate results
+description: Run parallel code reviews using Grok Composer 2.5 Fast (OpenCode) AND Gemini 3 Flash Preview (Gemini CLI), then consolidate results
 mode: subagent
-model: tokenrouter/MiniMax-M3
+model: xai/grok-composer-2.5-fast
 ---
 
-# UltraReview Lite: Parallel MiniMax + Gemini Flash Code Review
+# UltraReview Lite: Parallel Grok Composer + Gemini Flash Code Review
 
-Run simultaneous code reviews using **MiniMax-M3** (via OpenCode native) AND **Gemini 3 Flash Preview** (via Gemini CLI), then consolidate findings into a unified report.
+Run simultaneous code reviews using **Grok Composer 2.5 Fast** (via OpenCode native) AND **Gemini 3 Flash Preview** (via Gemini CLI), then consolidate findings into a unified report.
 
-Compared with `/ultrareview`, this variant reduces cost by replacing the GPT 5.5 lane with MiniMax-M3.
+Compared with `/ultrareview`, this variant reduces cost by replacing the GPT 5.5 lane with Grok Composer 2.5 Fast.
 
 ## Phase 1: Gather Context
 
@@ -27,8 +27,8 @@ Capture the complete set of changed files and their contents for both models.
 Both models should review from the **same** input to keep consensus detection meaningful. The bundle is an extended-context diff (`git diff -U40 HEAD`) carrying each hunk with +/-40 lines of context.
 
 Rules:
-- The extended-context diff is the **primary** input for both MiniMax and Gemini Flash.
-- MiniMax may still read a modified file in full when a hunk needs extra context.
+- The extended-context diff is the **primary** input for both Grok Composer and Gemini Flash.
+- Grok Composer may still read a modified file in full when a hunk needs extra context.
 - Gemini receives only the bundle (via file reference, not stdin).
 - Never replace the bundle with hand-edited excerpts.
 
@@ -48,18 +48,18 @@ Rules:
 
 ## Phase 2: Launch Reviews
 
-### Task 1: MiniMax-M3 Review (Primary - Always Run)
+### Task 1: Grok Composer 2.5 Fast Review (Primary - Always Run)
 
 This is the **primary** review. Gemini CLI is attempted in parallel but may timeout.
 
 Launch this task using the `task` tool:
 
 ```
-description: MiniMax-M3 read-only code review
+description: Grok Composer 2.5 Fast read-only code review
 subagent_type: review
 prompt: |
-  TASK: Perform READ-ONLY code review using MiniMax-M3
-  MODEL OVERRIDE: tokenrouter/MiniMax-M3
+  TASK: Perform READ-ONLY code review using Grok Composer 2.5 Fast
+  MODEL OVERRIDE: xai/grok-composer-2.5-fast
   TOOLS ALLOWED: Read, Bash (for git commands only), Grep, Glob
   TOOLS FORBIDDEN: Edit, Write
 
@@ -157,11 +157,11 @@ prompt: |
 
 ### Expected Outcomes
 
-| Scenario | MiniMax Result | Gemini Result | Action |
+| Scenario | Grok Composer Result | Gemini Result | Action |
 |----------|-------------|---------------|--------|
 | Ideal | Success | Success | Full dual-model consolidation |
-| Typical | Success | Timeout | MiniMax-only report with note about Gemini timeout |
-| Degraded | Success | Fail | MiniMax-only report with Gemini failure reason |
+| Typical | Success | Timeout | Grok Composer-only report with note about Gemini timeout |
+| Degraded | Success | Fail | Grok Composer-only report with Gemini failure reason |
 
 ### Processing Gemini Results
 
@@ -197,14 +197,14 @@ fi
 
 ```
 ## UltraReview Lite Summary
-- MiniMax-M3: <status>
+- Grok Composer 2.5 Fast: <status>
 - Gemini 3 Flash: <status> (<failure_reason if not success>)
 - Consensus Critical: <count>
-- MiniMax Exclusive: <count>
+- Grok Composer Exclusive: <count>
 - Gemini Exclusive: <count>
 - Total Models Used: <1 or 2>
-- Execution: MiniMax-M3 (OpenCode) + Gemini 3 Flash Preview (CLI)
-- Cost Level: Medium (MiniMax + optional Gemini Flash)
+- Execution: Grok Composer 2.5 Fast (OpenCode) + Gemini 3 Flash Preview (CLI)
+- Cost Level: Medium (Grok Composer + optional Gemini Flash)
 ```
 
 ### Gemini Failure Banner (when Gemini fails/times out)
@@ -213,12 +213,12 @@ fi
 ⚠️ Gemini 3 Flash CLI timeout or failure
 - Status: <status>
 - Reason: <failure_reason>
-- Review based on MiniMax-M3 results
+- Review based on Grok Composer 2.5 Fast results
 ```
 
 ### Report Structure
 
-1. **MiniMax-M3 Findings** (always present)
+1. **Grok Composer 2.5 Fast Findings** (always present)
 2. **Gemini 3 Flash Findings** (if available and successful)
 3. **Consensus Issues** (if both models succeeded)
 4. **Divergent Assessments** (if any)
@@ -239,14 +239,14 @@ fi
 
 ### Fallback Strategy
 
-1. **Always complete MiniMax review first** - this is the reliable path
+1. **Always complete Grok Composer review first** - this is the reliable path
 2. **Attempt Gemini in parallel** with generous timeouts (120s)
 3. **Expect occasional timeouts** - file-based review is thorough but slower
-4. **Consolidate with MiniMax as primary** - don't fail if Gemini times out
+4. **Consolidate with Grok Composer as primary** - don't fail if Gemini times out
 
 ### Both Models Unavailable
 
-If even MiniMax fails:
+If even Grok Composer fails:
 1. Report: `UltraReview Lite failed: Unable to complete code review`
 2. Suggest: `Use /review for standard single-model review`
 3. Check: Git repository status, network connectivity, model availability

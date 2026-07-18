@@ -1,7 +1,7 @@
 ---
 description: Generate handoff context for continuing work in a new session
 mode: subagent
-model: tokenrouter/MiniMax-M3
+model: xai/grok-composer-2.5-fast
 hidden: true
 permission:
   read: allow

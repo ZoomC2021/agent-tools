@@ -13,7 +13,7 @@ Tracked prompts use exact-byte deduplication: canonical files remain under `prom
 | **review** | Review uncommitted changes for bugs, regressions, and improvements |
 | **adversarial-review** | Spawn fresh subagents to adversarially review current changes, verify findings against live repo evidence, and fix confirmed issues |
 | **ultrareview** | Parallel dual-model review using GPT 5.5 + Gemini 3.1 Pro Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
-| **ultrareview-lite** | Parallel dual-model review using MiniMax-M3 + Gemini 3 Flash Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
+| **ultrareview-lite** | Parallel dual-model review using Grok Composer 2.5 Fast + Gemini 3 Flash Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
 | **widereview** | Wide fan-out review across four model CLIs (Grok Composer 2.5 via Grok CLI, Cursor Grok 4.5 High via Cursor Agent, GPT-5.6 Sol via Codex, Kimi K3 via Command Code) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (`--full`) *(Not available: Gemini, Antigravity)* |
 | **council** | Wide fan-out consultation across four model CLIs (Grok Composer 2.5 via Grok CLI, Cursor Grok 4.5 High via Cursor Agent, GPT-5.6 Sol via Codex, Kimi K3 via Command Code) on a single question, consolidated into a vote-weighted verdict with explicit dissent. The consultation analog of `widereview` *(Not available: Gemini, Antigravity)* |
 | **pr-reviewer** | Fetch PR comments, summarize issues, address them, update PR |
@@ -188,33 +188,33 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 | Subagent | Purpose | Model | Reasoning Effort |
 |----------|---------|-------|------------------|
 | **frontier-worker** | Primary orchestrator (plans, routes, delegates) | GPT-5.5 | High |
-| **worker-worker** | Worker-model orchestrator variant | MiniMax-M3 | — |
-| **worker-general** | Implementation, debugging, refactoring execution | MiniMax-M3 | — |
-| **worker-explore** | Local read-only codebase discovery and search | MiniMax-M3 | — |
-| **github-librarian** | Remote GitHub research (default branches, history) | MiniMax-M3 | — |
-| **docs-research** | Official docs, API behavior, release notes | MiniMax-M3 | — |
-| **walkthrough** | Architecture walkthroughs with Mermaid diagrams | MiniMax-M3 | — |
+| **worker-worker** | Worker-model orchestrator variant | Grok Composer 2.5 Fast | — |
+| **worker-general** | Implementation, debugging, refactoring execution | Grok Composer 2.5 Fast | — |
+| **worker-explore** | Local read-only codebase discovery and search | Grok Composer 2.5 Fast | — |
+| **github-librarian** | Remote GitHub research (default branches, history) | Grok Composer 2.5 Fast | — |
+| **docs-research** | Official docs, API behavior, release notes | Grok Composer 2.5 Fast | — |
+| **walkthrough** | Architecture walkthroughs with Mermaid diagrams | Grok Composer 2.5 Fast | — |
 | **oracle** | Deep reasoning for complex problems | GPT-5.5 | **High** |
-| **spec-compiler** | Compile Execution Contracts before implementation | MiniMax-M3 | — |
-| **plan-review** | Binary validation of Execution Contracts | MiniMax-M3 | — |
-| **quick-validator** | Fast validation of implementation output | MiniMax-M3 | — |
+| **spec-compiler** | Compile Execution Contracts before implementation | Grok Composer 2.5 Fast | — |
+| **plan-review** | Binary validation of Execution Contracts | Grok Composer 2.5 Fast | — |
+| **quick-validator** | Fast validation of implementation output | Grok Composer 2.5 Fast | — |
 | **mission-scrutiny** | Front-load scrutiny, milestone planning | GPT-5.5 | — |
 | **milestone-validator** | Validate each milestone before advancing | GPT-5.5 | — |
 | **change-auditor** | Deep audit for security, breaking changes | GPT-5.5 | **High** |
 | **review** | Review uncommitted changes | GPT-5.5 | **High** |
 | **adversarial-review** | Subagent-backed review, finding verification, and fix loop | GPT-5.5 | **High** |
-| **ultrareview** | Parallel dual-model review (GPT 5.5 + Gemini 3.1 Pro Preview) | MiniMax-M3 | — |
-| **ultrareview-lite** | Parallel dual-model review (MiniMax-M3 + Gemini 3 Flash Preview) | MiniMax-M3 | — |
+| **ultrareview** | Parallel dual-model review (GPT 5.5 + Gemini 3.1 Pro Preview) | Grok Composer 2.5 Fast | — |
+| **ultrareview-lite** | Parallel dual-model review (Grok Composer 2.5 Fast + Gemini 3 Flash Preview) | Grok Composer 2.5 Fast | — |
 | **widereview** | Wide fan-out review across 4 model CLIs (Grok Composer 2.5 + Cursor Grok 4.5 High + GPT-5.6 Sol + Kimi K3); diff or full-codebase (`--full`) | Active model | — |
 | **council** | Wide fan-out consultation across 4 model CLIs (Grok Composer 2.5 + Cursor Grok 4.5 High + GPT-5.6 Sol + Kimi K3); vote-weighted verdict with explicit dissent | Active model | — |
-| **deslop** | Code quality audit against principles | MiniMax-M3 | — |
+| **deslop** | Code quality audit against principles | Grok Composer 2.5 Fast | — |
 | **imagegen-grok** | Generate/edit images with xAI Grok Imagine | xAI Grok Imagine Image Quality | — |
 | **imagegen-google** | Generate/edit images with Google Nano Banana Pro | Gemini 3 Pro Image Preview | — |
-| **pr-reviewer** | Fetch PR comments and apply fixes | MiniMax-M3 | — |
-| **pr-reviewer-only** | Fetch PR comments, produce implementation prompt | MiniMax-M3 | — |
-| **create-pr** | Create PR with auto-generated title/description | MiniMax-M3 | — |
+| **pr-reviewer** | Fetch PR comments and apply fixes | Grok Composer 2.5 Fast | — |
+| **pr-reviewer-only** | Fetch PR comments, produce implementation prompt | Grok Composer 2.5 Fast | — |
+| **create-pr** | Create PR with auto-generated title/description | Grok Composer 2.5 Fast | — |
 
-| **refactor** | Analyze and prioritize refactoring opportunities | MiniMax-M3 | — |
+| **refactor** | Analyze and prioritize refactoring opportunities | Grok Composer 2.5 Fast | — |
 
 ### ⚠️ Security Warning
 
@@ -228,7 +228,7 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 
 A local reference setup uses:
 - GPT-5.6 Sol for the default build mode
-- MiniMax-M3 for worker and utility subagents
+- Grok Composer 2.5 Fast for worker and utility subagents
 - GPT-5.5 for the orchestrator (plan mode)
 - Specialized subagents for local discovery, remote GitHub research, docs research, architecture walkthroughs, and execution
 
@@ -933,13 +933,13 @@ Runs parallel code reviews using **GPT 5.5** (via OpenCode) AND **Gemini 3.1 Pro
 
 Lower-cost dual-model variant of `ultrareview`.
 
-Runs parallel code reviews using **MiniMax-M3** (via OpenCode) AND **Gemini 3 Flash Preview** (via Gemini CLI), then consolidates using the same consensus/exclusive/divergent reporting structure.
+Runs parallel code reviews using **Grok Composer 2.5 Fast** (via OpenCode) AND **Gemini 3 Flash Preview** (via Gemini CLI), then consolidates using the same consensus/exclusive/divergent reporting structure.
 
 1. **Launch parallel reviews**: Both models review the same `git diff -U40 HEAD` bundle
 2. **Consolidate findings** with identical severity-preserving rules from `ultrareview`
 3. **Use helper-managed Gemini execution**: deterministic bundle generation, chunking, retries, and `summary.json` status/failure metadata
 4. **Graceful fallback and partial reporting**: if Gemini lane is partial or unavailable, report `failure_reason` and proceed with available results
-5. **Lower operating cost** than `ultrareview` by replacing GPT 5.5 with MiniMax-M3 in the OpenCode lane
+5. **Lower operating cost** than `ultrareview` by replacing GPT 5.5 with Grok Composer 2.5 Fast in the OpenCode lane
 
 ### cc (Claude CLI)
 

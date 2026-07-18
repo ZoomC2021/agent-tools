@@ -67,6 +67,7 @@ display_name() {
     case "$1" in
         tokenrouter/MiniMax-M3)            echo "MiniMax-M3" ;;
         tokenrouter/MiniMax-M4)            echo "MiniMax-M4" ;;
+        xai/grok-composer-2.5-fast)        echo "Grok Composer 2.5 Fast" ;;
         openai/gpt-5.6-sol)                echo "GPT-5.6 Sol" ;;
         openai/gpt-5.5)                    echo "GPT-5.5" ;;
         pioneer/pioneer/auto)              echo "Pioneer Auto Router" ;;

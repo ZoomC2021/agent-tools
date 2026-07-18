@@ -1,7 +1,7 @@
 ---
 description: Research official documentation and external API behavior using web sources
 mode: subagent
-model: tokenrouter/MiniMax-M3
+model: xai/grok-composer-2.5-fast
 permission:
   task:
     '*': deny

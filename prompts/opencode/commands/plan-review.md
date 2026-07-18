@@ -1,7 +1,7 @@
 ---
 description: Binary plan reviewer that validates Execution Contracts before implementation. Momus-style anti-perfectionist: approve 80% clear plans, reject only true blockers.
 mode: subagent
-model: tokenrouter/MiniMax-M3
+model: xai/grok-composer-2.5-fast
 permission:
   task:
     '*': deny

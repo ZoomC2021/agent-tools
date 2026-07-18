@@ -268,6 +268,17 @@ function Install-OpenCode {
                     $entry.model = "tokenrouter/MiniMax-M3"
                 }
             }
+            foreach ($agent in @($config.agent.PSObject.Properties.Value)) {
+                if ([string]$agent.model -eq "tokenrouter/MiniMax-M3") {
+                    $agent.model = "xai/grok-composer-2.5-fast"
+                }
+            }
+            foreach ($agentName in @("widereview", "council")) {
+                $agentProperty = $config.agent.PSObject.Properties[$agentName]
+                if ($null -ne $agentProperty) {
+                    $agentProperty.Value.PSObject.Properties.Remove("model")
+                }
+            }
             $config.model = "openai/gpt-5.6-sol"
             $config.mode.build.model = "openai/gpt-5.6-sol"
             $sol = [PSCustomObject]@{
@@ -276,6 +287,11 @@ function Install-OpenCode {
                 modalities = [PSCustomObject]@{ input = @("text", "image"); output = @("text") }
             }
             $config.provider.openai.models | Add-Member -NotePropertyName "gpt-5.6-sol" -NotePropertyValue $sol -Force
+            if ($null -eq $config.provider.xai) {
+                $config.provider | Add-Member -NotePropertyName "xai" -NotePropertyValue ([PSCustomObject]@{ models = [PSCustomObject]@{} })
+            }
+            $composer = [PSCustomObject]@{ name = "Grok Composer 2.5 Fast" }
+            $config.provider.xai.models | Add-Member -NotePropertyName "grok-composer-2.5-fast" -NotePropertyValue $composer -Force
             if ($null -ne $config.provider.tokenrouter.models) {
                 $config.provider.tokenrouter.models.PSObject.Properties.Remove("xiaomi/mimo-v2.5-pro")
             }
@@ -769,7 +785,7 @@ Write-Host "  - Refactor         : Analyze codebase for refactoring opportunitie
 Write-Host "  - Review           : Review uncommitted changes"
 Write-Host "  - AdversarialReview: Spawn subagents to review changes, verify findings, and fix confirmed issues"
 Write-Host "  - UltraReview      : Parallel dual-model review (GPT 5.5 + Gemini 3.1 Pro)"
-Write-Host "  - UltraReview-Lite : Parallel dual-model review (MiniMax-M3 + Gemini 3 Flash Preview)"
+Write-Host "  - UltraReview-Lite : Parallel dual-model review (Grok Composer 2.5 Fast + Gemini 3 Flash Preview)"
 Write-Host "  - CC               : Execute Claude CLI commands and code reviews"
 Write-Host "  - PR-Reviewer      : Address PR review feedback"
 Write-Host "  - PR-Reviewer-Only : Generate implementation prompt for PR feedback"

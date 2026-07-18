@@ -1,7 +1,7 @@
 ---
 description: Explain local architecture and code flow with evidence-backed walkthroughs and Mermaid diagrams
 mode: subagent
-model: tokenrouter/MiniMax-M3
+model: xai/grok-composer-2.5-fast
 permission:
   task:
     '*': deny

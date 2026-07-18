@@ -1,7 +1,7 @@
 ---
 description: Execute Claude CLI commands and code reviews from OpenCode
 mode: subagent
-model: tokenrouter/MiniMax-M3
+model: xai/grok-composer-2.5-fast
 ---
 
 # CC: Claude CLI Command Execution
@@ -233,7 +233,7 @@ The helper returns:
 |----------|---------------|----------|
 | `/review` | GPT 5.5 | Standard single-model review |
 | `/ultrareview` | GPT 5.5 + Gemini 3.1 Pro | Dual high-tier model review |
-| `/ultrareview-lite` | MiniMax-M3 + Gemini 3 Flash | Cost-effective dual review |
+| `/ultrareview-lite` | Grok Composer 2.5 Fast + Gemini 3 Flash | Cost-effective dual review |
 | `/cc` | Claude Sonnet/Opus | Claude-specific analysis or multi-step tasks |
 
 Claude Code excels at:

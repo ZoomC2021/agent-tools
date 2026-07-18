@@ -53,8 +53,8 @@ Defaults:
 Examples:
   cmd-eval list
   cmd-eval run
-  cmd-eval run --variants matrix-minimax-m3 --scenarios subagent-worker-general-add-helper
-  cmd-eval run --variants matrix-minimax-m3 --scenarios "subagent-worker-*"
+  cmd-eval run --variants matrix-grok-composer-2.5-fast --scenarios subagent-worker-general-add-helper
+  cmd-eval run --variants matrix-grok-composer-2.5-fast --scenarios "subagent-worker-*"
   cmd-eval report evals/cmd-out/20260422T120000Z
 `)
 }

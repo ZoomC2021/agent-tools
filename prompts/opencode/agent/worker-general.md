@@ -1,7 +1,7 @@
 ---
 description: General-purpose execution worker for implementation and execution tasks
 mode: subagent
-model: tokenrouter/MiniMax-M3
+model: xai/grok-composer-2.5-fast
 permission:
   task:
     '*': deny
