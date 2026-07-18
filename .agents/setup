@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Installing system tools required to build and test agent-tools..."
+
+packages=()
+command -v git >/dev/null 2>&1 || packages+=(git)
+command -v make >/dev/null 2>&1 || packages+=(make)
+command -v python3 >/dev/null 2>&1 || packages+=(python3)
+command -v pip3 >/dev/null 2>&1 || packages+=(python3-pip)
+command -v python >/dev/null 2>&1 || packages+=(python-is-python3)
+command -v node >/dev/null 2>&1 || packages+=(nodejs)
+
+if ((${#packages[@]})); then
+  sudo -n apt-get update
+  sudo -n DEBIAN_FRONTEND=noninteractive apt-get install -y "${packages[@]}"
+fi
+
+python_major=$(python -c 'import sys; print(sys.version_info.major)')
+python_minor=$(python -c 'import sys; print(sys.version_info.minor)')
+if ((python_major < 3 || (python_major == 3 && python_minor < 10))); then
+  echo "Python 3.10 or newer is required (found $(python --version 2>&1))." >&2
+  exit 1
+fi
+
+node_major=${node_major:-$(node -p 'process.versions.node.split(".")[0]')}
+if ((node_major < 18)); then
+  echo "Node.js 18 or newer is required (found $(node --version))." >&2
+  exit 1
+fi
+
+if ! python -c 'import pytest' >/dev/null 2>&1; then
+  echo "Installing pytest..."
+  python -m pip install --user --disable-pip-version-check pytest || \
+    python -m pip install --user --break-system-packages --disable-pip-version-check pytest
+fi
+
+echo "Orb setup complete: $(python --version), $(node --version), $(make --version | head -n 1)."
