@@ -1,59 +1,59 @@
 ---
 name: oracle
-description: Consult the GPT-5.5 oracle subagent for deep reasoning on complex bugs, architecture tradeoffs, risky reviews, or performance problems.
+description: Consult the read-only GPT-5.6 Sol oracle subagent for hard engineering judgments.
 agent: oracle
 ---
 
 # Oracle Consultation
 
-Use this skill when the user asks to consult an oracle, get a second opinion from a stronger reasoning agent, or escalate a complex engineering question.
+Use Oracle when the user requests a second opinion or when a difficult bug,
+risky review, architecture decision, migration, or refactor needs deeper
+judgment. Do not use it for simple searches, routine edits, or obvious bugs.
 
 ## Workflow
 
-1. **Decide whether oracle is appropriate**
-   - Use it for complex bugs, architecture tradeoffs, risky reviews, refactoring uncertainty, cross-domain issues, or performance analysis.
-   - Do not use it for simple lookups, formatting changes, or questions answerable by reading one obvious file.
+1. **Investigate first**
+   - Establish the relevant ownership path, current behavior, and exact
+     uncertainty.
+   - Identify the current diff or exact files and symbols where Oracle should
+     begin. Do not gather and paste a broad file bundle.
 
-2. **Prepare a compact context bundle**
-   - Identify the exact question or decision point.
-   - Gather the 3-8 highest-signal files or excerpts, with precise paths and why each matters.
-   - Include prior attempts, current hypotheses, constraints, logs, failing commands, and validation output when relevant.
-   - Exclude secrets, credentials, PII, customer data, and broad unrelated files.
-
-3. **Invoke the custom Devin oracle profile**
-   - Use the `oracle` subagent profile.
-   - The installed profile is configured with `model: gpt-5.5`, so a Devin session running a different top-level model can still route this consultation to GPT-5.5.
-   - Give the oracle a self-contained prompt with sections like:
+2. **Invoke the `oracle` profile** with a focused task:
 
 ```markdown
-GOAL: [specific question]
+INTENT: [behavior or outcome that must be preserved]
 
-CONTEXT:
-- [facts]
-- [prior attempts]
-- [constraints]
+DECISION / QUESTION: [exact judgment needed]
 
-FILES / EXCERPTS:
-- `path/to/file`: [why it matters]
+RELEVANT FILES:
+- @path/to/file: [why it matters]
 
-VALIDATION / LOGS:
-- [command output or failure]
+CURRENT EVIDENCE:
+- [observations, reproduction, failures, or prior attempts]
 
-REQUESTED OUTPUT:
-- Assessment
-- Findings
-- Recommendations with tradeoffs
-- Next steps
+CONSTRAINTS: [compatibility, rollout, performance, and scope limits]
+
+REVIEW INSTRUCTIONS:
+- Start with: [current diff or exact path/symbol]
+- Focus on: [specific risks]
+- Ignore: [non-goals]
+
+OUTPUT: [recommendation, ranked risks, alternatives, smallest fixes, etc.]
 ```
 
-4. **Apply judgment after the oracle responds**
-   - Summarize the oracle's key findings for the user.
-   - Validate recommendations against the codebase before applying changes.
-   - Do not blindly implement suggestions that conflict with local evidence.
+   Include non-repository logs or facts when needed, but let Oracle inspect
+   named repository files through its read-only tools. Never include secrets,
+   credentials, PII, or customer data.
 
-## If the Oracle Profile Is Unavailable
+3. **Apply independent judgment**
+   - Validate material claims against the repository.
+   - Reject advice that conflicts with local evidence or stated intent.
+   - Implement changes in the parent session, never in Oracle, and run the
+     narrowest meaningful verification.
 
-Tell the user to install the Devin assets from this repo:
+## If Oracle Is Unavailable
+
+Install the Devin assets:
 
 ```bash
 ./scripts/install.sh devin
@@ -67,6 +67,5 @@ cp prompts/devin/agents/oracle/AGENT.md ~/.config/devin/agents/oracle/AGENT.md
 cp prompts/devin/skills/oracle/SKILL.md ~/.config/devin/skills/oracle/SKILL.md
 ```
 
-## Model Configuration Note
-
-The shipped Devin oracle profile uses `model: gpt-5.5`. Devin usage dashboards can show the child subagent model even when ATIF exports only show the parent run model.
+The shipped profile uses `model: gpt-5.6-sol`. Devin usage dashboards can show
+the child model even when exports show only the parent run model.

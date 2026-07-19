@@ -1,18 +1,18 @@
 ---
 name: ultrareview
-description: Run parallel dual-model code review using Devin GPT-5.5 and Gemini 3.1 Pro Preview simultaneously, then consolidate findings
+description: Run parallel dual-model code review using the GPT-5.6 Sol oracle and Gemini 3.1 Pro Preview, then consolidate findings
 ---
 
 # UltraReview: Parallel Dual-Model Code Review
 
-Run simultaneous code reviews using **GPT 5.5** AND **Gemini 3.1 Pro Preview** (via Gemini CLI), then consolidate findings into a unified report.
+Run simultaneous code reviews using the **GPT-5.6 Sol Oracle** AND **Gemini 3.1 Pro Preview** (via Gemini CLI), then consolidate findings into a unified report.
 
 ⚠️ **Cost Warning**: This uses 2 high-tier models simultaneously. Use for critical reviews only.
 
 ## Overview
 
 This workflow performs parallel code reviews using two different AI models:
-1. **GPT 5.5** - Primary model for reasoning-heavy analysis via Devin
+1. **GPT-5.6 Sol** - Primary model for reasoning-heavy analysis via Devin's read-only `oracle` profile
 2. **Gemini 3.1 Pro Preview** - Secondary model for pattern recognition (via Gemini CLI)
 
 The results are consolidated to catch issues each model might miss and surface conflicting interpretations.
@@ -32,22 +32,25 @@ git diff --cached
 git status --short
 ```
 
-Capture the complete set of changed files and their contents.
+Use the results to identify the intent, changed paths, risky symbols, and
+concise evidence. Give Oracle those pointers so it can inspect readable files
+directly; do not paste complete files into its prompt. The generated diff below
+is only for the Gemini CLI lane.
 
 ## Phase 2: Launch Parallel Reviews
 
 Launch TWO review processes concurrently:
 
-### Process 1: Devin GPT-5.5 Review
+### Process 1: Devin GPT-5.6 Sol Oracle Review
 
 **READ-ONLY REVIEW - Do NOT modify files during review**
 
-Use Devin's `review` or `oracle` subagent profile to review all uncommitted changes:
+Use Devin's read-only `oracle` subagent profile to review all uncommitted changes:
 1. Read full files for context (not just diff hunks)
 2. Check for: logic errors, edge cases, null access risks, error handling gaps, type safety, security vulnerabilities
 3. Check for regressions: breaking API changes, removed functionality
 4. Find optimization opportunities: redundancy, duplication, complexity, performance
-5. Run lint/build checks if available
+5. Inspect supplied validation results; the parent runs any new checks after review
 
 **DO NOT apply fixes during this phase.** This is analysis only.
 
@@ -58,20 +61,28 @@ Run in the terminal:
 ```bash
 # Write diff to temp file (safe method, no shell injection risk)
 DIFF_FILE=$(mktemp)
+GEMINI_OUT=$(mktemp)
 git diff HEAD > "$DIFF_FILE"
-cat "$DIFF_FILE" | gemini --model gemini-3.1-pro-preview -p "Review these code changes. For each issue found, provide: file:line location, severity (Critical/Warning/Suggestion), category (Logic/Security/Performance/etc), clear description, and confidence level (High/Medium/Low). Format clearly. Report 'No issues found' if clean."
-rm "$DIFF_FILE"
+gemini --model gemini-3.1-pro-preview -p "Review these code changes. For each issue found, provide: file:line location, severity (Critical/Warning/Suggestion), category (Logic/Security/Performance/etc), clear description, and confidence level (High/Medium/Low). Format clearly. Report 'No issues found' if clean." < "$DIFF_FILE" > "$GEMINI_OUT"
+status=$?
+if [ "$status" -ne 0 ] || [ ! -s "$GEMINI_OUT" ]; then
+  rm -f "$DIFF_FILE" "$GEMINI_OUT"
+  [ "$status" -ne 0 ] && exit "$status"
+  exit 1
+fi
+cat "$GEMINI_OUT"
+rm -f "$DIFF_FILE" "$GEMINI_OUT"
 ```
 
 ## Phase 3: Wait for Both Results
 
 Collect findings from both reviews:
-- Devin GPT-5.5 findings
+- Devin GPT-5.6 Sol Oracle findings
 - Gemini 3.1 Pro findings (from CLI output)
 
 Handle failures gracefully:
-- If Devin GPT-5.5 review fails → Use Gemini results alone
-- If Gemini CLI fails → Use Claude results alone
+- If Devin GPT-5.6 Sol Oracle review fails → Use Gemini results alone
+- If Gemini CLI fails → Use Oracle results alone
 - If both fail → Report failure, suggest using standard `/review` instead
 
 ## Phase 4: Consolidate Findings
@@ -102,19 +113,19 @@ Issues found by BOTH models. Original severity preserved.
 Format:
 ```
 🔴 [<Original_Severity>] [Category] filename:line
-   Consensus: Claude + Gemini 3.1 Pro
+   Consensus: Oracle + Gemini 3.1 Pro
    Original Severity: <Critical/Warning/Suggestion>
    Problem: <description>
    Fix: <recommendation>
 ```
 
-#### Section 2: 🟠 Claude Exclusive Findings
-Issues found ONLY by Claude.
+#### Section 2: 🟠 Oracle Exclusive Findings
+Issues found ONLY by Oracle.
 
 Format:
 ```
 🟠 [<Severity>] [Category] filename:line
-   Source: Claude
+   Source: Oracle
    Confidence: <High/Medium/Low>
    Problem: <description>
    Fix: <recommendation>
@@ -149,7 +160,7 @@ Same code location, but models disagree.
 Format:
 ```
 ⚠️ filename:line
-   Claude: <assessment>
+   Oracle: <assessment>
    Gemini 3.1 Pro: <assessment>
    Human Review Recommended: The models disagree significantly.
 ```
@@ -159,7 +170,7 @@ Format:
 ```
 ## UltraReview Summary
 - Consensus Critical: <count>
-- Claude Exclusive: <count>
+- Oracle Exclusive: <count>
 - Gemini 3.1 Pro Exclusive: <count>
 - Lower Confidence: <count>
 - Divergent Assessments: <count>
@@ -187,7 +198,7 @@ Suggestion: Run `gemini login` to authenticate
 Continue with the successful model's results. Add warning: "⚠️ UltraReview degraded to single-model review."
 
 ### Both Models Failure
-Report: "UltraReview failed: Both Claude and Gemini 3.1 Pro unavailable. Use standard /review instead."
+Report: "UltraReview failed: Both Oracle and Gemini 3.1 Pro unavailable. Use standard /review instead."
 
 ## Divergence Resolution Policy
 

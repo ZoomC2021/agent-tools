@@ -12,7 +12,7 @@ Tracked prompts use exact-byte deduplication: canonical files remain under `prom
 | **refactor** | Analyze codebase for refactoring opportunities, prioritize by severity/effort |
 | **review** | Review uncommitted changes for bugs, regressions, and improvements |
 | **adversarial-review** | Spawn fresh subagents to adversarially review current changes, verify findings against live repo evidence, and fix confirmed issues |
-| **ultrareview** | Parallel dual-model review using GPT 5.5 + Gemini 3.1 Pro Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
+| **ultrareview** | Parallel dual-model review using OpenCode GPT-5.5 or the Droid/Devin GPT-5.6 Sol Oracle alongside Gemini 3.1 Pro Preview, then consolidating findings *(Not available: Gemini, Antigravity, Amp)* |
 | **ultrareview-lite** | Parallel dual-model review using Grok Composer 2.5 Fast + Gemini 3 Flash Preview simultaneously, with helper-managed Gemini bundling/chunking/retries *(Not available: Gemini, Antigravity, Amp)* |
 | **widereview** | Wide fan-out review across four model CLIs (Grok 4.5 via Grok CLI, Composer 2.5 Fast via Cursor Agent, GPT-5.6 Sol via Codex, Kimi K3 via Command Code) run in parallel, then consolidated into a vote-weighted report. Diff mode (default) or full-codebase mode (`--full`) *(Not available: Gemini, Antigravity)* |
 | **council** | Wide fan-out consultation across four model CLIs (Grok 4.5 via Grok CLI, Composer 2.5 Fast via Cursor Agent, GPT-5.6 Sol via Codex, Kimi K3 via Command Code) on a single question, consolidated into a vote-weighted verdict with explicit dissent. The consultation analog of `widereview` *(Not available: Gemini, Antigravity)* |
@@ -162,7 +162,7 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 │   ├── github-librarian.md   # Remote GitHub research
 │   ├── docs-research.md      # Official docs + API research
 │   ├── walkthrough.md        # Architecture walkthroughs + diagrams
-│   └── oracle.md             # Deep reasoning (GPT-5.5)
+│   └── oracle.md             # Deep reasoning (GPT-5.6 Sol)
 └── commands/                  # Workflow prompts
     ├── review.md
     ├── adversarial-review.md
@@ -194,7 +194,7 @@ For implementation/debugging/refactoring tasks, the orchestrator uses one of two
 | **github-librarian** | Remote GitHub research (default branches, history) | Grok Composer 2.5 Fast | — |
 | **docs-research** | Official docs, API behavior, release notes | Grok Composer 2.5 Fast | — |
 | **walkthrough** | Architecture walkthroughs with Mermaid diagrams | Grok Composer 2.5 Fast | — |
-| **oracle** | Deep reasoning for complex problems | GPT-5.5 | **High** |
+| **oracle** | Deep reasoning for complex problems | GPT-5.6 Sol | **High** |
 | **spec-compiler** | Compile Execution Contracts before implementation | Grok Composer 2.5 Fast | — |
 | **plan-review** | Binary validation of Execution Contracts | Grok Composer 2.5 Fast | — |
 | **quick-validator** | Fast validation of implementation output | Grok Composer 2.5 Fast | — |
@@ -580,7 +580,7 @@ chmod +x ~/.factory/bin/droid-gh-librarian
 
 **Skills:** `oracle`, `adversarial-review`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`, `widereview`, `council`
 
-The shipped `oracle` droid uses Factory's built-in GPT-5.5 with `reasoningEffort: high`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
+The shipped `oracle` droid uses Factory's built-in GPT-5.6 Sol with `reasoningEffort: high`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
 </details>
 
 <details>
@@ -819,7 +819,7 @@ chmod +x ~/.factory/bin/droid-gh-librarian
 
 **Skills:** `oracle`, `adversarial-review`, `pr-reviewer`, `pr-reviewer-only`, `predict-issues`, `ultrareview`, `widereview`, `council`
 
-The shipped `oracle` droid uses Factory's built-in GPT-5.5 with `reasoningEffort: high`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
+The shipped `oracle` droid uses Factory's built-in GPT-5.6 Sol with `reasoningEffort: high`. A ChatGPT Plus/Pro browser subscription is not a CLI/API credential for Droid.
 </details>
 
 <details>
@@ -916,6 +916,10 @@ Uses fresh subagents to challenge the current diff, then verifies and fixes only
 ⚠️ **Uses 2 high-tier models simultaneously** — use for critical reviews only.
 
 Runs parallel code reviews using **GPT 5.5** (via OpenCode) AND **Gemini 3.1 Pro Preview** (via Gemini CLI) simultaneously, then consolidates:
+
+The Droid and Devin variants use the read-only **GPT-5.6 Sol Oracle** for the
+first lane; the OpenCode workflow retains its separately configured GPT-5.5
+review lane.
 
 1. **Launch parallel reviews**: Both models review the same changes concurrently
 2. **Consolidate findings**:

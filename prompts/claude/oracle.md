@@ -1,107 +1,137 @@
 # Oracle
 
-Consult an external deep-reasoning oracle — **GPT-5.5 (high reasoning effort)** driven via the `codex` CLI — when stuck on a hard problem. You bundle a compact, self-contained context package and hand it to the oracle for a second opinion; the oracle runs read-only and cannot change your repo.
+Consult **GPT-5.6 Sol** through a fresh, read-only `codex exec` process for hard
+software-engineering judgments. The oracle may inspect the repository but
+cannot change it. Its answer is advisory: validate it against the code before
+implementing anything.
 
 Question / problem: **$ARGUMENTS**
 
-Use this when the user asks to consult an oracle, wants a second opinion from a stronger reasoning model, or escalates a complex engineering question.
-
 ## When to Use
 
-- **Stuck on complex bugs**: root cause still unclear after initial investigation
-- **Architecture decisions**: tradeoffs and patterns need expert guidance
-- **Risky code review**: a second opinion on critical or risky changes
-- **Refactoring uncertainty**: unsure about approach or consequences
-- **Cross-domain problems**: issues spanning multiple technologies or systems
-- **Performance optimization**: bottleneck analysis and solutions
+Use Oracle for:
 
-Do **not** use it for simple lookups, formatting changes, or questions answerable by reading one obvious file.
+- Subtle bugs that remain unclear after focused investigation
+- Architecture, migration, or API-boundary tradeoffs
+- Risky reviews where correctness, security, data loss, or concurrency matters
+- Stress-testing a complex implementation plan
+- Comparing several plausible approaches
+
+Do not use it for codebase discovery, routine edits, simple lookups, or obvious
+bugs. Investigate those directly first.
 
 ## Prerequisites
 
-- The `codex` CLI installed and authenticated (`codex --version`).
-- Access to the `gpt-5.5` model through your Codex configuration (ChatGPT plan auth or a configured provider / `OPENAI_API_KEY`).
+- The `codex` CLI is installed and authenticated (`codex --version`).
+- The Codex configuration provides access to `gpt-5.6-sol`.
 
-If `codex` is missing, tell the user to install it (`npm install -g @openai/codex`) and authenticate (`codex login`), then retry.
+If Codex is unavailable, report that the consultation could not run rather than
+substituting a different model silently.
 
 ## Workflow
 
-1. **Decide whether the oracle is appropriate** (see *When to Use*). If it is trivial, just answer directly instead.
+1. **Investigate first.** Establish the relevant ownership path, current
+   behavior, and concrete uncertainty. Do not ask Oracle to perform broad
+   discovery that a targeted read or search can answer.
 
-2. **Prepare a compact context bundle.** Write a single self-contained prompt:
-   - The exact question or decision point.
-   - 3–8 highest-signal files or excerpts with precise paths and why each matters — quote the relevant lines rather than pointing at huge files.
-   - Prior attempts, current hypotheses, constraints, failing commands, and validation/log output.
-   - Exclude secrets, credentials, PII, and broad unrelated files.
-
-   Structure it like:
+2. **Write a focused task.** Give Oracle enough direction to inspect the right
+   evidence without pasting repository files into the prompt:
 
    ```markdown
-   GOAL: [specific question]
+   INTENT: [behavior or outcome that must be preserved]
 
-   CONTEXT:
-   - [facts]
-   - [prior attempts]
-   - [constraints]
+   DECISION / QUESTION: [the exact judgment needed]
 
-   FILES / EXCERPTS:
-   - `path/to/file`: [why it matters, with the relevant excerpt]
+   RELEVANT FILES:
+   - @path/to/file: [why it matters]
+   - @path/to/test: [why it matters]
 
-   VALIDATION / LOGS:
-   - [command output or failure]
+   CURRENT EVIDENCE:
+   - [observed behavior, reproduction, test failure, or prior attempt]
 
-   REQUESTED OUTPUT:
-   - Assessment
-   - Findings (with location references)
-   - Recommendations with rationale and tradeoffs
-   - Prioritized next steps
+   CONSTRAINTS:
+   - [compatibility, rollout, performance, or scope limits]
+
+   REVIEW INSTRUCTIONS:
+   - [where to begin, such as "start with git diff"]
+   - Focus on: [specific risks]
+   - Ignore: [explicit non-goals]
+
+   OUTPUT: [the useful shape: recommendation, ranked risks, alternatives,
+   smallest fixes, unverified assumptions, etc.]
    ```
 
-3. **Invoke the oracle.** Write the prompt to a scratch file and run `codex` read-only with GPT-5.5 at high reasoning effort. It runs inside the repo with read-only access, so it can verify referenced files, but treat the bundle as the authoritative working set.
+   Prefer exact paths and symbols. Include log excerpts or external facts that
+   are not present in the repository, but do not duplicate readable source
+   files. Never include secrets, credentials, PII, or customer data.
+
+3. **Run the oracle from the repository root.** Use a scratch file so quoting
+   cannot alter the task. The child process is ephemeral and read-only:
 
    ```bash
+   ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
    ORACLE_DIR="$(mktemp -d)"
    cat > "$ORACLE_DIR/prompt.md" <<'EOF'
-   <your bundled prompt here>
+   <focused task here>
    EOF
 
-   timeout 900 codex exec \
+   if command -v timeout >/dev/null 2>&1; then
+     ORACLE_TIMEOUT=(timeout 900)
+   elif command -v gtimeout >/dev/null 2>&1; then
+     ORACLE_TIMEOUT=(gtimeout 900)
+   else
+     ORACLE_TIMEOUT=()
+   fi
+
+   "${ORACLE_TIMEOUT[@]}" codex exec \
+     --ephemeral \
      -s read-only \
      --skip-git-repo-check \
-     --model gpt-5.5 \
+     -C "$ROOT" \
+     -m gpt-5.6-sol \
      -c 'model_reasoning_effort="high"' \
+     --output-last-message "$ORACLE_DIR/oracle.txt" \
      "$(cat "$ORACLE_DIR/prompt.md")" \
-     < /dev/null > "$ORACLE_DIR/oracle.txt" 2>&1
-   echo "exit: $?"; cat "$ORACLE_DIR/oracle.txt"
+     < /dev/null > "$ORACLE_DIR/codex.log" 2>&1
+   status=$?
+
+   if [ "$status" -ne 0 ] || [ ! -s "$ORACLE_DIR/oracle.txt" ]; then
+     cat "$ORACLE_DIR/codex.log" >&2
+     rm -rf "$ORACLE_DIR"
+     [ "$status" -ne 0 ] && exit "$status"
+     exit 1
+   fi
+
+   cat "$ORACLE_DIR/oracle.txt"
+   rm -rf "$ORACLE_DIR"
    ```
 
-   Notes:
-   - `-s read-only` keeps the oracle from editing anything; it is purely advisory.
-   - `< /dev/null` prevents the CLI from blocking on stdin.
-   - Bump the `timeout` for very large bundles; treat a timeout/non-zero exit as a failed consultation and report it rather than guessing.
+   `timeout` is used on Linux and Homebrew's `gtimeout` on macOS when present;
+   otherwise Codex runs without an outer deadline. A timeout, non-zero status,
+   or empty final response is a failed consultation. Do not treat diagnostic
+   output as an Oracle answer or guess what Oracle would have said.
 
-4. **Apply judgment after the oracle responds.**
-   - Summarize the oracle's key findings for the user.
-   - Validate every recommendation against the actual codebase before applying it.
-   - Do **not** blindly implement suggestions that conflict with local evidence — say so and explain.
+4. **Apply independent judgment.** Check each material claim against the
+   repository. Reject advice that conflicts with local evidence or the stated
+   intent. If changes are requested, implement them in the parent session and
+   run the narrowest meaningful verification.
 
-## Guidelines
+## Oracle Inspection Rules
 
-### DO
-- Ask specific, focused questions and include the exact files/excerpts that matter.
-- Summarize prior investigation so the oracle does not redo it.
-- Use the oracle for genuinely hard problems, then verify its output.
+The task should tell Oracle to:
 
-### DO NOT
-- Send secrets, credentials, or PII.
-- Hand the oracle a broad "look around the repo" task instead of a curated bundle.
-- Apply recommendations without validating them locally.
+- Start with the named files or current diff, then read only surrounding code
+  needed to verify relevant invariants.
+- Use read-only commands for inspection; never modify files, dependencies, git
+  state, or external systems.
+- Distinguish observed facts from hypotheses and state unverified assumptions.
+- Prioritize high-confidence, behavior-affecting findings over style comments.
+- Recommend the smallest safe fix and explain meaningful tradeoffs.
+- Ask for one narrow missing artifact only when it would materially change the
+  answer; never request broad repository rediscovery.
 
-### STOP IF
-- The consultation would expose sensitive data.
-- The issue is trivial or better resolved by direct investigation.
-- Cost/latency clearly outweighs the problem's impact.
+## Reporting
 
-## Output Format
-
-The oracle returns structured analysis: **Assessment**, **Findings**, **Recommendations** (with rationale and tradeoffs), and **Prioritized Next Steps**. Relay the substance to the user along with your plan for acting on it.
+Return the substance, not a transcript: the recommendation, evidence-backed
+findings, tradeoffs or plan changes that matter, and unresolved assumptions.
+State explicitly when Oracle found no issue or when the consultation failed.

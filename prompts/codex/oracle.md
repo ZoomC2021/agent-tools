@@ -1,158 +1,140 @@
 ---
 name: oracle
-description: "Invoke an external reasoning model for difficult debugging, architecture, review, or optimization questions."
+description: "Consult a read-only GPT-5.6 Sol reasoning agent for difficult debugging, architecture, review, or optimization decisions."
 ---
 
 # Oracle
 
-Invoke GPT-5.5 for deep reasoning when stuck on complex problems. Bundles your prompt and relevant files so the oracle can provide informed guidance.
+Consult GPT-5.6 Sol through a fresh, read-only `codex exec` process for hard
+software-engineering judgments. The oracle may inspect the repository but
+cannot change it. Its answer is advisory: validate it against the code before
+implementing anything.
 
 ## When to Use
 
-- **Stuck on complex bugs**: After initial investigation, when root cause remains unclear
-- **Architecture decisions**: Need expert guidance on tradeoffs and patterns
-- **Code review assistance**: Second opinion on critical or risky changes
-- **Refactoring uncertainty**: Unsure about approach or potential consequences
-- **Cross-domain problems**: Issues spanning multiple technologies or systems
-- **Performance optimization**: Need analysis of bottlenecks and solutions
+Use Oracle for:
+
+- Subtle bugs that remain unclear after focused investigation
+- Architecture, migration, or API-boundary tradeoffs
+- Risky reviews where correctness, security, data loss, or concurrency matters
+- Stress-testing a complex implementation plan
+- Comparing several plausible approaches
+
+Do not use it for codebase discovery, routine edits, simple lookups, or obvious
+bugs. Investigate those directly first.
 
 ## Prerequisites
 
-Requires Oracle CLI: `npm install -g @steipete/oracle`
+- The `codex` CLI is installed and authenticated (`codex --version`).
+- The Codex configuration provides access to `gpt-5.6-sol`.
 
-Or use npx: `npx -y @steipete/oracle ...`
+If Codex is unavailable, report that the consultation could not run rather than
+substituting a different model silently.
 
 ## Workflow
 
-1. **Prepare context**
-   - Identify the core question or problem
-   - Gather the 3-8 highest-signal files or excerpts (code, config, logs), with precise paths
-   - Summarize what you've already tried, your current hypothesis, and the constraints Oracle should respect
-   - Prefer a compact curated bundle over broad globs; if a file matters, attach it or quote the relevant excerpt
+1. **Investigate first.** Establish the relevant ownership path, current
+   behavior, and concrete uncertainty. Do not ask Oracle to perform broad
+   discovery that a targeted read or search can answer.
 
-2. **Bundle and consult**
-   ```bash
-   # Preview the bundle and per-file token cost before a paid run
-   npx -y @steipete/oracle \
-     --dry-run summary \
-     --files-report \
-     -p "Your detailed question here" \
-     --file "src/relevant/file.ts" \
-     --file "tests/failing_case.ts"
+2. **Write a focused task.** Give Oracle enough direction to inspect the right
+   evidence without pasting repository files into the prompt:
 
-   # API mode (requires OPENAI_API_KEY)
-   npx -y @steipete/oracle \
-     --engine api \
-     --model gpt-5.5 \
-     -p "Your detailed question here" \
-     --file "src/relevant/file.ts" \
-     --file "docs/architecture.md"
+   ```markdown
+   INTENT: [behavior or outcome that must be preserved]
 
-   # Or render for manual paste
-   npx -y @steipete/oracle \
-     --render --copy \
-     -p "Your question" \
-     --file "src/relevant/file.ts"
+   DECISION / QUESTION: [the exact judgment needed]
+
+   RELEVANT FILES:
+   - @path/to/file: [why it matters]
+   - @path/to/test: [why it matters]
+
+   CURRENT EVIDENCE:
+   - [observed behavior, reproduction, test failure, or prior attempt]
+
+   CONSTRAINTS:
+   - [compatibility, rollout, performance, or scope limits]
+
+   REVIEW INSTRUCTIONS:
+   - [where to begin, such as "start with git diff"]
+   - Focus on: [specific risks]
+   - Ignore: [explicit non-goals]
+
+   OUTPUT: [the useful shape: recommendation, ranked risks, alternatives,
+   smallest fixes, unverified assumptions, etc.]
    ```
 
-3. **Apply insights**
-   - Review the oracle's analysis
-   - Validate recommendations against your codebase
-   - Implement agreed-upon solutions
-   - Document decisions for future reference
+   Prefer exact paths and symbols. Include log excerpts or external facts that
+   are not present in the repository, but do not duplicate readable source
+   files. Never include secrets, credentials, PII, or customer data.
 
-## Guidelines
+3. **Run the oracle from the repository root.** Use a scratch file so quoting
+   cannot alter the task. The child process is ephemeral and read-only:
 
-### DO
-- Provide specific, focused questions
-- Include relevant code files and context
-- Summarize prior investigation attempts
-- Use `--dry-run summary|full` and `--files-report` to inspect the exact bundle before a paid run
-- Treat Oracle as attachment-first: if a file matters, attach it or quote the relevant excerpt instead of asking Oracle to search for it
-- Use for complex problems, not trivial tasks
-- Verify oracle recommendations before applying
+   ```bash
+   ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+   ORACLE_DIR="$(mktemp -d)"
+   cat > "$ORACLE_DIR/prompt.md" <<'EOF'
+   <focused task here>
+   EOF
 
-### DO NOT
-- Send sensitive data (secrets, PII, credentials)
-- Use for simple questions answerable by search
-- Blindly apply recommendations without validation
-- Rely on browser mode for automated workflows
-- Hand Oracle a broad directory or open-ended "look around the repo" task when you can provide the exact files instead
+   if command -v timeout >/dev/null 2>&1; then
+     ORACLE_TIMEOUT=(timeout 900)
+   elif command -v gtimeout >/dev/null 2>&1; then
+     ORACLE_TIMEOUT=(gtimeout 900)
+   else
+     ORACLE_TIMEOUT=()
+   fi
 
-### STOP IF
-- The consultation would include sensitive data
-- Cost concerns outweigh the problem's impact
-- The issue is better resolved through pair programming
-- Previous oracle guidance on similar issues was not helpful
+   "${ORACLE_TIMEOUT[@]}" codex exec \
+     --ephemeral \
+     -s read-only \
+     --skip-git-repo-check \
+     -C "$ROOT" \
+     -m gpt-5.6-sol \
+     -c 'model_reasoning_effort="high"' \
+     --output-last-message "$ORACLE_DIR/oracle.txt" \
+     "$(cat "$ORACLE_DIR/prompt.md")" \
+     < /dev/null > "$ORACLE_DIR/codex.log" 2>&1
+   status=$?
 
-## Model Configuration
+   if [ "$status" -ne 0 ] || [ ! -s "$ORACLE_DIR/oracle.txt" ]; then
+     cat "$ORACLE_DIR/codex.log" >&2
+     rm -rf "$ORACLE_DIR"
+     [ "$status" -ne 0 ] && exit "$status"
+     exit 1
+   fi
 
-This subagent uses GPT-5.5 via OpenAI API:
-- Model: `gpt-5.5`
-- Engine: API (requires `OPENAI_API_KEY` environment variable)
+   cat "$ORACLE_DIR/oracle.txt"
+   rm -rf "$ORACLE_DIR"
+   ```
 
-## Example Usage
+   `timeout` is used on Linux and Homebrew's `gtimeout` on macOS when present;
+   otherwise Codex runs without an outer deadline. A timeout, non-zero status,
+   or empty final response is a failed consultation. Do not treat diagnostic
+   output as an Oracle answer or guess what Oracle would have said.
 
-**Debugging a race condition:**
-```bash
-npx -y @steipete/oracle \
-  --engine api \
-  --model gpt-5.5 \
-  -p "Analyze this code for race conditions in the payment processing flow. I've observed intermittent test failures in test_payment_flow.py::test_refund. Review the transaction handling and async patterns." \
-  --file "src/payments/processor.py" \
-  --file "src/payments/transactions.py" \
-  --file "tests/test_payment_flow.py"
-```
+4. **Apply independent judgment.** Check each material claim against the
+   repository. Reject advice that conflicts with local evidence or the stated
+   intent. If changes are requested, implement them in the parent session and
+   run the narrowest meaningful verification.
 
-**Architecture guidance:**
-```bash
-npx -y @steipete/oracle \
-  --engine api \
-  --model gpt-5.5 \
-  -p "We're considering migrating from REST to GraphQL for our API. Review the current API structure and evaluate: 1) Migration complexity, 2) Performance implications, 3) Breaking changes for clients. Recommend approach with tradeoffs." \
-  --file "src/api/router.py" \
-  --file "src/api/resolvers.py" \
-  --file "docs/api-design.md"
-```
+## Oracle Inspection Rules
 
-**Code review assistance:**
-```bash
-npx -y @steipete/oracle \
-  --engine api \
-  --model gpt-5.5 \
-  -p "Review this authentication refactor for security issues and edge cases. Pay special attention to session handling and token validation." \
-  --file "src/auth/session.py" \
-  --file "src/auth/tokens.py" \
-  --file "src/middleware/auth.py"
-```
+The task should tell Oracle to:
 
-## Output Format
+- Start with the named files or current diff, then read only surrounding code
+  needed to verify relevant invariants.
+- Use read-only commands for inspection; never modify files, dependencies, git
+  state, or external systems.
+- Distinguish observed facts from hypotheses and state unverified assumptions.
+- Prioritize high-confidence, behavior-affecting findings over style comments.
+- Recommend the smallest safe fix and explain meaningful tradeoffs.
+- Ask for one narrow missing artifact only when it would materially change the
+  answer; never request broad repository rediscovery.
 
-Oracle returns structured analysis:
-- **Assessment**: Summary of the situation
-- **Findings**: Specific issues or opportunities identified
-- **Recommendations**: Actionable guidance with rationale
-- **Tradeoffs**: Pros/cons of different approaches
-- **Next Steps**: Prioritized action items
+## Reporting
 
-## Integration with Subagent Pattern
-
-When delegating to Oracle from an orchestrator:
-
-```markdown
-GOAL: Get expert analysis on [specific problem]
-
-SCOPE BOUNDARIES:
-- DO: Bundle pre-synthesized context, attach the exact files or excerpts that matter, ask focused questions, await analysis
-- DO NOT: Include sensitive data, ask open-ended research questions, or ask Oracle to search the repo for basic context
-- STOP IF: Cost exceeds value, sensitive data would be exposed
-
-CONTEXT: [What you've tried, current hypothesis, relevant architecture, constraints, exact file/log excerpts]
-
-ACCEPTANCE CRITERIA:
-- Oracle provides specific findings on the question asked
-- Recommendations include rationale and tradeoffs
-- Next steps are actionable and prioritized
-
-OUTPUT FORMAT: Return oracle's key findings and your plan for applying them.
-```
+Return the substance, not a transcript: the recommendation, evidence-backed
+findings, tradeoffs or plan changes that matter, and unresolved assumptions.
+State explicitly when Oracle found no issue or when the consultation failed.

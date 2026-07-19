@@ -89,7 +89,7 @@ vague “investigate” or “fix it” brief.
   targeted cleanup audit: `deslop`.
 - PR feedback: `pr-reviewer`; prompt-only PR review: `pr-reviewer-only`; PR
   creation: `create-pr`.
-- Evidence-bundled architecture or difficult debugging judgment: `oracle`.
+- Evidence-backed architecture or difficult debugging judgment: `oracle`.
 
 For substantial or risky implementation, have `spec-compiler` return an
 `## Execution Contract:` before `worker-general`. Inspect it and invoke
