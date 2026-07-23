@@ -274,10 +274,11 @@ def load_hermes_sessions(
 ) -> dict[str, SessionUsage]:
     """Load token usage from the Hermes agent state database.
 
-    Returns a dict mapping ``hermes-{session_id}-{model}`` to SessionUsage.
-    Only rows with ``billing_provider = 'openai-codex'`` are included
-    unless ``all_providers`` is True.  When ``since``/``until`` are
-    provided (YYYY-MM-DD), only rows with ``last_seen`` within that
+    Returns a dict mapping
+    ``hermes-{session_id}-{model}-{billing_provider}-{billing_base_url}-{billing_mode}-{task}``
+    to SessionUsage.  Only rows with ``billing_provider = 'openai-codex'``
+    are included unless ``all_providers`` is True.  When ``since``/``until``
+    are provided (YYYY-MM-DD), only rows with ``last_seen`` within that
     inclusive range are loaded.
     """
     result: dict[str, SessionUsage] = {}
@@ -304,7 +305,8 @@ def load_hermes_sessions(
         cur = con.cursor()
         if all_providers:
             cur.execute(
-                "SELECT session_id, model, billing_provider, billing_mode, "
+                "SELECT session_id, model, billing_provider, billing_base_url, "
+                "billing_mode, task, "
                 "input_tokens, output_tokens, cache_read_tokens, "
                 "cache_write_tokens, reasoning_tokens "
                 "FROM session_model_usage WHERE 1=1" + date_clause,
@@ -313,7 +315,8 @@ def load_hermes_sessions(
         else:
             placeholders = ",".join("?" * len(CODEX_BILLING_PROVIDERS))
             cur.execute(
-                f"SELECT session_id, model, billing_provider, billing_mode, "
+                f"SELECT session_id, model, billing_provider, billing_base_url, "
+                f"billing_mode, task, "
                 f"input_tokens, output_tokens, cache_read_tokens, "
                 f"cache_write_tokens, reasoning_tokens "
                 f"FROM session_model_usage "
@@ -322,11 +325,11 @@ def load_hermes_sessions(
                 list(CODEX_BILLING_PROVIDERS) + date_params,
             )
         for row in cur.fetchall():
-            (sid, model, provider, mode,
+            (sid, model, provider, base_url, mode, task,
              inp, out, cache_read, cache_write, reasoning) = row
             # In Hermes, input_tokens and cache_read_tokens are separate
             # (input_tokens = uncached input)
-            key = f"hermes-{sid}-{model}"
+            key = f"hermes-{sid}-{model}-{provider}-{base_url}-{mode}-{task}"
             result[key] = SessionUsage(
                 model=model,
                 uncached_input=inp,

@@ -89,6 +89,7 @@ def _make_hermes_db(path: Path, rows: list[tuple]):
             billing_provider TEXT NOT NULL DEFAULT '',
             billing_base_url TEXT NOT NULL DEFAULT '',
             billing_mode TEXT NOT NULL DEFAULT '',
+            task TEXT NOT NULL DEFAULT '',
             api_call_count INTEGER NOT NULL DEFAULT 0,
             input_tokens INTEGER NOT NULL DEFAULT 0,
             output_tokens INTEGER NOT NULL DEFAULT 0,
@@ -101,7 +102,7 @@ def _make_hermes_db(path: Path, rows: list[tuple]):
             cost_source TEXT,
             first_seen REAL,
             last_seen REAL,
-            PRIMARY KEY (session_id, model, billing_provider, billing_base_url, billing_mode)
+            PRIMARY KEY (session_id, model, billing_provider, billing_base_url, billing_mode, task)
         )
     """)
     cur.executemany(
@@ -238,6 +239,31 @@ def test_load_hermes_sessions_all_providers():
         ])
         result = ctu.load_hermes_sessions(str(db), all_providers=True)
         assert len(result) == 2
+
+
+def test_load_hermes_sessions_same_model_different_provider():
+    """Same session+model under different billing_providers are not lost.
+
+    Regression: the dict key previously only used session_id+model, so
+    rows sharing those fields but differing in billing_provider (or other
+    PK columns) silently overwrote each other in --all-providers mode.
+    """
+    with tempfile.TemporaryDirectory() as d:
+        db = Path(d) / "state.db"
+        _make_hermes_db(db, [
+            ("s1", "gpt-5.6-sol", "openai-codex", "subscription_included",
+             1000, 500, 5000, 0, 100),
+            ("s1", "gpt-5.6-sol", "auto", "",
+             2000, 800, 10000, 0, 200),
+        ])
+        result = ctu.load_hermes_sessions(str(db), all_providers=True)
+        assert len(result) == 2
+        # Both rows should be present with their own token counts
+        usages = sorted(result.values(), key=lambda u: u.uncached_input)
+        assert usages[0].uncached_input == 1000
+        assert usages[0].provider == "openai-codex"
+        assert usages[1].uncached_input == 2000
+        assert usages[1].provider == "auto"
 
 
 def test_load_hermes_sessions_missing_db():
@@ -509,13 +535,13 @@ def test_load_hermes_sessions_since_filter():
         con.execute("""
             CREATE TABLE session_model_usage (
                 session_id TEXT, model TEXT, billing_provider TEXT,
-                billing_base_url TEXT, billing_mode TEXT,
+                billing_base_url TEXT, billing_mode TEXT, task TEXT,
                 api_call_count INTEGER, input_tokens INTEGER, output_tokens INTEGER,
                 cache_read_tokens INTEGER, cache_write_tokens INTEGER,
                 reasoning_tokens INTEGER, estimated_cost_usd REAL,
                 actual_cost_usd REAL, cost_status TEXT, cost_source TEXT,
                 first_seen REAL, last_seen REAL,
-                PRIMARY KEY (session_id, model, billing_provider, billing_base_url, billing_mode)
+                PRIMARY KEY (session_id, model, billing_provider, billing_base_url, billing_mode, task)
             )
         """)
         # 2026-07-10 00:00 UTC = 1782662400 (approx); use explicit epochs
