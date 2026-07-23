@@ -611,3 +611,68 @@ def test_end_to_end_with_fixtures():
 
         # Grand totals
         assert report["totals"]["sessions"] == 3
+
+
+def test_subscription_value_summary():
+    """Report includes subscription value summary with implied API costs."""
+    per_model = {
+        "gpt-5.5": ctu.ModelTotals(
+            model="gpt-5.5", sessions=2,
+            uncached_input=1000000, cached_input=5000000,
+            output=100000, reasoning=50000,
+        ),
+        "gpt-5.6-sol": ctu.ModelTotals(
+            model="gpt-5.6-sol", sessions=1,
+            uncached_input=500000, cached_input=2000000,
+            output=50000, reasoning=25000,
+        ),
+    }
+    # Set providers
+    for t in per_model.values():
+        t.providers.add("openai-codex")
+    report = ctu.compute_report(per_model)
+    sub_value = report["subscription_value"]
+    assert len(sub_value) == 1
+    assert sub_value[0]["provider"] == "openai-codex"
+    assert sub_value[0]["display_name"] == "ChatGPT Plus/Pro"
+    assert sub_value[0]["sessions"] == 3
+    assert sub_value[0]["implied_api_cost"] > 0
+
+
+def test_subscription_value_all_providers():
+    """With --all-providers, subscription value shows multiple providers."""
+    per_model = {
+        "gpt-5.5": ctu.ModelTotals(
+            model="gpt-5.5", sessions=1,
+            uncached_input=1000000, cached_input=0,
+            output=100000, reasoning=0,
+        ),
+        "grok-composer-2.5-fast": ctu.ModelTotals(
+            model="grok-composer-2.5-fast", sessions=1,
+            uncached_input=500000, cached_input=0,
+            output=50000, reasoning=0,
+        ),
+    }
+    per_model["gpt-5.5"].providers.add("openai-codex")
+    per_model["grok-composer-2.5-fast"].providers.add("xai-oauth")
+    report = ctu.compute_report(per_model, all_providers=True)
+    sub_value = report["subscription_value"]
+    assert len(sub_value) == 2
+    providers = {e["provider"] for e in sub_value}
+    assert providers == {"openai-codex", "xai-oauth"}
+    xai = [e for e in sub_value if e["provider"] == "xai-oauth"][0]
+    assert xai["display_name"] == "X Premium+/SuperGrok"
+
+
+def test_report_includes_notes():
+    """Report includes explanatory notes about implied vs actual cost."""
+    per_model = {
+        "gpt-5.5": ctu.ModelTotals(
+            model="gpt-5.5", sessions=1,
+            uncached_input=1000, cached_input=5000, output=100, reasoning=50,
+        ),
+    }
+    report = ctu.compute_report(per_model)
+    assert "notes" in report
+    assert len(report["notes"]) >= 2
+    assert "implied" in report["notes"][0].lower()

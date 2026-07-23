@@ -312,7 +312,10 @@ Only use them in an environment where bypassing permission prompts is safe.
 
 ### Amp Token Usage
 
-Analyze Amp thread token usage from the local Amp CLI:
+Analyze Amp thread token usage from the local Amp CLI and compute the
+**implied API value** — what the same tokens would cost at full provider
+API rates. This shows how much value your Amp subscription and linked
+third-party subscriptions (ChatGPT, X Premium+) deliver.
 
 ```bash
 scripts/amp-token-usage.py
@@ -331,7 +334,34 @@ amp threads export T-019f... > /tmp/amp-thread.json
 scripts/amp-token-usage.py --export /tmp/amp-thread.json --json
 ```
 
-The report aggregates `totalInputTokens`, `cacheReadInputTokens`, `cacheCreationInputTokens`, `outputTokens`, calls, threads, cache-hit share, and best-effort API cost estimates by model. `--amp-costs` additionally calls `amp threads usage` per thread and reports Amp credit cost separately; Amp's display cost excludes any direct provider billing through customer-managed model keys. `--since`/`--until` filter by thread `updatedAt` timestamp (YYYY-MM-DD, inclusive).
+The report aggregates `totalInputTokens`, `cacheReadInputTokens`,
+`cacheCreationInputTokens`, `outputTokens`, calls, threads, cache-hit
+share, and implied API cost by model.
+
+**Billing routes.** Use `--amp-costs` to also call `amp threads usage` per
+thread. Routes are classified based on whether the thread's model(s) can
+route through a linked third-party subscription:
+
+- **subscription** — All models in the thread belong to a provider with a
+  linked subscription (OpenAI → ChatGPT Plus/Pro, xAI → X Premium+/
+  SuperGrok). The implied API value is attributed to that subscription at
+  no per-token cost. Any Amp dollar amount is **ancillary overhead** (tool
+  execution, web search), tracked separately as `amp_ancillary_cost`.
+  This applies whether `amp threads usage` returns "unavailable" or a small
+  dollar amount — Amp display costs for subscription-eligible models are
+  typically 1–5% of the implied API value, confirming they are overhead,
+  not per-token LLM cost.
+- **amp-credits** — The thread uses models from providers with no linked
+  subscription (Anthropic, Fireworks, MiniMax, Moonshot), or mixes
+  subscription-eligible and non-subscription models. Amp credits are the
+  only route, so both implied API value and Amp credit cost are real costs
+  against Amp.
+- **unknown** — `--amp-costs` was not used, so the billing route could not
+  be determined.
+
+Without `--amp-costs`, all threads show `billing_route: unknown` and the
+billing route summary is not printed. `--since`/`--until` filter by thread
+`updatedAt` timestamp (YYYY-MM-DD, inclusive).
 
 ### Devin Token Usage
 
@@ -344,6 +374,29 @@ scripts/devin-token-usage.py --no-acp
 scripts/devin-token-usage.py --since 2026-07-13            # only sessions on/after date
 scripts/devin-token-usage.py --since 2026-07-13 --until 2026-07-13  # single day
 ```
+
+### Codex/ChatGPT Token Usage
+
+Count ChatGPT/Codex subscription token usage from Codex CLI session
+rollouts and Hermes agent state, and compute the **implied API value** —
+what the same tokens would cost at full OpenAI API rates. This shows how
+much value your ChatGPT/Codex subscription delivers.
+
+```bash
+scripts/codex-token-usage.py
+scripts/codex-token-usage.py --json
+scripts/codex-token-usage.py --no-codex              # Hermes only
+scripts/codex-token-usage.py --no-hermes             # Codex CLI only
+scripts/codex-token-usage.py --all-providers         # include non-Codex Hermes providers
+scripts/codex-token-usage.py --since 2026-07-13            # only sessions on/after date
+scripts/codex-token-usage.py --since 2026-07-13 --until 2026-07-13  # single day
+```
+
+The report includes a **subscription value summary** that breaks down
+implied API cost by billing provider (ChatGPT Plus/Pro, X Premium+/
+SuperGrok) and shows the actual per-token cost ($0, included in the
+subscription). Use `--all-providers` to see per-subscription value when
+multiple Hermes billing providers are present.
 
 ### Codex ccapi Provider
 

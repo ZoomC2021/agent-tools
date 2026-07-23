@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Count ChatGPT/Codex subscription token usage from Codex CLI session
-rollouts and Hermes agent state, and estimate API cost based on per-model
-pricing.
+rollouts and Hermes agent state, and compute the implied API value — what
+the same tokens would cost at full provider API rates.
+
+This lets you see how much value your ChatGPT/Codex subscription delivers
+by comparing the included usage against equivalent pay-as-you-go API pricing.
 
 ChatGPT/Codex subscription usage is tracked in two places on this machine:
 
@@ -49,7 +52,7 @@ import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Any, Optional
 
 # ---------------------------------------------------------------------------
 # Default paths
@@ -82,6 +85,12 @@ DEFAULT_PRICING = {"in": 0.0, "cache": 0.0, "out": 0.0}
 
 # Hermes billing providers that route through the ChatGPT/Codex subscription
 CODEX_BILLING_PROVIDERS = {"openai-codex"}
+
+# Human-readable subscription names for billing providers
+PROVIDER_DISPLAY_NAMES = {
+    "openai-codex": "ChatGPT Plus/Pro",
+    "xai-oauth": "X Premium+/SuperGrok",
+}
 
 
 # ---------------------------------------------------------------------------
@@ -123,6 +132,7 @@ class SessionUsage:
     reasoning: int = 0
     source: str = ""       # "codex-cli" or "hermes"
     plan: str = ""         # subscription plan (e.g. "plus", "pro")
+    provider: str = ""     # billing provider (e.g. "openai-codex", "xai-oauth")
 
 
 @dataclass
@@ -135,6 +145,7 @@ class ModelTotals:
     output: int = 0        # excludes reasoning
     reasoning: int = 0
     sources: set[str] = field(default_factory=set)
+    providers: set[str] = field(default_factory=set)
 
     @property
     def billable_output(self) -> int:
@@ -250,6 +261,7 @@ def load_codex_sessions(
             reasoning=reasoning,
             source="codex-cli",
             plan=plan,
+            provider="openai-codex",
         )
     return result
 
@@ -322,6 +334,7 @@ def load_hermes_sessions(
                 output=out,
                 reasoning=reasoning,
                 source=f"hermes:{provider}",
+                provider=provider,
             )
         con.close()
     except sqlite3.Error:
@@ -353,6 +366,8 @@ def merge_usage(
         totals.output += usage.output
         totals.reasoning += usage.reasoning
         totals.sources.add(usage.source)
+        if usage.provider:
+            totals.providers.add(usage.provider)
 
     for usage in hermes.values():
         totals = _get_totals(usage.model)
@@ -362,6 +377,8 @@ def merge_usage(
         totals.output += usage.output
         totals.reasoning += usage.reasoning
         totals.sources.add(usage.source)
+        if usage.provider:
+            totals.providers.add(usage.provider)
 
     return per_model
 
@@ -405,6 +422,7 @@ def compute_report(
             "reasoning": totals.reasoning,
             "billable_output": totals.billable_output,
             "sources": sorted(totals.sources),
+            "providers": sorted(totals.providers),
             "cost": cost,
         }
         grand["sessions"] += totals.sessions
@@ -419,14 +437,55 @@ def compute_report(
 
     grand["billable_output"] = grand["output"] + grand["reasoning"]
     grand["total_input"] = grand["uncached_input"] + grand["cached_input"]
+
+    # Build subscription value summary — implied API cost per billing provider
+    sub_summary = _build_subscription_value(per_model)
+
     return {
         "models": models,
         "totals": grand,
+        "subscription_value": sub_summary,
         "pricing": PRICING,
         "all_providers": all_providers,
         "since": since,
         "until": until,
+        "notes": [
+            "Implied API cost is what the same tokens would cost at full provider API rates.",
+            "Subscription usage is included in your ChatGPT/Codex plan at no per-token cost.",
+            "The gap between implied API cost and $0 actual cost is the value delivered by your subscription.",
+        ],
     }
+
+
+def _build_subscription_value(
+    per_model: dict[str, ModelTotals],
+) -> list[dict[str, Any]]:
+    """Summarise implied API value by billing provider."""
+    by_provider: dict[str, dict[str, Any]] = {}
+
+    def _get(key: str) -> dict[str, Any]:
+        if key not in by_provider:
+            by_provider[key] = {
+                "provider": key,
+                "display_name": PROVIDER_DISPLAY_NAMES.get(key, key),
+                "sessions": 0,
+                "total_input": 0,
+                "output": 0,
+                "implied_api_cost": 0.0,
+            }
+        return by_provider[key]
+
+    for totals in per_model.values():
+        cost = totals.cost(PRICING)
+        providers = totals.providers or {"openai-codex"}
+        for provider in providers:
+            entry = _get(provider)
+            entry["sessions"] += totals.sessions
+            entry["total_input"] += totals.total_input
+            entry["output"] += totals.billable_output
+            entry["implied_api_cost"] += cost["total"]
+
+    return sorted(by_provider.values(), key=lambda x: x["implied_api_cost"], reverse=True)
 
 
 def print_text_report(report: dict) -> None:
@@ -440,26 +499,46 @@ def print_text_report(report: dict) -> None:
         hi = report.get("until") or "now"
         date_range = f"  [{lo} .. {hi}]"
     print("=" * 90)
-    print(f"CHATGPT/CODEX TOKEN USAGE & API COST ESTIMATE ({scope}){date_range}")
+    print(f"CHATGPT/CODEX TOKEN USAGE & IMPLIED API VALUE ({scope}){date_range}")
     print("=" * 90)
     print()
-    print(f"{'Model':<16}{'Sessions':>9}  {'Uncached In':>13}{'Cached In':>13}{'Output':>11}  {'Cost (USD)':>12}")
+    print(f"{'Model':<16}{'Sessions':>9}  {'Uncached In':>13}{'Cached In':>13}{'Output':>11}  {'Implied Cost':>13}")
     print("-" * 90)
     for model_key, m in models.items():
         print(f"{model_key:<16}{m['sessions']:>9}  "
               f"{_fmt(m['uncached_input']):>13}{_fmt(m['cached_input']):>13}"
-              f"{_fmt(m['billable_output']):>11}  {m['cost']['total']:>11.2f}$")
+              f"{_fmt(m['billable_output']):>11}  {m['cost']['total']:>12.2f}$")
     print("-" * 90)
     print(f"{'TOTAL':<16}{grand['sessions']:>9}  "
           f"{_fmt(grand['uncached_input']):>13}{_fmt(grand['cached_input']):>13}"
-          f"{_fmt(grand['billable_output']):>11}  {grand['total']:>11.2f}$")
+          f"{_fmt(grand['billable_output']):>11}  {grand['total']:>12.2f}$")
     print()
-    print("Cost breakdown:")
+    print("Implied API cost breakdown (what these tokens would cost at full API rates):")
     print(f"  Uncached input : ${grand['in_cost']:>9.2f}")
     print(f"  Cached input   : ${grand['cache_cost']:>9.2f}")
     print(f"  Output         : ${grand['out_cost']:>9.2f}")
     print(f"  TOTAL          : ${grand['total']:>9.2f}")
     print()
+
+    # Subscription value summary
+    sub_value = report.get("subscription_value", [])
+    if sub_value:
+        print("=" * 90)
+        print("SUBSCRIPTION VALUE SUMMARY")
+        print("=" * 90)
+        print(f"{'Subscription':<24}{'Sessions':>9}  {'Implied API Cost':>16}  {'Actual Paid':>12}")
+        print("-" * 90)
+        for entry in sub_value:
+            print(f"{entry['display_name']:<24}{entry['sessions']:>9}  "
+                  f"${entry['implied_api_cost']:>14.2f}  {'$0.00':>12}")
+        total_implied = sum(e["implied_api_cost"] for e in sub_value)
+        print("-" * 90)
+        print(f"{'TOTAL':<24}{'':>9}  ${total_implied:>14.2f}")
+        print()
+        print(f"Total subscription value: ${total_implied:.2f} in implied API costs")
+        print(f"Actual per-token cost:    $0.00 (included in your subscription)")
+        print()
+
     if grand["reasoning"] > 0:
         print(f"Reasoning tokens: {_fmt(grand['reasoning'])} (included in billable output)")
     print()
@@ -469,6 +548,9 @@ def print_text_report(report: dict) -> None:
     if grand["total_input"] > 0:
         cache_pct = grand["cached_input"] / grand["total_input"] * 100
         print(f"\n{cache_pct:.1f}% of input tokens were cache hits.")
+    print()
+    for note in report.get("notes", []):
+        print(f"Note: {note}")
 
 
 # ---------------------------------------------------------------------------
@@ -477,7 +559,7 @@ def print_text_report(report: dict) -> None:
 
 def main(argv: Optional[list[str]] = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Count ChatGPT/Codex subscription token usage and estimate API cost."
+        description="Count ChatGPT/Codex subscription token usage and compute implied API value."
     )
     parser.add_argument("--session-dir", default=DEFAULT_CODEX_SESSION_DIR,
                         help="Codex CLI sessions directory (default: %(default)s)")
