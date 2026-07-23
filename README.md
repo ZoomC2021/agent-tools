@@ -398,6 +398,47 @@ SuperGrok) and shows the actual per-token cost ($0, included in the
 subscription). Use `--all-providers` to see per-subscription value when
 multiple Hermes billing providers are present.
 
+### Cross-Machine Token Usage (All Sources)
+
+Aggregate token usage and implied API value across the local machine **and**
+remote hosts (via SSH).  This is the one command to see everything at once:
+
+```bash
+scripts/all-token-usage.py                            # full report
+scripts/all-token-usage.py --json                     # machine-readable JSON
+scripts/all-token-usage.py --hosts hetzner ssh.is-there.net
+scripts/all-token-usage.py --no-remote                # local only
+scripts/all-token-usage.py --no-amp                   # skip Amp
+scripts/all-token-usage.py --no-openclaw              # skip OpenClaw
+scripts/all-token-usage.py --since 2026-07-01
+```
+
+The script collects from:
+
+- **Local**: Codex CLI + Hermes (via `codex-token-usage.py --all-providers`)
+  and Amp (via `amp-token-usage.py --amp-costs`).
+- **Remote hosts** (SSH): Hermes `state.db` (queried read-only via Python
+  over SSH) and OpenClaw sessions (`openclaw sessions --json --all-agents`).
+
+The report shows per-machine, per-source, per-model token counts and implied
+API costs, a consolidated summary by billing provider/subscription, and a
+grand total.
+
+**Key design decisions:**
+
+- **Hermes is the primary token source** on each machine — it tracks
+  API-level usage with billing-provider attribution.  OpenClaw session data
+  is shown as a cross-reference but excluded from totals because OpenClaw
+  routes through Hermes/Codex and would double-count.
+- **`custom` billing provider** = direct API calls with real per-token cost.
+  The implied API value for these rows IS the actual cost.
+- **Subscription providers** (`openai-codex`, `xai-oauth`) cost $0 per-token
+  — the gap between implied API value and $0 is the value delivered by your
+  subscriptions.
+- **Remote hosts** are configurable via `--hosts`; default hosts are
+  `hetzner` and `ssh.is-there.net` (must be configured in `~/.ssh/config`).
+- Models with no known public API pricing are marked `*` and billed at $0.
+
 ### Codex ccapi Provider
 
 The Codex installer also adds a persistent custom provider for the ccapi.us OpenAI-compatible endpoint in `~/.codex/config.toml`:
