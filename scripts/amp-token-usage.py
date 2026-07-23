@@ -39,6 +39,7 @@ from typing import Any, Optional
 # USD per 1M tokens. These are best-effort local estimates for models this
 # repo already tracks. Use --pricing-file to override or add model prices.
 DEFAULT_PRICING = {
+    # OpenAI
     "gpt-5.5": {"input": 5.00, "cache_read": 0.50, "output": 30.00},
     "GPT-5.5": {"input": 5.00, "cache_read": 0.50, "output": 30.00},
     "gpt-5.6-sol": {"input": 5.00, "cache_read": 0.50, "output": 30.00},
@@ -47,9 +48,47 @@ DEFAULT_PRICING = {
     "gpt-5.4": {"input": 2.50, "cache_read": 0.25, "output": 15.00},
     "gpt-5.4-mini": {"input": 0.75, "cache_read": 0.075, "output": 4.50},
     "gpt-5.3-codex-spark": {"input": 1.75, "cache_read": 0.175, "output": 14.00},
-    "MiniMax-M3": {"input": 0.60, "cache_read": 0.12, "output": 2.40},
+    # Anthropic — claude-fable-5: $10/$50 per 1M, cache read at 0.1x = $1.00
+    "claude-fable-5": {"input": 10.00, "cache_read": 1.00, "output": 50.00},
+    # xAI — grok-4.5: $2/$6 per 1M, cached input $0.50
+    "grok-4.5": {"input": 2.00, "cache_read": 0.50, "output": 6.00},
+    # Fireworks — GLM-5.2 (Amp uses the full provider path as model name)
     "GLM-5.2": {"input": 1.40, "cache_read": 0.26, "output": 4.40},
+    "accounts/fireworks/models/glm-5p2": {"input": 1.40, "cache_read": 0.26, "output": 4.40},
+    # MiniMax
+    "MiniMax-M3": {"input": 0.60, "cache_read": 0.12, "output": 2.40},
+    # Moonshot
     "Kimi K2.7": {"input": 0.95, "cache_read": 0.19, "output": 4.00},
+}
+
+# Model → provider mapping for subscription attribution.
+# When amp threads usage returns "unavailable", the thread's tokens
+# went through a linked third-party subscription rather than Amp credits.
+MODEL_PROVIDERS = {
+    # OpenAI — can route through linked ChatGPT subscription or Amp credits
+    "gpt-5.5": "OpenAI",
+    "gpt-5.6-sol": "OpenAI",
+    "gpt-5.6-luna": "OpenAI",
+    "gpt-5.6-terra": "OpenAI",
+    "gpt-5.4": "OpenAI",
+    "gpt-5.4-mini": "OpenAI",
+    "gpt-5.3-codex-spark": "OpenAI",
+    # Anthropic — Amp credits only
+    "claude-fable-5": "Anthropic",
+    # Fireworks — Amp credits only
+    "accounts/fireworks/models/glm-5p2": "Fireworks",
+    "GLM-5.2": "Fireworks",
+    # xAI — can route through linked X Premium+ subscription or Amp credits
+    "grok-4.5": "xAI",
+    # Others — Amp credits only
+    "MiniMax-M3": "MiniMax",
+    "Kimi K2.7": "Moonshot",
+}
+
+# Human-readable subscription names for connected providers
+SUBSCRIPTION_NAMES = {
+    "OpenAI": "ChatGPT Plus/Pro",
+    "xAI": "X Premium+/SuperGrok",
 }
 
 
@@ -130,6 +169,24 @@ class ThreadUsage:
     @property
     def billable_input_tokens(self) -> int:
         return max(self.total_input_tokens - self.cache_read_input_tokens, 0)
+
+    def cost(self, pricing: dict[str, dict[str, float]]) -> Optional[dict[str, float]]:
+        """Compute implied API cost for this thread's tokens."""
+        total = {"input": 0.0, "cache_read": 0.0, "output": 0.0, "total": 0.0}
+        has_pricing = False
+        for event in self.events:
+            price = pricing_for_model(event.model, pricing)
+            if not price:
+                continue
+            has_pricing = True
+            billable = max(event.total_input_tokens - event.cache_read_input_tokens, 0)
+            total["input"] += billable / 1_000_000 * price["input"]
+            total["cache_read"] += event.cache_read_input_tokens / 1_000_000 * price["cache_read"]
+            total["output"] += event.output_tokens / 1_000_000 * price["output"]
+        if not has_pricing:
+            return None
+        total["total"] = total["input"] + total["cache_read"] + total["output"]
+        return total
 
 
 @dataclass
@@ -333,16 +390,63 @@ def export_amp_thread(amp_bin: str, thread_id: str) -> ThreadUsage:
 
 
 def parse_amp_display_cost(text: str) -> Optional[dict[str, Any]]:
-    """Parse the first line of ``amp threads usage`` output."""
+    """Parse ``amp threads usage`` output into a cost dict.
+
+    Handles these formats:
+    - "$5.94 (free)" → Amp credits from free bucket
+    - "$0.11" → Amp credits from paid bucket
+    - "$9.42 (free) + $1.66" → split between free and paid Amp credits
+    - "Usage information is currently unavailable" → routed through subscription
+    """
     first_line = next((line.strip() for line in text.splitlines() if line.strip()), "")
     if not first_line:
         return None
-    match = re.search(r"\$([0-9]+(?:\.[0-9]+)?)", first_line)
+
+    # Subscription-routed threads have no Amp credit cost
+    if "unavailable" in first_line.lower():
+        return {
+            "display": first_line,
+            "amount_usd": None,
+            "bucket": None,
+            "billing_route": "subscription",
+            "free_amount": None,
+            "paid_amount": None,
+        }
+
+    # Parse all dollar amounts — may be split: "$9.42 (free) + $1.66"
+    amounts = re.findall(r"\$([0-9]+(?:\.[0-9]+)?)", first_line)
+    if not amounts:
+        return {
+            "display": first_line,
+            "amount_usd": None,
+            "bucket": None,
+            "billing_route": "unknown",
+            "free_amount": None,
+            "paid_amount": None,
+        }
+
+    total = sum(float(a) for a in amounts)
     bucket_match = re.search(r"\(([^)]+)\)", first_line)
+    bucket = bucket_match.group(1) if bucket_match else None
+
+    # Extract free and paid portions
+    free_amount = 0.0
+    paid_amount = 0.0
+    if len(amounts) > 1 and "+ $" in first_line:
+        free_amount = float(amounts[0])
+        paid_amount = float(amounts[1])
+    elif bucket == "free":
+        free_amount = total
+    else:
+        paid_amount = total
+
     return {
         "display": first_line,
-        "amount_usd": float(match.group(1)) if match else None,
-        "bucket": bucket_match.group(1) if bucket_match else None,
+        "amount_usd": total,
+        "bucket": bucket,
+        "billing_route": "amp-credits",
+        "free_amount": free_amount,
+        "paid_amount": paid_amount,
     }
 
 
@@ -395,6 +499,30 @@ def pricing_for_model(model: str, pricing: dict[str, dict[str, float]]) -> Optio
     return None
 
 
+def provider_for_model(model: str) -> str:
+    """Return the provider name for a model, or 'Unknown'."""
+    if model in MODEL_PROVIDERS:
+        return MODEL_PROVIDERS[model]
+    lower_model = model.lower()
+    for key, provider in MODEL_PROVIDERS.items():
+        if key.lower() == lower_model:
+            return provider
+    # Fuzzy matches for model variants
+    if "gpt-5" in lower_model or "gpt-4" in lower_model:
+        return "OpenAI"
+    if "claude" in lower_model:
+        return "Anthropic"
+    if "grok" in lower_model:
+        return "xAI"
+    if "glm" in lower_model:
+        return "Fireworks"
+    if "minimax" in lower_model:
+        return "MiniMax"
+    if "kimi" in lower_model:
+        return "Moonshot"
+    return "Unknown"
+
+
 def _thread_in_date_range(thread: ThreadUsage, since_epoch: Optional[float], until_epoch: Optional[float]) -> bool:
     """Check if a thread's updated timestamp falls within the date range."""
     if since_epoch is None and until_epoch is None:
@@ -438,6 +566,14 @@ def aggregate_by_model(threads: list[ThreadUsage]) -> dict[str, ModelTotals]:
     return per_model
 
 
+def _thread_provider(thread: ThreadUsage) -> str:
+    """Infer the provider for a thread from its models."""
+    providers = {provider_for_model(e.model) for e in thread.events}
+    if len(providers) == 1:
+        return providers.pop()
+    return "Mixed"
+
+
 def _thread_to_json(thread: ThreadUsage) -> dict[str, Any]:
     models = sorted({event.model for event in thread.events})
     return {
@@ -454,6 +590,8 @@ def _thread_to_json(thread: ThreadUsage) -> dict[str, Any]:
         "cache_creation_input_tokens": thread.cache_creation_input_tokens,
         "output_tokens": thread.output_tokens,
         "amp_cost": thread.amp_cost,
+        "billing_route": (thread.amp_cost or {}).get("billing_route"),
+        "provider": _thread_provider(thread),
         "source": thread.source,
     }
 
@@ -474,6 +612,166 @@ def _model_to_json(totals: ModelTotals, pricing: dict[str, dict[str, float]]) ->
         "last_timestamp": totals.last_timestamp,
         "estimated_cost": totals.cost(pricing),
     }
+
+
+def _thread_has_unpriced_models(thread: ThreadUsage, pricing: dict[str, dict[str, float]]) -> bool:
+    """Check if any of the thread's models lack API pricing."""
+    for event in thread.events:
+        if not pricing_for_model(event.model, pricing):
+            return True
+    return False
+
+
+def _thread_unpriced_model_names(thread: ThreadUsage, pricing: dict[str, dict[str, float]]) -> set[str]:
+    """Return the set of model names in the thread that lack API pricing."""
+    return {
+        event.model for event in thread.events
+        if not pricing_for_model(event.model, pricing)
+    }
+
+
+def _model_has_linked_subscription(model: str) -> Optional[str]:
+    """Return the subscription name if this model's provider has a linked
+    third-party subscription, or None if Amp credits are the only route.
+
+    OpenAI models can route through a linked ChatGPT Plus/Pro subscription.
+    xAI models can route through a linked X Premium+/SuperGrok subscription.
+    All other providers (Anthropic, Fireworks, MiniMax, Moonshot) have no
+    linked subscription — Amp credits are the only route.
+    """
+    provider = provider_for_model(model)
+    if provider in SUBSCRIPTION_NAMES:
+        return SUBSCRIPTION_NAMES[provider]
+    return None
+
+
+def _thread_subscription_route(thread: ThreadUsage) -> Optional[str]:
+    """If all models in a thread route through the same linked subscription,
+    return the subscription name.  If models mix subscriptions or include
+    non-subscription models, return None.
+    """
+    subs = {_model_has_linked_subscription(e.model) for e in thread.events if e.model != "unknown"}
+    # Remove None if there are also subscription-eligible models
+    if len(subs) == 1:
+        return subs.pop()
+    return None
+
+
+def _build_billing_routes(
+    threads: list[ThreadUsage],
+    pricing: dict[str, dict[str, float]],
+) -> list[dict[str, Any]]:
+    """Summarise token usage and implied API cost by billing route and provider.
+
+    **Route classification logic:**
+
+    For threads where ``--amp-costs`` was used, each thread is classified
+    based on whether its model(s) can route through a linked third-party
+    subscription:
+
+    - **subscription** — All models in the thread belong to a provider with a
+      linked subscription (OpenAI → ChatGPT Plus/Pro, xAI → X Premium+/
+      SuperGrok).  The implied API value is attributed to that subscription
+      (the LLM tokens went through it at no per-token cost).  Any Amp credit
+      cost shown by ``amp threads usage`` is **ancillary overhead** (tool
+      execution, web search, etc.) — it is tracked separately as
+      ``amp_ancillary_cost``, not as per-token LLM cost.
+
+      This covers both cases:
+      * ``amp threads usage`` returns "unavailable" (Amp confirms the thread
+        is subscription-routed)
+      * ``amp threads usage`` returns a small dollar amount (Amp charged for
+        ancillary overhead while LLM tokens went through the subscription)
+
+    - **amp-credits** — The thread uses models from providers with no linked
+      subscription (Anthropic, Fireworks, MiniMax, Moonshot).  Amp credits
+      are the only billing route, so both the implied API value and the Amp
+      credit cost are real costs against Amp.
+
+    - **unknown** — ``--amp-costs`` was not used.
+
+    The key insight: Amp display costs for subscription-eligible models
+    (OpenAI, xAI) are typically 1–5% of the implied API value — clearly
+    ancillary overhead, not per-token LLM cost.  For non-subscription
+    models (GLM, Claude), Amp display costs are close to the implied API
+    value, confirming Amp is paying for the actual tokens.
+    """
+    routes: dict[str, dict[str, Any]] = {}
+
+    def _get_route(key: str) -> dict[str, Any]:
+        if key not in routes:
+            routes[key] = {
+                "route": key,
+                "threads": 0,
+                "calls": 0,
+                "total_input_tokens": 0,
+                "output_tokens": 0,
+                "implied_api_cost": 0.0,
+                "amp_credit_cost": 0.0,
+                "amp_free_cost": 0.0,
+                "amp_paid_cost": 0.0,
+                "amp_ancillary_cost": 0.0,
+                "unpriced_models": set(),
+            }
+        return routes[key]
+
+    for thread in threads:
+        ac = thread.amp_cost or {}
+        raw_route = ac.get("billing_route") or "unknown"
+        implied = thread.cost(pricing)
+        implied_total = implied["total"] if implied else 0.0
+        amp_amount = ac.get("amount_usd")
+
+        # Determine route based on model subscription eligibility
+        sub_name = _thread_subscription_route(thread)
+        if raw_route == "unknown":
+            # No --amp-costs, can't determine
+            key = "unknown"
+        elif sub_name:
+            # All models route through a linked subscription
+            key = f"subscription:{sub_name}"
+        else:
+            # Models with no linked subscription → Amp credits
+            key = "amp-credits"
+
+        entry = _get_route(key)
+        entry["threads"] += 1
+        entry["calls"] += thread.calls
+        entry["total_input_tokens"] += thread.total_input_tokens
+        entry["output_tokens"] += thread.output_tokens
+
+        if implied:
+            entry["implied_api_cost"] += implied_total
+
+        if isinstance(amp_amount, (int, float)):
+            if key.startswith("subscription:"):
+                # Amp cost on subscription-routed threads is ancillary
+                # overhead, not per-token LLM cost
+                entry["amp_ancillary_cost"] += float(amp_amount)
+            else:
+                entry["amp_credit_cost"] += float(amp_amount)
+                entry["amp_free_cost"] += float(ac.get("free_amount") or 0)
+                entry["amp_paid_cost"] += float(ac.get("paid_amount") or 0)
+
+        # Track unpriced models
+        entry["unpriced_models"].update(
+            _thread_unpriced_model_names(thread, pricing)
+        )
+
+    # Build sorted result with display labels
+    result = []
+    for key, entry in sorted(routes.items(), key=lambda x: x[1]["implied_api_cost"], reverse=True):
+        if key.startswith("subscription:"):
+            entry["route"] = "subscription"
+            entry["provider"] = key.split(":", 1)[1]
+        elif key == "amp-credits":
+            entry["provider"] = "Amp credits"
+        elif key == "unknown":
+            entry["provider"] = "Unknown"
+        # Convert unpriced_models set to sorted list for JSON
+        entry["unpriced_models"] = sorted(entry["unpriced_models"])
+        result.append(entry)
+    return result
 
 
 def compute_report(
@@ -500,13 +798,22 @@ def compute_report(
             totals.cache_creation_input_tokens += event.cache_creation_input_tokens
             totals.max_input_tokens = max(totals.max_input_tokens, event.max_input_tokens)
 
+    # Amp credit cost totals (handling split costs)
     amp_cost_total = 0.0
+    amp_cost_free = 0.0
+    amp_cost_paid = 0.0
     amp_cost_count = 0
     for thread in threads:
-        amount = (thread.amp_cost or {}).get("amount_usd")
+        ac = thread.amp_cost or {}
+        amount = ac.get("amount_usd")
         if isinstance(amount, (int, float)):
             amp_cost_total += float(amount)
+            amp_cost_free += float(ac.get("free_amount") or 0)
+            amp_cost_paid += float(ac.get("paid_amount") or 0)
             amp_cost_count += 1
+
+    # Build billing route summary
+    route_summary = _build_billing_routes(threads, pricing)
 
     return {
         "models": model_rows,
@@ -527,13 +834,19 @@ def compute_report(
             "cache_read_pct": totals.cache_read_pct,
             "amp_cost_threads": amp_cost_count,
             "amp_cost_total_usd": amp_cost_total if amp_cost_count else None,
+            "amp_cost_free_usd": amp_cost_free if amp_cost_count else None,
+            "amp_cost_paid_usd": amp_cost_paid if amp_cost_count else None,
         },
+        "billing_routes": route_summary,
         "pricing": pricing,
         "since": since,
         "until": until,
         "notes": [
-            "Estimated API costs use local pricing assumptions and are separate from Amp credits.",
-            "Amp thread usage cost reflects Amp credits only and excludes direct customer-managed provider billing.",
+            "Implied API cost = tokens × public provider list rates — what the equivalent usage would cost via direct pay-as-you-go API calls.",
+            "Subscription-routed threads: LLM tokens went through a linked third-party subscription (ChatGPT Plus/Pro, X Premium+/SuperGrok) at no per-token cost. Any Amp charge is ancillary overhead (tool execution, web search), tracked separately as amp_ancillary_cost.",
+            "Amp-credits threads: models from providers with no linked subscription (Anthropic, Fireworks, MiniMax, Moonshot). Amp credits are the only route — both implied API value and Amp credit cost are real costs against Amp.",
+            "Amp credit cost breakdown: 'free' = Amp Free daily credits + Megawatt included usage; 'paid' = individual credits. Megawatt ($20/month) includes $20 of agent usage.",
+            "Route attribution is based on model→provider→subscription eligibility, not on amp threads usage cost-ratio heuristics. It cannot detect cases where a thread mixes subscription-routed and Amp-credited calls within the same thread.",
         ],
     }
 
@@ -554,44 +867,82 @@ def print_text_report(report: dict[str, Any]) -> None:
         lo = report.get("since") or "begin"
         hi = report.get("until") or "now"
         date_range = f"  [{lo} .. {hi}]"
-    print("=" * 104)
+    print("=" * 120)
     print(f"AMP TOKEN USAGE{date_range}")
-    print("=" * 104)
+    print("=" * 120)
     print()
-    print(f"{'Model':<24}{'Threads':>8}{'Calls':>8}  {'Billable In':>13}{'Cache Read':>13}{'Output':>11}  {'Cache %':>8}  {'Est. Cost':>10}")
-    print("-" * 104)
+    print(f"{'Model':<24}{'Provider':<14}{'Threads':>8}{'Calls':>8}  {'Billable In':>13}{'Cache Read':>13}{'Output':>11}  {'Cache %':>8}  {'Implied Cost':>12}")
+    print("-" * 120)
     for model, row in sorted(
         report["models"].items(),
         key=lambda item: item[1]["total_input_tokens"] + item[1]["output_tokens"],
         reverse=True,
     ):
+        provider = provider_for_model(model)
         print(
-            f"{model:<24}{row['threads']:>8}{row['calls']:>8}  "
+            f"{model:<24}{provider:<14}{row['threads']:>8}{row['calls']:>8}  "
             f"{_fmt_int(row['billable_input_tokens']):>13}"
             f"{_fmt_int(row['cache_read_input_tokens']):>13}"
             f"{_fmt_int(row['output_tokens']):>11}  "
             f"{row['cache_read_pct']:>7.1f}%  "
-            f"{_fmt_cost(row['estimated_cost']):>10}"
+            f"{_fmt_cost(row['estimated_cost']):>12}"
         )
     totals = report["totals"]
-    print("-" * 104)
+    print("-" * 120)
     print(
-        f"{'TOTAL':<24}{totals['threads']:>8}{totals['calls']:>8}  "
+        f"{'TOTAL':<24}{'':<14}{totals['threads']:>8}{totals['calls']:>8}  "
         f"{_fmt_int(totals['billable_input_tokens']):>13}"
         f"{_fmt_int(totals['cache_read_input_tokens']):>13}"
         f"{_fmt_int(totals['output_tokens']):>11}  "
         f"{totals['cache_read_pct']:>7.1f}%"
     )
     if totals["amp_cost_total_usd"] is not None:
-        print(f"\nAmp display cost total: ${totals['amp_cost_total_usd']:.2f} across {totals['amp_cost_threads']} threads")
+        free_str = f" (free: ${totals.get('amp_cost_free_usd', 0):.2f}, paid: ${totals.get('amp_cost_paid_usd', 0):.2f})" if totals.get("amp_cost_free_usd") else ""
+        print(f"\nAmp credit cost: ${totals['amp_cost_total_usd']:.2f}{free_str} across {totals['amp_cost_threads']} threads")
+
+    # Billing route summary
+    routes = report.get("billing_routes", [])
+    if routes:
+        print()
+        print("=" * 130)
+        print("BILLING ROUTE VALUE SUMMARY")
+        print("=" * 130)
+        print(f"{'Route':<14}{'Provider':<24}{'Threads':>7}  {'Implied API':>12}  {'Amp Credits':>14}  {'Ancillary':>10}  {'Unpriced'}")
+        print("-" * 130)
+        for route in routes:
+            route_label = route.get("route", "unknown")
+            implied = f"${route['implied_api_cost']:.2f}"
+            amp_cost = route.get("amp_credit_cost", 0)
+            if amp_cost > 0:
+                free_part = route.get("amp_free_cost", 0)
+                paid_part = route.get("amp_paid_cost", 0)
+                if free_part > 0 and paid_part > 0:
+                    amp_str = f"${amp_cost:.2f} (f:${free_part:.2f}+p:${paid_part:.2f})"
+                elif free_part > 0:
+                    amp_str = f"${amp_cost:.2f} (free)"
+                else:
+                    amp_str = f"${amp_cost:.2f}"
+            else:
+                amp_str = "-"
+            ancillary = route.get("amp_ancillary_cost", 0)
+            ancillary_str = f"${ancillary:.2f}" if ancillary > 0 else "-"
+            unpriced = ", ".join(route.get("unpriced_models", [])) or "-"
+            print(f"{route_label:<14}{route.get('provider',''):<24}{route['threads']:>7}  {implied:>12}  {amp_str:>14}  {ancillary_str:>10}  {unpriced}")
+        total_implied = sum(r["implied_api_cost"] for r in routes)
+        total_amp = sum(r.get("amp_credit_cost", 0) for r in routes)
+        total_ancillary = sum(r.get("amp_ancillary_cost", 0) for r in routes)
+        print("-" * 130)
+        print(f"{'TOTAL':<14}{'':<24}{'':>7}  ${total_implied:>10.2f}  ${total_amp:>12.2f}  ${total_ancillary:>8.2f}")
+
     print()
     print("Top threads by token volume:")
     for thread in report["threads"][:10]:
         label = thread["title"] or thread["id"]
         models = ",".join(thread["models"]) if thread["models"] else "-"
         token_total = thread["total_input_tokens"] + thread["output_tokens"]
-        cost = f"  {thread['amp_cost']['display']}" if thread.get("amp_cost") else ""
-        print(f"  {_fmt_int(token_total):>13} tokens  {thread['id']}  {models}  {label[:80]}{cost}")
+        route = thread.get("billing_route") or "?"
+        cost = f"  {thread['amp_cost']['display']}" if thread.get("amp_cost") else f"  [{route}]"
+        print(f"  {_fmt_int(token_total):>13} tokens  {thread['id']}  {models}  {label[:70]}{cost}")
     print()
     for note in report["notes"]:
         print(f"Note: {note}")

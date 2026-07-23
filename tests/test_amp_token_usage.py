@@ -123,7 +123,196 @@ def test_compute_report_includes_cost_estimates():
 
 def test_parse_amp_display_cost():
     parsed = atu.parse_amp_display_cost("$0.72 (free)\nDetails: https://example.test")
-    assert parsed == {"display": "$0.72 (free)", "amount_usd": 0.72, "bucket": "free"}
+    assert parsed == {
+        "display": "$0.72 (free)",
+        "amount_usd": 0.72,
+        "bucket": "free",
+        "billing_route": "amp-credits",
+        "free_amount": 0.72,
+        "paid_amount": 0.0,
+    }
+
+
+def test_parse_amp_display_cost_split():
+    """Split costs like '$9.42 (free) + $1.66' are parsed correctly."""
+    parsed = atu.parse_amp_display_cost("$9.42 (free) + $1.66\nDetails: ...")
+    assert parsed["amount_usd"] == 11.08
+    assert parsed["billing_route"] == "amp-credits"
+    assert parsed["free_amount"] == 9.42
+    assert parsed["paid_amount"] == 1.66
+
+
+def test_parse_amp_display_cost_unavailable():
+    """Subscription-routed threads show 'unavailable' with no Amp credit cost."""
+    parsed = atu.parse_amp_display_cost("Usage information is currently unavailable for this thread.\nDetails: ...")
+    assert parsed["amount_usd"] is None
+    assert parsed["billing_route"] == "subscription"
+
+
+def test_parse_amp_display_cost_paid_only():
+    """Paid-only costs (no '(free)' bucket) route to amp-credits."""
+    parsed = atu.parse_amp_display_cost("$0.11\nDetails: ...")
+    assert parsed["amount_usd"] == 0.11
+    assert parsed["billing_route"] == "amp-credits"
+    assert parsed["free_amount"] == 0.0
+    assert parsed["paid_amount"] == 0.11
+
+
+def test_provider_for_model():
+    assert atu.provider_for_model("gpt-5.6-sol") == "OpenAI"
+    assert atu.provider_for_model("accounts/fireworks/models/glm-5p2") == "Fireworks"
+    assert atu.provider_for_model("grok-4.5") == "xAI"
+    assert atu.provider_for_model("claude-fable-5") == "Anthropic"
+    assert atu.provider_for_model("gpt-5.4-2026-03-05") == "OpenAI"
+    assert atu.provider_for_model("unknown-model") == "Unknown"
+
+
+def test_compute_report_billing_routes():
+    """Report includes billing route summary with subscription-eligibility-based routing."""
+    thread = atu.thread_usage_from_export(_export_payload())  # gpt-5.5 → OpenAI → ChatGPT
+    thread.amp_cost = {
+        "display": "$5.00 (free)",
+        "amount_usd": 5.0,
+        "bucket": "free",
+        "billing_route": "amp-credits",
+        "free_amount": 5.0,
+        "paid_amount": 0.0,
+    }
+    report = atu.compute_report([thread], atu.load_pricing(None))
+    routes = report["billing_routes"]
+    # gpt-5.5 is OpenAI → subscription route (ChatGPT), even though amp-credits was reported
+    sub_routes = [r for r in routes if r["route"] == "subscription"]
+    assert len(sub_routes) == 1
+    assert sub_routes[0]["provider"] == "ChatGPT Plus/Pro"
+    assert sub_routes[0]["threads"] == 1
+    assert sub_routes[0]["implied_api_cost"] > 0
+    # Amp cost is ancillary, not amp_credit_cost
+    assert sub_routes[0]["amp_ancillary_cost"] == 5.0
+    assert sub_routes[0]["amp_credit_cost"] == 0.0
+    assert sub_routes[0]["unpriced_models"] == []
+
+
+def test_billing_routes_track_unpriced_models():
+    """Threads with unpriced models are tracked so amp_credit > implied is explainable."""
+    payload = _export_payload()
+    for msg in payload["messages"]:
+        if isinstance(msg, dict) and "usage" in msg:
+            msg["usage"]["model"] = "some-unpriced-model"
+    thread = atu.thread_usage_from_export(payload)
+    thread.amp_cost = {
+        "display": "$2.00",
+        "amount_usd": 2.0,
+        "bucket": None,
+        "billing_route": "amp-credits",
+        "free_amount": 0.0,
+        "paid_amount": 2.0,
+    }
+    report = atu.compute_report([thread], atu.load_pricing(None))
+    routes = report["billing_routes"]
+    # Unknown provider → no subscription → amp-credits route
+    amp_route = [r for r in routes if r["route"] == "amp-credits"][0]
+    assert amp_route["unpriced_models"] == ["some-unpriced-model"]
+    assert amp_route["implied_api_cost"] == 0.0
+    assert amp_route["amp_credit_cost"] == 2.0
+
+
+def test_amp_credits_route_for_non_openai():
+    """Non-subscription models (e.g. GLM/Fireworks) route to amp-credits."""
+    payload = _export_payload()
+    for msg in payload["messages"]:
+        if isinstance(msg, dict) and "usage" in msg:
+            msg["usage"]["model"] = "accounts/fireworks/models/glm-5p2"
+    thread = atu.thread_usage_from_export(payload)
+    thread.amp_cost = {
+        "display": "$0.50 (free)",
+        "amount_usd": 0.50,
+        "bucket": "free",
+        "billing_route": "amp-credits",
+        "free_amount": 0.50,
+        "paid_amount": 0.0,
+    }
+    report = atu.compute_report([thread], atu.load_pricing(None))
+    routes = report["billing_routes"]
+    # GLM/Fireworks has no linked subscription → amp-credits
+    amp_routes = [r for r in routes if r["route"] == "amp-credits"]
+    assert len(amp_routes) == 1
+    assert amp_routes[0]["threads"] == 1
+    assert amp_routes[0]["implied_api_cost"] > 0
+    assert amp_routes[0]["amp_credit_cost"] == 0.50
+    assert amp_routes[0]["unpriced_models"] == []
+
+
+def test_openai_subscription_route_even_with_amp_cost():
+    """OpenAI threads route to ChatGPT subscription even when Amp shows a dollar cost.
+
+    The Amp dollar amount is ancillary overhead (tool calls, web search),
+    not per-token LLM cost. The LLM tokens went through the linked ChatGPT
+    subscription.
+    """
+    thread = atu.thread_usage_from_export(_export_payload())
+    thread.amp_cost = {
+        "display": "$0.44 (free)",
+        "amount_usd": 0.44,
+        "bucket": "free",
+        "billing_route": "amp-credits",
+        "free_amount": 0.44,
+        "paid_amount": 0.0,
+    }
+    report = atu.compute_report([thread], atu.load_pricing(None))
+    routes = report["billing_routes"]
+    # OpenAI → ChatGPT subscription, regardless of amp threads usage output
+    sub_routes = [r for r in routes if r["route"] == "subscription"]
+    assert len(sub_routes) == 1
+    assert sub_routes[0]["provider"] == "ChatGPT Plus/Pro"
+    assert sub_routes[0]["amp_ancillary_cost"] == 0.44
+    # No amp-credits route
+    amp_routes = [r for r in routes if r["route"] == "amp-credits"]
+    assert len(amp_routes) == 0
+
+
+def test_xai_subscription_route():
+    """xAI models route to X Premium+/SuperGrok subscription."""
+    payload = _export_payload()
+    for msg in payload["messages"]:
+        if isinstance(msg, dict) and "usage" in msg:
+            msg["usage"]["model"] = "grok-4.5"
+    thread = atu.thread_usage_from_export(payload)
+    thread.amp_cost = {
+        "display": "Usage information is currently unavailable for this thread.",
+        "amount_usd": None,
+        "bucket": None,
+        "billing_route": "subscription",
+        "free_amount": None,
+        "paid_amount": None,
+    }
+    report = atu.compute_report([thread], atu.load_pricing(None))
+    routes = report["billing_routes"]
+    sub_routes = [r for r in routes if r["route"] == "subscription"]
+    assert len(sub_routes) == 1
+    assert sub_routes[0]["provider"] == "X Premium+/SuperGrok"
+
+
+def test_mixed_provider_thread_routes_to_amp_credits():
+    """A thread mixing subscription-eligible and non-subscription models routes to amp-credits."""
+    payload = _export_payload()
+    # First event: gpt-5.5 (OpenAI/ChatGPT), second: GLM (Fireworks/no subscription)
+    payload["messages"][1]["usage"]["model"] = "gpt-5.5"
+    payload["messages"][2]["usage"]["model"] = "accounts/fireworks/models/glm-5p2"
+    thread = atu.thread_usage_from_export(payload)
+    thread.amp_cost = {
+        "display": "$3.00 (free)",
+        "amount_usd": 3.0,
+        "bucket": "free",
+        "billing_route": "amp-credits",
+        "free_amount": 3.0,
+        "paid_amount": 0.0,
+    }
+    report = atu.compute_report([thread], atu.load_pricing(None))
+    routes = report["billing_routes"]
+    # Mixed providers → can't attribute to one subscription → amp-credits
+    amp_routes = [r for r in routes if r["route"] == "amp-credits"]
+    assert len(amp_routes) == 1
+    assert amp_routes[0]["amp_credit_cost"] == 3.0
 
 
 def test_load_pricing_accepts_devin_style_keys():
@@ -299,3 +488,34 @@ def test_gpt_5_6_sol_cost_estimated():
     model = report["models"]["gpt-5.6-sol"]
     assert model["estimated_cost"] is not None
     assert model["estimated_cost"]["total"] > 0
+
+
+def test_glm_5p2_pricing_matches_alias():
+    """The Amp model identifier accounts/fireworks/models/glm-5p2 resolves to GLM-5.2 pricing."""
+    pricing = atu.load_pricing(None)
+    price = atu.pricing_for_model("accounts/fireworks/models/glm-5p2", pricing)
+    assert price is not None
+    assert price["input"] == 1.40
+    assert price["output"] == 4.40
+
+
+def test_grok_4_5_pricing():
+    """grok-4.5 has API pricing ($2/$0.50/$6 per 1M)."""
+    pricing = atu.load_pricing(None)
+    assert "grok-4.5" in pricing
+    price = atu.pricing_for_model("grok-4.5", pricing)
+    assert price is not None
+    assert price["input"] == 2.00
+    assert price["cache_read"] == 0.50
+    assert price["output"] == 6.00
+
+
+def test_claude_fable_5_pricing():
+    """claude-fable-5 has API pricing ($10/$1/$50 per 1M)."""
+    pricing = atu.load_pricing(None)
+    assert "claude-fable-5" in pricing
+    price = atu.pricing_for_model("claude-fable-5", pricing)
+    assert price is not None
+    assert price["input"] == 10.00
+    assert price["cache_read"] == 1.00
+    assert price["output"] == 50.00
